@@ -1,0 +1,23 @@
+# workflow configuration where it automatically runs tests for the backend
+name: Backend Pipeline 
+
+# the trigger - when pull request and push is created on those branches only 
+on:
+    push:
+        branches: [main, dev]
+        paths:
+            - 'apps/backend/**' 
+    pull_request:
+        paths:
+            - 'apps/backend/**'
+
+jobs:
+    # this is only for backend check only and provide job access to the code in the repo 
+    # ubuntu latest - Github will uses linux machine - better and minimize build minutes
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            # Note here: check if we use checkout@sha - that was in lecture slides not v4 (could be more secure)
+            - uses: actions/checkout@v4 
+            - name: Placeholder 
+              run: echo "Backend CI logic will implemented (Java 17, Build with Maven)"
