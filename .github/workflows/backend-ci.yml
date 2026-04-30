@@ -14,7 +14,7 @@ on:
 jobs:
     # this is only for backend check only and provide job access to the code in the repo 
     # ubuntu latest - Github will uses linux machine - better and minimize build minutes
-    build:
+    backend-check:
         runs-on: ubuntu-latest
         steps:
             # Note here: check if we use checkout@sha - that was in lecture slides not v4 (could be more secure)
