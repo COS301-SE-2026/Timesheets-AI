@@ -3,6 +3,15 @@ This file tells Maven ( builds the project, manages dependencies and runs tests)
 * who you are (groupId, artifactId, version)
 * how to build 
 * the dependencies, modules and packages used
+
+Lifecyle  of Maven:
+comile -> test -> package -> install 
+
+** For the test ** 
+it must end with:
+- *Test.java
+- *Tests.java
+- *TestCase.java
 -->
 
 <!--
@@ -22,5 +31,22 @@ Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and ma
     <maven.compiler.release>17</maven.compiler.release> <!-- ensure that the code is compiled for Java 17 (for Java 9+)-->
 </properties>
 
+<!-- plugins (referred to a) vs plugins management (referred to b)
+(a) plugins for the backend folder
+these are active plugins used during the build.
+Maven will download and run them (plugins) automatically and execute (use) it in the build 
 
+(b) is the default 
+Maven will not execute the plugins 
+just define the versions and shared configurations used by others. 
+-->
+
+<build>
+    <plugins>
+        <plugin>
+            <artifactId>maven-surefire-plugin</artifactId> <!-- runs the unit tests during build -->
+            <version>3.1.2</version>
+        </plugin>
+    </plugins>
+</build>
 </project>
