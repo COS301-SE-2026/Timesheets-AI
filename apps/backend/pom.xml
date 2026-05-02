@@ -1,0 +1,20 @@
+<!--
+This file tells Maven ( builds the project, manages dependencies and runs tests)
+* who you are (groupId, artifactId, version)
+* how to build 
+* the dependencies, modules and packages used
+-->
+
+<!--
+Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and maybe Security
+-->
+
+<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion> 4.0.0 </modelVersion>
+
+<groupId>com.timesheetai</groupId> <!-- identifier for the project across all other projects -->
+<artifactId>timesheet-ai</artifactId> <!-- name of the project -->
+<version> 0.0.1-SNAPSHOT</version> <!-- the project has not been released (project version) -->
+
+</project>
