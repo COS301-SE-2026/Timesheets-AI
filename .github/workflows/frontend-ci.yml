@@ -1,13 +1,14 @@
 name: Frontend Pipeline 
 
 # the trigger - when pull request and push is created on those branches only 
+# the workflow only runs if the files inside
 on:
     push:
         branches: [main, dev]
         paths:
             - 'apps/frontend/**' 
     pull_request:
-        paths:
+        paths: 
             - 'apps/frontend/**'
 
 jobs:
@@ -18,5 +19,18 @@ jobs:
         steps:
             # Note here: check if we use checkout@sha - that was in lecture slides not v4 (could be more secure)
             - uses: actions/checkout@v4 
-            - name: Placeholder 
-              run: echo "Frontend CI logic will implemented (Java 17, Build with Maven)"
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: '24' #node 20 will be deprecated 
+                # uses yarn NOT npm to store downloaded dependencies, dependency-path: means rebuild cache only if yarn.lock changes
+                cache: 'yarn'
+                cache-dependency-path: apps/frontend/yarn.lock 
+            - name: Install & Test (Yarn)
+                # install all dependencies - Angular and builds node_modules 
+                # frozen--lockfile -> prevent changes to lockfile and this installs all packages 
+                # watch=false and --browser -> runs tests in chrome without opening a visible browser window 
+              run: |
+                cd apps/frontend
+                yarn install --frozen-lockfile 
+                yarn test --watch=false --browsers=ChromeHeadless
