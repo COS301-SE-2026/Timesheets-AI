@@ -27,7 +27,7 @@ jobs:
              distribution: 'temurin'
              # maven (pom.xml) will be used to download dependencies and it will be cache so it will spped up with the builds
              cache: 'maven'
-             cache-dependency-path: app/backend/pom.xml
+             cache-dependency-path: apps/backend/pom.xml
         - name: Build with Maven 
             # maven to used only for backend module
             # '-am' is for required to building dependencies
