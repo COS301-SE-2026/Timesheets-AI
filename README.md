@@ -1,4 +1,4 @@
-<!-- Logo -->
+
 <p align="center">
   <img src="./assets/images/logo-light.png#gh-light-mode-only" width="200" alt="Momently"/>
   <img src="./assets/images/logo-dark.png#gh-dark-mode-only" width="200" alt="Momently"/>
