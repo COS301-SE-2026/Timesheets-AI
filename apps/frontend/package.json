@@ -4,6 +4,6 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "echo \"No tests yet."
+    "test": "echo \"No tests yet.\""
   }
 }
