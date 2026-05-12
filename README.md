@@ -273,7 +273,7 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 |------|---------|---------|
 | Java | 17+ | [adoptium.net](https://adoptium.net) |
 | Node.js | 20 LTS | [nodejs.org](https://nodejs.org) |
-| Angular CLI | 17+ | `npm install -g @angular/cli` |
+| Angular CLI | 17+ | `npx @angular/cli` |
 | Python | 3.11+ | [python.org](https://python.org) |
 | PostgreSQL | 15 | [postgresql.org](https://postgresql.org) |
 | Maven | 3.9+ | [maven.apache.org](https://maven.apache.org) |
