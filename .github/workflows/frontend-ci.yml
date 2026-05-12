@@ -31,6 +31,6 @@ jobs:
                 # frozen--lockfile -> prevent changes to lockfile and this installs all packages 
                 # watch=false and --browser -> runs tests in chrome without opening a visible browser window 
               run: |
-                cd apps/frontend
+                cd apps/frontend/client
                 yarn install --frozen-lockfile 
                 yarn test --watch=false --browsers=ChromeHeadless
