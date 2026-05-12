@@ -25,12 +25,12 @@ jobs:
                 node-version: '24' #node 20 will be deprecated 
                 # uses yarn NOT npm to store downloaded dependencies, dependency-path: means rebuild cache only if yarn.lock changes
                 cache: 'yarn'
-                cache-dependency-path: apps/frontend/yarn.lock 
+                cache-dependency-path: apps/frontend/client/yarn.lock 
             - name: Install & Test (Yarn)
                 # install all dependencies - Angular and builds node_modules 
                 # frozen--lockfile -> prevent changes to lockfile and this installs all packages 
                 # watch=false and --browser -> runs tests in chrome without opening a visible browser window 
               run: |
-                cd apps/frontend
+                cd apps/frontend/client
                 yarn install --frozen-lockfile 
                 yarn test --watch=false --browsers=ChromeHeadless
