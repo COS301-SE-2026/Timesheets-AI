@@ -14,7 +14,7 @@ RUN yarn build
 FROM nginx:alpine
 EXPOSE 8080 
 # 
-COPY --from=build src/dist/timesheets-ai/browser /usr/share/nginx/html
+COPY --from=build src/dist/client/browser /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]
 
 # description: Docker can build images automatically 
