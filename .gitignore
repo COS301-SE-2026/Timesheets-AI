@@ -1,0 +1,19 @@
+.DS_Store
+Thumbs.db
+
+# VS code
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+
+.env
+.env.*
+!.env.example
+*.pem
+
+npm-debug.log*
+yarn-error.log*
+yar-debug.log*
+
+node_modules

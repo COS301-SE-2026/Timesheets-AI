@@ -1,0 +1,36 @@
+# workflow configuration where it automatically runs tests for the backend
+name: Backend Pipeline 
+
+# the trigger - when pull request and push is created on those branches only 
+on:
+    push:
+        branches: [main, dev]
+        paths:
+            - 'apps/backend/**' 
+    pull_request:
+        paths:
+            - 'apps/backend/**'
+
+jobs:
+    # this is only for backend check only and provide job access to the code in the repo 
+    # ubuntu latest - Github will uses linux machine - better and minimize build minutes
+    backend-check:
+        runs-on: ubuntu-latest
+        steps:
+        # Note here: check if we use checkout@sha - that was in lecture slides not v4 (could be more secure)
+        - uses: actions/checkout@v4 
+        - name: Set up JDK 17
+          uses: actions/setup-java@v4
+          with:
+             # these lines tell Github Actions which installer and distribution to install
+             java-version: '17'
+             distribution: 'temurin'
+             # maven (pom.xml) will be used to download dependencies and it will be cache so it will spped up with the builds
+             cache: 'maven'
+             cache-dependency-path: apps/backend/pom.xml
+        - name: Build with Maven 
+            # maven to used only for backend module
+            # '-am' is for required to building dependencies
+            # 'clean' is to ensure that removes complied files
+            # 'verify' is to validate that it complies code and runs all the tests
+          run: mvn -f apps/backend/pom.xml clean verify 
