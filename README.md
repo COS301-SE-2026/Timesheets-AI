@@ -1,10 +1,10 @@
-
+<h1 align="center">Momently</h1>
 <p align="center">
   <img src="./assets/images/logo-light.png#gh-light-mode-only" width="200" alt="Momently"/>
-  <img src="./assets/images/logo-dark.png#gh-dark-mode-only" width="200" alt="Momently"/>
+  <img src="./assets/images/logo-light.png#gh-dark-mode-only" width="200" alt="Momently"/>
 </p>
 
-<h1 align="center">Momently</h1>
+
 <p align="center"><em>Every moment counts.</em></p>
 
 <p align="center">
@@ -18,53 +18,56 @@
 
 <p align="center">
   <img src="./assets/images/team-logo-light.png#gh-light-mode-only" width="100" alt="Cybernauts"/>
-  <img src="./assets/images/team-logo-dark.png#gh-dark-mode-only" width="100" alt="Cybernauts"/>
+  <img src="./assets/images/team-logo-light.png#gh-dark-mode-only" width="100" alt="Cybernauts"/>
+  &nbsp;&nbsp;&nbsp;
+  <img src="./assets/images/client-logo.png" width="100" alt="Momentum Life"/>
 </p>
 
+<p align="center">
+  <img src="./assets/images/Momently-gif.gif" width="160" alt="Momently in action"/>
+</p>
 
+---
 
 ## About Momently
 
-**Momently** is a web-based time-tracking and productivity insights platform built for Momentum Life's IT department. Where existing tools track hours, Momently understands them, surfacing AI-driven insights into where effort goes, flagging anomalies, integrating with Jira and GitHub, and giving managers the visibility they need to lead high-performing teams.
+**Momently** is a web-based time-tracking and productivity insights platform built for Momentum Life's IT department. Where existing tools track hours, Momently understands them - surfacing AI-driven insights into where effort goes, flagging anomalies, integrating with Jira and GitHub, and giving managers the visibility they need to lead high-performing teams.
 
-
-
+---
 
 ## Project Dashboard
 
 ### Build and Quality
 
 <p align="left">
-  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/backend-ci.yml?branch=dev&label=backend%20build&style=for-the-badge&logo=githubactions&logoColor=white&color=2E75B6" alt="Backend Build"/>
-  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/frontend-ci.yml?branch=dev&label=frontend%20build&style=for-the-badge&logo=githubactions&logoColor=white&color=2E75B6" alt="Frontend Build"/>
-  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/ai-ci.yml?branch=dev&label=ai%20service&style=for-the-badge&logo=githubactions&logoColor=white&color=2E75B6" alt="AI Build"/>
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/backend-ci.yml?branch=dev&label=backend%20build&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="Backend Build"/>
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/frontend-ci.yml?branch=dev&label=frontend%20build&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="Frontend Build"/>
 </p>
 
 <p align="left">
-  <img src="https://img.shields.io/coveralls/github/COS301-SE-2026/Timesheets-AI?style=for-the-badge&logo=coveralls&logoColor=white&label=coverage&color=1D6E4E" alt="Coverage"/>
-  <img src="https://img.shields.io/badge/linting-clean-1D6E4E?style=for-the-badge&logo=eslint&logoColor=white" alt="Linting"/>
-  <img src="https://img.shields.io/badge/tests-passing-1D6E4E?style=for-the-badge&logo=jest&logoColor=white" alt="Tests"/>
+  <img src="https://img.shields.io/badge/linting-clean-1A65BF?style=for-the-badge&logo=eslint&logoColor=white" alt="Linting"/>
+  <img src="https://img.shields.io/badge/tests-passing-1A65BF?style=for-the-badge&logo=jest&logoColor=white" alt="Tests"/>
 </p>
 
 ### Project Status
 
 <p align="left">
-  <img src="https://img.shields.io/badge/status-active-success?style=for-the-badge" alt="Status"/>
-  <img src="https://img.shields.io/badge/maintained-yes-brightgreen?style=for-the-badge" alt="Maintained"/>
-  <img src="https://img.shields.io/github/last-commit/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=EF9F27&label=last%20commit" alt="Last Commit"/>
-  <img src="https://img.shields.io/github/contributors/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=EF9F27" alt="Contributors"/>
+  <img src="https://img.shields.io/badge/status-active-E07830?style=for-the-badge" alt="Status"/>
+  <img src="https://img.shields.io/badge/maintained-yes-E07830?style=for-the-badge" alt="Maintained"/>
+  <img src="https://img.shields.io/github/last-commit/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830&label=last%20commit" alt="Last Commit"/>
+  <img src="https://img.shields.io/github/contributors/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830" alt="Contributors"/>
 </p>
 
 ### Issues and Activity
 
 <p align="left">
-  <img src="https://img.shields.io/github/issues/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E24B4A&label=open%20issues" alt="Open Issues"/>
-  <img src="https://img.shields.io/github/issues-closed/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=1D6E4E&label=closed%20issues" alt="Closed Issues"/>
-  <img src="https://img.shields.io/github/stars/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=EF9F27" alt="Stars"/>
+  <img src="https://img.shields.io/github/issues/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830&label=open%20issues" alt="Open Issues"/>
+  <img src="https://img.shields.io/github/issues-closed/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=1A65BF&label=closed%20issues" alt="Closed Issues"/>
+  <img src="https://img.shields.io/github/stars/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830" alt="Stars"/>
 </p>
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Powered%20by-Cybernauts-1F3864?style=for-the-badge" alt="Powered by Cybernauts"/>
+  <img src="https://img.shields.io/badge/Powered%20by-Cybernauts-0F4C91?style=for-the-badge" alt="Powered by Cybernauts"/>
 </p>
 
 
@@ -80,7 +83,7 @@
 | [Architecture](./docs/architecture/) | Domain model and ERD |
 | [Demo 1 video](./docs/) | Video recording for demo one |
 
-
+---
 
 ## <img src="https://img.icons8.com/?size=100&id=hSm5FhlnhnlL&format=png&color=000000" width="22"> Technology Stack
 
@@ -196,32 +199,29 @@ momently/
 └── README.md
 ```
 
----
 
 ## Team Cybernauts
 
 <p align="center">
-  <img src="./assets/images/team-photo.jpg" width="580" alt="Team Cybernauts" style="border-radius:12px"/>
+  <img src="./assets/images/team-photo.jpeg" width="580" alt="Team Cybernauts" style="border-radius:12px"/>
 </p>
 
 <p align="center">
-  <em>Left to right: Kgaugelo &nbsp;·&nbsp; Lerato &nbsp;·&nbsp; Zamokuhle &nbsp;·&nbsp; Cleopatra &nbsp;·&nbsp; Nyashadzashe</em>
+  <em>Left to right: Zamokuhle &nbsp;·&nbsp; Kgaugelo &nbsp;·&nbsp; Cleopatra &nbsp;·&nbsp; Nyashadzashe &nbsp;·&nbsp; Lerato </em>
 </p>
 
 We are a team of five women in Computer Science at the University of Pretoria. We bring technical depth, collaborative energy, and a shared commitment to building software that makes a real difference. Roles are clearly defined but we work across the whole stack - no one gets stuck, no one gets left behind.
 
 
-
 ### <img src="https://img.icons8.com/?size=100&id=vthqLC9ZovO9&format=png&color=000000" width="18"> Members
 
-| &nbsp; | Name | Role | GitHub | LinkedIn |
-|:---:|---|---|:---:|:---:|
-| <img src="./assets/images/headshots/zamokuhle.jpg" width="60" style="border-radius:50%"/> | **Zamokuhle Zwane** | Team Lead · AI/ML Specialist | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/zamokuhle-zwane) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/zamokuhle-zwane) |
-| <img src="./assets/images/headshots/nyashadzashe.jpg" width="60" style="border-radius:50%"/> | **Nyashadzashe Makwabarara** | Backend Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/nyasha-makwabarara) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/nyashadzashe-makwabarara) |
-| <img src="./assets/images/headshots/lerato.jpg" width="60" style="border-radius:50%"/> | **Lerato Sibanda** | Frontend Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/lerato-sibanda) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/lerato-sibanda) |
-| <img src="./assets/images/headshots/kgaugelo.jpg" width="60" style="border-radius:50%"/> | **Kgaugelo Matsena** | DevOps Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/kgaugelo-matsena) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/kgaugelo-matsena) |
-| <img src="./assets/images/headshots/cleopatra.jpg" width="60" style="border-radius:50%"/> | **Cleopatra Kwenda** | Integration and QA Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/cleopatra-kwenda) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/cleopatra-kwenda) |
-
+| Name | Role | GitHub | LinkedIn |
+|---|---|:---:|:---:|
+| **Zamokuhle Zwane** | Team Lead · AI/ML Specialist | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/zamokuhle-zwane) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/zamokuhle-zwane) |
+| **Nyashadzashe Makwabarara** | Backend Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/nyasha-makwabarara) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/nyashadzashe-makwabarara) |
+| **Lerato Sibanda** | Frontend Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/lerato-sibanda) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/lerato-sibanda) |
+| **Kgaugelo Matsena** | DevOps Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/kgaugelo-matsena) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/kgaugelo-matsena) |
+| **Cleopatra Kwenda** | Integration and QA Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/cleopatra-kwenda) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/cleopatra-kwenda) |
 
 
 ### Role Breakdown
@@ -235,20 +235,16 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 | **Cleopatra Kwenda** | Testing strategy, E2E testing with Cypress, QA, documentation, system reliability |
 
 
-
 ## Features
 
 <table>
 <tr>
-  
   <td><strong>Smart time tracking</strong> - start/stop timer or manual entry, linked to projects and tasks</td>
 </tr>
 <tr>
-  
   <td><strong>AI-powered productivity insights</strong> - understand where effort goes, not just how many hours were logged</td>
 </tr>
 <tr>
- 
   <td><strong>Anomaly detection</strong> - flags unusual time patterns before they become a problem</td>
 </tr>
 <tr>
@@ -261,7 +257,6 @@ We are a team of five women in Computer Science at the University of Pretoria. W
   <td><strong>Project-scoped roles</strong> - a user can be a Developer on one project and a Manager on another</td>
 </tr>
 <tr>
-
   <td><strong>Jira and GitHub integration</strong> - compare logged time against external task data</td>
 </tr>
 <tr>
@@ -269,7 +264,6 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 </tr>
 </table>
 
----
 
 ## Getting Started
 
@@ -287,8 +281,6 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 | Docker *(optional)* | 24+ | [docker.com](https://docker.com) |
 
 
-
-
 ## ADD SYSTEM SETUP HERE
 
 
@@ -304,8 +296,6 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 | Git and Code Standards | [`docs/`](./docs/) |
 
 
-
-
 See the full [Git and Code Standards](./docs/) guide for commit conventions, branch rules, and the PR checklist.
 
 
@@ -313,18 +303,24 @@ See the full [Git and Code Standards](./docs/) guide for commit conventions, bra
 
 <p align="left">
   <a href="mailto:cybernauts301@gmail.com">
-    <img src="https://img.shields.io/badge/cybernauts301%40gmail.com-1F3864?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"/>
+    <img src="https://img.shields.io/badge/cybernauts301%40gmail.com-0F4C91?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"/>
   </a>
 </p>
 
 
 <p align="center">
-  <img src="./assets/images/logo-light.png#gh-light-mode-only" width="56" alt="Momently"/>
-  <img src="./assets/images/logo-dark.png#gh-dark-mode-only" width="56" alt="Momently"/>
+  <img src="./assets/images/logo-light.png#gh-light-mode-only" width="120" alt="Momently"/>
+  <img src="./assets/images/logo-light.png#gh-dark-mode-only" width="120" alt="Momently"/>
+</p>
+
+<p align="center">
+  <img src="./assets/images/team-logo-light.png#gh-light-mode-only" width="80" alt="Cybernauts"/>
+  <img src="./assets/images/team-logo-light.png#gh-dark-mode-only" width="80" alt="Cybernauts"/>
+  &nbsp;&nbsp;&nbsp;
+  <img src="./assets/images/client-logo.png" width="80" alt="Momentum Life"/>
 </p>
 
 <p align="center">
   <strong>Momently</strong> &nbsp;·&nbsp; <em>Every moment counts.</em><br/>
   <sub>Team Cybernauts &nbsp;·&nbsp; COS 301 &nbsp;·&nbsp; University of Pretoria &nbsp;·&nbsp; 2026</sub>
 </p>
-
