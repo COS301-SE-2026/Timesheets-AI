@@ -22,6 +22,7 @@ Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and ma
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 <modelVersion> 4.0.0 </modelVersion>
 
+<!-- Spring boot parent is a Maven configuration project used to build Spring Boot apps -->
 <!-- the parent will handle and download the versions we need -->
 <parent>
     <groupId>org.springframework.boot</groupId> <!-- the organisation that created that parent -->
@@ -38,6 +39,16 @@ Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and ma
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- ensure the same character encoding for each file -->
     <java.version>17</java.version> <!-- ensure that the code is compiled for Java 17 (for Java 9+)-->
 </properties>
+
+
+<dependencies>
+    <!-- dependencies are libaries Maven will download the required libraries  -->
+    <!-- ensure that application create REST APIs, handle HTTP requests and communicate with Angular frontend -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId> <!-- the specific library to download -->
+    </dependency>
+</dependencies>
 
 <!-- plugins (referred to a) vs plugins management (referred to b)
 (a) plugins for the backend folder
