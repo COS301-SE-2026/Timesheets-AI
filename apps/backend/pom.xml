@@ -15,12 +15,12 @@ it must end with:
 -->
 
 <!--
-Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and maybe Security
+Needed to be updated: NEED TO ADD VALIDATION LATER WHEN API RULES ARE READY
 -->
 
 <project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<modelVersion> 4.0.0 </modelVersion>
+<modelVersion>4.0.0</modelVersion>
 
 <!-- Spring boot parent is a Maven configuration project used to build Spring Boot apps -->
 <!-- the parent will handle and download the versions we need -->
@@ -33,7 +33,7 @@ Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and ma
 
 <groupId>com.timesheetai</groupId> <!-- identifier for the project across all other projects -->
 <artifactId>timesheet-ai</artifactId> <!-- name of the project -->
-<version> 0.0.1-SNAPSHOT</version> <!-- the project has not been released (project version) -->
+<version>0.0.1-SNAPSHOT</version> <!-- the project has not been released (project version) -->
 
 <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- ensure the same character encoding for each file -->
@@ -104,3 +104,4 @@ just define the versions and shared configurations used by others.
     </plugins>
 </build>
 </project>
+
