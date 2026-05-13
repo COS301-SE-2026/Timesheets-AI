@@ -74,8 +74,6 @@ Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and ma
         <artifactId>spring-security-test</artifactId>
         <scope>test</scope>
     </dependency>
-
-    
 </dependencies>
 
 <!-- plugins (referred to a) vs plugins management (referred to b)
@@ -90,7 +88,16 @@ just define the versions and shared configurations used by others.
 
 <build>
     <plugins>
+
+        <!--make everything into one runnable file -->
         <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+
+        <!-- this is used to run unit tests -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId> <!-- runs the unit tests during build -->
             <version>3.1.2</version>
         </plugin>
