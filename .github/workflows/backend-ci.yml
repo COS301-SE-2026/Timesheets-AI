@@ -23,9 +23,11 @@ jobs:
         - uses: actions/checkout@v4 
 
         # Logic Gate: This is used to determine if the files changed are in Backend
+        # dorny repo is used in this logic gate - this is using SHA instead of versions for security suggested by SonarQube 
+        # The SHA is version 3 (v3.0.3)
         - name: Check for Backend Changes
           id: filter
-          uses: dorny/paths-filter@v3
+          uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590 
           with:
             filters: |
                 backend:
