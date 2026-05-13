@@ -22,6 +22,14 @@ Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and ma
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 <modelVersion> 4.0.0 </modelVersion>
 
+<!-- the parent will handle and download the versions we need -->
+<parent>
+    <groupId>org.springframework.boot</groupId> <!-- the organisation that created that parent -->
+    <artifactId>spring-boot-starter-parent</artifactId> <!--specifies which parent to inherits from -->
+    <version>3.5.0-SNAPSHOT</version> <!-- indicate that we are still in development version -->
+    <relativePath/> <!-- forces not search locally for parent POM but to download it -->
+</parent>
+
 <groupId>com.timesheetai</groupId> <!-- identifier for the project across all other projects -->
 <artifactId>timesheet-ai</artifactId> <!-- name of the project -->
 <version> 0.0.1-SNAPSHOT</version> <!-- the project has not been released (project version) -->
@@ -40,6 +48,7 @@ Maven will download and run them (plugins) automatically and execute (use) it in
 Maven will not execute the plugins 
 just define the versions and shared configurations used by others. 
 -->
+
 
 <build>
     <plugins>
