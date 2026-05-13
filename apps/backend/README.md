@@ -1,20 +1,28 @@
-# Backend Architecture Overview
+# Backend Architecture
 
-## Introduction
+<p align="center">
+  <strong>Momently Backend</strong><br/>
+  Layered Spring Boot architecture for scalable enterprise development
+</p>
 
-The backend follows a **layer-first layered architecture** using **Spring Boot**.  
-This architecture separates responsibilities into logical layers to improve:
+---
 
-- Maintainability
-- Scalability
-- Readability
-- Separation of concerns
-- Testability
-- Clean dependency flow
+## Overview
 
-The backend currently follows a **layer-first structure**, where components are grouped by technical responsibility (controllers, services, repositories, etc.).
+The backend for **Momently** follows a **layer-first layered architecture** using **Java 17+** and **Spring Boot 3.5+**.
 
-As the system grows, the architecture may evolve into a **feature-first, layer-second structure** to improve scalability and modularity for larger development teams.
+The purpose of this architecture is to provide:
+
+- Clear separation of concerns
+- Maintainable backend development
+- Scalable feature growth
+- Cleaner dependency management
+- Easier testing and debugging
+- Enterprise-ready structure
+
+The backend currently uses a **layer-first structure**, where files are grouped according to technical responsibility.
+
+As the project grows, the system may evolve toward a **feature-first, layer-second architecture** for improved modularity and large-team scalability.
 
 ---
 
@@ -32,18 +40,16 @@ Database
 
 ---
 
-# Why This Architecture Is Used
-
-This architecture ensures:
+# Architectural Principles
 
 | Principle | Explanation |
 |---|---|
-| Separation of Concerns | Each layer has a single responsibility |
-| Scalability | Features can grow without tightly coupling components |
-| Maintainability | Easier debugging and future enhancement |
-| Testability | Layers can be independently unit tested |
-| Clean Architecture | Enforces proper dependency direction |
-| Enterprise Readiness | Aligns with industry-standard Spring Boot practices |
+| Separation of Concerns | Each layer handles a specific responsibility |
+| Scalability | Features can expand independently |
+| Maintainability | Easier debugging and long-term enhancement |
+| Testability | Layers can be unit and integration tested independently |
+| Clean Dependency Flow | Prevents tightly coupled components |
+| Enterprise Readiness | Aligns with standard Spring Boot architecture practices |
 
 ---
 
@@ -78,17 +84,17 @@ backend/
 
 | Folder/File | Responsibility | Why It Is Needed |
 |---|---|---|
-| `controller/` | Handles HTTP requests and API endpoints | Separates API communication logic from business logic and acts as the entry point into the backend |
-| `service/` | Contains business logic and workflows | Prevents controllers from becoming overloaded and centralizes system rules and operations |
-| `repository/` | Handles database access and queries | Abstracts database operations and provides clean data persistence using JPA/Hibernate |
-| `entity/` | Represents database tables as Java classes | Enables ORM mapping between Java objects and PostgreSQL tables |
-| `dto/` | Transfers safe data between frontend and backend | Prevents exposing internal entities directly and controls API payload structure |
-| `security/` | Manages authentication and authorization | Implements JWT security, access control and Spring Security configuration |
-| `config/` | Contains application configuration classes | Centralizes framework and application-level configuration such as CORS and web settings |
-| `resources/` | Stores configuration and SQL files | Contains application properties, environment settings and optional database seed data |
-| `test/` | Contains unit and integration tests | Ensures system reliability and supports automated testing |
-| `pom.xml` | Maven dependency and build configuration | Manages project dependencies, plugins and build lifecycle |
-| `docker-compose.yml` | Docker container orchestration | Allows the backend and supporting services to run consistently across environments |
+| `controller/` | Handles REST API requests and responses | Separates HTTP communication from business logic and acts as the API entry point |
+| `service/` | Contains business rules and workflows | Centralises application logic and prevents controllers from becoming overloaded |
+| `repository/` | Handles database interaction | Provides abstraction over PostgreSQL queries using Spring Data JPA |
+| `entity/` | Represents database tables as Java classes | Enables ORM mapping between Java objects and relational tables |
+| `dto/` | Transfers structured data between layers | Prevents exposing internal entities directly through APIs |
+| `security/` | Manages authentication and authorisation | Implements JWT authentication and Spring Security configuration |
+| `config/` | Contains application configuration classes | Centralises framework and environment configuration |
+| `resources/` | Stores application configuration and SQL files | Contains properties, environment settings and optional seed data |
+| `test/` | Contains automated tests | Supports unit testing and integration testing |
+| `pom.xml` | Maven dependency and build configuration | Manages dependencies, plugins and project builds |
+| `docker-compose.yml` | Container orchestration | Enables consistent local development and deployment environments |
 
 ---
 
@@ -97,16 +103,19 @@ backend/
 ## Presentation Layer
 
 Implemented using:
-- Controllers
-- REST APIs
+
+- Spring MVC Controllers
+- RESTful APIs
 
 Responsibilities:
+
 - Receive frontend requests
-- Validate incoming data
+- Validate incoming payloads
 - Return API responses
-- Delegate operations to the service layer
+- Delegate logic to services
 
 Examples:
+
 - `ProjectController`
 - `TaskController`
 - `AuthController`
@@ -116,39 +125,48 @@ Examples:
 ## Business Layer
 
 Implemented using:
+
 - Services
 
 Responsibilities:
+
 - Handle business rules
 - Coordinate workflows
-- Enforce system constraints
-- Implement application logic
+- Enforce permissions
+- Implement application behaviour
 
 Examples:
-- Task assignment rules
+
 - Timesheet approval workflows
-- Role-based restrictions
+- Role-based task restrictions
+- Productivity calculations
 
 Examples:
+
 - `TaskService`
 - `TimesheetService`
+- `AuthService`
 
 ---
 
 ## Persistence Layer
 
 Implemented using:
-- Repositories
-- Entities
-- JPA/Hibernate
+
+- Spring Data JPA
+- Hibernate
+- Repository classes
 
 Responsibilities:
-- Interact with PostgreSQL
+
 - Perform CRUD operations
-- Map Java objects to database tables
+- Execute database queries
+- Map Java entities to PostgreSQL tables
 
 Examples:
+
 - `ProjectRepository`
+- `TaskRepository`
 - `TimeEntryRepository`
 
 ---
@@ -156,12 +174,15 @@ Examples:
 ## Database Layer
 
 Implemented using:
+
 - PostgreSQL
 
 Responsibilities:
+
 - Persist application data
-- Store projects, tasks, users, time entries and analytics information
-- Support transactional consistency and relational integrity
+- Maintain relational integrity
+- Support transactional consistency
+- Store users, projects, tasks, time entries and analytics data
 
 ---
 
@@ -174,12 +195,15 @@ The backend uses:
 - Stateless authentication flow
 
 Security responsibilities include:
+
 - User authentication
 - Token validation
 - Endpoint protection
-- Role-based authorization
+- Role-based authorisation
+- Secure API access
 
 Key files:
+
 - `JwtAuthFilter`
 - `JwtUtil`
 - `SecurityConfig`
@@ -201,15 +225,68 @@ Database
 ```
 
 This prevents:
+
 - Tight coupling
-- Direct database access from controllers
-- Business logic leaking into API layers
+- Business logic inside controllers
+- Direct database access from APIs
+- Poor architectural separation
+
+---
+
+# Technologies Used
+
+## Core Backend Stack
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Java-17+-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java"/>
+  <img src="https://img.shields.io/badge/Spring_Boot-3.5+-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
+  <img src="https://img.shields.io/badge/Spring_Security-JWT-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Spring Security"/>
+</p>
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Hibernate-JPA-59666C?style=for-the-badge&logo=hibernate&logoColor=white" alt="Hibernate"/>
+  <img src="https://img.shields.io/badge/Maven-Build-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white" alt="Maven"/>
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+  <img src="https://img.shields.io/badge/REST-API-0F4C91?style=for-the-badge" alt="REST API"/>
+</p>
+
+---
+
+## Backend Testing Stack
+
+<p align="left">
+  <img src="https://img.shields.io/badge/JUnit_5-Testing-25A162?style=for-the-badge&logo=java&logoColor=white" alt="JUnit"/>
+  <img src="https://img.shields.io/badge/Mockito-Mocking-25A162?style=for-the-badge&logo=java&logoColor=white" alt="Mockito"/>
+  <img src="https://img.shields.io/badge/Spring_Boot_Test-Integration-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot Test"/>
+</p>
+
+---
+
+## Supporting Backend Technologies
+
+| Area | Technology |
+|---|---|
+| Backend Framework | Spring Boot 3.5+ |
+| Language | Java 17+ |
+| Security | Spring Security + JWT |
+| Database | PostgreSQL 15 |
+| ORM | Hibernate + JPA |
+| API Style | RESTful APIs |
+| Containerisation | Docker |
+| Build Tool | Maven |
+| Version Control | Git & GitHub |
+| Testing | JUnit 5, Mockito, Spring Boot Test |
+| Documentation | Swagger / OpenAPI |
+| Monitoring | Spring Boot Actuator |
+| Environment Configuration | Spring Profiles |
+| Integrations | Spring WebClient |
 
 ---
 
 # Future Architectural Evolution
 
-As the system grows, the backend may transition toward:
+As the backend grows, the project may evolve toward:
 
 ## Feature-First, Layer-Second Architecture
 
@@ -217,6 +294,7 @@ Example:
 
 ```text
 modules/
+├── auth/
 ├── projects/
 ├── tasks/
 ├── timesheets/
@@ -224,39 +302,25 @@ modules/
 └── integrations/
 ```
 
-This approach improves:
-- Scalability
-- Team collaboration
+This improves:
+
 - Feature modularity
-- Large-project maintainability
-
----
-
-# Technologies Used
-
-| Area | Technology |
-|---|---|
-| Backend Framework | Spring Boot 3.5+ |
-| Language | Java 17+ |
-| Database | PostgreSQL |
-| Security | Spring Security + JWT |
-| ORM | JPA / Hibernate |
-| API Style | RESTful APIs |
-| Containerization | Docker |
-| Build Tool | Maven |
-| Version Control | Git & GitHub |
+- Team scalability
+- Domain ownership
+- Maintainability for large systems
 
 ---
 
 # Summary
 
-This backend architecture is designed to provide:
+This backend architecture provides:
 
-- Modular system design
-- Enterprise-ready layering
-- Clean separation of responsibilities
-- Maintainable and scalable backend development
-- Secure API communication
-- Reliable database interaction
+- Modular backend development
+- Clean layered separation
+- Enterprise-ready Spring Boot structure
+- Scalable API development
+- Secure authentication and authorisation
+- Reliable PostgreSQL persistence
+- Maintainable long-term system growth
 
-The architecture aligns with standard enterprise Spring Boot layered architecture principles and provides a strong foundation for future system growth.
+The architecture aligns with enterprise Spring Boot layered architecture principles and provides a strong foundation for future system expansion.
