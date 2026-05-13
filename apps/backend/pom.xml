@@ -48,6 +48,18 @@ Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and ma
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-web</artifactId> <!-- the specific library to download -->
     </dependency>
+
+    <!-- help to communicate with PostgreSQL, JDBC is the translator between Java and PostgreSQL -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.postgresql</groupId> <!-- the organisation that created that parent -->
+        <artifactId>postgresql</artifactId> <!-- specifies which libary to download -->
+        <scope>runtime</scope>
+    </dependency>
 </dependencies>
 
 <!-- plugins (referred to a) vs plugins management (referred to b)
