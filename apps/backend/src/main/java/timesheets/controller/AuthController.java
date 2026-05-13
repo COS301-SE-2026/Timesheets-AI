@@ -42,4 +42,32 @@ public class AuthController {
         UserResponse userResponse = authService.register(request);
         return new ResponseEntitystatus(HttpStatus.CREATED).body(userResponse);
     }
+
+    @Operation(
+        summary = "Login a user/employee",
+        description = "Authenticates a user/employee and returns an authentication token.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Login successful",
+                content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials")
+        }
+    )
+    @PostMapping("/login")
+    public ResponseEntity <AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse authResponse = authService.login(request);
+        return ResponseEntity.ok(authResponse);
+    }
+        @Operation(
+            summary = "Logout a user/employee",
+            description = "Logs out the currently authenticated user/employee.",
+            responses = {
+                @ApiResponse(responseCode = "200", description = "Logout successful"),
+                @ApiResponse(responseCode = "401", description = "Missing or invalid JWT")
+            }
+        )
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
+        authService.logout(token);
+        return ResponseEntity.noContent().build();
+    }
 }
