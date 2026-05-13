@@ -15,5 +15,5 @@ Thumbs.db
 npm-debug.log*
 yarn-error.log*
 yar-debug.log*
-
+*:Zone.Identifier
 node_modules
