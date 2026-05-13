@@ -279,26 +279,6 @@ This prevents:
 
 ---
 
-## Supporting Backend Technologies
-
-| Area | Technology |
-|---|---|
-| Backend Framework | Spring Boot 3.5+ |
-| Language | Java 17+ |
-| Security | Spring Security + JWT |
-| Database | PostgreSQL 15 |
-| ORM | Hibernate + JPA |
-| API Style | RESTful APIs |
-| Containerisation | Docker |
-| Build Tool | Maven |
-| Version Control | Git & GitHub |
-| Testing | JUnit 5, Mockito, Spring Boot Test |
-| Documentation | Swagger / OpenAPI |
-| Monitoring | Spring Boot Actuator |
-| Environment Configuration | Spring Profiles |
-| Integrations | Spring WebClient |
-
----
 
 # Future Architectural Evolution
 
