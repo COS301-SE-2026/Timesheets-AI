@@ -28,7 +28,7 @@ Needed to be updated: NEED TO ADD VALIDATION LATER WHEN API RULES ARE READY
     <groupId>org.springframework.boot</groupId> <!-- the organisation that created that parent -->
     <artifactId>spring-boot-starter-parent</artifactId> <!--specifies which parent to inherits from -->
     <version>3.4.0</version> <!-- updated to a stable release depsite 3.5.0 being released >
-    <relativePath/> <!-- forces not search locally for parent POM but to download it -->
+    <relativePath/> <!- forces not search locally for parent POM but to download it -->
 </parent>
 
 <groupId>com.timesheetai</groupId> <!-- identifier for the project across all other projects -->
