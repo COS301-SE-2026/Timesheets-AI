@@ -28,7 +28,7 @@ Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and ma
 
 <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- ensure the same character encoding for each file -->
-    <maven.compiler.release>17</maven.compiler.release> <!-- ensure that the code is compiled for Java 17 (for Java 9+)-->
+    <java.version>17</java.version> <!-- ensure that the code is compiled for Java 17 (for Java 9+)-->
 </properties>
 
 <!-- plugins (referred to a) vs plugins management (referred to b)
