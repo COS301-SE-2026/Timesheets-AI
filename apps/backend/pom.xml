@@ -76,6 +76,7 @@ Needed to be updated: NEED TO ADD VALIDATION LATER WHEN API RULES ARE READY
     </dependency>
 </dependencies>
 
+
 <!-- plugins (referred to a) vs plugins management (referred to b)
 (a) plugins for the backend folder
 these are active plugins used during the build.
@@ -89,11 +90,11 @@ just define the versions and shared configurations used by others.
 <build>
     <plugins>
 
-        <!--make everything into one runnable file -->
-        <plugin>
+        <!--make everything into one runnable file - this will be done after the file structure is complete because I need to add a file to repackage -->
+        <!-- <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
+        </plugin> -->
 
         <!-- this is used to run unit tests -->
         <plugin>
