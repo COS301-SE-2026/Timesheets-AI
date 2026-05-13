@@ -53,32 +53,46 @@ Database
 
 ---
 
+
 # Backend File Structure
 
 ```text
 backend/
 ├── src/
 │   ├── main/
-│   │   ├── java/com/timesheets/
+│   │   ├── java/timesheets/
 │   │   │   ├── TimesheetsApplication.java
 │   │   │   │
 │   │   │   ├── controller/
 │   │   │   ├── service/
 │   │   │   ├── repository/
-│   │   │   ├── entity/
+│   │   │   ├── domain/
 │   │   │   ├── dto/
+│   │   │   │   ├── request/
+│   │   │   │   └── response/
+│   │   │   ├── mapper/
 │   │   │   ├── security/
-│   │   │   └── config/
+│   │   │   ├── config/
+│   │   │   └── enums/
 │   │   │
 │   │   └── resources/
+│   │       ├── application.properties
+│   │       ├── application-dev.properties
+│   │       ├── application-prod.properties
+│   │       └── db/migration/
 │   │
 │   └── test/
+│       └── java/timesheets/
+│           ├── service/
+│           └── controller/
 │
 ├── pom.xml
 └── docker-compose.yml
 ```
 
 ---
+
+
 
 # Folder Responsibilities
 
@@ -87,11 +101,13 @@ backend/
 | `controller/` | Handles REST API requests and responses | Separates HTTP communication from business logic and acts as the API entry point |
 | `service/` | Contains business rules and workflows | Centralises application logic and prevents controllers from becoming overloaded |
 | `repository/` | Handles database interaction | Provides abstraction over PostgreSQL queries using Spring Data JPA |
-| `entity/` | Represents database tables as Java classes | Enables ORM mapping between Java objects and relational tables |
+| `domain/` | Represents database tables as Java classes | Enables ORM mapping between Java objects and relational tables |
 | `dto/` | Transfers structured data between layers | Prevents exposing internal entities directly through APIs |
+| `mapper/` | Converts between entities and DTOs | Centralises mapping logic and prevents boilerplate code in services |
 | `security/` | Manages authentication and authorisation | Implements JWT authentication and Spring Security configuration |
 | `config/` | Contains application configuration classes | Centralises framework and environment configuration |
-| `resources/` | Stores application configuration and SQL files | Contains properties, environment settings and optional seed data |
+| `enums/` | Stores fixed set of constants | Provides type-safe constants for statuses, roles and levels |
+| `resources/` | Stores application configuration and SQL files | Contains properties, environment settings and Flyway migrations |
 | `test/` | Contains automated tests | Supports unit testing and integration testing |
 | `pom.xml` | Maven dependency and build configuration | Manages dependencies, plugins and project builds |
 | `docker-compose.yml` | Container orchestration | Enables consistent local development and deployment environments |
