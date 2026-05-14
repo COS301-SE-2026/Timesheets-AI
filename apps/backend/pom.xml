@@ -1,108 +1,258 @@
-<!--
-This file tells Maven ( builds the project, manages dependencies and runs tests)
-* who you are (groupId, artifactId, version)
-* how to build 
-* the dependencies, modules and packages used
+<!--Redid the POM to have all dependencies in one place, old one was missing some things like the PostgreSQL driver and JJWT and other security dependencies-->
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-Lifecyle  of Maven:
-comile -> test -> package -> install 
-
-** For the test ** 
-it must end with:
-- *Test.java
-- *Tests.java
-- *TestCase.java
--->
-
-<!--
-Needed to be updated: NEED TO ADD VALIDATION LATER WHEN API RULES ARE READY
--->
-
-<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<modelVersion>4.0.0</modelVersion>
-
-<!-- Spring boot parent is a Maven configuration project used to build Spring Boot apps -->
-<!-- the parent will handle and download the versions we need -->
-<parent>
-    <groupId>org.springframework.boot</groupId> <!-- the organisation that created that parent -->
-    <artifactId>spring-boot-starter-parent</artifactId> <!--specifies which parent to inherits from -->
-    <version>3.4.0</version> <!-- updated to a stable release depsite 3.5.0 being released >
-    <relativePath/> <!- forces not search locally for parent POM but to download it -->
-</parent>
-
-<groupId>com.timesheetai</groupId> <!-- identifier for the project across all other projects -->
-<artifactId>timesheet-ai</artifactId> <!-- name of the project -->
-<version>0.0.1-SNAPSHOT</version> <!-- the project has not been released (project version) -->
-
-<properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- ensure the same character encoding for each file -->
-    <java.version>17</java.version> <!-- ensure that the code is compiled for Java 17 (for Java 9+)-->
-</properties>
-
-
-<dependencies>
-    <!-- dependencies are libaries Maven will download the required libraries  -->
-    <!-- ensure that application create REST APIs, handle HTTP requests and communicate with Angular frontend -->
-    <dependency>
+    <!--
+        Spring Boot's parent POM is doing a lot of heavy lifting here.
+        It manages dependency versions so we don't have to specify them
+        everywhere , if two libraries need compatible versions of the same
+        transitive dependency, the parent sorts that out automatically.
+        We're pinning to 3.4.0 (stable) rather than chasing 3.5.x for now.
+    -->
+    <parent>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId> <!-- the specific library to download -->
-    </dependency>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.0</version>
+        <relativePath/> <!-- don't look for this locally , always pull from Maven Central -->
+    </parent>
 
-    <!-- help to communicate with PostgreSQL, JDBC is the translator between Java and PostgreSQL -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
+    <!-- section about who we are -->
+    <groupId>com.timesheetai</groupId>
+    <artifactId>timesheet-ai</artifactId>
+    <version>0.0.1-SNAPSHOT</version> <!-- SNAPSHOT = still in development, not a release build -->
+    <name>Momently Backend</name>
+    <description>Momently - Every moment counts</description>
 
-    <dependency>
-        <groupId>org.postgresql</groupId> <!-- the organisation that created that parent -->
-        <artifactId>postgresql</artifactId> <!-- specifies which libary to download -->
-        <scope>runtime</scope>
-    </dependency>
+    <properties>
+        <java.version>17</java.version> <!-- LTS, required by Spring Boot 3.x -->
 
-    <!-- this library has junit 5, mockito and used for unit tests and integration tests -->
-    <!-- Validation: helps test endpoints -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-    </dependency>
+        <!--
+            Centralising versions here so we only update in one place.
+            jjwt 0.12.x is a major API change from 0.11.x , the builder
+            pattern changed completely, so please don't downgrade without checking.
+        -->
+        <jjwt.version>0.12.5</jjwt.version>
+        <springdoc.version>2.5.0</springdoc.version>
+    </properties>
 
-    <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-</dependencies>
+    <dependencies>
 
+        <!-- ── Web Layer ─────────────────────────────────────────────────── -->
 
-<!-- plugins (referred to a) vs plugins management (referred to b)
-(a) plugins for the backend folder
-these are active plugins used during the build.
-Maven will download and run them (plugins) automatically and execute (use) it in the build 
-
-(b) is the default 
-Maven will not execute the plugins 
-just define the versions and shared configurations used by others. 
--->
-
-<build>
-    <plugins>
-
-        <!--make everything into one runnable file - this will be done after the file structure is complete because I need to add a file to repackage -->
-        <!-- <plugin>
+        <!--
+            Brings in the embedded Tomcat server, Spring MVC, Jackson (JSON),
+            and everything needed to expose REST endpoints. This is the core
+            of what makes our @RestController classes actually work.
+        -->
+        <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin> -->
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
-        <!-- this is used to run unit tests -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId> <!-- runs the unit tests during build -->
-            <version>3.1.2</version>
-        </plugin>
-    </plugins>
-</build>
+        <!-- ── Database Layer ────────────────────────────────────────────── -->
+
+        <!--
+            JPA + Hibernate ORM. Lets us map Java classes to PostgreSQL tables
+            using annotations instead of writing raw SQL for every query.
+            Repositories extend JpaRepository and get CRUD for free.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!--
+            The actual PostgreSQL JDBC driver. Runtime-only because we only
+            need it when the app is running , not during compilation.
+            Version is managed by the Spring Boot parent BOM.
+        -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!--
+            Flyway handles database migrations , every schema change lives in
+            a versioned SQL file under db/migration/. This means the DB schema
+            is version-controlled alongside the code, and the team always has
+            the same schema without manually running scripts.
+            V1 = initial schema, V2 = seed data, V3 = next change, etc.
+        -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <!--
+            Required alongside flyway-core when targeting PostgreSQL specifically.
+            Flyway split driver support into separate modules in newer versions
+            , without this, Flyway won't recognise the PostgreSQL datasource.
+        -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+
+        <!-- ── Security + Auth ───────────────────────────────────────────── -->
+
+        <!--
+            Spring Security gives us the filter chain, authentication manager,
+            password encoding, and method-level security out of the box.
+            We configure it to be stateless (no sessions) in SecurityConfig.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!--
+            JWT library split into three parts intentionally:
+            - jjwt-api:     the interfaces we code against (compile time)
+            - jjwt-impl:    the actual implementation (runtime only , we never
+                            call impl classes directly, only through the API)
+            - jjwt-jackson: plugs Jackson in for JSON parsing inside tokens
+
+            Note: 0.12.x uses Jwts.parser().verifyWith(key).build() ,
+            the old parseClaimsJws() is gone. Don't mix versions.
+        -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jjwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ── Validation ────────────────────────────────────────────────── -->
+
+        <!--
+            Jakarta Bean Validation , powers @NotBlank, @Email, @Size etc.
+            on our request DTOs. Without this, @Valid in controllers does nothing.
+            Errors are caught by GlobalExceptionHandler and returned as 400s.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- ── API Documentation ─────────────────────────────────────────── -->
+
+        <!--
+            Auto-generates Swagger UI from our @RestController classes.
+            Available at /swagger-ui.html once the app is running.
+            Useful for the team to test endpoints without needing Postman,
+            and doubles as living documentation for the Angular frontend.
+        -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
+        <!-- ── Developer Experience ──────────────────────────────────────── -->
+
+        <!--
+            Lombok cuts boilerplate , @Data, @Builder, @NoArgsConstructor etc.
+            generate getters/setters/constructors at compile time via annotation
+            processing. marked optional so it doesn't leak into dependents.
+            The build plugin below excludes it from the final packaged jar.
+        -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--
+            DevTools enables hot reload during local development , change a class,
+            the app restarts in ~1s instead of the full 10s cold start.
+            Automatically disabled in production (detects it's not a local run).
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- ── Testing ───────────────────────────────────────────────────── -->
+
+        <!--
+            Bundles JUnit 5, Mockito, AssertJ, and Spring Test together.
+            The test scope means none of this ends up in the production jar.
+            Spring Boot Test also gives us @SpringBootTest for full context
+            integration tests and MockMvc for testing controllers in isolation.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!--
+            Adds @WithMockUser and SecurityMockMvcRequestPostProcessors so we
+            can write tests that simulate authenticated requests without spinning
+            up a real JWT flow. Essential for testing secured endpoints.
+        -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <!--
+                Repackages the compiled output into a single executable fat jar
+                that contains all dependencies. This is what we deploy ,
+                java -jar momently-backend.jar and it runs, no app server needed.
+
+                Lombok is excluded from the fat jar because it's only needed
+                at compile time (annotation processing). Including it would
+                just add unnecessary size to the deployment artifact.
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!--
+                Surefire is the plugin that actually runs our JUnit tests during
+                mvn verify. Pinning to 3.2.5 for stability , the version bundled
+                with older Spring Boot parents had issues with JUnit 5 discovery.
+                Any test class ending in *Test.java or *Tests.java gets picked up.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+
+        </plugins>
+    </build>
+
 </project>
-
