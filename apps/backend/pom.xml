@@ -1,112 +1,108 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
+<!--
+This file tells Maven ( builds the project, manages dependencies and runs tests)
+* who you are (groupId, artifactId, version)
+* how to build 
+* the dependencies, modules and packages used
+
+Lifecyle  of Maven:
+comile -> test -> package -> install 
+
+** For the test ** 
+it must end with:
+- *Test.java
+- *Tests.java
+- *TestCase.java
+-->
+
+<!--
+Needed to be updated: NEED TO ADD VALIDATION LATER WHEN API RULES ARE READY
+-->
+
+<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
+
+<!-- Spring boot parent is a Maven configuration project used to build Spring Boot apps -->
+<!-- the parent will handle and download the versions we need -->
+<parent>
+    <groupId>org.springframework.boot</groupId> <!-- the organisation that created that parent -->
+    <artifactId>spring-boot-starter-parent</artifactId> <!--specifies which parent to inherits from -->
+    <version>3.4.0</version> <!-- updated to a stable release depsite 3.5.0 being released >
+    <relativePath/> <!- forces not search locally for parent POM but to download it -->
+</parent>
+
+<groupId>com.timesheetai</groupId> <!-- identifier for the project across all other projects -->
+<artifactId>timesheet-ai</artifactId> <!-- name of the project -->
+<version>0.0.1-SNAPSHOT</version> <!-- the project has not been released (project version) -->
+
+<properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- ensure the same character encoding for each file -->
+    <java.version>17</java.version> <!-- ensure that the code is compiled for Java 17 (for Java 9+)-->
+</properties>
+
+
+<dependencies>
+    <!-- dependencies are libaries Maven will download the required libraries  -->
+    <!-- ensure that application create REST APIs, handle HTTP requests and communicate with Angular frontend -->
+    <dependency>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.0</version>
-        <relativePath/>
-    </parent>
-    <groupId>com.timesheetai</groupId>
-    <artifactId>timesheet-ai</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>Momently Backend</name>
-    <description>Momently - Every moment counts</description>
-    <properties>
-        <java.version>17</java.version>
-        <jjwt.version>0.12.5</jjwt.version>
-        <springdoc.version>2.5.0</springdoc.version>
-    </properties>
-    <dependencies>
-        <dependency>
+        <artifactId>spring-boot-starter-web</artifactId> <!-- the specific library to download -->
+    </dependency>
+
+    <!-- help to communicate with PostgreSQL, JDBC is the translator between Java and PostgreSQL -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.postgresql</groupId> <!-- the organisation that created that parent -->
+        <artifactId>postgresql</artifactId> <!-- specifies which libary to download -->
+        <scope>runtime</scope>
+    </dependency>
+
+    <!-- this library has junit 5, mockito and used for unit tests and integration tests -->
+    <!-- Validation: helps test endpoints -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+
+
+<!-- plugins (referred to a) vs plugins management (referred to b)
+(a) plugins for the backend folder
+these are active plugins used during the build.
+Maven will download and run them (plugins) automatically and execute (use) it in the build 
+
+(b) is the default 
+Maven will not execute the plugins 
+just define the versions and shared configurations used by others. 
+-->
+
+<build>
+    <plugins>
+
+        <!--make everything into one runnable file - this will be done after the file structure is complete because I need to add a file to repackage -->
+        <!-- <plugin>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-database-postgresql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>${jjwt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>${jjwt.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <version>${jjwt.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin> -->
+
+        <!-- this is used to run unit tests -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId> <!-- runs the unit tests during build -->
+            <version>3.1.2</version>
+        </plugin>
+    </plugins>
+</build>
 </project>
 
