@@ -15,21 +15,67 @@ it must end with:
 -->
 
 <!--
-Needed to be updated: it does not yet support for Spring Boot, PostgreSQL and maybe Security
+Needed to be updated: NEED TO ADD VALIDATION LATER WHEN API RULES ARE READY
 -->
 
 <project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<modelVersion> 4.0.0 </modelVersion>
+<modelVersion>4.0.0</modelVersion>
+
+<!-- Spring boot parent is a Maven configuration project used to build Spring Boot apps -->
+<!-- the parent will handle and download the versions we need -->
+<parent>
+    <groupId>org.springframework.boot</groupId> <!-- the organisation that created that parent -->
+    <artifactId>spring-boot-starter-parent</artifactId> <!--specifies which parent to inherits from -->
+    <version>3.4.0</version> <!-- updated to a stable release depsite 3.5.0 being released >
+    <relativePath/> <!- forces not search locally for parent POM but to download it -->
+</parent>
 
 <groupId>com.timesheetai</groupId> <!-- identifier for the project across all other projects -->
 <artifactId>timesheet-ai</artifactId> <!-- name of the project -->
-<version> 0.0.1-SNAPSHOT</version> <!-- the project has not been released (project version) -->
+<version>0.0.1-SNAPSHOT</version> <!-- the project has not been released (project version) -->
 
 <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- ensure the same character encoding for each file -->
-    <maven.compiler.release>17</maven.compiler.release> <!-- ensure that the code is compiled for Java 17 (for Java 9+)-->
+    <java.version>17</java.version> <!-- ensure that the code is compiled for Java 17 (for Java 9+)-->
 </properties>
+
+
+<dependencies>
+    <!-- dependencies are libaries Maven will download the required libraries  -->
+    <!-- ensure that application create REST APIs, handle HTTP requests and communicate with Angular frontend -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId> <!-- the specific library to download -->
+    </dependency>
+
+    <!-- help to communicate with PostgreSQL, JDBC is the translator between Java and PostgreSQL -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.postgresql</groupId> <!-- the organisation that created that parent -->
+        <artifactId>postgresql</artifactId> <!-- specifies which libary to download -->
+        <scope>runtime</scope>
+    </dependency>
+
+    <!-- this library has junit 5, mockito and used for unit tests and integration tests -->
+    <!-- Validation: helps test endpoints -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+
 
 <!-- plugins (referred to a) vs plugins management (referred to b)
 (a) plugins for the backend folder
@@ -43,10 +89,20 @@ just define the versions and shared configurations used by others.
 
 <build>
     <plugins>
+
+        <!--make everything into one runnable file - this will be done after the file structure is complete because I need to add a file to repackage -->
+        <!-- <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin> -->
+
+        <!-- this is used to run unit tests -->
         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId> <!-- runs the unit tests during build -->
             <version>3.1.2</version>
         </plugin>
     </plugins>
 </build>
 </project>
+

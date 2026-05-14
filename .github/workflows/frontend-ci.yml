@@ -5,11 +5,12 @@ name: Frontend Pipeline
 on:
     push:
         branches: [main, dev]
-        paths:
-            - 'apps/frontend/**' 
+        # paths:
+        #     - 'apps/frontend/**' 
     pull_request:
-        paths: 
-            - 'apps/frontend/**'
+        branches: [main, dev]
+        # paths: 
+        #     - 'apps/frontend/**'
 
 jobs:
     # this is only for frontend check only and provide job access to the code in the repo 
@@ -19,17 +20,29 @@ jobs:
         steps:
             # Note here: check if we use checkout@sha - that was in lecture slides not v4 (could be more secure)
             - uses: actions/checkout@v4 
+            
+            # Logic Gate: This is used to determine if the files changed are in Backend
+            # dorny repo is used in this logic gate - this is using SHA instead of versions for security suggested by SonarQube 
+            # The SHA is version 3 (v3.0.3)
+            - name: Check for Frontend Changes
+              id: filter
+              uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590
+              with:
+                filters: |
+                    frontend:
+                        - 'apps/frontend/**'
+                        - '.github/workflows/frontend-ci.yml'
+            # Only runs if frontend filter is true 
             - name: Set up Node.js
+              if: steps.filter.outputs.frontend == 'true'
               uses: actions/setup-node@v4
               with:
-                node-version: '24' #node 20 will be deprecated 
+                node-version: '22' # current node.js version - recommeded 
                 # uses yarn NOT npm to store downloaded dependencies, dependency-path: means rebuild cache only if yarn.lock changes
                 cache: 'yarn'
                 cache-dependency-path: apps/frontend/client/yarn.lock 
             - name: Install & Test (Yarn)
-                # install all dependencies - Angular and builds node_modules 
-                # frozen--lockfile -> prevent changes to lockfile and this installs all packages 
-                # watch=false and --browser -> runs tests in chrome without opening a visible browser window 
+              if: steps.filter.outputs.frontend == 'true'
               run: |
                 cd apps/frontend/client
                 yarn install --frozen-lockfile 
