@@ -1,41 +1,46 @@
-server:
-  port: 8080
-
 spring:
   application:
-    name: timesheet-ai
-  
+    name: momently-backend
+
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/momently}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/momently_dev}
     username: ${DB_USERNAME:momently}
-    password: ${DB_PASSWORD:password}
+    password: ${DB_PASSWORD:momently_dev_password}
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    show-sql: false
     hibernate:
       ddl-auto: validate
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  
+        format_sql: true
+    open-in-view: false
+
   flyway:
     enabled: true
     locations: classpath:db/migration
+    baseline-on-migrate: true
+
+server:
+  port: ${SERVER_PORT:8080}
 
 app:
   jwt:
-  //we will use environment variables for the secret and expiration, but provide defaults for development.
-    secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
-    expirationMs: ${JWT_EXPIRATION_MS:86400000}
+    secret: ${JWT_SECRET:this-is-a-dev-only-secret-replace-in-production-min-32-chars}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
 
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    try-it-out-enabled: true
+    operations-sorter: method
   api-docs:
     path: /v3/api-docs
 
 logging:
   level:
-    root: INFO
     timesheets: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
