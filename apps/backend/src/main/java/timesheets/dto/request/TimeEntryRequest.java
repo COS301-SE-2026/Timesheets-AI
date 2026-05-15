@@ -21,5 +21,70 @@ public class TimeEntryRequest {
     private Integer durationMinutes;
     private String entryType;
     private String description;
+
+    //the getters and setters are below
+    public Long getProjectId() { 
+        return projectId; 
+    }
+
+    public void setProjectId(Long projectId) { 
+        this.projectId = projectId; 
+    }
+    
+
+    public Long getTaskId() { 
+        return taskId; 
+    }
+
+    public void setTaskId(Long taskId) { 
+        this.taskId = taskId; 
+    }
+    
+
+    public LocalDateTime getStartTime() { 
+        return startTime; 
+    }
+
+    public void setStartTime(LocalDateTime startTime) { 
+        this.startTime = startTime; 
+    }
+    
+
+    public LocalDateTime getEndTime() { 
+        return endTime; 
+    }
+
+    public void setEndTime(LocalDateTime endTime) { 
+        this.endTime = endTime; 
+    }
+    
+
+    public Integer getDurationMinutes() { 
+        return durationMinutes; 
+    }
+
+    public void setDurationMinutes(Integer durationMinutes) { 
+        this.durationMinutes = durationMinutes; 
+    }
+    
+
+
+    public String getEntryType() { 
+        return entryType; 
+    }
+
+    public void setEntryType(String entryType) { 
+        this.entryType = entryType; 
+    }
+    
+
+    
+    public String getDescription() { 
+        return description; 
+    }
+
+    public void setDescription(String description) { 
+        this.description = description; 
+    }
     
 }
