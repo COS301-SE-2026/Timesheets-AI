@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
-//just to customize the title and description on how the document looks
+//just to customize the title and description on how the document looks.
 @Configuration
 public class SwaggerConfig {
 
