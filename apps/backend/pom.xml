@@ -107,7 +107,7 @@ it must end with:
             <scope>test</scope>
         </dependency>
 
-        <!-- SpringDoc for documentation -->
+        <!-- SpringDoc for documentation  -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
