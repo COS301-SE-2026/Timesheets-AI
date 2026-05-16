@@ -98,19 +98,19 @@ backend/
 
 | Folder/File | Responsibility | Why It Is Needed |
 |---|---|---|
-| `controller/` | Handles REST API requests and responses | Separates HTTP communication from business logic and acts as the API entry point |
-| `service/` | Contains business rules and workflows | Centralises application logic and prevents controllers from becoming overloaded |
-| `repository/` | Handles database interaction | Provides abstraction over PostgreSQL queries using Spring Data JPA |
-| `domain/` | Represents database tables as Java classes | Enables ORM mapping between Java objects and relational tables |
-| `dto/` | Transfers structured data between layers | Prevents exposing internal entities directly through APIs |
-| `mapper/` | Converts between entities and DTOs | Centralises mapping logic and prevents boilerplate code in services |
-| `security/` | Manages authentication and authorisation | Implements JWT authentication and Spring Security configuration |
-| `config/` | Contains application configuration classes | Centralises framework and environment configuration |
-| `enums/` | Stores fixed set of constants | Provides type-safe constants for statuses, roles and levels |
-| `resources/` | Stores application configuration and SQL files | Contains properties, environment settings and Flyway migrations |
-| `test/` | Contains automated tests | Supports unit testing and integration testing |
-| `pom.xml` | Maven dependency and build configuration | Manages dependencies, plugins and project builds |
-| `docker-compose.yml` | Container orchestration | Enables consistent local development and deployment environments |
+| `controller/` | Handles REST API requests and responses | Acts as the entry point of the API and keeps HTTP handling separate from business logic |
+| `service/` | Contains business rules and application workflows | Keeps core application logic organised and prevents controllers from becoming overloaded |
+| `repository/` | Handles database interaction | Provides a clean abstraction for querying and updating PostgreSQL using Spring Data JPA |
+| `domain/` | Represents database tables as Java classes | Allows Hibernate/JPA to map relational database tables to Java objects |
+| `dto/` | Transfers structured data between layers | Helps control what data is exposed through the API and avoids exposing internal entities directly |
+| `mapper/` | Converts between entities and DTOs | Centralises translation between different object types and reduces repetitive conversion code |
+| `security/` | Manages security, authentication and authorisation | Handles JWT authentication, access control and Spring Security configuration |
+| `config/` | Contains application configuration classes | Keeps framework setup and environment configuration organised in one place |
+| `enums/` | Stores fixed sets of constants | Provides type-safe values for statuses, roles, priorities and other predefined options |
+| `resources/` | Stores application configuration and SQL files | Contains properties files, environment settings and Flyway database migrations |
+| `test/` | Contains automated tests | Supports unit and integration testing to improve reliability and maintainability |
+| `pom.xml` | Maven dependency and build configuration | Manages project dependencies, plugins and build settings |
+| `docker-compose.yml` | Container orchestration configuration | Creates consistent local development and deployment environments using Docker containers |
 
 ---
 
