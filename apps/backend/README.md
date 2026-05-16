@@ -90,11 +90,11 @@ backend/
 # Architectural Flow
 
 ```text
-Presentation Layer (Controllers) <---> [DTOs / Request Payloads]
+Presentation Layer (Controllers) 
         ↓
-Business Layer (Services) <---> [Mappers translate DTO to Entity]
+Business Layer (Services)
         ↓
-Persistence Layer (Repositories) <---> [Domain Entities]
+Persistence Layer (Repositories) 
         ↓
 Database (PostgreSQL)
 ```
