@@ -9,7 +9,7 @@
 
 ## Overview
 
-The backend for **Momently** follows a **layer-first layered architecture** using **Java 17+** and **Spring Boot 3.5+**.
+The backend for **Momently** follows a **layer-first, layered architecture** using **Java 17+** and **Spring Boot 3.5+**.
 
 The purpose of this architecture is to provide:
 
@@ -90,13 +90,13 @@ backend/
 # Architectural Flow
 
 ```text
-Presentation Layer
+Presentation Layer (Controllers) <---> [DTOs / Request Payloads]
         ↓
-Business Layer
+Business Layer (Services) <---> [Mappers translate DTO to Entity]
         ↓
-Persistence Layer
+Persistence Layer (Repositories) <---> [Domain Entities]
         ↓
-Database
+Database (PostgreSQL)
 ```
 
 ---
