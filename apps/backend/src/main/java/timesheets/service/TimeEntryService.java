@@ -92,7 +92,41 @@ public class TimeEntryService {
         return timeEntryRepository.save(entry);
     }
 
+    
+    
 
+    @Transactional
+    public void deleteTimeEntry(Long id, Long workspaceMemberId) {
+
+        TimeEntry entry = getTimeEntryById(id);
+        
+        if (entry.getStatus() != TimeEntryStatus.DRAFT) {
+            throw new RuntimeException("Cannot delete time entry that is already " + entry.getStatus().name());
+        }
+        
+        if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
+            throw new TimeEntryAccessDeniedException("You can only delete your own time entries");
+        }
+        
+        timeEntryRepository.deleteById(id);
+    }
     
-    
+    //I am doing these things to maintain data integrity
+    @Transactional
+    public TimeEntry submitTimeEntry(Long id, Long workspaceMemberId) {
+        TimeEntry entry = getTimeEntryById(id);
+        
+        if (entry.getStatus() != TimeEntryStatus.DRAFT) {
+            throw new RuntimeException("Time entry has already been submitted");
+        }
+        
+        if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
+            throw new RuntimeException("You can only submit your own time entries");
+        }
+        
+        entry.setStatus(TimeEntryStatus.SUBMITTED);
+        entry.setSubmittedAt(LocalDateTime.now());
+        
+        return timeEntryRepository.save(entry);
+    }
 }

@@ -1,4 +1,4 @@
-package com.timesheets;
+package timesheets;
 
 public class TimesheetsApplication {
     
