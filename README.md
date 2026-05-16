@@ -429,6 +429,55 @@ Use this if you are on a low-spec machine, on Windows without WSL, or want to ge
 3. Wait approximately 3 minutes for the environment to set up automatically
 4. Run Option A or B inside the Codespaces terminal
 
+## Command Reference
+
+<p> Run all commands from the repo root. Full reference in [`SETUP.md`](./SETUP.md).</p>
+
+### Full Stack
+| Command | Description |
+|---------|-------------|
+| `yarn dev` | Run everything in parallel |
+| `yarn build` | Build all services |
+| `yarn test` | Test all services |
+| `yarn lint` | Lint all services |
+| `yarn coverage` | Coverage for all services |
+
+### Backend
+| Command | Description |
+|---------|-------------|
+| `yarn backend:dev` | Run with dev profile (hot reload) |
+| `yarn backend:build` | Package JAR (skip tests) |
+| `yarn backend:test` | Run tests |
+| `yarn backend:coverage` | Tests with coverage report |
+| `yarn backend:lint` | Checkstyle check |
+
+### Frontend
+| Command | Description |
+|---------|-------------|
+| `yarn frontend:dev` | Dev server |
+| `yarn frontend:build` | Production build |
+| `yarn frontend:test` | Run tests |
+| `yarn frontend:lint` | Lint |
+| `yarn frontend:coverage` | Coverage report |
+| `yarn frontend:e2e` | Cypress E2E tests |
+
+### AI Service
+| Command | Description |
+|---------|-------------|
+| `yarn ai:dev` | Uvicorn on port 8000 |
+| `yarn ai:test` | Pytest |
+| `yarn ai:coverage` | Pytest with HTML coverage report |
+| `yarn ai:lint` | Ruff linter |
+
+### Docker
+| Command | Description |
+|---------|-------------|
+| `yarn docker:up` | Start all containers |
+| `yarn docker:down` | Stop containers |
+| `yarn docker:build` | Build images |
+| `yarn docker:logs` | Follow logs |
+| `yarn docker:reset` | Wipe volumes and restart |
+
 ### Verify everything is running
 
 | Service | URL | Expected |
