@@ -61,5 +61,38 @@ public class TimeEntryService {
         return timeEntryRepository.findById(id).orElseThrow(() -> new TimeEntryNotFoundException(id));
     }
     //this will be if only one specific entry is needed
+
+    @Transactional
+    public TimeEntry updateTimeEntry(Long id, Long workspaceMemberId, TimeEntryRequest request) {
+        TimeEntry entry = getTimeEntryById(id);
+        
+        //we only want draft entries to be editable, to maintain data integrity, we don't want users to go and edit entries that have already been added
+        if (entry.getStatus() != TimeEntryStatus.DRAFT) {
+            throw new RuntimeException("Cannot edit time entry that is already " + entry.getStatus().name());
+        }
+        
+        //we only want the owner of time entries to be able to edit them
+        if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
+            throw new RuntimeException("You can only edit your own time entries");
+        }
+        
+        entry.setProjectId(request.getProjectId());
+        entry.setTaskId(request.getTaskId());
+
+        entry.setStartTime(request.getStartTime());
+        entry.setEndTime(request.getEndTime());
+
+        entry.setDurationMinutes(request.getDurationMinutes());
+        entry.setEntryType(request.getEntryType());
+        entry.setDescription(request.getDescription());
+        entry.setEditedAt(LocalDateTime.now());
+
+        entry.setEditedByWorkspaceMemberId(workspaceMemberId);
+        
+        return timeEntryRepository.save(entry);
+    }
+
+
+    
     
 }
