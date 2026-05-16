@@ -26,33 +26,6 @@ As the project grows, the system may evolve toward a **feature-first, layer-seco
 
 ---
 
-# Architectural Flow
-
-```text
-Presentation Layer
-        ↓
-Business Layer
-        ↓
-Persistence Layer
-        ↓
-Database
-```
-
----
-
-# Architectural Principles
-
-| Principle | Explanation |
-|---|---|
-| Separation of Concerns | Each layer handles a specific responsibility |
-| Scalability | Features can expand independently |
-| Maintainability | Easier debugging and long-term enhancement |
-| Testability | Layers can be unit and integration tested independently |
-| Clean Dependency Flow | Prevents tightly coupled components |
-| Enterprise Readiness | Aligns with standard Spring Boot architecture practices |
-
----
-
 
 # Backend File Structure
 
@@ -111,6 +84,33 @@ backend/
 | `test/` | Contains automated tests | Supports unit and integration testing to improve reliability and maintainability |
 | `pom.xml` | Maven dependency and build configuration | Manages project dependencies, plugins and build settings |
 | `docker-compose.yml` | Container orchestration configuration | Creates consistent local development and deployment environments using Docker containers |
+
+---
+
+# Architectural Flow
+
+```text
+Presentation Layer
+        ↓
+Business Layer
+        ↓
+Persistence Layer
+        ↓
+Database
+```
+
+---
+
+# Architectural Principles
+
+| Principle | Explanation |
+|---|---|
+| Separation of Concerns | Each layer handles a specific responsibility |
+| Scalability | Features can expand independently |
+| Maintainability | Easier debugging and long-term enhancement |
+| Testability | Layers can be unit and integration tested independently |
+| Clean Dependency Flow | Prevents tightly coupled components |
+| Enterprise Readiness | Aligns with standard Spring Boot architecture practices |
 
 ---
 
