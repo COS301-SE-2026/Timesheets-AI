@@ -87,4 +87,200 @@ public class TimeEntry {
         updatedAt = LocalDateTime.now();
     }
     
+    
+    //the getters and setters 
+    public Long getId() { 
+        return id; 
+    }
+
+    public void setId(Long id) { 
+        this.id = id; 
+    }
+    
+
+    public Long getWorkspaceMemberId() { 
+        return workspaceMemberId; 
+    }
+
+    public void setWorkspaceMemberId(Long workspaceMemberId) {
+        this.workspaceMemberId = workspaceMemberId; 
+    }
+    
+
+    public Long getProjectId() { 
+        return projectId; 
+    }
+
+    public void setProjectId(Long projectId) { 
+        this.projectId = projectId; 
+    }
+    
+
+
+    public Long getTaskId() { 
+        return taskId; 
+    }
+
+    public void setTaskId(Long taskId) { 
+        this.taskId = taskId; 
+    }
+    
+
+
+    public LocalDateTime getStartTime() { 
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) { 
+        this.startTime = startTime; 
+    }
+    
+
+
+    public LocalDateTime getEndTime() { 
+        return endTime; 
+    }
+
+    public void setEndTime(LocalDateTime endTime) { 
+        this.endTime = endTime; 
+    }
+    
+
+
+    public Integer getDurationMinutes() { 
+        return durationMinutes; 
+    }
+
+    public void setDurationMinutes(Integer durationMinutes) { 
+        this.durationMinutes = durationMinutes; 
+    }
+    
+
+
+    public String getEntryType() { 
+        return entryType; 
+    }
+
+    public void setEntryType(String entryType) { 
+        this.entryType = entryType; 
+    }
+    
+
+
+    public String getDescription() { 
+        return description; 
+    }
+
+    public void setDescription(String description) { 
+        this.description = description; 
+    }
+    
+
+
+    public Boolean getIsLocked() { 
+        return isLocked; 
+    }
+
+    public void setIsLocked(Boolean isLocked) { 
+        this.isLocked = isLocked; 
+    }
+    
+
+
+    public LocalDateTime getLockedAt() { 
+        return lockedAt; 
+    }
+
+    public void setLockedAt(LocalDateTime lockedAt) { 
+        this.lockedAt = lockedAt; 
+    }
+    
+
+
+    public LocalDateTime getEditedAt() { 
+        return editedAt; 
+    }
+
+    public void setEditedAt(LocalDateTime editedAt) { 
+        this.editedAt = editedAt; 
+    }
+    
+
+
+    public Long getEditedByWorkspaceMemberId() { 
+        return editedByWorkspaceMemberId; 
+    }
+
+    public void setEditedByWorkspaceMemberId(Long editedByWorkspaceMemberId) { 
+        this.editedByWorkspaceMemberId = editedByWorkspaceMemberId; 
+    }
+    
+
+
+    public TimeEntryStatus getStatus() { 
+        return status; 
+    }
+
+    public void setStatus(TimeEntryStatus status) { 
+        this.status = status; 
+    }
+    
+
+
+    public LocalDateTime getSubmittedAt() { 
+        return submittedAt; 
+    }
+
+    public void setSubmittedAt(LocalDateTime submittedAt) { 
+        this.submittedAt = submittedAt; 
+    }
+    
+
+
+    public Long getReviewedByWorkspaceMemberId() { 
+        return reviewedByWorkspaceMemberId; 
+    }
+
+    public void setReviewedByWorkspaceMemberId(Long reviewedByWorkspaceMemberId) { 
+        this.reviewedByWorkspaceMemberId = reviewedByWorkspaceMemberId; 
+    }
+    
+
+
+    public LocalDateTime getReviewedAt() { 
+        return reviewedAt; 
+    }
+    public void setReviewedAt(LocalDateTime reviewedAt) { 
+        this.reviewedAt = reviewedAt; 
+    }
+    
+
+
+    public String getRejectionReason() { 
+        return rejectionReason; 
+    }
+
+    public void setRejectionReason(String rejectionReason) { 
+        this.rejectionReason = rejectionReason; 
+    }
+    
+
+
+    public LocalDateTime getCreatedAt() { 
+        return createdAt; 
+    }
+
+    public LocalDateTime getUpdatedAt() { 
+        return updatedAt; 
+    }
+
+
+
+    public void setCreatedAt(LocalDateTime createdAt) { 
+        this.createdAt = createdAt; 
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) { 
+        this.updatedAt = updatedAt; 
+    }
 }
