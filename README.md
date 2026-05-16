@@ -174,32 +174,92 @@
 
 ## Repository Structure
 
+
 ```
-momently/
+Timesheest-AI/
 │
 ├── apps/
-│   ├── backend/           # Java 17 and Spring Boot
-│   └── frontend/          # Angular 17 and Material UI
+│   ├── backend/                  # Java 17 and Spring Boot 3.5
+│   │   ├── src/
+│   │   │   ├── main/
+│   │   │   │   ├── java/timesheets/
+│   │   │   │   │   ├── TimesheetsApplication.java
+│   │   │   │   │   ├── controller/
+│   │   │   │   │   ├── service/
+│   │   │   │   │   │   └── impl/
+│   │   │   │   │   ├── repository/
+│   │   │   │   │   ├── domain/
+│   │   │   │   │   ├── dto/
+│   │   │   │   │   │   ├── request/
+│   │   │   │   │   │   └── response/
+│   │   │   │   │   ├── mapper/
+│   │   │   │   │   ├── security/
+│   │   │   │   │   │   ├── filter/
+│   │   │   │   │   │   └── jwt/
+│   │   │   │   │   ├── config/
+│   │   │   │   │   ├── exception/
+│   │   │   │   │   ├── enums/
+│   │   │   │   │   └── util/
+│   │   │   │   └── resources/
+│   │   │   │       ├── application.yml
+│   │   │   │       └── db/
+│   │   │   │           └── migration/
+│   │   │   │               ├── V1__init_schema.sql
+│   │   │   │               └── V2__seed_data.sql
+│   │   │   └── test/
+│   │   │       └── java/timesheets/
+│   │   ├── pom.xml
+│   │   ├── Dockerfile
+│   │   └── checkstyle.xml
+│   │
+│   └── frontend/                 # Angular 17 and Material UI
+│       ├── client/
+│       │   ├── src/
+│       │   │   ├── app/
+│       │   │   ├── assets/
+│       │   │   └── environments/
+│       │   ├── angular.json
+│       │   ├── package.json
+│       │   └── yarn.lock
+│       └── Dockerfile
 │
-├── ai-service/            # Python and FastAPI
+├── ai-service/                   # Python 3.11 and FastAPI
+│   ├── main.py
+│   ├── requirements.txt
+│   ├── pyproject.toml
+│   ├── Dockerfile
+│   └── tests/
+│       └── test_health.py
 │
-├── infrastructure/        # Docker Compose and AWS config
+├── infrastructure/               
 │
-├── docs/                  # All documentation
+├── docs/                         # All documentation
 │   ├── srs/
 │   ├── wireframes/
 │   ├── architecture/
 │   └── meeting-minutes/
 │
 ├── assets/
-│   └── images/            # Logos and team photos
+│   └── images/           n       # Logos and team photos
+│
+├── .devcontainer/
+│   ├── devcontainer.json
+│   └── setup.sh
+│
+├── .github/
+│   └── workflows/
+│       ├── backend-ci.yml
+│       └── frontend-ci.yml
 │
 ├── docker-compose.yml
+├── package.json
+├── turbo.json
+├── yarn.lock
 ├── .env.example
 ├── .gitignore
+├── SETUP.md
 └── README.md
 ```
-
 
 ## Team Cybernauts
 
