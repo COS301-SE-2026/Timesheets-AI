@@ -19,7 +19,7 @@ services:
     environment:
       POSTGRES_DB: momently_dev
       POSTGRES_USER: momently
-      POSTGRES_PASSWORD: momently_dev_password
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-momently_dev_password}
     ports:
       - "5432:5432"
     volumes:

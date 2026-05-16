@@ -1,8 +1,10 @@
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-asyncio_mode = "auto"
+from fastapi.testclient import TestClient
+from main import app
 
-[tool.ruff]
-line-length = 100
-select = ["E", "F", "I", "UP"]
-ignore = ["E501"]
+client = TestClient(app)
+
+
+def test_health():
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
