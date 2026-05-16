@@ -74,6 +74,16 @@ Needed to be updated: NEED TO ADD VALIDATION LATER WHEN API RULES ARE READY
         <artifactId>spring-security-test</artifactId>
         <scope>test</scope>
     </dependency>
+    
+    <!-- Flyway: runs SQL migration files on startup -->
+    <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-database-postgresql</artifactId>
+    </dependency>
 </dependencies>
 
 
