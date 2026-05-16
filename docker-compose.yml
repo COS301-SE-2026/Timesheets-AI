@@ -1,5 +1,4 @@
 version: "3.9"
-
 # Momently, local development stack
 # Starts: PostgreSQL, Redis, Backend (Spring Boot), Frontend (Angular), AI Service (FastAPI)
 #
@@ -11,15 +10,14 @@ version: "3.9"
 #   docker compose down -v            # stop and wipe all data
 
 services:
-  #Database
   postgres:
     image: postgres:15-alpine
     container_name: momently-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: momently_dev
-      POSTGRES_USER: momently
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-momently_dev_password}
+      POSTGRES_DB: ${DB_NAME:-momently_dev}
+      POSTGRES_USER: ${DB_USERNAME:-momently}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -30,7 +28,6 @@ services:
       timeout: 5s
       retries: 5
 
-  #Cache
   redis:
     image: redis:7-alpine
     container_name: momently-redis
@@ -43,7 +40,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend
   backend:
     build:
       context: ./apps/backend
@@ -57,27 +53,25 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      DB_URL: jdbc:postgresql://postgres:5432/momently_dev
-      DB_USERNAME: momently
-      DB_PASSWORD: momently_dev_password
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-momently_dev}
+      DB_USERNAME: ${DB_USERNAME:-momently}
+      DB_PASSWORD: ${DB_PASSWORD}
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      JWT_SECRET: dev-only-secret-replace-in-production-min-32-chars-abc123
-      JWT_EXPIRATION_MS: 86400000
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
       SERVER_PORT: 8080
     ports:
       - "8080:8080"
     volumes:
       - ./apps/backend:/workspace:ro
     healthcheck:
-      test:
-        ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 60s
 
-  #Frontend
   frontend:
     build:
       context: ./apps/frontend
@@ -95,7 +89,6 @@ services:
       - ./apps/frontend/client:/app/client
       - /app/client/node_modules
 
-  #AI Service
   ai-service:
     build:
       context: ./ai-service
@@ -106,7 +99,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DB_URL: postgresql://momently:momently_dev_password@postgres:5432/momently_dev
+      DB_URL: postgresql://${DB_USERNAME:-momently}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-momently_dev}
       BACKEND_URL: http://backend:8080
       ENVIRONMENT: development
     ports:
