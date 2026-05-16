@@ -60,4 +60,4 @@ htmlcov/
 docker-compose.override.yml
 
 #  Turbo 
-.turbo/
+.turbo/apps/backend/src/main/resources/db/migration/V2__seed_Data.sql
