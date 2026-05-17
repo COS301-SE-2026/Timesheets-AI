@@ -17,4 +17,49 @@ These are defined on :root so they work everywhere in the app
     --color-primary-tint: #BFD4F4;
     --color-primary-surface: #E6F1FB;
 
+    /* Secondary colours (supporting actions and highlights) */
+    --color-secondary: #E07830;
+    --color-secondary-surface: #FEF0E6;
+
+    /* Semantic colours (used for meaning like success, warning, error, info) */
+    --color-semantic-purple: #EDE0FF;
+    --color-semantic-green: #D7F5D3;
+    --color-semantic-amber: #F0D49A;
+    --color-semantic-red: #EFB3B3;
+
+    /* Text colours for semantic backgrounds (keeps text readable) */
+    --color-semantic-purple-text: #3B0F8C;
+    --color-semantic-green-text: #0E3D0B;
+    --color-semantic-amber-text: #4A2D00;
+    --color-semantic-red-text: #5C0F0F;
+
+    /* Neutral colours (used for backgrounds and layout structure) */
+    --color-white: #FFFFFF;
+    --color-gray-light: #F5F5F5;
+    --color-dark-surface: #1E1E2E;
+    --color-dark-bg: #12121E;
+
+    /* Text colours (used for readability and hierarchy) */
+    --color-text-primary: #0F4C91;
+    --color-text-body: #1A1A2E;
+    --color-text-muted: #6B7A99;
+    --color-text-inverse: #FFFFFF;
+    --color-text-link: #1A65BF;
+
+    /* Status colours (used for chips like tasks and workflow states) */
+    --color-status-in-progress-bg: #E6F1FB;
+    --color-status-in-progress-dot: #0F4C91;
+    --color-status-in-progress-text: #0F4C91;
+
+    --color-status-approved-bg: #D7F5D3;
+    --color-status-approved-dot: #0E3D0B;
+    --color-status-approved-text: #0E3D0B;
+
+    --color-status-pending-bg: #F0D49A;
+    --color-status-pending-dot: #4A2D00;
+    --color-status-pending-text: #4A2D00;
+
+    --color-status-overdue-bg: #EFB3B3;
+    --color-status-overdue-dot: #5C0F0F;
+    --color-status-overdue-text: #5C0F0F;
 }
