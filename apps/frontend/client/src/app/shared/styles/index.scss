@@ -1,0 +1,11 @@
+/* ============================================================
+MOMENTLY DESIGN SYSTEM — INDEX
+Single import point for all design tokens
+============================================================ */
+
+@forward './colors';
+@forward './typography';
+
+/*just keep adding those we completed and tested!*/
+/*@forward './spacing';
+@forward './radius';*/
