@@ -1,0 +1,20 @@
+/* =============================================================================
+_colors.scss
+Momently Design System (Colour Tokens)
+All colours come from Brand Style Kit
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+CSS Variables (global usage in components)
+These are defined on :root so they work everywhere in the app
+   ----------------------------------------------------------------------------- */
+
+:root {
+
+    /* Primary colours (main brand colours used for key actions and UI) */
+    --color-primary: #0F4C91;
+    --color-primary-hover: #1A65BF;
+    --color-primary-tint: #BFD4F4;
+    --color-primary-surface: #E6F1FB;
+
+}
