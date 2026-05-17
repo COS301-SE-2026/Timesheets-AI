@@ -1,11 +1,9 @@
-//I'm writing comments so that it makes it easier when you are reviewing code and you want to make sense of what is happening, don't think I will add to all the files, instead I will just refer you to this file maybe??
-
 package timesheets.domain;
 
 import timesheets.enums.TimeEntryStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-
+import java.util.UUID;
 
 //so this is the JPA entity- you can kinda think of it like the data template
 // it's basically showing us what the time entry looks like in the database
@@ -17,17 +15,17 @@ import java.time.LocalDateTime;
 public class TimeEntry {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     
     @Column(name = "workspace_member_id", nullable = false)
-    private Long workspaceMemberId;
+    private UUID workspaceMemberId;
     
     @Column(name = "project_id", nullable = false)
-    private Long projectId;
+    private UUID projectId;
     
     @Column(name = "task_id")
-    private Long taskId;
+    private UUID taskId;
     
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
@@ -53,7 +51,7 @@ public class TimeEntry {
     private LocalDateTime editedAt;
     
     @Column(name = "edited_by_workspace_member_id")
-    private Long editedByWorkspaceMemberId;
+    private UUID editedByWorkspaceMemberId;
     
     @Enumerated(EnumType.STRING)
     private TimeEntryStatus status = TimeEntryStatus.DRAFT;
@@ -62,7 +60,7 @@ public class TimeEntry {
     private LocalDateTime submittedAt;
     
     @Column(name = "reviewed_by_workspace_member_id")
-    private Long reviewedByWorkspaceMemberId;
+    private UUID reviewedByWorkspaceMemberId;
     
     @Column(name = "reviewed_at")
     private LocalDateTime reviewedAt;
@@ -89,39 +87,39 @@ public class TimeEntry {
     
     
     //the getters and setters 
-    public Long getId() { 
+    public UUID getId() { 
         return id; 
     }
 
-    public void setId(Long id) { 
+    public void setId(UUID id) { 
         this.id = id; 
     }
     
 
-    public Long getWorkspaceMemberId() { 
+    public UUID getWorkspaceMemberId() { 
         return workspaceMemberId; 
     }
 
-    public void setWorkspaceMemberId(Long workspaceMemberId) {
+    public void setWorkspaceMemberId(UUID workspaceMemberId) {
         this.workspaceMemberId = workspaceMemberId; 
     }
     
 
-    public Long getProjectId() { 
+    public UUID getProjectId() { 
         return projectId; 
     }
 
-    public void setProjectId(Long projectId) { 
+    public void setProjectId(UUID projectId) { 
         this.projectId = projectId; 
     }
     
 
 
-    public Long getTaskId() { 
+    public UUID getTaskId() { 
         return taskId; 
     }
 
-    public void setTaskId(Long taskId) { 
+    public void setTaskId(UUID taskId) { 
         this.taskId = taskId; 
     }
     
@@ -207,11 +205,11 @@ public class TimeEntry {
     
 
 
-    public Long getEditedByWorkspaceMemberId() { 
+    public UUID getEditedByWorkspaceMemberId() { 
         return editedByWorkspaceMemberId; 
     }
 
-    public void setEditedByWorkspaceMemberId(Long editedByWorkspaceMemberId) { 
+    public void setEditedByWorkspaceMemberId(UUID editedByWorkspaceMemberId) { 
         this.editedByWorkspaceMemberId = editedByWorkspaceMemberId; 
     }
     
@@ -237,11 +235,11 @@ public class TimeEntry {
     
 
 
-    public Long getReviewedByWorkspaceMemberId() { 
+    public UUID getReviewedByWorkspaceMemberId() { 
         return reviewedByWorkspaceMemberId; 
     }
 
-    public void setReviewedByWorkspaceMemberId(Long reviewedByWorkspaceMemberId) { 
+    public void setReviewedByWorkspaceMemberId(UUID reviewedByWorkspaceMemberId) { 
         this.reviewedByWorkspaceMemberId = reviewedByWorkspaceMemberId; 
     }
     

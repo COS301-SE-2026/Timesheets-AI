@@ -12,6 +12,7 @@ import exception.TimeEntryNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 //this is the file that has all my business logic, the control will call the service and the service will call repo
 
@@ -25,7 +26,7 @@ public class TimeEntryService {
     }
     
     @Transactional //this will help that is anything fails then the database rollback happens automatically
-    public TimeEntry createTimeEntry(Long workspaceMemberId, TimeEntryRequest request) {
+    public TimeEntry createTimeEntry(UUID workspaceMemberId, TimeEntryRequest request) {
 
         TimeEntry entry = new TimeEntry();
 
@@ -45,25 +46,25 @@ public class TimeEntryService {
         return timeEntryRepository.save(entry);
     }
     
-    public List<TimeEntry> getMyTimeEntries(Long workspaceMemberId) {
+    public List<TimeEntry> getMyTimeEntries(UUID workspaceMemberId) {
         return timeEntryRepository.findByWorkspaceMemberIdOrderByStartTimeDesc(workspaceMemberId);
     } 
     //all the entries should be gotten by this, also this will not need transactional because it's only reading data
     
 
-    public List<TimeEntry> getMyTimeEntriesByStatus(Long workspaceMemberId, TimeEntryStatus status) {
+    public List<TimeEntry> getMyTimeEntriesByStatus(UUID workspaceMemberId, TimeEntryStatus status) {
         return timeEntryRepository.findByWorkspaceMemberIdAndStatus(workspaceMemberId, status);
     }
     //if we only want draft entries or only approved entries
     
 
-    public TimeEntry getTimeEntryById(Long id) {
+    public TimeEntry getTimeEntryById(UUID id) {
         return timeEntryRepository.findById(id).orElseThrow(() -> new TimeEntryNotFoundException(id));
     }
     //this will be if only one specific entry is needed
 
     @Transactional
-    public TimeEntry updateTimeEntry(Long id, Long workspaceMemberId, TimeEntryRequest request) {
+    public TimeEntry updateTimeEntry(UUID id, UUID workspaceMemberId, TimeEntryRequest request) {
         TimeEntry entry = getTimeEntryById(id);
         
         //we only want draft entries to be editable, to maintain data integrity, we don't want users to go and edit entries that have already been added
@@ -96,7 +97,7 @@ public class TimeEntryService {
     
 
     @Transactional
-    public void deleteTimeEntry(Long id, Long workspaceMemberId) {
+    public void deleteTimeEntry(UUID id, UUID workspaceMemberId) {
 
         TimeEntry entry = getTimeEntryById(id);
         
@@ -113,7 +114,7 @@ public class TimeEntryService {
     
     //I am doing these things to maintain data integrity
     @Transactional
-    public TimeEntry submitTimeEntry(Long id, Long workspaceMemberId) {
+    public TimeEntry submitTimeEntry(UUID id, UUID workspaceMemberId) {
         TimeEntry entry = getTimeEntryById(id);
         
         if (entry.getStatus() != TimeEntryStatus.DRAFT) {

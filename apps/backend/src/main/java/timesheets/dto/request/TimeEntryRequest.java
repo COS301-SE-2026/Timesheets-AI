@@ -3,17 +3,18 @@ package timesheets.dto.request;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
+import java.util.UUID;  // ← ADD THIS IMPORT
 
 //DTO - data transfer object
 
 // this file will essentially be what the front-end sends to create the time-entry
-// defines the JSON that frontend must send and then SProngBoot will automatically map the JSON to the object field getters and setters
+// defines the JSON that frontend must send and then SpringBoot will automatically map the JSON to the object field getters and setters
 public class TimeEntryRequest {
 
     @NotNull(message = "Project ID is required")
-    private Long projectId;
+    private UUID projectId;  // ← Long → UUID
 
-    private Long taskId;
+    private UUID taskId;     // ← Long → UUID
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
@@ -23,20 +24,20 @@ public class TimeEntryRequest {
     private String description;
 
     //the getters and setters are below
-    public Long getProjectId() { 
+    public UUID getProjectId() { 
         return projectId; 
     }
 
-    public void setProjectId(Long projectId) { 
+    public void setProjectId(UUID projectId) { 
         this.projectId = projectId; 
     }
     
 
-    public Long getTaskId() { 
+    public UUID getTaskId() { 
         return taskId; 
     }
 
-    public void setTaskId(Long taskId) { 
+    public void setTaskId(UUID taskId) { 
         this.taskId = taskId; 
     }
     

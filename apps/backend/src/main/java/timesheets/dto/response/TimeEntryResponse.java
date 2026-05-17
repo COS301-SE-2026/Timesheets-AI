@@ -3,15 +3,16 @@ package timesheets.dto.response;
 import timesheets.domain.TimeEntry;
 import timesheets.enums.TimeEntryStatus;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
-//this is what the backend will send back to the frontend, when a a time entry is created or retrieved
+//this is what the backend will send back to the frontend, when a time entry is created or retrieved
 
 public class TimeEntryResponse {
     
-    private Long id;
-    private Long workspaceMemberId;
-    private Long projectId;
-    private Long taskId;
+    private UUID id;
+    private UUID workspaceMemberId;
+    private UUID projectId;
+    private UUID taskId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Integer durationMinutes;
@@ -46,41 +47,41 @@ public class TimeEntryResponse {
     }
     
     //my getters and setters below
-    public Long getId() { 
+    public UUID getId() { 
         return id; 
     }
 
-    public void setId(Long id) { 
+    public void setId(UUID id) { 
         this.id = id; 
     }
     
 
 
-    public Long getWorkspaceMemberId() { 
+    public UUID getWorkspaceMemberId() { 
         return workspaceMemberId; 
     }
 
-    public void setWorkspaceMemberId(Long workspaceMemberId) { 
+    public void setWorkspaceMemberId(UUID workspaceMemberId) { 
         this.workspaceMemberId = workspaceMemberId; 
     }
     
 
 
-    public Long getProjectId() { 
+    public UUID getProjectId() { 
         return projectId; 
     }
 
-    public void setProjectId(Long projectId) { 
+    public void setProjectId(UUID projectId) { 
         this.projectId = projectId; 
     }
     
 
 
-    public Long getTaskId() { 
+    public UUID getTaskId() { 
         return taskId; 
     }
 
-    public void setTaskId(Long taskId) { 
+    public void setTaskId(UUID taskId) { 
         this.taskId = taskId; 
     }
     
