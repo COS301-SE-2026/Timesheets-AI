@@ -17,3 +17,47 @@ yarn-error.log*
 yar-debug.log*
 *:Zone.Identifier
 node_modules
+
+#  Secrets 
+.env
+.env.local
+.env.*.local
+
+#  Java / Maven 
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+#  Node / Angular 
+node_modules/
+dist/
+.angular/
+.cache/
+
+#  Python 
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+htmlcov/
+.pytest_cache/
+*.egg-info/
+
+#  IDE 
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+
+#  Docker 
+docker-compose.override.yml
+
+#  Turbo 
+.turbo/apps/backend/src/main/resources/db/migration/V2__seed_Data.sql

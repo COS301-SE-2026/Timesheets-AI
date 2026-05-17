@@ -1,0 +1,44 @@
+{
+  "name": "momently",
+  "private": true,
+  "workspaces": [
+    "apps/frontend",
+    "ai-service"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "coverage": "turbo run coverage",
+    "clean": "turbo run clean",
+    "backend:dev": "export $(grep -v '^#' .env | xargs) && cd apps/backend && mvn spring-boot:run -Dspring-boot.run.profiles=dev",
+    "backend:build": "cd apps/backend && mvn clean package -DskipTests",
+    "backend:test": "cd apps/backend && mvn test",
+    "backend:coverage": "cd apps/backend && mvn verify -P coverage",
+    "backend:lint": "cd apps/backend && mvn checkstyle:check",
+    "frontend:dev": "cd apps/frontend && yarn start",
+    "frontend:build": "cd apps/frontend && yarn build",
+    "frontend:test": "cd apps/frontend && yarn test",
+    "frontend:lint": "cd apps/frontend && yarn lint",
+    "frontend:coverage": "cd apps/frontend && yarn test:coverage",
+    "frontend:e2e": "cd apps/frontend && yarn e2e",
+    "ai:dev": "cd ai-service && uvicorn main:app --reload --port 8000",
+    "ai:test": "cd ai-service && pytest",
+    "ai:coverage": "cd ai-service && pytest --cov=. --cov-report=html",
+    "ai:lint": "cd ai-service && ruff check .",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose build",
+    "docker:logs": "docker compose logs -f",
+    "docker:reset": "docker compose down -v && docker compose up -d"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "yarn": ">=1.22.0"
+  },
+  "packageManager": "yarn@1.22.22"
+}
