@@ -63,3 +63,54 @@ These are defined on :root so they work everywhere in the app
     --color-status-overdue-dot: #5C0F0F;
     --color-status-overdue-text: #5C0F0F;
 }
+
+/* -----------------------------------------------------------------------------
+    SCSS Variables (used inside SCSS logic and mixins only)
+    These match the CSS variables above so both systems stay consistent
+   ----------------------------------------------------------------------------- */
+
+/* Primary colours */
+$color-primary: #0F4C91;
+$color-primary-hover: #1A65BF;
+$color-primary-tint: #BFD4F4;
+$color-primary-surface: #E6F1FB;
+
+/* Secondary colours */
+$color-secondary: #E07830;
+$color-secondary-surface: #FEF0E6;
+
+/* Semantic colours */
+$color-semantic-purple: #EDE0FF;
+$color-semantic-green: #D7F5D3;
+$color-semantic-amber: #F0D49A;
+$color-semantic-red: #EFB3B3;
+
+/* Neutral colours */
+$color-white: #FFFFFF;
+$color-gray-light: #F5F5F5;
+$color-dark-surface: #1E1E2E;
+$color-dark-bg: #12121E;
+
+/* Text colours */
+$color-text-primary: #0F4C91;
+$color-text-body: #1A1A2E;
+$color-text-muted: #6B7A99;
+$color-text-inverse: #FFFFFF;
+$color-text-link: #1A65BF;
+
+/* Status colours (task and workflow states) */
+$color-status-in-progress-bg: #E6F1FB;
+$color-status-in-progress-dot: #0F4C91;
+$color-status-in-progress-text: #0F4C91;
+
+$color-status-approved-bg: #D7F5D3;
+$color-status-approved-dot: #0E3D0B;
+$color-status-approved-text: #0E3D0B;
+
+$color-status-pending-bg: #F0D49A;
+$color-status-pending-dot: #4A2D00;
+$color-status-pending-text: #4A2D00;
+
+$color-status-overdue-bg: #EFB3B3;
+$color-status-overdue-dot: #5C0F0F;
+$color-status-overdue-text: #5C0F0F;
