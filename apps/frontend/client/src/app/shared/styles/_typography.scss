@@ -95,3 +95,126 @@ $letter-spacing-wider: 0.08em;
 
 /*these can always be adjusted*/
 
+
+/* -----------------------------------------------------------------------------
+4. Base Typography Styles
+-----------------------------------------------------------------------------
+These define default styling for the whole application.
+----------------------------------------------------------------------------- */
+
+html {
+font-size: 16px;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+text-rendering: optimizeLegibility;
+}
+
+body {
+font-family: var(--font-body);
+font-size: var(--font-size-body);
+font-weight: var(--font-weight-regular);
+line-height: var(--line-height-normal);
+color: var(--color-text-body);
+}
+
+/* -----------------------------------------------------------------------------
+5. Typography Utility Classes
+-----------------------------------------------------------------------------
+These are used directly in HTML templates for consistent text styling.
+----------------------------------------------------------------------------- */
+
+/* Display text (hero headings) */
+.text-display {
+    font-family: var(--font-display);
+    font-size: var(--font-size-display);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--color-text-primary);
+}
+
+/* H1 heading */
+.text-h1 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--color-text-primary);
+}
+
+/* H2 heading */
+.text-h2 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-primary);
+}
+
+/* H3 heading */
+.text-h3 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-body);
+}
+
+/* Body text */
+.text-body {
+    font-family: var(--font-body);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-body);
+}
+
+/* Strong body text */
+.text-body-strong {
+    font-family: var(--font-body);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-body);
+}
+
+/* Caption text */
+.text-caption {
+    font-family: var(--font-body);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-muted);
+}
+
+/* Label text (uppercase UI labels) */
+.text-label {
+    font-family: var(--font-body);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-wider);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+/* Monospace text (numbers, time, system values) */
+.text-mono {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-mono);
+    font-weight: var(--font-weight-regular);
+    color: var(--color-text-body);
+}
+
+/* Link text */
+.text-link {
+    color: var(--color-text-link);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.text-link:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+}
