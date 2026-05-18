@@ -10,6 +10,10 @@
 /node_modules
 npm-debug.log
 yarn-error.log
+.yarn/
+.pnp.cjs
+.pnp.loader.mjs
+package-lock.json
 
 # IDEs and editors
 .idea/
