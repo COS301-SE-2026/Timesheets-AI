@@ -22,7 +22,7 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar 
 
 # the port used since frontend uses 8080 to avoid clashing 
-EXPOSE 8081
+EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]
 
 # uses a docker imahe that has maven 3.9, JDK 17 
