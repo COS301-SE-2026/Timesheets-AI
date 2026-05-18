@@ -27,4 +27,4 @@ RUN yarn build --configuration production
 FROM nginxinc/nginx-unprivileged:alpine AS prod
 COPY --from=build /app/client/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 8080
+EXPOSE 4200
