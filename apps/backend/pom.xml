@@ -119,6 +119,7 @@ it must end with:
             <version>2.6.0</version>
         </dependency>
 
+        <!-- So flyway is not working right now, will keep this for future reference  -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
