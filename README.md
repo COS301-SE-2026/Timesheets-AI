@@ -80,6 +80,7 @@
 | [Pull Requests](https://github.com/COS301-SE-2026/Timesheets-AI/pulls) | Active and merged pull requests |
 | [SRS Document](./docs/srs/functional-requirements.pdf) | Demo 1 Functional Requirements |
 | [Wireframes](./docs/wireframes/) | UI wireframes and brand style guide |
+| [Setup Guide](./SETUP.md) | Local development setup, startup options and command reference |
 | [Architecture](./docs/architecture/) | Domain model and ERD |
 | [Demo 1 video](./docs/) | Video recording for demo one |
 
@@ -173,32 +174,92 @@
 
 ## Repository Structure
 
+
 ```
-momently/
+Timesheest-AI/
 │
 ├── apps/
-│   ├── backend/           # Java 17 and Spring Boot
-│   └── frontend/          # Angular 17 and Material UI
+│   ├── backend/                  # Java 17 and Spring Boot 3.5
+│   │   ├── src/
+│   │   │   ├── main/
+│   │   │   │   ├── java/timesheets/
+│   │   │   │   │   ├── TimesheetsApplication.java
+│   │   │   │   │   ├── controller/
+│   │   │   │   │   ├── service/
+│   │   │   │   │   │   └── impl/
+│   │   │   │   │   ├── repository/
+│   │   │   │   │   ├── domain/
+│   │   │   │   │   ├── dto/
+│   │   │   │   │   │   ├── request/
+│   │   │   │   │   │   └── response/
+│   │   │   │   │   ├── mapper/
+│   │   │   │   │   ├── security/
+│   │   │   │   │   │   ├── filter/
+│   │   │   │   │   │   └── jwt/
+│   │   │   │   │   ├── config/
+│   │   │   │   │   ├── exception/
+│   │   │   │   │   ├── enums/
+│   │   │   │   │   └── util/
+│   │   │   │   └── resources/
+│   │   │   │       ├── application.yml
+│   │   │   │       └── db/
+│   │   │   │           └── migration/
+│   │   │   │               ├── V1__init_schema.sql
+│   │   │   │               └── V2__seed_data.sql
+│   │   │   └── test/
+│   │   │       └── java/timesheets/
+│   │   ├── pom.xml
+│   │   ├── Dockerfile
+│   │   └── checkstyle.xml
+│   │
+│   └── frontend/                 # Angular 17 and Material UI
+│       ├── client/
+│       │   ├── src/
+│       │   │   ├── app/
+│       │   │   ├── assets/
+│       │   │   └── environments/
+│       │   ├── angular.json
+│       │   ├── package.json
+│       │   └── yarn.lock
+│       └── Dockerfile
 │
-├── ai-service/            # Python and FastAPI
+├── ai-service/                   # Python 3.11 and FastAPI
+│   ├── main.py
+│   ├── requirements.txt
+│   ├── pyproject.toml
+│   ├── Dockerfile
+│   └── tests/
+│       └── test_health.py
 │
-├── infrastructure/        # Docker Compose and AWS config
+├── infrastructure/               
 │
-├── docs/                  # All documentation
+├── docs/                         # All documentation
 │   ├── srs/
 │   ├── wireframes/
 │   ├── architecture/
 │   └── meeting-minutes/
 │
 ├── assets/
-│   └── images/            # Logos and team photos
+│   └── images/           n       # Logos and team photos
+│
+├── .devcontainer/
+│   ├── devcontainer.json
+│   └── setup.sh
+│
+├── .github/
+│   └── workflows/
+│       ├── backend-ci.yml
+│       └── frontend-ci.yml
 │
 ├── docker-compose.yml
+├── package.json
+├── turbo.json
+├── yarn.lock
 ├── .env.example
 ├── .gitignore
+├── SETUP.md
 └── README.md
 ```
-
 
 ## Team Cybernauts
 
@@ -264,24 +325,197 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 </tr>
 </table>
 
-
 ## Getting Started
 
 ### Prerequisites
 
-| Tool | Version | Install |
-|------|---------|---------|
-| Java | 17+ | [adoptium.net](https://adoptium.net) |
-| Node.js | 20 LTS | [nodejs.org](https://nodejs.org) |
-| Angular CLI | 17+ | `npm install -g @angular/cli` |
-| Python | 3.11+ | [python.org](https://python.org) |
-| PostgreSQL | 15 | [postgresql.org](https://postgresql.org) |
-| Maven | 3.9+ | [maven.apache.org](https://maven.apache.org) |
-| Yarn | 1.22+ | `npm install -g yarn` |
-| Docker *(optional)* | 24+ | [docker.com](https://docker.com) |
+| Tool | Version | Check | Install |
+|------|---------|-------|---------|
+| Java | 17+ | `java -version` | [adoptium.net](https://adoptium.net) |
+| Maven | 3.9+ | `mvn -version` | [maven.apache.org](https://maven.apache.org) |
+| Node.js | 20 LTS | `node -v` | [nodejs.org](https://nodejs.org) |
+| Yarn | 1.22+ | `yarn -v` | `npm install -g yarn` |
+| Angular CLI | 17+ | `ng version` | `npm install -g @angular/cli` |
+| Python | 3.11+ | `python3 --version` | [python.org](https://python.org) |
+| Docker | 24+ | `docker -v` | [docker.com](https://docker.com) |
 
+<p align="left">
+  <img src="https://img.shields.io/badge/Java-17+-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java"/>
+  <img src="https://img.shields.io/badge/Node.js-20_LTS-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node"/>
+  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
+  <img src="https://img.shields.io/badge/Docker-24+-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+</p>
 
-## ADD SYSTEM SETUP HERE
+### First-time setup
+
+```bash
+git clone https://github.com/COS301-SE-2026/Timesheets-AI.git
+cd Timesheets-AI
+yarn install
+cp .env.example .env
+```
+
+> `.env` defaults work out of the box for local development. No changes needed unless you want custom values.
+
+### Setup Options
+
+**Option A: Docker**
+
+<p align="left">
+  <img src="https://img.shields.io/badge/requires-Docker_24+-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Requires Docker"/>
+</p>
+
+Use this if you want everything running with one command and do not need to actively develop a specific service.
+
+```bash
+docker compose up -d
+```
+
+All five services start automatically: postgres, redis, backend, frontend and ai-service.
+
+**Option B: Hybrid (recommended for active development)**
+
+<p align="left">
+  <img src="https://img.shields.io/badge/requires-Docker_+_Java_17_+_Node_20-0F4C91?style=for-the-badge" alt="Requires Docker and Java"/>
+</p>
+
+Use this if you are actively developing the backend or frontend and want hot reload without running everything in Docker.
+
+```bash
+# Start only the database and cache
+docker compose up -d postgres redis
+
+# Then run whichever service you are working on
+cd apps/backend && mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# or
+cd apps/frontend && yarn start
+# or
+cd ai-service && source venv/bin/activate && uvicorn main:app --reload --port 8000
+```
+
+**Option C: Fully local (no Docker)**
+
+<p align="left">
+  <img src="https://img.shields.io/badge/requires-Java_17_+_Node_20_+_Python_3.11_+_PostgreSQL_+_Redis-E07830?style=for-the-badge" alt="Requires everything locally"/>
+</p>
+
+Use this if you cannot run Docker on your machine. Requires postgres and redis installed and running locally.
+
+```bash
+# Backend
+cd apps/backend
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+
+# Frontend (new terminal)
+cd apps/frontend
+yarn start
+
+# AI service (new terminal)
+cd ai-service
+source venv/bin/activate
+uvicorn main:app --reload --port 8000
+```
+
+**Option D: GitHub Codespaces**
+
+<p align="left">
+  <img src="https://img.shields.io/badge/requires-GitHub_account_only-181717?style=for-the-badge&logo=github&logoColor=white" alt="Requires GitHub"/>
+</p>
+
+Use this if you are on a low-spec machine, on Windows without WSL, or want to get started without installing anything locally.
+
+1. Go to the repo on GitHub
+2. Click the green **Code** button, then **Codespaces**, then **Create codespace on dev**
+3. Wait approximately 3 minutes for the environment to set up automatically
+4. Run Option A or B inside the Codespaces terminal
+
+## Command Reference
+
+<p> Run all commands from the repo root. Full reference in [`SETUP.md`](./SETUP.md).</p>
+
+### Full Stack
+| Command | Description |
+|---------|-------------|
+| `yarn dev` | Run everything in parallel |
+| `yarn build` | Build all services |
+| `yarn test` | Test all services |
+| `yarn lint` | Lint all services |
+| `yarn coverage` | Coverage for all services |
+
+### Backend
+| Command | Description |
+|---------|-------------|
+| `yarn backend:dev` | Run with dev profile (hot reload) |
+| `yarn backend:build` | Package JAR (skip tests) |
+| `yarn backend:test` | Run tests |
+| `yarn backend:coverage` | Tests with coverage report |
+| `yarn backend:lint` | Checkstyle check |
+
+### Frontend
+| Command | Description |
+|---------|-------------|
+| `yarn frontend:dev` | Dev server |
+| `yarn frontend:build` | Production build |
+| `yarn frontend:test` | Run tests |
+| `yarn frontend:lint` | Lint |
+| `yarn frontend:coverage` | Coverage report |
+| `yarn frontend:e2e` | Cypress E2E tests |
+
+### AI Service
+| Command | Description |
+|---------|-------------|
+| `yarn ai:dev` | Uvicorn on port 8000 |
+| `yarn ai:test` | Pytest |
+| `yarn ai:coverage` | Pytest with HTML coverage report |
+| `yarn ai:lint` | Ruff linter |
+
+### Docker
+| Command | Description |
+|---------|-------------|
+| `yarn docker:up` | Start all containers |
+| `yarn docker:down` | Stop containers |
+| `yarn docker:build` | Build images |
+| `yarn docker:logs` | Follow logs |
+| `yarn docker:reset` | Wipe volumes and restart |
+
+### Verify everything is running
+
+| Service | URL | Expected |
+|---------|-----|----------|
+| Backend health | http://localhost:8080/actuator/health | `{"status":"UP"}` |
+| Swagger UI | http://localhost:8080/swagger-ui.html | Swagger page loads |
+| Frontend | http://localhost:4200 | Angular app loads |
+| AI service health | http://localhost:8000/health | `{"status":"ok"}` |
+| AI service docs | http://localhost:8000/docs | FastAPI Swagger loads |
+
+### DBeaver connection
+
+| Field | Value |
+|-------|-------|
+| Host | `localhost` |
+| Port | `5432` |
+| Database | `momently_dev` |
+| Username | `momently` |
+| Password | from `.env` file |
+
+### Seeded test users
+
+After Flyway migrations run, these users are available:
+
+| Name | Email | Password | Role |
+|------|-------|----------|------|
+| Alice Admin | alice@momentum.co.za | Password123! | ADMIN |
+| Bob Developer | bob@momentum.co.za | Password123! | DEVELOPER |
+| Carol Manager | carol@momentum.co.za | Password123! | MANAGER |
+
+```bash
+curl -s -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"alice@momentum.co.za","password":"Password123!"}' | jq .
+```
+
+> Full setup guide and command reference: [`SETUP.md`](./SETUP.md)
+
 
 
 ## Documentation

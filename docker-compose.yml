@@ -1,4 +1,13 @@
 version: "3.9"
+# Momently, local development stack
+# Starts: PostgreSQL, Redis, Backend (Spring Boot), Frontend (Angular), AI Service (FastAPI)
+#
+# Usage:
+#   docker compose up -d              # start everything in background
+#   docker compose up -d postgres     # start only the database
+#   docker compose logs -f backend    # tail backend logs
+#   docker compose down               # stop everything (keeps volumes)
+#   docker compose down -v            # stop and wipe all data
 
 services:
   postgres:
@@ -68,37 +77,45 @@ services:
       retries: 5
       start_period: 60s
 
-  # frontend:
-  #   build:
-  #     context: ./apps/frontend
-  #     dockerfile: Dockerfile
-  #     target: dev
-  #   container_name: momently-frontend
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - backend
-  #   environment:
-  #     API_URL: http://backend:8080  # FIX: correct internal service name
-  #   ports:
-  #     - "4200:4200"
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+      target: dev
+    container_name: momently-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      API_URL: http://backend:8080
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./apps/frontend/client:/app/client
+      - /app/client/node_modules
 
-  # ai-service:
-  #   build:
-  #     context: ./apps/ai-services
-  #     dockerfile: Dockerfile
-  #   container_name: momently-ai
-  #   restart: unless-stopped
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-
-  #   environment:
-  #     DB_URL: postgresql://${DB_USERNAME:-momently}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-momently_dev}
-  #     BACKEND_URL: http://backend:8080
-  #     ENVIRONMENT: development
-
-  #   ports:
-  #     - "8000:8000"
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: momently-ai
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: postgresql://${DB_USERNAME:-momently}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-momently_dev}
+      BACKEND_URL: http://backend:8080
+      ENVIRONMENT: development
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ai-service:/app
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   postgres_data:

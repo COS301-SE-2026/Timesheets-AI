@@ -1,0 +1,71 @@
+{
+  "name": "Momently Dev",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "installMaven": true,
+      "installGradle": false
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+
+  "forwardPorts": [4200, 8080, 8000, 5432, 6379],
+
+  "portsAttributes": {
+    "4200": { "label": "Frontend (Angular)", "onAutoForward": "openBrowser" },
+    "8080": { "label": "Backend (Spring Boot)", "onAutoForward": "notify" },
+    "8000": { "label": "AI Service (FastAPI)", "onAutoForward": "notify" },
+    "5432": { "label": "PostgreSQL", "onAutoForward": "silent" },
+    "6379": { "label": "Redis", "onAutoForward": "silent" }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "angular.ng-template",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-pull-request-github",
+        "eamodio.gitlens",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "redhat.vscode-yaml",
+        "42crunch.vscode-openapi"
+      ],
+      "settings": {
+        "java.compile.nullAnalysis.mode": "automatic",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[java]": {
+          "editor.defaultFormatter": "redhat.java"
+        },
+        "python.defaultInterpreterPath": "/usr/local/bin/python3",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+
+  "remoteEnv": {
+    "SPRING_PROFILES_ACTIVE": "dev",
+    "DB_URL": "jdbc:postgresql://localhost:5432/momently_dev",
+    "DB_USERNAME": "momently",
+    "DB_PASSWORD": "momently_dev_password",
+    "REDIS_HOST": "localhost",
+    "REDIS_PORT": "6379",
+    "JWT_SECRET": "codespaces-dev-secret-replace-in-production-abc123",
+    "JWT_EXPIRATION_MS": "86400000"
+  }
+}
