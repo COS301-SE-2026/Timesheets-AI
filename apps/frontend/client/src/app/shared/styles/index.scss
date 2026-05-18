@@ -5,5 +5,8 @@ Single import point for all design tokens
 
 @forward './colors';
 @forward './typography';
+@forward './spacing';
+@forward './radius';
+@forward './elevation';
 
 /*just keep adding those we completed and tested!*/
