@@ -65,10 +65,10 @@ These are defined on :root so they work everywhere in the app
 
     /* Auth page gradient (used for signup/login background design) */
     --gradient-auth-panel: linear-gradient(
-    135deg,
-    #E6F1FB 0%,
-    #BFD4F4 40%,
-    #FEF0E6 100%
+        135deg,
+        #0F4C91 0%,   /* Your brand primary blue */
+        #12121E 50%,  /* Neutral dark background to deepen the core blend */
+        #E07830 100%  /* Your secondary accent amber/orange */
     );
 
     /* Logo colours (used for brand identity elements) */
@@ -131,9 +131,9 @@ $color-status-overdue-text: #5C0F0F;
 /* Auth gradient (login background styling) */
 $gradient-auth-panel: linear-gradient(
     135deg,
-    #E6F1FB 0%,
-    #BFD4F4 40%,
-    #FEF0E6 100%
+    #0F4C91 0%,   /* Your brand primary blue */
+    #12121E 50%,  /* Neutral dark background to deepen the core blend */
+    #E07830 100%  /* Your secondary accent amber/orange */
 );
 
 /* Logo colours */
