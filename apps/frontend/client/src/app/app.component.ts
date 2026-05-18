@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TimesheetsComponent } from './features/timesheets/timesheets.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, TimesheetsComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
