@@ -1,0 +1,27 @@
+/* ============================================================
+BORDER RADIUS TOKENS
+Momently Design System — Corner Radius Scale
+Rule: larger and more important components get rounder corners
+============================================================ */
+
+:root {
+
+    /* Tags, small badges, tight UI elements */
+    --radius-xs: 4px;
+
+    /* Buttons, small cards, input fields */
+    --radius-sm: 8px;
+
+    /* Standard cards, form containers */
+    --radius-md: 12px;
+
+    /* Large containers, panels */
+    --radius-lg: 16px;
+
+    /* Modals, major page panels, auth cards */
+    --radius-xl: 24px;
+
+    /* Pills, status chips, badge pills */
+    --radius-full: 9999px;
+
+}
