@@ -14,7 +14,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U momently -d momently_dev"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-momently} -d ${DB_NAME:-momently_dev}"]
       interval: 10s
       timeout: 5s
       retries: 5
