@@ -1,5 +1,8 @@
-package com.timesheets.enums;
+package timesheets.enums;
 
-public class TimeEntryStatus {
-    
+public enum TimeEntryStatus {
+    DRAFT,
+    SUBMITTED,
+    APPROVED,
+    REJECTED
 }

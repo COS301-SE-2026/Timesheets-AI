@@ -1,4 +1,4 @@
-package com.timesheets.config;
+package timesheets.config;
 
 public class AuditConfig {
     
