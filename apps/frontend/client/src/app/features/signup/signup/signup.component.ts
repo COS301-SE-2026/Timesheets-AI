@@ -23,6 +23,8 @@ export class SignupComponent {
 
   // Reactive signup form definition
   protected readonly signupForm = this.formBuilder.nonNullable.group({
+    name: ['', [Validators.required, Validators.minLength(2)]],
+    surname: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
     password: [
       '',
@@ -52,8 +54,46 @@ export class SignupComponent {
 
     // INTEGRATE API HERE 
     console.info('Sign up submitted', {
+      name: this.signupForm.controls.name.value,
+      surname: this.signupForm.controls.surname.value,
       email: this.signupForm.controls.email.value
     });
+  }
+
+  protected get showNameError(): boolean {
+    const control = this.signupForm.controls.name;
+    return (control.touched || this.submitted) && control.invalid;
+  }
+
+  protected get nameErrorMessage(): string {
+    const control = this.signupForm.controls.name;
+
+    if (control.hasError('required')) {
+      return 'Name is required.';
+    }
+    if (control.hasError('minlength')) {
+      return 'Name must be at least 2 characters.';
+    }
+
+    return '';
+  }
+
+  protected get showSurnameError(): boolean {
+    const control = this.signupForm.controls.surname;
+    return (control.touched || this.submitted) && control.invalid;
+  }
+
+  protected get surnameErrorMessage(): string {
+    const control = this.signupForm.controls.surname;
+
+    if (control.hasError('required')) {
+      return 'Surname is required.';
+    }
+    if (control.hasError('minlength')) {
+      return 'Surname must be at least 2 characters.';
+    }
+
+    return '';
   }
 
   // Determines when email error should be shown

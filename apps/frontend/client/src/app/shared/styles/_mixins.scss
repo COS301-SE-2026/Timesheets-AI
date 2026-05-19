@@ -364,18 +364,18 @@
         color: var(--color-text-muted);
     }
 
-    // Form layout structure
-    form {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-4);
-    }
+  // Form layout structure
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
 
-    .name-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: var(--space-4);
-    }
+  .name-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
 
     // Individual form field wrapper
     .field {
@@ -664,16 +664,16 @@
         }
     }
 
-    // Small mobile scaling for preview UI
-    @media (max-width: 640px) {
-        .name-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .project-preview {
-            transform: scale(0.72);
-        }
+  // Small mobile scaling for preview UI
+  @media (max-width: 640px) {
+    .name-grid {
+      grid-template-columns: 1fr;
     }
+
+    .project-preview {
+      transform: scale(0.72);
+    }
+  }
 
     // Extra small screens adjustments
     @media (max-width: 480px) {
