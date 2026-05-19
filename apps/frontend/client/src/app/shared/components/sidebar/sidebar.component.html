@@ -2,35 +2,35 @@
     <!-- branding --> 
     <div class="logo-container">
         <div class="logo-icon">
-            Momently Stand By
+            Logo To Add
         </div>
         <div class="logo-text">
             <h2>momently</h2>
             <p>Every moment counts</p>
         </div>
     </div>
-</div>
 
-<!-- I am going to use mordern version instead of ngFor-->
- <!-- <a class="nav-item" - each item becomes a clickable link and the one clicked on will add class active and it will get active styling -->
-<nav class="nav-links">
-    @for (item of navItems(); track item.label) {
-        <a 
-            class="nav-item"
-            [class.active]="item.label === activeItem()"
-            (click)="setActive(item.label)">
-            <span class="nav-icon" [ngClass]="item.icon"></span>
-            <span class="nav-label">{{ item.label }}</span>
-        </a>
-    }
-</nav>
+    <!-- navigation -->
+    <nav class="nav-links">
+        @for (item of navItems(); track item.label) {
+            <a 
+                class="nav-item"
+                [class.active]="item.route === activeRoute()"
+                (click)="setActive(item.route)">
 
-<div class="user-profile">
-    <div class="avatar">JD</div>
-    <div class="user-info">
-      <span class="user-name">John Doe</span>
-      <span class="user-role">Software Developer</span>
+                <span class="nav-icon" [ngClass]="item.icon"></span>
+                <span class="nav-label">{{ item.label }}</span>
+            </a>
+        }
+    </nav>
+
+    <!-- user profile -->
+    <div class="user-profile">
+        <div class="avatar">JD</div>
+        <div class="user-info">
+            <span class="user-name">John Doe</span>
+            <span class="user-role">Software Developer</span>
+        </div>
+        <span class="dropdown-arrow">⌄</span>
     </div>
-    <span class="dropdown-arrow">▼</span>
-  </div>
 </div>
