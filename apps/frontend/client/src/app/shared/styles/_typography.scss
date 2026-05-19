@@ -97,27 +97,6 @@ $letter-spacing-wider: 0.08em;
 
 
 /* -----------------------------------------------------------------------------
-4. Base Typography Styles
------------------------------------------------------------------------------
-These define default styling for the whole application.
------------------------------------------------------------------------------ */
-
-html {
-font-size: 16px;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-text-rendering: optimizeLegibility;
-}
-
-body {
-font-family: var(--font-body);
-font-size: var(--font-size-body);
-font-weight: var(--font-weight-regular);
-line-height: var(--line-height-normal);
-color: var(--color-text-body);
-}
-
-/* -----------------------------------------------------------------------------
 5. Typography Utility Classes
 -----------------------------------------------------------------------------
 These are used directly in HTML templates for consistent text styling.
