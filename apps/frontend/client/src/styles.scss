@@ -8,3 +8,20 @@ MOMENTLY DESIGN SYSTEM
 './app/shared/styles/index' as *;
 
 /*The "as *" means all forwarded tokens are available globally without needing to prefix them*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    background: #f5f7fb;
+}
+
+body {
+    font-family: var(--font-body);
+}

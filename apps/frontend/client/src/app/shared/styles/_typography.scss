@@ -218,3 +218,9 @@ These are used directly in HTML templates for consistent text styling.
     color: var(--color-primary-hover);
     text-decoration: underline;
 }
+
+/* Add to _typography.scss */
+:root {
+  --letter-spacing-normal: 0;
+  --letter-spacing-wider:  0.08em;
+}

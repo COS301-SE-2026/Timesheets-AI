@@ -1,0 +1,35 @@
+/* ============================================================
+SPACING TOKENS
+Momently Design System — 8pt Grid Scale
+All spacing values are multiples of 4px or 8px
+Use these tokens for margin, padding and gap throughout
+the application to maintain visual consistency
+============================================================ */
+
+:root {
+
+    /* Extra small : icon to label gaps, tight inner padding */
+    --space-1: 4px;
+
+    /* Small : list item gaps, small button padding */
+    --space-2: 8px;
+
+    /* Small-medium : compact cards, form field inner padding */
+    --space-3: 12px;
+
+    /* Medium (default) : standard card padding, button padding */
+    --space-4: 16px;
+
+    /* Large : gap between form sections, dashboard card gaps */
+    --space-6: 24px;
+
+    /* Extra large : gap between major page sections */
+    --space-8: 32px;
+
+    /* 2x large : top of page padding, hero section spacing */
+    --space-12: 48px;
+
+    /* 3x large : left and right page margins on desktop */
+    --space-16: 64px;
+
+}
