@@ -1,0 +1,13 @@
+// variables for elevation styling
+
+:root {
+  --elevation-0: none;
+  --elevation-1: 0 8px 24px rgba(26, 26, 46, 0.08);
+  --elevation-2: 0 16px 36px rgba(26, 26, 46, 0.12);
+  --elevation-3: 0 24px 56px rgba(26, 26, 46, 0.16);
+}
+
+$elevation-0: none;
+$elevation-1: 0 8px 24px rgba(26, 26, 46, 0.08);
+$elevation-2: 0 16px 36px rgba(26, 26, 46, 0.12);
+$elevation-3: 0 24px 56px rgba(26, 26, 46, 0.16);

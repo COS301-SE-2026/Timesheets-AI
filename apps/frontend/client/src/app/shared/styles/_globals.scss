@@ -1,0 +1,36 @@
+/* Ensure full-height layout and remove default browser spacing */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+/* Base HTML settings for typography and text rendering */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Global body styles for consistent typography and background */
+body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-body);
+  background: var(--color-white);
+}
+
+/* Ensure consistent box model across all elements */
+* {
+  box-sizing: border-box;
+}
+
+/* Ensure form elements inherit typography styles from body */
+button,
+input {
+  font: inherit;
+}
