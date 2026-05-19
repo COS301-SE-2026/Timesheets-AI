@@ -25,3 +25,12 @@ Rule: larger and more important components get rounder corners
     --radius-full: 9999px;
 
 }
+
+/* Add to _radius.scss */
+:root {
+  --radius-pill:   9999px;  /* same as --radius-full */
+  --radius-button: 12px;    /* same as --radius-md */
+  --radius-card:   12px;    /* same as --radius-md */
+  --radius-panel:  16px;    /* same as --radius-lg */
+  --radius-tag:    6px;     /* between xs and sm */
+}

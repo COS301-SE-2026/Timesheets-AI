@@ -1,0 +1,693 @@
+// Reusable brand/logo layout used across auth screens
+@mixin auth-brand-lockup {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    color: inherit;
+    text-decoration: none;
+
+
+    // Brand logo image sizing
+    .brand-logo {
+    display: block;
+    flex: 0 0 auto;
+    width: var(--space-12);
+    height: var(--space-12);
+    object-fit: contain;
+    }
+
+    // Text stack (name + tagline)
+    .brand-copy {
+    display: flex;
+    flex-direction: column;
+    margin-left: var(--space-3);
+    }
+
+    // Main brand name styling
+    .brand-name {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-display);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-normal);
+    color: var(--color-text-body);
+    }
+
+    // Secondary tagline under brand name
+    .brand-tagline {
+    margin-top: var(--space-1);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-tight);
+    color: var(--color-primary-hover);
+    }
+}
+
+// Main layout mixin for signup/auth screens
+@mixin signup-auth-screen {
+    // Host wrapper for Angular component
+    :host {
+    display: block;
+    min-height: 100vh;
+    overflow: hidden;
+    background: var(--color-white);
+    }
+
+    // Two-column page layout (hero + form)
+    .signup-shell {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100vw;
+    min-height: 100vh;
+    overflow: hidden;
+    font-family: var(--font-body);
+    color: var(--color-text-body);
+    background: var(--color-white);
+    }
+
+    // Left side: marketing/hero panel
+    .signup-hero {
+    min-width: 0;
+    background: var(--gradient-auth-panel);
+    }
+
+    // Hero content wrapper (spacing + layout)
+    .hero-inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: var(--space-16) clamp(var(--space-16), 8.8vw, 112px);
+    }
+
+    // Shared brand component usage
+    .brand {
+    @include auth-brand-lockup;
+    }
+
+    // Container for hero text content
+    .hero-content {
+    width: 360px;
+    margin-top: clamp(var(--space-12), 8vh, 88px);
+    }
+
+    // Small label above main heading
+    .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        height: var(--space-6);
+        margin: 0 0 var(--space-8);
+        padding: 0 var(--space-3);
+        font-size: var(--font-size-caption);
+        font-weight: var(--font-weight-medium);
+        line-height: var(--line-height-tight);
+        color: var(--color-text-body);
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-pill);
+        box-shadow: var(--elevation-1);
+    }
+
+    // Decorative dot inside eyebrow label
+    .eyebrow-dot {
+        width: var(--space-1);
+        height: var(--space-1);
+        margin-right: var(--space-2);
+        background: var(--color-secondary);
+        border-radius: var(--radius-pill);
+    }
+
+    // Main hero title
+    .hero-title {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: var(--font-size-display);
+        font-weight: var(--font-weight-bold);
+        line-height: var(--line-height-tight);
+        letter-spacing: var(--letter-spacing-normal);
+        color: var(--color-text-body);
+    }
+
+    // Highlighted part of hero title
+    .hero-title__accent {
+        white-space: nowrap;
+        color: var(--color-primary-hover);
+    }
+
+    // Hero description text
+    .hero-description {
+        width: 360px;
+        margin: var(--space-6) 0 0;
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-normal);
+        color: var(--color-text-muted);
+    }
+
+    // Decorative product preview container
+    .project-preview {
+        position: relative;
+        width: 410px;
+        height: 225px;
+        margin-top: clamp(var(--space-16), 10vh, 112px);
+    }
+
+    // Floating preview card
+    .preview-card {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 312px;
+        min-height: 158px;
+        padding: var(--space-6) var(--space-8) var(--space-6);
+        background: var(--color-white);
+        border-radius: var(--radius-panel);
+        box-shadow: var(--elevation-2);
+    }
+
+    // Header of preview card (label + status)
+    .preview-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-6);
+    }
+
+    // Label text inside preview card header
+    .preview-label {
+        font-size: var(--font-size-caption);
+        font-weight: var(--font-weight-semibold);
+        letter-spacing: var(--letter-spacing-wider);
+        color: var(--color-text-muted);
+    }
+
+    // Live status pill
+    .live-pill {
+        padding: var(--space-1) var(--space-2);
+        font-size: var(--font-size-caption);
+        font-weight: var(--font-weight-semibold);
+        line-height: var(--line-height-tight);
+        color: var(--color-semantic-green-text);
+        background: var(--color-semantic-green);
+        border-radius: var(--radius-tag);
+    }
+
+    // Each metric row in preview card
+    .preview-row {
+        display: grid;
+        grid-template-columns: var(--space-8) 1fr var(--space-8);
+        gap: var(--space-4);
+        align-items: center;
+        margin-top: var(--space-4);
+    }
+
+    // Icon container in preview rows
+    .preview-icon {
+        display: grid;
+        width: var(--space-8);
+        height: var(--space-8);
+        place-items: center;
+        color: var(--color-primary-hover);
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-button);
+        box-shadow: var(--elevation-1);
+
+        // SVG styling for icons
+        svg {
+            width: var(--space-4);
+            height: var(--space-4);
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 2.4;
+        }
+    }
+
+    // Alternate icon color variant
+    .preview-icon--wand {
+        color: var(--color-secondary);
+    }
+
+    // Progress bar background track
+    .progress-track {
+        height: var(--space-2);
+        overflow: hidden;
+        background: var(--color-primary-surface);
+        border-radius: var(--radius-pill);
+    }
+
+    // Progress bar fill base
+    .progress-fill {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+    }
+
+    // Blue progress variation
+    .progress-fill--blue {
+        width: 75%;
+        background: var(--color-primary-hover);
+    }
+
+    // Orange progress variation
+    .progress-fill--orange {
+        width: 48%;
+        background: var(--color-secondary);
+    }
+
+    // Numeric progress value
+    .progress-value {
+        font-size: var(--font-size-body);
+        color: var(--color-text-body);
+    }
+
+    // AI suggestion card (floating element)
+    .suggestion-card {
+        position: absolute;
+        top: 104px;
+        right: 0;
+        display: grid;
+        grid-template-columns: var(--space-12) 1fr;
+        gap: var(--space-3) var(--space-4);
+        width: 285px;
+        padding: var(--space-6);
+        background: var(--color-secondary-surface);
+        border: 1px solid var(--color-white);
+        border-radius: var(--radius-panel);
+        box-shadow: var(--elevation-3);
+
+        // Title text inside suggestion card
+        strong {
+            display: block;
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            line-height: var(--line-height-tight);
+            color: var(--color-text-body);
+        }
+
+        // Supporting description text
+        p {
+            margin: var(--space-1) 0 0;
+            font-size: var(--font-size-caption);
+            line-height: var(--line-height-tight);
+            color: var(--color-text-muted);
+        }
+
+        // CTA button inside suggestion card
+        button {
+            grid-column: 1 / -1;
+            height: var(--space-12);
+            font-family: inherit;
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-inverse);
+            background: var(--color-primary-hover);
+            border: 0;
+            border-radius: var(--radius-button);
+            cursor: default;
+        }
+    }
+
+    // Spark icon container in suggestion card
+    .spark-icon {
+        display: grid;
+        place-items: center;
+        width: var(--space-12);
+        height: var(--space-12);
+        color: var(--color-primary-hover);
+        background: var(--color-primary-surface);
+        border-radius: var(--radius-pill);
+
+        svg {
+            width: var(--space-6);
+            height: var(--space-6);
+            fill: currentColor;
+        }
+    }
+
+    // Right side: signup form panel
+    .signup-panel {
+        display: flex;
+        min-width: 0;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: var(--space-16);
+        background: var(--color-white);
+    }
+
+    // Form container width wrapper
+    .form-wrap {
+        width: min(440px, 72%);
+    }
+
+    // Form heading section
+    .form-heading {
+        margin-bottom: var(--space-8);
+    }
+
+    // Main form title
+    .form-title {
+        margin: 0 0 var(--space-2);
+        font-family: var(--font-display);
+        font-size: var(--font-size-display);
+        font-weight: var(--font-weight-bold);
+        line-height: var(--line-height-tight);
+        letter-spacing: var(--letter-spacing-normal);
+        color: var(--color-text-body);
+    }
+
+    // Form subtitle text
+    .form-subtitle {
+        margin: 0;
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-normal);
+        color: var(--color-text-muted);
+    }
+
+    // Form layout structure
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .name-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-4);
+    }
+
+    // Individual form field wrapper
+    .field {
+        display: grid;
+        gap: var(--space-2);
+    }
+
+    // Label styling for inputs
+    .field-label {
+        font-size: var(--font-size-caption);
+        font-weight: var(--font-weight-semibold);
+        line-height: var(--line-height-tight);
+        color: var(--color-text-body);
+    }
+
+    // Shared hint/error text styles
+    .field-hint,
+    .field-error {
+        margin: 0;
+        font-size: var(--font-size-caption);
+        line-height: var(--line-height-normal);
+    }
+
+    // Hint text (helper message)
+    .field-hint {
+        color: var(--color-text-muted);
+    }
+
+    // Error text styling
+    .field-error {
+        color: var(--color-semantic-red-text);
+    }
+
+    // Input wrapper (icon + input)
+    .input-shell {
+        display: flex;
+        align-items: center;
+        height: var(--space-12);
+        padding: 0 var(--space-4);
+        background: var(--color-white);
+        border: 1px solid var(--color-input-border);
+        border-radius: var(--radius-card);
+        transition:
+            border-color 0.15s,
+            box-shadow 0.15s;
+
+        // Focus state for accessibility
+        &:focus-within {
+            border-color: var(--color-primary-hover);
+            box-shadow: 0 0 0 var(--space-1) var(--color-primary-surface);
+        }
+    }
+
+    // Error state styling for inputs
+    .input-shell--error {
+            border-color: var(--color-semantic-red);
+    }
+
+    // Input field icon styling
+    .field-icon {
+            flex: 0 0 auto;
+            width: var(--space-4);
+            height: var(--space-4);
+            fill: none;
+            stroke: var(--color-text-muted);
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 1.6;
+    }
+
+    // Input element styling
+    .input-shell input {
+            flex: 1;
+            min-width: 0;
+            padding: 0 var(--space-3);
+            color: var(--color-text-body);
+            background: transparent;
+            border: 0;
+            outline: 0;
+
+            &::placeholder {
+                color: var(--color-text-muted);
+            }
+    }
+
+    // Icon button (password toggle etc.)
+    .icon-button {
+        display: grid;
+        flex: 0 0 auto;
+        width: var(--space-8);
+        height: var(--space-8);
+        padding: 0;
+        place-items: center;
+        color: var(--color-text-muted);
+        appearance: none;
+        background: transparent;
+        border: 0;
+        border-radius: var(--radius-button);
+        cursor: pointer;
+
+        svg {
+            width: var(--space-4);
+            height: var(--space-4);
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 1.8;
+        }
+
+        &:hover {
+            background: var(--color-primary-surface);
+        }
+    }
+
+    // Terms section wrapper
+    .terms-block {
+        margin-top: var(--space-1);
+    }
+
+    // Terms checkbox layout
+    .terms {
+        display: flex;
+        gap: var(--space-3);
+        align-items: center;
+        font-size: var(--font-size-body);
+        line-height: var(--line-height-normal);
+        color: var(--color-text-muted);
+        cursor: pointer;
+
+        input {
+            width: var(--space-4);
+            height: var(--space-4);
+            margin: 0;
+            accent-color: var(--color-primary);
+        }
+
+        a {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-secondary);
+            text-decoration: none;
+        }
+    }
+
+    // Primary submit button
+    .submit-button {
+        width: 100%;
+        height: var(--space-12);
+        font-family: inherit;
+        font-size: var(--font-size-body);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-inverse);
+        appearance: none;
+        background: var(--color-primary);
+        border: 0;
+        border-radius: var(--radius-button);
+        cursor: pointer;
+
+        &:hover {
+            background: var(--color-primary-hover);
+        }
+    }
+
+    // Divider between form and social login
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: clamp(var(--space-16), 9vh, 104px) 0 var(--space-6);
+    }
+
+    .divider-line {
+        flex: 1;
+        height: 1px;
+        background: var(--color-border);
+    }
+
+    .divider-label {
+        padding: var(--space-2) var(--space-4);
+        font-size: var(--font-size-caption);
+        font-weight: var(--font-weight-semibold);
+        line-height: var(--line-height-tight);
+        letter-spacing: var(--letter-spacing-wider);
+        color: var(--color-primary);
+        background: var(--color-primary-surface);
+        border-radius: var(--radius-tag);
+    }
+
+    // Social login button grid
+    .social-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-4);
+    }
+
+    // Social login button styles
+    .social-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: var(--space-12);
+        gap: var(--space-2);
+        font-family: inherit;
+        font-size: var(--font-size-body);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text-body);
+        appearance: none;
+        background: var(--color-white);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-button);
+        cursor: pointer;
+
+        &:hover {
+            background: var(--color-primary-surface);
+        }
+    }
+
+    // Social icon size
+    .social-logo {
+        width: var(--space-4);
+        height: var(--space-4);
+        flex-shrink: 0;
+    }
+
+    // Bottom sign in link
+    .signin-copy {
+        margin: var(--space-6) 0 0;
+        font-size: var(--font-size-body);
+        text-align: center;
+        color: var(--color-text-muted);
+
+        a {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-primary-hover);
+            text-decoration: none;
+        }
+    }
+
+    // Tablet responsive layout adjustments
+    @media (max-width: 980px) {
+        :host {
+            overflow: auto;
+        }
+
+        .signup-shell {
+            display: block;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .signup-hero {
+            min-height: 680px;
+        }
+
+        .hero-inner {
+            padding: var(--space-12) max(var(--space-6), 8vw);
+        }
+
+        .hero-content,
+        .hero-description {
+            width: min(100%, 360px);
+        }
+
+        .project-preview {
+            width: min(100%, 410px);
+            margin-top: var(--space-12);
+            transform-origin: top left;
+        }
+
+        .signup-panel {
+            padding: var(--space-12) var(--space-6);
+        }
+
+        .form-wrap {
+            width: min(100%, 440px);
+        }
+    }
+
+    // Short screen height adjustments
+    @media (max-height: 760px) and (min-width: 981px) {
+        .hero-content {
+            margin-top: var(--space-12);
+        }
+
+        .project-preview {
+            margin-top: var(--space-12);
+        }
+    }
+
+    // Small mobile scaling for preview UI
+    @media (max-width: 640px) {
+        .name-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .project-preview {
+            transform: scale(0.72);
+        }
+    }
+
+    // Extra small screens adjustments
+    @media (max-width: 480px) {
+        .hero-title {
+            font-size: var(--font-size-h1);
+        }
+
+        .project-preview {
+            width: 410px;
+            transform: scale(0.56);
+        }
+
+        .divider {
+            margin-top: var(--space-16);
+        }
+    }
+}
