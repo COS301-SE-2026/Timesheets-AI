@@ -159,7 +159,7 @@
               [type]="showPassword ? 'text' : 'password'"
               formControlName="password"
               placeholder="••••••••"
-              autocomplete="new-password"
+              autocomplete="off"
               [attr.aria-invalid]="showPasswordError"
             />
 
@@ -206,10 +206,10 @@
       </form>
 
       <!-- Social login divider -->
-      <div class="divider" role="separator" aria-hidden="true">
-        <span class="divider-line"></span>
+      <div class="divider" aria-hidden="true">
+        <hr class="divider-line" />
         <span class="divider-label">OR SIGN UP WITH</span>
-        <span class="divider-line"></span>
+        <hr class="divider-line" />
       </div>
 
       <!-- Social signup buttons -->
