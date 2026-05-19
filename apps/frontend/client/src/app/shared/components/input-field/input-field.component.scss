@@ -1,0 +1,16 @@
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-input {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.field-error {
+  color: #dc2626;
+  font-size: 0.875rem;
+}
