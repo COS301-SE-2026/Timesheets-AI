@@ -1,0 +1,19 @@
+//this put the header, content and footer vertically 
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    background: #f9fafb;
+}
+
+.main-layout {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-content {
+    flex: 1;
+    padding: 2rem;
+}
+
