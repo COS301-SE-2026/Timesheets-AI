@@ -32,9 +32,9 @@ export class SidebarComponent {
 
   // Temporary mock tracking for active link styling until full router links are added 
   // Stores the currently selected navigation item.
-  activeItem = signal<string>('Timesheets');
+  activeRoute = signal<string>('Timesheets');
 
   setActive(label: string){
-    this.activeItem.set(label);
+    this.activeRoute.set(label);
   }
 }
