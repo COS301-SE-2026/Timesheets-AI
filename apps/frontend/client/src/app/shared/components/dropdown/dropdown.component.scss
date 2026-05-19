@@ -1,0 +1,24 @@
+.dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dropdown-select {
+  padding: 0.75rem;
+  border: 1px solid var(--color-gray-light);
+  border-radius: 8px;
+  background: var(--color-white);
+  color: var(--color-text-body);
+  cursor: pointer;
+}
+
+.dropdown-select:disabled {
+  background: var(--color-gray-light);
+  cursor: not-allowed;
+}
+
+.dropdown-error {
+  color: var(--color-error);
+  font-size: 0.875rem;
+}

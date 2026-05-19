@@ -1,1 +1,13 @@
-<p>dropdown works!</p>
+<div class="dropdown">
+  <label *ngIf="label">{{ label }}</label>
+
+  <select class="dropdown-select" [disabled]="disabled">
+    <option *ngFor="let option of options" [value]="option">
+      {{ option }}
+    </option>
+  </select>
+
+  <small class="dropdown-error" *ngIf="error">
+    {{ error }}
+  </small>
+</div>
