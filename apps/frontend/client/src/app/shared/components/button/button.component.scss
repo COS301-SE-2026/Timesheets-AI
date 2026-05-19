@@ -1,0 +1,21 @@
+.app-button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.secondary {
+  border: 1px solid #d1d5db;
+  background: white;
+}
+
+.tertiary {
+  background: transparent;
+}
