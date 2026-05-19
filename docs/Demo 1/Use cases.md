@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="../assets/images/momently name.png" alt="Momently" width="260" />
+  <img src="../../assets/images/momently name.png" alt="Momently" width="260" />
 </p>
 
 <p align="center">Every moment counts</p>
 <p align="center">Team Cybernauts · COS 301 · University of Pretoria · 2026</p>
 
-## Use cases
+<h1 align="center">Use Cases</h1>
 
 
 ## Use Case Summary
@@ -33,27 +33,25 @@
 1. User navigates to the login page.
 2. User enters their company email and password.
 3. System validates credentials against the registered account.
-4. System prompts the user to enter their MFA code.
-5. User submits the MFA code.
-6. System grants access and redirects to the dashboard.
-
-### Extensions
-- **1a. Remember Me:** User ticks "Remember Me" before submitting. Session persists for 30 days without re-authentication unless the user manually logs out.
-- **1b. Forgot Password:** User clicks "Forgot Password", enters their email, and receives a reset link. Clicking the link opens a form to set a new password.
+4. System generates a 6-digit OTP and sends it to the user's email.
+5. User enters the OTP on the verification screen.
+6. System validates the OTP and checks it has not expired (5 minute window).
+7. System grants access and redirects to the dashboard.
 
 ### Acceptance Criteria
-- User can log in successfully with valid company email, correct password, and valid MFA code.
+- User can log in successfully with valid company email, correct password, and valid OTP.
 - After successful login, the user is redirected to their role-appropriate dashboard.
 - "Remember Me" keeps the session active for 30 days on that device.
 - Password reset link is sent to the registered email within 60 seconds.
+- OTP is sent to the user's email within 30 seconds of successful credential validation.
 
 ### Negative Criteria
 - Login is rejected if the email domain is not a recognised company domain.
 - Login is rejected if the password is incorrect; the system shows a generic error without specifying which field is wrong.
 - Login is blocked after 5 consecutive failed attempts; account is temporarily locked.
 - An expired or already-used password reset link renders the reset form invalid.
-- Entering an incorrect MFA code denies access; the user must retry.
-
+- An incorrect OTP denies access; the user must retry or request a new OTP.
+- An OTP older than 5 minutes is rejected as expired; the user must request a new one.
 
 ## UC2: Register
 
@@ -69,15 +67,14 @@
 3. System validates that the email belongs to an accepted company domain.
 4. System creates the account and sends a verification email.
 5. User clicks the verification link in their email.
-6. Account is activated and user is redirected to the login page.
+6. Account is activated and user is redirected to the dashboard.
 
 ### Acceptance Criteria
 - Account is created successfully when all required fields are valid and the email domain is accepted.
 - A verification email is sent within 60 seconds of registration.
-- Clicking the verification link activates the account.
+- Clicking the verification link activates the account and redirects the user directly to the dashboard.
 - Passwords must meet the minimum strength requirements (at least 8 characters, one uppercase, one number, one special character).
 - Newly registered users are assigned the Developer role by default until an admin changes it.
-
 ### Negative Criteria
 - Registration is rejected if the email does not match an accepted company domain.
 - Registration is rejected if any required field is empty.
