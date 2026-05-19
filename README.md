@@ -1,4 +1,7 @@
-<h1 align="center">Momently</h1>
+<p align="center">
+  <img src="./assets/images/momently name.png" alt="Momently" width="260" />
+</p>
+
 <p align="center">
   <img src="./assets/images/logo-light.png#gh-light-mode-only" width="200" alt="Momently"/>
   <img src="./assets/images/logo-light.png#gh-dark-mode-only" width="200" alt="Momently"/>
@@ -23,9 +26,6 @@
   <img src="./assets/images/client-logo.png" width="100" alt="Momentum Life"/>
 </p>
 
-<p align="center">
-  <img src="./assets/images/Momently-gif.gif" width="160" alt="Momently in action"/>
-</p>
 
 ---
 
