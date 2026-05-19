@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/images/momently name.png" alt="Momently" width="260" />
+  <img src="../assets/images/momently name.png" alt="Momently" width="260" />
 </p>
 
 <p align="center">Every moment counts</p>
