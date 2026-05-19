@@ -7,7 +7,7 @@ import java.util.UUID;  // ← ADD THIS IMPORT
 
 //DTO - data transfer object
 
-// this file will essentially be what the front-end sends to create the time-entry
+// this file will essentially be what the front-end sends to create the time-entry, so basically this is what backend expects
 // defines the JSON that frontend must send and then SpringBoot will automatically map the JSON to the object field getters and setters
 public class TimeEntryRequest {
 
