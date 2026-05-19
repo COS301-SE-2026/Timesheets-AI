@@ -3,7 +3,7 @@ package timesheets.dto.request;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
-import java.util.UUID;  // ← ADD THIS IMPORT
+import java.util.UUID; 
 
 //DTO - data transfer object
 
@@ -12,9 +12,9 @@ import java.util.UUID;  // ← ADD THIS IMPORT
 public class TimeEntryRequest {
 
     @NotNull(message = "Project ID is required")
-    private UUID projectId;  // ← Long → UUID
+    private UUID projectId;  
 
-    private UUID taskId;     // ← Long → UUID
+    private UUID taskId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
