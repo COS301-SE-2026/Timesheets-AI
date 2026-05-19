@@ -1,1 +1,247 @@
-<p>signup works!</p>
+<main class="signup-shell">
+
+  <!-- Left: Hero / marketing section -->
+  <section class="signup-hero" aria-label="Momently productivity overview">
+    <div class="hero-inner">
+
+      <!-- Brand (hero header) -->
+      <a class="brand brand--hero" href="/" aria-label="Momently home">
+        <img class="brand-logo" [src]="brandLogo" alt="" />
+        <span class="brand-copy">
+          <span class="brand-name">Momently</span>
+          <span class="brand-tagline">Every moment counts</span>
+        </span>
+      </a>
+
+      <!-- Hero content / headline -->
+      <div class="hero-content">
+        <p class="eyebrow"><span class="eyebrow-dot"></span>Every moment counts</p>
+
+        <h1 class="hero-title">
+          Start Your<br />
+          <span class="hero-title__accent">AI Productivity</span><br />
+          Journey
+        </h1>
+
+        <p class="hero-description">
+          Join over 10,000+ professionals who have regained 5 hours per week by automating their time tracking with Momently.
+        </p>
+      </div>
+
+      <!-- Decorative product preview (non-interactive UI mock) -->
+      <div class="project-preview" aria-hidden="true">
+
+        <!-- Active projects card -->
+        <div class="preview-card">
+
+          <!-- Card header -->
+          <div class="preview-header">
+            <span class="preview-label">ACTIVE PROJECTS</span>
+            <span class="live-pill">LIVE</span>
+          </div>
+
+          <!-- Progress row: code activity -->
+          <div class="preview-row">
+            <span class="preview-icon preview-icon--code">
+              <svg viewBox="0 0 24 24">
+                <path d="m9 8-4 4 4 4"></path>
+                <path d="m15 8 4 4-4 4"></path>
+              </svg>
+            </span>
+
+            <div class="progress-track">
+              <span class="progress-fill progress-fill--blue"></span>
+            </div>
+
+            <span class="progress-value">75%</span>
+          </div>
+
+          <!-- Progress row: automation/task activity -->
+          <div class="preview-row">
+            <span class="preview-icon preview-icon--wand">
+              <svg viewBox="0 0 24 24">
+                <path d="m14 4 6 6"></path>
+                <path d="m5 19 9-9"></path>
+                <path d="m12 6 2-2 6 6-2 2"></path>
+              </svg>
+            </span>
+
+            <div class="progress-track">
+              <span class="progress-fill progress-fill--orange"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI suggestion card -->
+        <div class="suggestion-card">
+
+          <!-- Icon -->
+          <span class="spark-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3.5 13.6 9l5.4 1.6-5.4 1.7L12 18l-1.6-5.7L5 10.6 10.4 9 12 3.5Z"></path>
+            </svg>
+          </span>
+
+          <!-- Suggestion text -->
+          <div class="suggestion-copy">
+            <strong>AI Suggestion</strong>
+            <p>Found 2.5 untracked hours</p>
+          </div>
+
+          <button type="button" tabindex="-1">Apply to Timesheet</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Right: Signup form section -->
+  <section class="signup-panel" aria-labelledby="signup-title">
+    <div class="form-wrap">
+
+      <!-- Brand (form header) -->
+      <a class="brand brand--form" href="/" aria-label="Momently home">
+        <img class="brand-logo" [src]="brandLogo" alt="" />
+        <span class="brand-copy">
+          <span class="brand-name">Momently</span>
+          <span class="brand-tagline">Every moment counts</span>
+        </span>
+      </a>
+
+      <!-- Form heading -->
+      <header class="form-heading">
+        <h1 id="signup-title" class="form-title">Create your account</h1>
+        <p class="form-subtitle">Start tracking with intelligence today.</p>
+      </header>
+
+      <!-- Signup form -->
+      <form [formGroup]="signupForm" (ngSubmit)="createAccount()" novalidate>
+
+        <!-- Email field -->
+        <div class="field">
+          <label class="field-label" for="signup-email">Work Email</label>
+
+          <span class="input-shell" [class.input-shell--error]="showEmailError">
+            <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6.5h16v11H4z"></path>
+              <path d="m4.5 7 7.5 6 7.5-6"></path>
+            </svg>
+
+            <input
+              id="signup-email"
+              type="email"
+              formControlName="email"
+              placeholder="john@company.com"
+              autocomplete="email"
+              [attr.aria-invalid]="showEmailError"
+            />
+          </span>
+
+          <!-- Email validation error -->
+          @if (showEmailError) {
+            <p class="field-error" role="alert">{{ emailErrorMessage }}</p>
+          }
+        </div>
+
+        <!-- Password field -->
+        <div class="field">
+          <label class="field-label" for="signup-password">Password</label>
+
+          <span class="input-shell" [class.input-shell--error]="showPasswordError">
+            <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="6" y="10" width="12" height="10" rx="2"></rect>
+              <path d="M8 10V8a4 4 0 0 1 8 0v2"></path>
+            </svg>
+
+            <!-- Password input toggle -->
+            <input
+              id="signup-password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              [attr.aria-invalid]="showPasswordError"
+            />
+
+            <button
+              class="icon-button"
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
+                <circle cx="12" cy="12" r="2.5"></circle>
+              </svg>
+            </button>
+          </span>
+
+          <!-- Password validation error or hint -->
+          @if (showPasswordError) {
+            <p class="field-error" role="alert">{{ passwordErrorMessage }}</p>
+          } @else {
+            <p class="field-hint">
+              Must be at least 8 characters long with a mix of letters and numbers.
+            </p>
+          }
+        </div>
+
+        <!-- Terms checkbox -->
+        <div class="terms-block">
+          <label class="terms">
+            <input type="checkbox" formControlName="acceptedTerms" />
+            <span>
+              I agree to the <a href="/">Terms of Service</a> and <a href="/">Privacy Policy</a>.
+            </span>
+          </label>
+
+          <!-- Terms validation error -->
+          @if (showTermsError) {
+            <p class="field-error" role="alert">{{ termsErrorMessage }}</p>
+          }
+        </div>
+
+        <!-- Submit button -->
+        <button class="submit-button" type="submit">Create Account</button>
+      </form>
+
+      <!-- Social login divider -->
+      <div class="divider" role="separator" aria-hidden="true">
+        <span class="divider-line"></span>
+        <span class="divider-label">OR SIGN UP WITH</span>
+        <span class="divider-line"></span>
+      </div>
+
+      <!-- Social signup buttons -->
+      <div class="social-grid">
+
+        <button class="social-button" type="button" aria-label="Sign up with Google">
+          <svg class="social-logo" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Google
+        </button>
+
+        <button class="social-button" type="button" aria-label="Sign up with Microsoft">
+          <svg class="social-logo" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#f25022" d="M1 1h10v10H1z"/>
+            <path fill="#00a4ef" d="M13 1h10v10H13z"/>
+            <path fill="#7fba00" d="M1 13h10v10H1z"/>
+            <path fill="#ffb900" d="M13 13h10v10H13z"/>
+          </svg>
+          Microsoft
+        </button>
+
+      </div>
+
+      <!-- Link to sign in page -->
+      <p class="signin-copy">
+        Already have an account? <a href="/">Sign in here</a>
+      </p>
+
+    </div>
+  </section>
+</main>
