@@ -34,6 +34,8 @@ describe('SignupComponent', () => {
   // Test that the signup form starts with default invalid values
   it('should initialise the signup form as invalid', () => {
     expect(componentInstance.signupForm.invalid).toBe(true);
+    expect(componentInstance.signupForm.controls.name.value).toBe('');
+    expect(componentInstance.signupForm.controls.surname.value).toBe('');
     expect(componentInstance.signupForm.controls.email.value).toBe('');
     expect(componentInstance.signupForm.controls.password.value).toBe('');
     expect(componentInstance.signupForm.controls.acceptedTerms.value).toBe(false);
@@ -65,6 +67,14 @@ describe('SignupComponent', () => {
 
     fixture.detectChanges();
 
+    // Verify name validation errors
+    expect(componentInstance.showNameError).toBe(true);
+    expect(componentInstance.nameErrorMessage).toBe('Name is required.');
+
+    // Verify surname validation errors
+    expect(componentInstance.showSurnameError).toBe(true);
+    expect(componentInstance.surnameErrorMessage).toBe('Surname is required.');
+
     // Verify email validation errors
     expect(componentInstance.showEmailError).toBe(true);
     expect(componentInstance.emailErrorMessage).toBe('Work email is required.');
@@ -76,6 +86,50 @@ describe('SignupComponent', () => {
     // Verify terms checkbox validation errors
     expect(componentInstance.showTermsError).toBe(true);
     expect(componentInstance.termsErrorMessage).toBe('You must accept the Terms of Service and Privacy Policy.');
+  });
+
+  // Test name validation rules
+  it('should validate name minimum length', () => {
+
+    // Set a name that is too short
+    componentInstance.signupForm.controls.name.setValue('J');
+    componentInstance.signupForm.controls.name.markAsTouched();
+
+    expect(componentInstance.showNameError).toBe(true);
+    expect(componentInstance.nameErrorMessage).toBe('Name must be at least 2 characters.');
+  });
+
+  // Test that valid names do not show errors
+  it('should return an empty name error message when name is valid', () => {
+
+    // Set a valid name
+    componentInstance.signupForm.controls.name.setValue('John');
+    componentInstance.signupForm.controls.name.markAsTouched();
+
+    expect(componentInstance.showNameError).toBe(false);
+    expect(componentInstance.nameErrorMessage).toBe('');
+  });
+
+  // Test surname validation rules
+  it('should validate surname minimum length', () => {
+
+    // Set a surname that is too short
+    componentInstance.signupForm.controls.surname.setValue('D');
+    componentInstance.signupForm.controls.surname.markAsTouched();
+
+    expect(componentInstance.showSurnameError).toBe(true);
+    expect(componentInstance.surnameErrorMessage).toBe('Surname must be at least 2 characters.');
+  });
+
+  // Test that valid surnames do not show errors
+  it('should return an empty surname error message when surname is valid', () => {
+
+    // Set a valid surname
+    componentInstance.signupForm.controls.surname.setValue('Doe');
+    componentInstance.signupForm.controls.surname.markAsTouched();
+
+    expect(componentInstance.showSurnameError).toBe(false);
+    expect(componentInstance.surnameErrorMessage).toBe('');
   });
 
   // Test that terms error disappears once terms are accepted
@@ -142,6 +196,8 @@ describe('SignupComponent', () => {
 
     // Fill the form with valid values
     componentInstance.signupForm.setValue({
+      name: 'John',
+      surname: 'Doe',
       email: 'john@company.com',
       password: 'Password1',
       acceptedTerms: true
@@ -154,6 +210,8 @@ describe('SignupComponent', () => {
 
     // Verify submission logging
     expect(consoleInfoSpy).toHaveBeenCalledWith('Sign up submitted', {
+      name: 'John',
+      surname: 'Doe',
       email: 'john@company.com'
     });
 
@@ -172,6 +230,10 @@ describe('SignupComponent', () => {
 
     // Verify form heading text
     expect(compiled.querySelector('#signup-title')?.textContent).toContain('Create your account');
+
+    // Verify name and surname fields render
+    expect(compiled.querySelector('label[for="signup-name"]')?.textContent).toContain('Name');
+    expect(compiled.querySelector('label[for="signup-surname"]')?.textContent).toContain('Surname');
 
     // Verify submit button text
     expect(compiled.querySelector('.submit-button')?.textContent).toContain('Create Account');

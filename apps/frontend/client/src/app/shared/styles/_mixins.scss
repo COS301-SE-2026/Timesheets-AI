@@ -372,6 +372,12 @@
     gap: var(--space-4);
   }
 
+  .name-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+
   // Individual form field wrapper
   .field {
     display: grid;
@@ -659,6 +665,10 @@
 
   // Small mobile scaling for preview UI
   @media (max-width: 640px) {
+    .name-grid {
+      grid-template-columns: 1fr;
+    }
+
     .project-preview {
       transform: scale(0.72);
     }

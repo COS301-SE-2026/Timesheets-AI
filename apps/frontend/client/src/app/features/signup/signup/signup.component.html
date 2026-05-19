@@ -117,6 +117,58 @@
       <!-- Signup form -->
       <form [formGroup]="signupForm" (ngSubmit)="createAccount()" novalidate>
 
+        <div class="name-grid">
+          <!-- Name field -->
+          <div class="field">
+            <label class="field-label" for="signup-name">Name</label>
+
+            <span class="input-shell" [class.input-shell--error]="showNameError">
+              <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 21a8 8 0 0 0-16 0"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+
+              <input
+                id="signup-name"
+                type="text"
+                formControlName="name"
+                placeholder="John"
+                autocomplete="given-name"
+                [attr.aria-invalid]="showNameError"
+              />
+            </span>
+
+            @if (showNameError) {
+              <p class="field-error" role="alert">{{ nameErrorMessage }}</p>
+            }
+          </div>
+
+          <!-- Surname field -->
+          <div class="field">
+            <label class="field-label" for="signup-surname">Surname</label>
+
+            <span class="input-shell" [class.input-shell--error]="showSurnameError">
+              <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 21a8 8 0 0 0-16 0"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+
+              <input
+                id="signup-surname"
+                type="text"
+                formControlName="surname"
+                placeholder="Doe"
+                autocomplete="family-name"
+                [attr.aria-invalid]="showSurnameError"
+              />
+            </span>
+
+            @if (showSurnameError) {
+              <p class="field-error" role="alert">{{ surnameErrorMessage }}</p>
+            }
+          </div>
+        </div>
+
         <!-- Email field -->
         <div class="field">
           <label class="field-label" for="signup-email">Work Email</label>
