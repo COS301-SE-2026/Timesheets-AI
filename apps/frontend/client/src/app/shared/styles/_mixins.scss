@@ -29,7 +29,11 @@
     font-weight: var(--font-weight-semibold);
     line-height: var(--line-height-tight);
     letter-spacing: var(--letter-spacing-normal);
-    color: var(--color-text-body);
+    color: var(--color-text-primary);
+  }
+
+  .brand-name__accent {
+    color: var(--color-secondary);
   }
 
   // Secondary tagline under brand name
