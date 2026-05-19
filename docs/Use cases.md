@@ -1,8 +1,11 @@
-# Use Cases
+<p align="center">
+  <img src="assets/images/momently name.png" alt="Momently" width="260" />
+</p>
 
-**Momently** 
-Every moment counts
-Team Cybernauts · COS 301 · University of Pretoria · 2026
+<p align="center">Every moment counts</p>
+<p align="center">Team Cybernauts · COS 301 · University of Pretoria · 2026</p>
+
+## Use cases
 
 
 ## Use Case Summary
