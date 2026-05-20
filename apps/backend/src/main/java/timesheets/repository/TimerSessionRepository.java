@@ -17,6 +17,9 @@ public interface TimerSessionRepository extends JpaRepository<TimerSession, UUID
     
     //should find an active timer of a member by their workspace_id
     Optional<TimerSession> findByWorkspaceMemberIdAndIsRunningTrue(UUID workspaceMemberId);
+
+    //! the reason I am using optional is because this might not exist and optional forces a case where this does not exist to be handled.
+    //! if I used null I might get null exceptions
     
     
     //sees if the user has an active timer
