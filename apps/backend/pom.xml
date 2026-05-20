@@ -128,6 +128,23 @@ it must end with:
             <version>${flyway.version}</version>
             <scope>runtime</scope>
         </dependency>
+        
+        <!-- Lombok reduces boilerplate code by auto-generating getters, setters,
+             constructors and builders at compile time using annotations like
+             @Data, @Builder, @NoArgsConstructor and @AllArgsConstructor.
+             marked as optional so it is not included in the final JAR -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Spring Data Redis provides RedisTemplate and other utilities for
+             interacting with Redis. Used here for token blacklisting on logout -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -143,6 +160,22 @@ it must end with:
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId> 
+            </plugin>
+
+            <!-- Spring Boot Maven Plugin - packages the app into a runnable JAR and provides
+                 the spring-boot:run command. Lombok is excluded from the final JAR because
+                 it is only needed at compile time, not at runtime -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
