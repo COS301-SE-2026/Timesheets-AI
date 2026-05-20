@@ -7,6 +7,8 @@ MOMENTLY DESIGN SYSTEM
 @use
 './app/shared/styles/index' as *;
 
+@import 'material-icons/iconfont/material-icons.css';
+
 /*The "as *" means all forwarded tokens are available globally without needing to prefix them*/
 
 html, body {
