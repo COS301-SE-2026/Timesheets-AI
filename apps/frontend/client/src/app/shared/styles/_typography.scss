@@ -53,6 +53,9 @@ These fonts are loaded from Google Fonts and used globally.
     --letter-spacing-normal: 0;
     --letter-spacing-wide: 0.04em;
     --letter-spacing-wider: 0.08em;
+
+    --letter-spacing-normal: 0;
+    --letter-spacing-wider:  0.08em;
 }
 
 /* -----------------------------------------------------------------------------
@@ -217,10 +220,4 @@ These are used directly in HTML templates for consistent text styling.
 .text-link:hover {
     color: var(--color-primary-hover);
     text-decoration: underline;
-}
-
-/* Add to _typography.scss */
-:root {
-  --letter-spacing-normal: 0;
-  --letter-spacing-wider:  0.08em;
 }
