@@ -1,6 +1,6 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-// import { ComponentShowcaseComponent } from './component-showcase.component';
+import { ComponentShowcaseComponent } from './component-showcase.component';
 
 // describe('ComponentShowcaseComponent', () => {
 //   let component: ComponentShowcaseComponent;

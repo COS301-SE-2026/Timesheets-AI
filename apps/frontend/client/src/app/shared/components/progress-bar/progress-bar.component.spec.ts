@@ -1,6 +1,6 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-// import { ProgressBarComponent } from './progress-bar.component';
+import { ProgressBarComponent } from './progress-bar.component';
 
 // describe('ProgressBarComponent', () => {
 //   let component: ProgressBarComponent;

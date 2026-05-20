@@ -18,7 +18,8 @@ interface NavItem {
 
 export class SidebarComponent {
 
-  constructor(private router: Router) {}
+  //since it is not reassigned
+  constructor(private readonly router: Router) {}
 
   // create reactive state variable so it stores state, update UI automatically when changed 
   navItems = signal<NavItem[]>([

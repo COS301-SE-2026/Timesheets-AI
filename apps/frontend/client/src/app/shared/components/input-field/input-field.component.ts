@@ -7,7 +7,12 @@ import { Component, input } from '@angular/core';
   styleUrl: './input-field.component.scss'
 })
 export class InputFieldComponent {
+
   label = input<string>('');
+
   placeholder = input<string>('');
+
   error = input<string>('');
+
+  inputId = `input-${crypto.randomUUID()}`;
 }

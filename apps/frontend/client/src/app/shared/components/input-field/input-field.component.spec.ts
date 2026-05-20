@@ -1,6 +1,6 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-// import { InputFieldComponent } from './input-field.component';
+import { InputFieldComponent } from './input-field.component';
 
 // describe('InputFieldComponent', () => {
 //   let component: InputFieldComponent;
