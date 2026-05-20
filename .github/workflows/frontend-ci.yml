@@ -47,3 +47,12 @@ jobs:
                 cd apps/frontend/client
                 yarn install --frozen-lockfile 
                 yarn test --watch=false
+
+            - name: Lint (Turbo)
+              run: yarn lint
+
+            - name: Test (Turbo)
+              run: yarn test
+
+            - name: Build (Turbo)
+              run: yarn build 
