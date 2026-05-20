@@ -1,0 +1,17 @@
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-input {
+  padding: 0.75rem;
+  border: 1px solid var(--color-gray-light);
+  border-radius: 8px;
+  color: var(--color-text-body);
+}
+
+.field-error {
+  color: var(--color-error);
+  font-size: 0.875rem;
+}
