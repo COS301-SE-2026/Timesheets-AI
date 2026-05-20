@@ -131,13 +131,14 @@
                 <polyline points="22,6 12,13 2,6"/>
                 </svg>
                 <input
-                id="email"
-                type="email"
-                formControlName="email"
-                placeholder="john@company.com"
-                autocomplete="email"
-                [attr.aria-invalid]="loginForm.get('email')?.invalid &&
-                                    loginForm.get('email')?.touched"
+                    id="email"
+                    name="username"
+                    type="email"
+                    formControlName="email"
+                    placeholder="john@company.com"
+                    autocomplete="username"
+                    [attr.aria-invalid]="loginForm.get('email')?.invalid &&
+                                        loginForm.get('email')?.touched"
                 />
             </span>
             @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
@@ -158,13 +159,14 @@
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                 </svg>
                 <input
-                id="password"
-                [type]="showPassword ? 'text' : 'password'"
-                formControlName="password"
-                placeholder="••••••••"
-                autocomplete="current-password"
-                [attr.aria-invalid]="loginForm.get('password')?.invalid &&
-                                    loginForm.get('password')?.touched"
+                    id="password"
+                    name="password"
+                    [type]="showPassword ? 'text' : 'password'"
+                    formControlName="password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                    [attr.aria-invalid]="loginForm.get('password')?.invalid &&
+                                        loginForm.get('password')?.touched"
                 />
                     <button
                     class="icon-button"
