@@ -14,12 +14,15 @@
         <!-- Imports -->
         <module name="UnusedImports"/>
         <module name="RedundantImport"/>
+        <module name="AvoidStarImport"/> <!-- prevent import java.util.* - to avoids hidden dependencies-->
 
         <!-- Whitespace -->
         <module name="NoTrailingWhitespace"/>
         <module name="GenericWhitespace"/>
+        <module name="EmptyLineSeparator"/>
 
-        <!-- Misc -->
+        <!-- Misc: Code style  -->
         <module name="UpperEll"/>
+        <module name="NeedBraces"/>
     </module>
 </module>

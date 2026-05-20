@@ -6,12 +6,9 @@ name: Backend Pipeline
 on:
     push:
         branches: [main, dev]
-        # paths:
-        #     - 'apps/backend/**' 
+    
     pull_request:
         branches: [main, dev]
-        # paths:
-        #     - 'apps/backend/**'
 
 jobs:
     # this is only for backend check only and provide job access to the code in the repo 
@@ -44,6 +41,15 @@ jobs:
             # maven (pom.xml) will be used to download dependencies and it will be cache so it will spped up with the builds
             cache: 'maven'
             cache-dependency-path: apps/backend/pom.xml
+
         - name: Build with Maven 
           if: steps.filter.outputs.backend == 'true'
           run: mvn -f apps/backend/pom.xml clean verify 
+
+        - name: Run Unit Tests
+          if: steps.filter.outputs.backend == 'true'
+          run: mvn -f apps/backend/pom.xml test
+
+        - name: Lint 
+          if: steps.filter.outputs.backend == 'true'
+          run: mvn -f apps/backend/pom.xml checkstyle:check
