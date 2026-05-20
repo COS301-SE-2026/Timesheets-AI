@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { TimesheetsComponent } from './features/timesheets/timesheets.component';
+import { ComponentShowcaseComponent } from './pages/component-showcase/component-showcase.component';
 
 export const routes: Routes = [
     { path: '', redirectTo:'timesheets', pathMatch:'full'},
-    { path: 'timesheets', component: TimesheetsComponent}
+    { path: '', component: ComponentShowcaseComponent}
 ];

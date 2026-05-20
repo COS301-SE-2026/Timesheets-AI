@@ -1,15 +1,23 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
 .sidebar {
-  width: 240px;
+  width: 100%;
   height: 100vh;
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
   display: flex;
   flex-direction: column;
+
+  overflow-y: auto;
+
   padding: 24px 16px;
   box-sizing: border-box;
-  position: fixed;
-  left: 0;
-  top: 0;
+
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
 }
 
 // Logo Styling
