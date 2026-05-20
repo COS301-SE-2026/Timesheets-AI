@@ -120,39 +120,49 @@
             </div>
 
             <!-- Password -->
+            <!-- Password -->
             <div class="field">
-            <label class="field-label" for="password">Password</label>
-            <span class="input-shell"
-                [class.input-shell--error]="loginForm.get('password')?.invalid &&
-                                            loginForm.get('password')?.touched">
-                <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-                <input
-                    id="password"
-                    name="password"
-                    [type]="showPassword ? 'text' : 'password'"
-                    formControlName="password"
-                    placeholder="••••••••"
-                    autocomplete="current-password"
-                    [attr.aria-invalid]="loginForm.get('password')?.invalid &&
-                                        loginForm.get('password')?.touched"
-                />
-                    <button
-                    class="icon-button"
-                    type="button"
-                    (click)="togglePassword()"
-                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                        <circle cx="12" cy="12" r="3"/>
+                <label class="field-label" for="password">Password</label>
+
+                <span class="input-shell"
+                    [class.input-shell--error]="loginForm.get('password')?.invalid &&
+                                                loginForm.get('password')?.touched">
+
+                    <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                     </svg>
+
+                    <input
+                        id="password"
+                        name="password"
+                        [type]="showPassword ? 'text' : 'password'"
+                        formControlName="password"
+                        placeholder="••••••••"
+                        autocomplete="off"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        [attr.aria-invalid]="loginForm.get('password')?.invalid &&
+                                            loginForm.get('password')?.touched"
+                    />
+
+                    <button
+                        class="icon-button"
+                        type="button"
+                        (click)="togglePassword()"
+                        [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
                     </button>
-            </span>
-            @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
-                <p class="field-error" role="alert">Password is required.</p>
-            }
+
+                </span>
+
+                @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                    <p class="field-error" role="alert">Password is required.</p>
+                }
             </div>
 
             <!-- Remember me + Forgot -->
