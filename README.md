@@ -33,9 +33,10 @@
 
 **Momently** is a web-based time-tracking and productivity insights platform built for Momentum Life's IT department. Where existing tools track hours, Momently understands them - surfacing AI-driven insights into where effort goes, flagging anomalies, integrating with Jira and GitHub, and giving managers the visibility they need to lead high-performing teams.
 
----
+
 
 ## Project Dashboard
+
 
 ### Build and Quality
 
@@ -47,7 +48,26 @@
 <p align="left">
   <img src="https://img.shields.io/badge/linting-clean-1A65BF?style=for-the-badge&logo=eslint&logoColor=white" alt="Linting"/>
   <img src="https://img.shields.io/badge/tests-passing-1A65BF?style=for-the-badge&logo=jest&logoColor=white" alt="Tests"/>
+  
 </p>
+<p>
+  <img src ="https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg" alt="Contributors"/>
+</p>
+
+### SonarQube quality badges
+<p>
+   <img src = "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=security_rating&logoColor=white&color=0F4C91" alt="Bugs"/>
+   <img src = "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=sqale_rating&logoColor=white&color=0F4C91" alt = "Badge"/>
+  <img src= "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=reliability_rating" alt = "Badges"/>
+</p>
+<p>
+   <img src= "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=sqale_index" alt = "Badges"/>
+  <img src = "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=bugs&logoColor=white&color=0F4C91" alt="Bugs"/>
+   <img src = "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=ncloc&logoColor=white&color=0F4C91" alt="Bugs"/>
+     <img src = "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=vulnerabilities&logoColor=white&color=0F4C91" alt="Bugs"/>
+</p>
+
+
 
 ### Project Status
 
@@ -57,6 +77,9 @@
   <img src="https://img.shields.io/github/last-commit/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830&label=last%20commit" alt="Last Commit"/>
   <img src="https://img.shields.io/github/contributors/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830" alt="Contributors"/>
 </p>
+
+
+
 
 ### Issues and Activity
 
@@ -68,6 +91,7 @@
 
 <p align="left">
   <img src="https://img.shields.io/badge/Powered%20by-Cybernauts-0F4C91?style=for-the-badge" alt="Powered by Cybernauts"/>
+</p>
 </p>
 
 
