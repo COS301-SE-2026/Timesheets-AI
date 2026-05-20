@@ -52,11 +52,11 @@ public class InsightsService {
         double avgHoursPerDay = daysBetween > 0 ? totalHours / daysBetween : 0;
         
         //hours per day breakdown
-        Map<LocalDate, Double> hoursPerDay = entries.stream()
-                .collect(Collectors.groupingBy(
-                        entry -> entry.getStartTime().toLocalDate(),
-                        Collectors.summingDouble(entry -> entry.getDurationMinutes() / 60.0)
-                ));
+        //Map<LocalDate, Double> hoursPerDay = entries.stream()
+        // .collect(Collectors.groupingBy(
+        //         entry -> entry.getStartTime().toLocalDate(),
+        //         Collectors.summingDouble(entry -> entry.getDurationMinutes() / 60.0)
+        // ));
 
         //hours per project
         List<InsightsSummaryResponse.ProjectHours> hoursPerProject = entries.stream()
@@ -121,7 +121,7 @@ public class InsightsService {
                 .totalHoursLogged(totalHours)
                 .averageHoursPerDay(avgHoursPerDay)
                 .totalDaysLogged((int) uniqueDays)
-                .hoursPerDay(hoursPerDay)
+                //.hoursPerDay(hoursPerDay)
                 .hoursPerProject(hoursPerProject)
                 .hoursPerTask(hoursPerTask)
                 .dailyTrend(dailyTrend)
