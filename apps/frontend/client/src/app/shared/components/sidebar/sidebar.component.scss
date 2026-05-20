@@ -1,8 +1,8 @@
 .sidebar {
   width: 240px;
   height: 100vh;
-  background-color: #0043a4;
-  color: #ffffff;
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
@@ -21,19 +21,28 @@
   padding-left: 8px;
 
   .logo-icon {
-    background: rgba(255, 255, 255, 0.2);
     width: 32px;
     height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+    object-fit: contain;
   }
 
   .logo-text {
-    h2 { font-size: 18px; margin: 0; font-weight: 600; }
-    p { font-size: 11px; margin: 2px 0 0 0; opacity: 0.7; }
+    h2 {
+      font-size: 18px;
+      margin: 0;
+      font-weight: 700;
+      color: var(--color-text-inverse);
+    }
+
+    h2 span {
+      color: var(--color-secondary);
+    }
+
+    p {
+      font-size: 11px;
+      margin: 2px 0 0 0;
+      opacity: 0.8;
+    }
   }
 }
 
@@ -59,12 +68,12 @@
 
   &:hover {
     background-color: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
+    color: var(--color-text-inverse);
   }
 
   &.active {
-    background-color: #0052cc; // Brighter highlight blue
-    color: #ffffff;
+    background-color: var(--color-primary-hover);
+    color: var(--color-text-inverse);
     font-weight: 500;
   }
 }
