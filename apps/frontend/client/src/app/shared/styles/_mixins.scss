@@ -11,8 +11,8 @@
     .brand-logo {
     display: block;
     flex: 0 0 auto;
-    width: calc(var(--space-12) * 1.4);
-    height: calc(var(--space-12) * 1.4);
+    width: var(--space-12);
+    height: var(--space-12);
     object-fit: contain;
     }
 
@@ -93,7 +93,6 @@
     width: 360px;
     margin-top: clamp(var(--space-12), 8vh, 88px);
   }
-  }
 
     // Main hero title
     .hero-title {
@@ -150,13 +149,6 @@
         margin-bottom: var(--space-6);
     }
 
-  // Label text inside preview card header
-  .preview-label {
-    font-size: var(--font-size-caption);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: var(--letter-spacing-wider);
-    color: var(--color-text-muted);
-  }
   // Label text inside preview card header
   .preview-label {
     font-size: var(--font-size-caption);
@@ -345,18 +337,7 @@
     flex-direction: column;
     gap: var(--space-4);
   }
-  // Form layout structure
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-  }
 
-  .name-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-4);
-  }
   .name-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -655,16 +636,7 @@
     .name-grid {
       grid-template-columns: 1fr;
     }
-  // Small mobile scaling for preview UI
-  @media (max-width: 640px) {
-    .name-grid {
-      grid-template-columns: 1fr;
-    }
 
-    .project-preview {
-      transform: scale(0.72);
-    }
-  }
     .project-preview {
       transform: scale(0.72);
     }
