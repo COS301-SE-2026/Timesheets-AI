@@ -16,7 +16,7 @@ export class LoginComponent implements OnInit {
   errorMessage = '';
   showPassword = false;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private readonly fb: FormBuilder) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({
