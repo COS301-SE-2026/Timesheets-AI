@@ -4,7 +4,4 @@
 MOMENTLY DESIGN SYSTEM
 ============================================================ */ 
 
-@use
-'./app/shared/styles/index' as *;
-
-/*The "as *" means all forwarded tokens are available globally without needing to prefix them*/
+@use './app/shared/styles/index' as *;
