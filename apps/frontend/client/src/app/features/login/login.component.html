@@ -4,39 +4,14 @@
     <section class="signup-hero">
         <div class="hero-inner">
 
-        <div class="brand brand--hero">
-            <div class="brand-icon">
-            <svg width="20" height="20" viewBox="0 0 120 150"
-                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <defs>
-                <clipPath id="cl-top">
-                    <polygon points="18,10 102,10 68,76 52,76"/>
-                </clipPath>
-                <clipPath id="cl-bot">
-                    <polygon points="52,80 68,80 102,140 18,140"/>
-                </clipPath>
-                </defs>
-                <polygon points="18,10 102,10 68,76 52,76"
-                fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
-                <polygon points="52,80 68,80 102,140 18,140"
-                fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/>
-                <line x1="14" y1="10" x2="106" y2="10"
-                stroke="#fff" stroke-width="8" stroke-linecap="round"/>
-                <line x1="14" y1="140" x2="106" y2="140"
-                stroke="#fff" stroke-width="8" stroke-linecap="round"/>
-                <g clip-path="url(#cl-top)">
-                <rect x="10" y="10" width="100" height="66" fill="#E07830" rx="2"/>
-                </g>
-                <g clip-path="url(#cl-bot)">
-                <rect x="10" y="80" width="100" height="60" fill="#4A7AB5" rx="2"/>
-                </g>
-            </svg>
-            </div>
+            <!-- Brand (hero header) -->
+        <a class="brand brand--hero" href="/" aria-label="Momently home">
+            <img class="brand-logo" [src]="brandLogo" alt="" />
             <span class="brand-copy">
-            <span class="brand-name">Momently</span>
+            <span class="brand-name"><span class="brand-name__accent">m</span>omently</span>
             <span class="brand-tagline">Every moment counts</span>
             </span>
-        </div>
+        </a>
 
         <div class="hero-content">
             <h1 class="hero-title">

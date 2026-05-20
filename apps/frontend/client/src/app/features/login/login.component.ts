@@ -1,44 +1,86 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { RouterLink } from '@angular/router'; 
-
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent implements OnInit {
-  loginForm!: FormGroup;
-  loading = false;
-  errorMessage = '';
-  showPassword = false;
+export class LoginComponent {
 
-  constructor(private readonly fb: FormBuilder) {}
+  // Form builder (same style as signup OR you can inject if you want full consistency)
+  private readonly formBuilder = inject(FormBuilder);
 
-  ngOnInit() {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-      remember: [false]
-    });
-  }
+  // Logo (fixes your NG error + allows reuse in template)
+  protected readonly brandLogo = '/assets/momently.png';
 
-  togglePassword() {
+  // UI state
+  protected loading = false;
+  protected errorMessage = '';
+  protected showPassword = false;
+  protected submitted = false;
+
+  // Login form
+  protected readonly loginForm: FormGroup = this.formBuilder.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
+    remember: [false]
+  });
+
+  // Toggle password visibility
+  protected togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
 
-  onSubmit() {
-    if (this.loginForm.invalid) return;
+  // Submit handler
+  protected onSubmit(): void {
+    this.submitted = true;
+
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
     this.loading = true;
     this.errorMessage = '';
+
     setTimeout(() => {
       this.loading = false;
       this.errorMessage = 'Demo only — no backend connected yet.';
     }, 1000);
+  }
+
+  // Email error logic
+  protected get showEmailError(): boolean {
+    const control = this.loginForm.controls['email'];
+    return (control.touched || this.submitted) && control.invalid;
+  }
+
+  protected get emailErrorMessage(): string {
+    const control = this.loginForm.controls['email'];
+
+    if (control.hasError('required')) return 'Email is required.';
+    if (control.hasError('email')) return 'Enter a valid email address.';
+
+    return '';
+  }
+
+  // Password error logic
+  protected get showPasswordError(): boolean {
+    const control = this.loginForm.controls['password'];
+    return (control.touched || this.submitted) && control.invalid;
+  }
+
+  protected get passwordErrorMessage(): string {
+    const control = this.loginForm.controls['password'];
+
+    if (control.hasError('required')) return 'Password is required.';
+
+    return '';
   }
 }
