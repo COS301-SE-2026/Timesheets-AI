@@ -2,7 +2,6 @@ import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-header',
-  imports: [],
   standalone: true,
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'

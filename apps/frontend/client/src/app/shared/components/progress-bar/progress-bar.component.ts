@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-progress-bar',
@@ -8,5 +8,6 @@ import { Component, input } from '@angular/core';
 })
 export class ProgressBarComponent {
   // if the parent does not pass a value, it will starts at 0%
-  progress = input<number>(0);
+  // progress = input<number>(0);
+  @Input() progress = 0;
 }

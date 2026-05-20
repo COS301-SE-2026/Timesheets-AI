@@ -9,26 +9,27 @@ import { CommonModule } from '@angular/common';
   styleUrl: './dropdown.component.scss'
 })
 export class DropdownComponent {
-  //The dropdown receives a list of strings from outside.
+
   options = input<string[]>([]);
-  /*
-  dropdown starts CLOSED (false)
-  becomes true when opened
-  */
+
+  label = input('');
+
+  error = input('');
+
+  disabled = input(false);
+
   isOpen = signal(false);
 
-  //What the user selected
   selectedOption = signal('');
 
-  // read the current state and flips it 
-  toggleDropDown(){
+  dropdownId = `dropdown-${crypto.randomUUID()}`;
+
+  toggleDropDown() {
     this.isOpen.update(open => !open);
   }
 
-  // closes menu after value is set
-  selectOption(option: string){
+  selectOption(option: string) {
     this.selectedOption.set(option);
     this.isOpen.set(false);
-
   }
 }
