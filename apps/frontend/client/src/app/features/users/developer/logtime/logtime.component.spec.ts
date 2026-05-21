@@ -130,7 +130,7 @@ describe('LogtimeComponent', () => {
     const initialTaskCount = component.tasks().length;
 
     component.openManualPanel();
-    component.isCreatingNewTask.set(true);
+    component.newTaskFormContext.set('manual');
     component.newTaskTitle.set('API integration spike');
     component.entryForm.patchValue({
       projectId: projectOneId,
@@ -145,12 +145,12 @@ describe('LogtimeComponent', () => {
     expect(component.tasks().length).toBe(initialTaskCount + 1);
     expect(createdTask?.projectId).toBe(projectOneId);
     expect(component.entries()[0].taskId).toBe(createdTask?.id);
-    expect(component.isCreatingNewTask()).toBe(false);
+    expect(component.newTaskFormContext()).toBeNull();
   });
 
   it('should require a task name when creating a new task', () => {
     component.openManualPanel();
-    component.isCreatingNewTask.set(true);
+    component.newTaskFormContext.set('manual');
     component.newTaskTitle.set('   ');
 
     component.saveEntry();
