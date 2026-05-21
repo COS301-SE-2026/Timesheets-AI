@@ -152,6 +152,10 @@ describe('LoginComponent', () => {
     expect(comp.loginForm.invalid).toBe(true);
   });
 
-  
+  it('should match login page snapshot', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled).toMatchSnapshot();
+  });
 
 });
