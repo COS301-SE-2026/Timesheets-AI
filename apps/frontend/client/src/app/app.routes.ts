@@ -1,8 +1,8 @@
 /* ============================================================
-   APP ROUTES
-   Momently — top-level application routing
-   All feature routes are lazy loaded for performance
-   ============================================================ */
+  APP ROUTES
+  Momently (top-level application routing)
+  All feature routes are lazy loaded for performance
+  ============================================================ */
 
 import { Routes } from '@angular/router';
 import { ComponentShowcaseComponent } from './pages/component-showcase/component-showcase.component';
