@@ -10,5 +10,9 @@ Single import point for all design tokens
 @forward './elevation';
 @forward './globals';
 @forward './mixins';
+@forward './icons';
+
 
 /*just keep adding those we completed and tested!*/
+// So to use: Import the centralized design tokens index system
+// @use '../../shared/styles/index' as tokens;
