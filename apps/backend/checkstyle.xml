@@ -6,6 +6,8 @@
 <!--
   Momently Checkstyle configuration.
   Intentionally permissive for Demo 1, please tighten gradually.
+  Modules to add: AvoidStarImport, EmptyLineSeparator
+  -  
 -->
 <module name="Checker">
     <property name="severity" value="warning"/>
