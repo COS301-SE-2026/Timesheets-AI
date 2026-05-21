@@ -126,6 +126,39 @@ describe('LogtimeComponent', () => {
     expect(component.activePanel()).toBeNull();
   });
 
+  it('should create a new task when saving a manual entry with a custom task name', () => {
+    const initialTaskCount = component.tasks().length;
+
+    component.openManualPanel();
+    component.isCreatingNewTask.set(true);
+    component.newTaskTitle.set('API integration spike');
+    component.entryForm.patchValue({
+      projectId: projectOneId,
+      startTime: '15:00',
+      endTime: '16:00',
+      description: 'Spike work on API integration.'
+    });
+
+    component.saveEntry();
+
+    const createdTask = component.tasks().find((task) => task.title === 'API integration spike');
+    expect(component.tasks().length).toBe(initialTaskCount + 1);
+    expect(createdTask?.projectId).toBe(projectOneId);
+    expect(component.entries()[0].taskId).toBe(createdTask?.id);
+    expect(component.isCreatingNewTask()).toBe(false);
+  });
+
+  it('should require a task name when creating a new task', () => {
+    component.openManualPanel();
+    component.isCreatingNewTask.set(true);
+    component.newTaskTitle.set('   ');
+
+    component.saveEntry();
+
+    expect(component.newTaskTitleError()).toBe(true);
+    expect(component.activePanel()).toBe('manual');
+  });
+
   // Validation: Double Booking Prevention
   it('should prevent overlapping manual entries', () => {
     component.openManualPanel();

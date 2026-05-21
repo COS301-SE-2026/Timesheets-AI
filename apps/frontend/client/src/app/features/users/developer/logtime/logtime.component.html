@@ -97,13 +97,30 @@
             <!-- Tasks are filtered based on the selected project -->
             <label class="field">
               <span class="field__label">Task (Optional)</span>
-              <select formControlName="taskId">
-                @for (task of filteredTasks(); track task.id) {
+              <select formControlName="taskId" (change)="onTaskSelectionChange($event)">
+                <option value="">No task selected</option>
+                @for (task of selectableTasks(); track task.id) {
                   <option [value]="task.id">{{ task.title }}</option>
                 }
+                <option [value]="createNewTaskValue">+ Create new task...</option>
               </select>
             </label>
           </div>
+
+          @if (isCreatingNewTask()) {
+            <label class="field field--full">
+              <span class="field__label">New task name</span>
+              <input
+                type="text"
+                [value]="newTaskTitle()"
+                (input)="newTaskTitle.set($any($event.target).value)"
+                placeholder="Enter a name for the new task"
+              />
+              @if (newTaskTitleError()) {
+                <span class="field__error">Task name is required.</span>
+              }
+            </label>
+          }
 
           <!-- Entry type selector (e.g. Development, Meeting) -->
           <label class="field">
