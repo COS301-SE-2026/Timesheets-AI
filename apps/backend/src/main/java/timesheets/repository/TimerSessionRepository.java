@@ -7,10 +7,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 
 // okay so I am going to use the method of allowing Spring to parse through the method names to get an SQL query
 // I like it, it's faster and somewhat easier, but I will use SQL here and there yk??
+
+//! I want to prevent users from starting multiple timers across different workspaces.
 
 @Repository
 public interface TimerSessionRepository extends JpaRepository<TimerSession, UUID> {
@@ -31,4 +34,8 @@ public interface TimerSessionRepository extends JpaRepository<TimerSession, UUID
     long countActiveByMemberId(@Param("memberId") UUID memberId);
 
     //where the :memberId is, that is where it will be replaced by the variable in the query
+
+
+    //this function will first find the workspaces where the workspaceID is a member and then find if there is a timer that is true
+    Optional<TimerSession> findFirstByWorkspaceMemberIdInAndIsRunningTrue(List<UUID> workspaceMemberIds);
 }
