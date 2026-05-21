@@ -1,0 +1,44 @@
+.stats-card {
+    background: var(--color-white);
+
+    border-radius: 20px;
+
+    padding: 24px;
+
+    border: 1px solid var(--color-border);
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    box-shadow:
+        0 2px 8px rgba(15, 76, 145, 0.04);
+}
+
+.stats-label {
+    font-size: 12px;
+    font-weight: 600;
+
+    color: var(--color-text-muted);
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.08em;
+}
+
+h2 {
+    margin: 0;
+
+    font-size: 28px;
+    font-weight: 700;
+
+    color: var(--color-text-body);
+}
+
+p {
+    margin: 0;
+
+    font-size: 13px;
+
+    color: var(--color-text-muted);
+}
