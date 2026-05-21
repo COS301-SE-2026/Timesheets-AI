@@ -168,7 +168,7 @@ class TimerServiceTest {
         when(workspaceMemberRepository.findAllByUserId(userId)).thenReturn(List.of(workspaceMember));
         when(timerSessionRepository.findFirstByWorkspaceMemberIdInAndIsRunningTrue(any())).thenReturn(Optional.of(existingTimer));  //active timer found!
 
-        assertThatThrownBy(() -> timerService.startTimer(workspaceMemberId, request)).isInstanceOf(ConflictException.class).hasMessageContaining("Timer already active");
+        assertThatThrownBy(() -> timerService.startTimer(workspaceMemberId, request)).isInstanceOf(ConflictException.class).hasMessageContaining("Timer already active in another workspace");
     }
 
 
