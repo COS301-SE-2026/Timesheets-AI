@@ -7,5 +7,5 @@ import { Component, input } from '@angular/core';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  title = input<string>('Dashboard');
+  
 }
