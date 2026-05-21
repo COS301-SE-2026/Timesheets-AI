@@ -1,14 +1,21 @@
 import { Routes } from '@angular/router';
-import { ComponentShowcaseComponent } from './pages/component-showcase/component-showcase.component';
 
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./features/signup/signup/signup.component').then((m) => m.SignupComponent)
+    redirectTo: 'log-time',
+    pathMatch: 'full'
   },
-  
   {
-    path: 'timesheets',
-    loadComponent: () => import('./features/timesheets/timesheets.component').then((m) => m.TimesheetsComponent)
+    path: 'log-time',
+    loadComponent: () =>
+      import('./features/users/developer/logtime/logtime.component').then(
+        (m) => m.LogtimeComponent
+      )
+  },
+  {
+    path: 'signup',
+    loadComponent: () =>
+      import('./features/signup/signup/signup.component').then((m) => m.SignupComponent)
   }
 ];
