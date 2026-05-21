@@ -93,6 +93,21 @@ public class TimerController {
         return ResponseEntity.noContent().build();
     }
 
+    
+    @DeleteMapping("/discard") //the endpoint will look like DELETE /api/timers/discard
+    public ResponseEntity<Void> discardTimer(@RequestHeader("X-Workspace-Member-Id") UUID workspaceMemberId) {
+        
+        TimerSession activeTimer = timerService.getActiveTimer(workspaceMemberId); //should see if there is an active timer
+        
+        if (activeTimer == null) {
+            return ResponseEntity.notFound().build(); //meaning no timer found
+        }
+        
+        timerService.discardTimer(workspaceMemberId); //should just discard the timer
+        
+        return ResponseEntity.noContent().build(); //no success cause nothing created
+    }
+
 
 
 
