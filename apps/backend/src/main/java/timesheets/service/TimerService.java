@@ -172,4 +172,16 @@ public class TimerService {
         return timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId).orElse(null);
     }
     //okay so when the page is refreshed it should still have their timer running, so that is how I am doing it
+
+
+    //! we want our users to be able to discard a timer without without it creating a time entry
+    @Transactional
+    public void discardTimer(UUID workspaceMemberId) {
+        
+        //should find an active timer
+        TimerSession activeTimer = timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId).orElseThrow(() -> new IllegalStateException("No active timer found to discard"));
+        
+       
+        timerSessionRepository.delete(activeTimer); //will just delete the timer entry without creating a new one
+    }
 }
