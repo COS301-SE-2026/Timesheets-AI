@@ -50,6 +50,13 @@ public class InsightsService {
         //average hours per day
         long daysBetween = ChronoUnit.DAYS.between(request.getFrom(), request.getTo()) + 1;
         double avgHoursPerDay = daysBetween > 0 ? totalHours / daysBetween : 0;
+        
+        //hours per day breakdown
+        //Map<LocalDate, Double> hoursPerDay = entries.stream()
+        // .collect(Collectors.groupingBy(
+        //         entry -> entry.getStartTime().toLocalDate(),
+        //         Collectors.summingDouble(entry -> entry.getDurationMinutes() / 60.0)
+        // ));
 
         //hours per project
         List<InsightsSummaryResponse.ProjectHours> hoursPerProject = entries.stream()
