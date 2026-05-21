@@ -1,0 +1,33 @@
+.status-chip {
+    padding: 6px 12px;
+    border-radius: 900px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+    display: inline-block;
+}
+
+.status-chip.Approved {
+    background: var(--color--status-approved-bg);
+    color: var(--color--status--approved-text);
+}
+
+.status-chip.Submitted {
+    background: var(--color-status-in-progress-bg);
+    color: var(--color-status-in-progress-text);
+}
+
+.status-chip.Pending {
+    background: var(--color-status-pending-bg);
+    color: var(--color-status-pending-text);
+}
+
+.status-chip.Rejected {
+    background: var(--color-status-overdue-bg);
+    color: var(--color-status-overdue-text);
+}
+
+.status-chip.Draft {
+    background: var(--color-status-draft-bg);
+    color: var(--color-status-draft-text);
+}

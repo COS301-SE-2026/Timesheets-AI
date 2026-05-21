@@ -1,4 +1,15 @@
-<!-- 
-<router-outlet /> -->
+<div class="app-layout">
+    
+    <app-sidebar></app-sidebar>
 
-<app-timesheets></app-timesheets>
+    <div class="main-layout">
+        <app-header></app-header>
+
+        <main class="page-content">
+            <router-outlet></router-outlet>
+        </main>
+
+        <app-footer></app-footer>
+    </div>
+</div>
+
