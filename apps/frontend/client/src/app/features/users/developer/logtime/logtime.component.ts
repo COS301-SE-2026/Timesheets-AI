@@ -82,9 +82,11 @@ export class LogtimeComponent implements OnDestroy {
   readonly elapsedSeconds = signal(0);
   readonly openMenuEntryId = signal<string | null>(null);
   readonly isEditMode = signal(false);
-  readonly isCreatingNewTask = signal(false);
+  readonly newTaskFormContext = signal<'manual' | 'timer' | null>(null);
   readonly newTaskTitle = signal('');
   readonly newTaskTitleError = signal(false);
+  readonly isTimerPaused = signal(false);
+  readonly pausedElapsedSeconds = signal(0);
 
   // Mock data mimicking database tables
   readonly projects = signal<Project[]>([
@@ -147,6 +149,51 @@ export class LogtimeComponent implements OnDestroy {
       createdAt: `${this.today()}T14:00:00`,
       updatedAt: `${this.today()}T14:00:00`,
       rejectionReason: 'Please add more detail.'
+    },
+    {
+      id: '00000000-0000-0000-0003-000000000004',
+      workspaceMemberId: '00000000-0000-0000-0003-000000000002',
+      projectId: '00000000-0000-0000-0001-000000000001',
+      taskId: '00000000-0000-0000-0002-000000000002',
+      entryType: 'DESIGN',
+      startTime: `${this.today()}T15:30:00`,
+      endTime: `${this.today()}T17:00:00`,
+      durationMinutes: 90,
+      description: 'Created wireframes for dashboard.',
+      status: 'APPROVED',
+      isLocked: false,
+      createdAt: `${this.today()}T15:30:00`,
+      updatedAt: `${this.today()}T15:30:00`
+    },
+    {
+      id: '00000000-0000-0000-0003-000000000005',
+      workspaceMemberId: '00000000-0000-0000-0003-000000000002',
+      projectId: '00000000-0000-0000-0001-000000000002',
+      taskId: '00000000-0000-0000-0002-000000000003',
+      entryType: 'DEVELOPMENT',
+      startTime: `${this.today()}T17:15:00`,
+      endTime: `${this.today()}T18:45:00`,
+      durationMinutes: 90,
+      description: 'Implemented reporting module.',
+      status: 'DRAFT',
+      isLocked: false,
+      createdAt: `${this.today()}T17:15:00`,
+      updatedAt: `${this.today()}T17:15:00`
+    },
+    {
+      id: '00000000-0000-0000-0003-000000000006',
+      workspaceMemberId: '00000000-0000-0000-0003-000000000002',
+      projectId: '00000000-0000-0000-0001-000000000001',
+      taskId: '00000000-0000-0000-0002-000000000001',
+      entryType: 'BREAK',
+      startTime: `${this.today()}T19:00:00`,
+      endTime: `${this.today()}T19:30:00`,
+      durationMinutes: 30,
+      description: 'Lunch break.',
+      status: 'DRAFT',
+      isLocked: false,
+      createdAt: `${this.today()}T19:00:00`,
+      updatedAt: `${this.today()}T19:00:00`
     }
   ]);
 
@@ -185,6 +232,13 @@ export class LogtimeComponent implements OnDestroy {
   readonly selectableTasks = computed(() => this.tasks().filter(
     (task) => task.id && task.projectId === this.entryForm.controls.projectId.value
   ));
+
+  readonly selectableTimerTasks = computed(() => this.tasks().filter(
+    (task) => task.id && task.projectId === this.timerForm.controls.projectId.value
+  ));
+
+  readonly isCreatingNewManualTask = computed(() => this.newTaskFormContext() === 'manual');
+  readonly isCreatingNewTimerTask = computed(() => this.newTaskFormContext() === 'timer');
   
   // Cascades tasks depending on the project selected inside the automated timer form
   readonly timerTasks = computed(() => this.tasks().filter((task) => !task.id || task.projectId === this.timerForm.controls.projectId.value));
@@ -217,9 +271,16 @@ export class LogtimeComponent implements OnDestroy {
     // Cascade resets: Clear tasks selections immediately if a parent project reassignment occurs
     this.entryForm.controls.projectId.valueChanges.subscribe(() => {
       this.entryForm.controls.taskId.setValue('');
-      this.resetNewTaskState();
+      if (this.newTaskFormContext() === 'manual') {
+        this.resetNewTaskState();
+      }
     });
-    this.timerForm.controls.projectId.valueChanges.subscribe(() => this.timerForm.controls.taskId.setValue(''));
+    this.timerForm.controls.projectId.valueChanges.subscribe(() => {
+      this.timerForm.controls.taskId.setValue('');
+      if (this.newTaskFormContext() === 'timer') {
+        this.resetNewTaskState();
+      }
+    });
     
     // Dynamic calculation: Synchronize real-time total duration when inputs change
     this.entryForm.controls.startTime.valueChanges.subscribe(() => this.updateDuration());
@@ -256,14 +317,15 @@ export class LogtimeComponent implements OnDestroy {
     this.activePanel.set('manual');
   }
 
-  onTaskSelectionChange(event: Event): void {
+  onTaskSelectionChange(event: Event, context: 'manual' | 'timer'): void {
     const value = (event.target as HTMLSelectElement).value;
+    const form = context === 'manual' ? this.entryForm : this.timerForm;
 
     if (value === this.createNewTaskValue) {
-      this.isCreatingNewTask.set(true);
+      this.newTaskFormContext.set(context);
       this.newTaskTitle.set('');
       this.newTaskTitleError.set(false);
-      this.entryForm.controls.taskId.setValue('', { emitEvent: false });
+      form.controls.taskId.setValue('', { emitEvent: false });
       return;
     }
 
@@ -271,6 +333,7 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   openTimerPanel(): void {
+    this.resetNewTaskState();
     this.activePanel.set('timer');
   }
 
@@ -291,7 +354,7 @@ export class LogtimeComponent implements OnDestroy {
       return;
     }
 
-    if (this.isCreatingNewTask() && !this.newTaskTitle().trim()) {
+    if (this.newTaskFormContext() === 'manual' && !this.newTaskTitle().trim()) {
       this.newTaskTitleError.set(true);
       return;
     }
@@ -332,15 +395,22 @@ export class LogtimeComponent implements OnDestroy {
    // Instantiates the async timer interval loops, updating counters progressively.
    
   startTimer(): void {
+    if (this.newTaskFormContext() === 'timer' && !this.newTaskTitle().trim()) {
+      this.newTaskTitleError.set(true);
+      return;
+    }
+
     const timer = {
       projectId: this.timerForm.controls.projectId.value,
-      taskId: this.timerForm.controls.taskId.value,
+      taskId: this.resolveTaskId('timer'),
       description: this.timerForm.controls.description.value,
       startedAt: new Date()
     };
 
     this.activeTimer.set(timer);
     this.elapsedSeconds.set(0);
+    this.isTimerPaused.set(false);
+    this.pausedElapsedSeconds.set(0);
     this.clearTimerInterval();
     
     // Increment tracking properties sequentially per second pass
@@ -351,6 +421,26 @@ export class LogtimeComponent implements OnDestroy {
 
   pauseTimer(): void {
     this.clearTimerInterval();
+    this.isTimerPaused.set(true);
+    this.pausedElapsedSeconds.set(this.elapsedSeconds());
+  }
+
+  resumeTimer(): void {
+    const timer = this.activeTimer();
+    if (!timer) {
+      return;
+    }
+
+    this.isTimerPaused.set(false);
+    this.clearTimerInterval();
+
+    // Calculate the offset to continue from paused time
+    const pausedSeconds = this.pausedElapsedSeconds();
+    const startTime = Date.now() - (pausedSeconds * 1000);
+
+    this.timerIntervalId = setInterval(() => {
+      this.elapsedSeconds.set(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
   }
 
    // Evaluates the active time tracking segment and builds a concrete log entry.
@@ -378,6 +468,8 @@ export class LogtimeComponent implements OnDestroy {
 
     this.activeTimer.set(null);
     this.elapsedSeconds.set(0);
+    this.isTimerPaused.set(false);
+    this.pausedElapsedSeconds.set(0);
     this.clearTimerInterval();
     this.toastMessage.set('Timer entry saved.');
     this.closePanel();
@@ -487,14 +579,16 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   private resetNewTaskState(): void {
-    this.isCreatingNewTask.set(false);
+    this.newTaskFormContext.set(null);
     this.newTaskTitle.set('');
     this.newTaskTitleError.set(false);
   }
 
-  private resolveTaskIdForSave(): string {
-    if (!this.isCreatingNewTask()) {
-      return this.entryForm.controls.taskId.value;
+  private resolveTaskId(context: 'manual' | 'timer'): string {
+    const form = context === 'manual' ? this.entryForm : this.timerForm;
+
+    if (this.newTaskFormContext() !== context) {
+      return form.controls.taskId.value;
     }
 
     const title = this.newTaskTitle().trim();
@@ -502,7 +596,7 @@ export class LogtimeComponent implements OnDestroy {
       return '';
     }
 
-    const projectId = this.entryForm.controls.projectId.value;
+    const projectId = form.controls.projectId.value;
     const newTask: Task = {
       id: this.createTaskId(),
       projectId,
@@ -510,7 +604,7 @@ export class LogtimeComponent implements OnDestroy {
     };
 
     this.tasks.update((tasks) => [...tasks, newTask]);
-    this.entryForm.controls.taskId.setValue(newTask.id);
+    form.controls.taskId.setValue(newTask.id);
     this.resetNewTaskState();
 
     return newTask.id;
@@ -549,7 +643,7 @@ export class LogtimeComponent implements OnDestroy {
 
     return {
       projectId: this.entryForm.controls.projectId.value,
-      taskId: this.resolveTaskIdForSave() || null,
+      taskId: this.resolveTaskId('manual') || null,
       startTime: this.toDateTimeValue(selectedDate, this.entryForm.controls.startTime.value),
       endTime: this.toDateTimeValue(selectedDate, this.entryForm.controls.endTime.value),
       durationMinutes: this.entryForm.controls.durationMinutes.value,
