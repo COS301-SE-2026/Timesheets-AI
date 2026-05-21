@@ -1,0 +1,23 @@
+<div class="stats-card">
+
+    <div class="stats-top">
+
+        <span class="stats-label">
+            {{ label }}
+        </span>
+
+    </div>
+
+    <h2>
+        {{ value }}
+    </h2>
+
+    <p>
+        {{ description }}
+    </p>
+
+    <app-progress-bar
+        [progress]="progress">
+    </app-progress-bar>
+
+</div>
