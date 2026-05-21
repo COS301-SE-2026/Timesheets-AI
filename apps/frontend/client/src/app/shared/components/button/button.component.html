@@ -1,0 +1,10 @@
+<button
+  class="app-button"
+  [class.primary]="variant() === 'primary'"
+  [class.secondary]="variant() === 'secondary'"
+  [class.tertiary]="variant() === 'tertiary'"
+  [disabled]="disabled()">
+
+  <ng-content></ng-content>
+
+</button>
