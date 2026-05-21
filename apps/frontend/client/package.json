@@ -8,8 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:watch": "ng test --watch",
-    "test:coverage": "ng test --code-coverage",
-    "lint": "ng lint"
+    "test:coverage": "ng test --coverage"
   },
   "private": true,
   "dependencies": {

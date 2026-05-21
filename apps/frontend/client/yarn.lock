@@ -9579,5 +9579,5 @@ yoctocolors@^2.1.1:
 
 zone.js@~0.15.0:
   version "0.15.1"
-  resolved "https://registry.npmjs.org/zone.js/-/zone.js-0.15.1.tgz"
+  resolved "https://registry.yarnpkg.com/zone.js/-/zone.js-0.15.1.tgz#1e109adb75f80e9e004ee8e0d4a0a52e0a336481"
   integrity sha512-XE96n56IQpJM7NAoXswY3XRLcWFW83xe0BiAOeMD7K5k5xecOeul3Qcpx6GqEeeHNkW5DWL5zOyTbEfB4eti8w==
