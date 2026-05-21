@@ -97,7 +97,7 @@
             <!-- Tasks are filtered based on the selected project -->
             <label class="field">
               <span class="field__label">Task (Optional)</span>
-              <select formControlName="taskId" (change)="onTaskSelectionChange($event)">
+              <select formControlName="taskId" (change)="onTaskSelectionChange($event, 'manual')">
                 <option value="">No task selected</option>
                 @for (task of selectableTasks(); track task.id) {
                   <option [value]="task.id">{{ task.title }}</option>
@@ -107,7 +107,7 @@
             </label>
           </div>
 
-          @if (isCreatingNewTask()) {
+          @if (isCreatingNewManualTask()) {
             <label class="field field--full">
               <span class="field__label">New task name</span>
               <input
@@ -225,12 +225,34 @@
             <!-- Tasks filtered by selected project -->
             <label class="field">
               <span class="field__label">Task (Optional)</span>
-              <select formControlName="taskId" [disabled]="!!activeTimer()">
-                @for (task of timerTasks(); track task.id) {
+              <select
+                formControlName="taskId"
+                [disabled]="!!activeTimer()"
+                (change)="onTaskSelectionChange($event, 'timer')"
+              >
+                <option value="">No task selected</option>
+                @for (task of selectableTimerTasks(); track task.id) {
                   <option [value]="task.id">{{ task.title }}</option>
                 }
+                <option [value]="createNewTaskValue">+ Create new task...</option>
               </select>
             </label>
+
+            @if (isCreatingNewTimerTask()) {
+              <label class="field">
+                <span class="field__label">New task name</span>
+                <input
+                  type="text"
+                  [value]="newTaskTitle()"
+                  (input)="newTaskTitle.set($any($event.target).value)"
+                  placeholder="Enter a name for the new task"
+                  [disabled]="!!activeTimer()"
+                />
+                @if (newTaskTitleError()) {
+                  <span class="field__error">Task name is required.</span>
+                }
+              </label>
+            }
 
             <label class="field">
               <span class="field__label">Description (Optional)</span>
@@ -262,11 +284,21 @@
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12l10-6-10-6Z"></path></svg>
                   Start Timer
                 </button>
-              } @else {
+              } @else if (!isTimerPaused()) {
                 <!-- Pause and stop controls shown when timer is running -->
                 <button class="btn btn--outline" type="button" (click)="pauseTimer()">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12M16 6v12"></path></svg>
                   Pause
+                </button>
+                <button class="btn btn--danger" type="button" (click)="stopTimer()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>
+                  Stop &amp; Save
+                </button>
+              } @else {
+                <!-- Resume and stop controls shown when timer is paused -->
+                <button class="btn btn--primary" type="button" (click)="resumeTimer()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12l10-6-10-6Z"></path></svg>
+                  Resume
                 </button>
                 <button class="btn btn--danger" type="button" (click)="stopTimer()">
                   <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>
