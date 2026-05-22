@@ -15,6 +15,14 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
 
+  /* Log Time page */
+  {
+    path: 'log-time',
+    loadComponent: () =>
+      import('./features/users/developer/logtime/logtime.component')
+        .then(m => m.LogtimeComponent)
+  },
+
   /* Signup page */
   {
     path: 'signup',
