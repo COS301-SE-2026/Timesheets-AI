@@ -69,7 +69,7 @@
 
   <!-- Manual entry panel, also used for editing existing entries -->
   @if (activePanel() === 'manual') {
-    <section class="entry-panel" role="dialog" aria-labelledby="manual-panel-title">
+    <dialog class="entry-panel" aria-labelledby="manual-panel-title">
       <article class="card entry-panel__card">
         <header class="card__header">
           <div>
@@ -193,12 +193,12 @@
           </div>
         </form>
       </article>
-    </section>
+      </dialog>
   }
 
   <!-- Timer panel for automatic time tracking -->
   @if (activePanel() === 'timer') {
-    <section class="entry-panel" role="dialog" aria-labelledby="timer-panel-title">
+   <dialog class="entry-panel" aria-labelledby="timer-panel-title">
       <article class="card entry-panel__card">
         <header class="card__header">
           <div>
@@ -310,7 +310,7 @@
           </div>
         </div>
       </article>
-    </section>
+   </dialog>
   }
 
   <!-- Entries list section -->
