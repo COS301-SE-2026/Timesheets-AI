@@ -16,7 +16,7 @@ export interface Task {
 }
 
 /* ============================================================
-   DAYS (generated to avoid duplication)
+   DAYS 
    ============================================================ */
 const dayLabels = [
   'Mon, May 18',
@@ -37,7 +37,7 @@ export const DAYS: Day[] = dayLabels.map((label, index) => ({
 /* ============================================================
    SUMMARY DATA
    ============================================================ */
-export const DAILY_TOTALS = [
+export const DAILY_TOTALS: string[] = [
   '5hr 30 m',
   '9hr 30 m',
   '6hr 12 m',
@@ -50,7 +50,7 @@ export const DAILY_TOTALS = [
 export const GRAND_TOTAL = '55hr 48 m';
 
 /* ============================================================
-   TASK FACTORY (removes repeated structure)
+   TASK FACTORY 
    ============================================================ */
 const createTask = (
   id: string,
@@ -105,6 +105,37 @@ export const TASKS: Task[] = [
     '#F7C66F',
     ['1hr 10m', '-', '2hr 00m', '2hr 20m', '-', '-', '1hr 20m'],
     '5hr 30m'
+  ),
+  createTask(
+    'DEVOPS-031',
+    'Configure AWS Deployment Pipeline',
+    'Cloud Infrastructure',
+    'Software Development',
+    'fa-solid fa-cloud',
+    '#6FD3C4',
+    ['3hr 00m', '2hr 45m', '-', '-', '-', '1hr 20m', '-'],
+    '5hr 45m'
+  ),
+  createTask(
+    'QA-119',
+    'Test Payment Gateway Integration',
+    'E-Commerce Platform',
+    'Software Development',
+    'fa-solid fa-bug',
+    '#C8A2FF',
+    ['-', '-', '1hr 50m', '2hr 10m', '1hr 30m', '-', '-'],
+    '5hr 30m'
+  ),
+  createTask(
+    'PM-056',
+    'Sprint Planning & Task Estimation',
+    'Internal Management System',
+    'Software Development',
+    'fa-solid fa-list-check',
+    '#89C36B',
+    ['1hr 30m', '1hr 45m', '1hr 20m', '2hr 00m', '-', '-', '1hr 20m'],
+    '5hr 15m'
   )
-  // (you can continue same pattern for remaining tasks)
+
+
 ];
