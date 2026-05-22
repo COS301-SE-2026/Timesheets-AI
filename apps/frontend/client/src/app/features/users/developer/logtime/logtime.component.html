@@ -1,0 +1,468 @@
+<main class="logtime-page">
+  <!-- Page header with title and filter controls -->
+  <header class="page-header">
+    <div class="page-header__copy">
+      <h1>Log Time</h1>
+      <p>Log and manage your time entries.</p>
+    </div>
+
+    <!-- Date and view selector filters -->
+    <div class="page-header__actions" [formGroup]="filterForm">
+      <!-- Date picker pill bound to 'from' filter -->
+      <label class="header-pill header-pill--date">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="4" y="5" width="16" height="15" rx="2"></rect>
+          <path d="M8 3v4M16 3v4M4 10h16"></path>
+        </svg>
+        <input type="date" formControlName="from" aria-label="Select date" />
+        <span class="header-pill__label">{{ headerDateLabel() }}</span>
+      </label>
+
+      <!-- View mode selector  -->
+      <label class="header-pill">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="4" y="5" width="16" height="15" rx="2"></rect>
+          <path d="M8 3v4M16 3v4M4 10h16"></path>
+        </svg>
+        <select [value]="selectedView()" (change)="selectedView.set($any($event.target).value)">
+          @for (view of viewOptions; track view) {
+            <option [value]="view">{{ view }}</option>
+          }
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <!-- Conflict error banner, shown when a time overlap is detected -->
+  @if (conflictMessage()) {
+    <section class="banner banner--danger" role="alert">
+      {{ conflictMessage() }}
+      <button type="button" class="banner__dismiss" (click)="dismissConflict()">Dismiss</button>
+    </section>
+  }
+
+  <!-- Success toast banner, shown after a successful save or update -->
+  @if (toastMessage()) {
+    <output class="banner banner--success">
+      {{ toastMessage() }}
+      <button type="button" class="banner__dismiss" (click)="dismissToast()">Dismiss</button>
+    </output>
+  }
+
+  <!-- Persistent timer banner, shown when timer is running but panel is closed -->
+  @if (activeTimer() && activePanel() !== 'timer') {
+    <section class="banner banner--info">
+      <span class="timer-status"><span class="timer-status__dot"></span> Timer running — {{ formatElapsed(elapsedSeconds()) }}</span>
+      <button type="button" class="link-btn" (click)="openTimerPanel()">View timer</button>
+    </section>
+  }
+
+  <!-- Entry action buttons to open manual or timer panels -->
+  <section class="entry-actions">
+    <button class="btn btn--outline" type="button" (click)="openManualPanel()">
+      + Add Manual Time Entry
+    </button>
+    <button class="btn btn--primary" type="button" (click)="openTimerPanel()">
+       Start Automatic Time Entry
+    </button>
+  </section>
+
+  <!-- Manual entry panel, also used for editing existing entries -->
+  @if (activePanel() === 'manual') {
+    <section class="entry-panel" aria-labelledby="manual-panel-title">
+      <article class="card entry-panel__card">
+        <header class="card__header">
+          <div>
+            <!-- Title changes between 'Edit Entry' and 'Manual Time Entry' based on edit mode -->
+            <h2 id="manual-panel-title">{{ isEditMode() ? 'Edit Entry' : 'Manual Time Entry' }}</h2>
+            <p>Fill in the details below to log time manually.</p>
+          </div>
+          <button type="button" class="icon-btn" aria-label="Close" (click)="closePanel()">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+          </button>
+        </header>
+
+        <form class="manual-form" [formGroup]="entryForm" (ngSubmit)="saveEntry()">
+          <!-- Project and task selectors -->
+          <div class="manual-form__row manual-form__row--2">
+            <label class="field">
+              <span class="field__label">Project</span>
+              <select formControlName="projectId">
+                @for (project of projects(); track project.id) {
+                  <option [value]="project.id">{{ project.name }}</option>
+                }
+              </select>
+            </label>
+
+            <!-- Tasks are filtered based on the selected project -->
+            <label class="field">
+              <span class="field__label">Task (Optional)</span>
+              <select formControlName="taskId" (change)="onTaskSelectionChange($event, 'manual')">
+                <option value="">No task selected</option>
+                @for (task of selectableTasks(); track task.id) {
+                  <option [value]="task.id">{{ task.title }}</option>
+                }
+                <option [value]="createNewTaskValue">+ Create new task...</option>
+              </select>
+            </label>
+          </div>
+
+          @if (isCreatingNewManualTask()) {
+            <label class="field field--full">
+              <span class="field__label">New task name</span>
+              <input
+                type="text"
+                [value]="newTaskTitle()"
+                (input)="newTaskTitle.set($any($event.target).value)"
+                placeholder="Enter a name for the new task"
+              />
+              @if (newTaskTitleError()) {
+                <span class="field__error">Task name is required.</span>
+              }
+            </label>
+          }
+
+          <!-- Entry type selector (e.g. Development, Meeting) -->
+          <label class="field">
+            <span class="field__label">Entry Type</span>
+            <select formControlName="entryType">
+              <option value="DEVELOPMENT">Development</option>
+              <option value="MEETING">Meeting</option>
+              <option value="DOCUMENTATION">Documentation</option>
+              <option value="DESIGN">Design</option>
+              <option value="BREAK">Break</option>
+            </select>
+          </label>
+
+          <!-- Start time, end time, and auto calculated duration -->
+          <div class="manual-form__row manual-form__row--3">
+            <label class="field">
+              <span class="field__label">Start Time</span>
+              <span class="field__control field__control--icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="8"></circle>
+                  <path d="M12 8v4l3 2"></path>
+                </svg>
+                <input type="time" formControlName="startTime" />
+              </span>
+            </label>
+
+            <label class="field">
+              <span class="field__label">End Time</span>
+              <span class="field__control field__control--icon">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="8"></circle>
+                  <path d="M12 8v4l3 2"></path>
+                </svg>
+                <input type="time" formControlName="endTime" />
+              </span>
+              <!-- Validation error shown when end time is before start time -->
+              @if (endTimeInvalid) {
+                <span class="field__error">End time must be after start time.</span>
+              }
+            </label>
+
+            <!-- Duration is read only and derived from start/end times -->
+            <label class="field">
+              <span class="field__label">Duration</span>
+              <input
+                type="text"
+                readonly
+                [value]="formatDuration(entryForm.controls.durationMinutes.value)"
+              />
+            </label>
+          </div>
+
+          <!-- Optional description field -->
+          <label class="field field--full">
+            <span class="field__label">Description (Optional)</span>
+            <textarea
+              rows="3"
+              formControlName="description"
+              placeholder="What did you work on?"
+            ></textarea>
+          </label>
+
+          <!-- Form actions: cancel or save/update -->
+          <div class="manual-form__actions">
+            <button class="btn btn--ghost" type="button" (click)="closePanel()">Cancel</button>
+            <!-- Button label changes based on whether we're creating or editing -->
+            <button class="btn btn--primary" type="submit">
+              {{ isEditMode() ? 'Update Entry' : 'Save Entry' }}
+            </button>
+          </div>
+        </form>
+      </article>
+    </section>
+  }
+
+  <!-- Timer panel for automatic time tracking -->
+  @if (activePanel() === 'timer') {
+     <section class="entry-panel" aria-labelledby="manual-panel-title">
+      <article class="card entry-panel__card">
+        <header class="card__header">
+          <div>
+            <h2 id="timer-panel-title">Automatic Time Entry</h2>
+            <p>Set your project details, then start the timer.</p>
+          </div>
+          <button type="button" class="icon-btn" aria-label="Close" (click)="closePanel()">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+          </button>
+        </header>
+
+        <div class="timer-panel">
+          <!-- Timer form fields are disabled once the timer is running -->
+          <form class="timer-form" [formGroup]="timerForm">
+            <label class="field">
+              <span class="field__label">Project</span>
+              <select formControlName="projectId" [disabled]="!!activeTimer()">
+                @for (project of projects(); track project.id) {
+                  <option [value]="project.id">{{ project.name }}</option>
+                }
+              </select>
+            </label>
+
+            <!-- Tasks filtered by selected project -->
+            <label class="field">
+              <span class="field__label">Task (Optional)</span>
+              <select
+                formControlName="taskId"
+                [disabled]="!!activeTimer()"
+                (change)="onTaskSelectionChange($event, 'timer')"
+              >
+                <option value="">No task selected</option>
+                @for (task of selectableTimerTasks(); track task.id) {
+                  <option [value]="task.id">{{ task.title }}</option>
+                }
+                <option [value]="createNewTaskValue">+ Create new task...</option>
+              </select>
+            </label>
+
+            @if (isCreatingNewTimerTask()) {
+              <label class="field">
+                <span class="field__label">New task name</span>
+                <input
+                  type="text"
+                  [value]="newTaskTitle()"
+                  (input)="newTaskTitle.set($any($event.target).value)"
+                  placeholder="Enter a name for the new task"
+                  [disabled]="!!activeTimer()"
+                />
+                @if (newTaskTitleError()) {
+                  <span class="field__error">Task name is required.</span>
+                }
+              </label>
+            }
+
+            <label class="field">
+              <span class="field__label">Description (Optional)</span>
+              <input
+                type="text"
+                formControlName="description"
+                placeholder="What are you working on?"
+                [disabled]="!!activeTimer()"
+              />
+            </label>
+          </form>
+
+          <!-- Timer display: shows elapsed time and start/stop controls -->
+          <div class="timer-display">
+            <!-- Running indicator, only visible when timer is active -->
+            @if (activeTimer()) {
+              <p class="timer-status"><span class="timer-status__dot"></span> TIMER RUNNING</p>
+            }
+            <p class="timer-display__label">Elapsed Time</p>
+            <strong class="timer-display__value">{{ formatElapsed(elapsedSeconds()) }}</strong>
+            <!-- Shows when the timer was started -->
+            @if (activeTimer()) {
+              <p class="timer-display__started">{{ timerStartedLabel() }}</p>
+            }
+            <div class="timer-display__actions">
+              <!-- Start button shown when no timer is active -->
+              @if (!activeTimer()) {
+                <button class="btn btn--primary" type="button" (click)="startTimer()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12l10-6-10-6Z"></path></svg>
+                  Start Timer
+                </button>
+              } @else if (!isTimerPaused()) {
+                <!-- Pause and stop controls shown when timer is running -->
+                <button class="btn btn--outline" type="button" (click)="pauseTimer()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12M16 6v12"></path></svg>
+                  Pause
+                </button>
+                <button class="btn btn--danger" type="button" (click)="stopTimer()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>
+                  Stop &amp; Save
+                </button>
+              } @else {
+                <!-- Resume and stop controls shown when timer is paused -->
+                <button class="btn btn--primary" type="button" (click)="resumeTimer()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12l10-6-10-6Z"></path></svg>
+                  Resume
+                </button>
+                <button class="btn btn--danger" type="button" (click)="stopTimer()">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>
+                  Stop &amp; Save
+                </button>
+              }
+              <button class="btn btn--ghost" type="button" (click)="closePanel()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  }
+
+  <!-- Entries list section -->
+  <section class="entries-section">
+    <article class="card entries-card">
+      <header class="entries-card__header">
+        <div class="entries-card__title">
+          <h2>Today's Entries</h2>
+          <!-- Total duration badge across all filtered entries -->
+          <span class="total-badge">Total: {{ formatDuration(totalMinutes()) }}</span>
+        </div>
+      </header>
+
+      <div class="entries-toolbar">
+        <!-- Status filter chips (e.g. All, Draft, Submitted, Approved) -->
+        <div class="status-filters">
+          @for (status of statusOptions; track status) {
+            <button
+              type="button"
+              class="status-chip"
+              [class.status-chip--active]="selectedStatus() === status"
+              (click)="selectStatus(status)"
+            >
+              {{ status }}
+            </button>
+          }
+        </div>
+
+        <!-- Project and date range filters -->
+        <div class="entries-toolbar__filters" [formGroup]="filterForm">
+          <select [value]="selectedProjectId()" (change)="selectedProjectId.set($any($event.target).value)">
+            <option value="">All projects</option>
+            @for (project of projects(); track project.id) {
+              <option [value]="project.id">{{ project.name }}</option>
+            }
+          </select>
+          <label class="filter-date">
+            <span>From</span>
+            <input type="date" formControlName="from" />
+          </label>
+          <label class="filter-date">
+            <span>To</span>
+            <input type="date" formControlName="to" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Entries table -->
+      <div class="table-wrap">
+        <table class="entries-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Project / Task</th>
+              <th>Type</th>
+              <th>Duration</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (entry of filteredEntries(); track entry.id) {
+              <tr>
+                <!-- Dot indicator color reflects entry status -->
+                <td class="col-time">
+                  <span [class]="entryDotClass(entry)"></span>
+                  {{ formatEntryTimeRange(entry) }}
+                </td>
+                <td class="col-project">
+                  <strong>{{ getProjectName(entry.projectId) }}</strong>
+                  <span>{{ getTaskTitle(entry.taskId) }}</span>
+                </td>
+                <td>
+                  <span class="type-pill">
+                    {{ entry.entryType }}
+                  </span>
+                </td>
+                <td>{{ formatDuration(entry.durationMinutes) }}</td>
+                <td class="col-description">
+                  <span>{{ entry.description }}</span>
+                  <!-- Status notes shown below description -->
+                  @if (entry.status === 'SUBMITTED') {
+                    <em class="status-note">Awaiting review</em>
+                  }
+                  @if (entry.status === 'APPROVED') {
+                    <em class="status-note status-note--approved">Approved</em>
+                  }
+                  <!-- Rejection reason shown for rejected entries -->
+                  @if (entry.status === 'REJECTED') {
+                    <em class="status-note status-note--rejected">
+                      {{ entry.rejectionReason }}
+                    </em>
+                  }
+                </td>
+                <td class="col-actions">
+                  <!-- Edit button shown for draft and rejected entries -->
+                  @if (entry.status === 'DRAFT' || entry.status === 'REJECTED') {
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      aria-label="Edit entry"
+                      (click)="editEntry(entry)"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"></path>
+                      </svg>
+                    </button>
+                  }
+                  <!-- Overflow menu for draft entries: submit or delete -->
+                  @if (entry.status === 'DRAFT') {
+                    <div class="action-menu">
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        aria-label="More actions"
+                        (click)="toggleEntryMenu(entry.id)"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <circle cx="12" cy="6" r="1.5"></circle>
+                          <circle cx="12" cy="12" r="1.5"></circle>
+                          <circle cx="12" cy="18" r="1.5"></circle>
+                        </svg>
+                      </button>
+                      <!-- Dropdown shown when this entry's menu is open -->
+                      @if (openMenuEntryId() === entry.id) {
+                        <div class="action-menu__dropdown">
+                          <button type="button" (click)="submitEntry(entry)">Submit</button>
+                          <button type="button" (click)="deleteEntry(entry)">Delete</button>
+                        </div>
+                      }
+                    </div>
+                  }
+                  <!-- Resubmit button shown for rejected entries -->
+                  @if (entry.status === 'REJECTED') {
+                    <button type="button" class="link-btn" (click)="resubmitEntry(entry)">Resubmit</button>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <!-- Empty state when no entries match the current filters -->
+              <tr>
+                <td colspan="6" class="empty-state">No entries match the selected filters.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Shortcut to add another entry without scrolling back up -->
+      <button class="btn btn--outline btn--full" type="button" (click)="openManualPanel()">
+        + Add Another Entry
+      </button>
+    </article>
+  </section>
+</main>

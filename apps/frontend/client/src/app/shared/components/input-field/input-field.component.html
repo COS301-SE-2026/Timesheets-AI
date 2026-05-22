@@ -1,0 +1,23 @@
+<div class="input-field">
+
+    <label
+        class="field-label"
+        *ngIf="label()"
+        [for]="inputId">
+
+        {{ label() }}
+    </label>
+
+    <input
+        type="text"
+        class="field-input"
+        [id]="inputId"
+        [placeholder]="placeholder()" />
+
+    @if (error()) {
+        <span class="field-error">
+            {{ error() }}
+        </span>
+    }
+
+</div>

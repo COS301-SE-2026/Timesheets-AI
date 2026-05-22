@@ -1,0 +1,456 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`LoginComponent should match login page snapshot 1`] = `
+<div>
+  <main
+    class="signup-shell"
+  >
+    <section
+      class="signup-hero"
+    >
+      <div
+        class="hero-inner"
+      >
+        <a
+          aria-label="Momently home"
+          class="brand brand--hero"
+          href="/"
+        >
+          <img
+            alt=""
+            class="brand-logo"
+            src="/assets/momently.png"
+          />
+          <span
+            class="brand-copy"
+          >
+            <span
+              class="brand-name"
+            >
+              <span
+                class="brand-name__accent"
+              >
+                m
+              </span>
+              omently
+            </span>
+            <span
+              class="brand-tagline"
+            >
+              Every moment counts
+            </span>
+          </span>
+        </a>
+        <div
+          class="hero-content"
+        >
+          <h1
+            class="hero-title"
+          >
+             Welcome back!
+            <br />
+            <span
+              class="hero-title__accent"
+            >
+              Sign in
+            </span>
+             to continue 
+          </h1>
+          <p
+            class="hero-description"
+          >
+             Track time, boost productivity, and make every moment count with Momently. 
+          </p>
+        </div>
+        <div
+          aria-hidden="true"
+          class="project-preview"
+        >
+          <div
+            class="preview-card"
+          >
+            <div
+              class="preview-header"
+            >
+              <span
+                class="preview-label"
+              >
+                YOUR WEEK AT A GLANCE
+              </span>
+              <span
+                class="live-pill"
+              >
+                LIVE
+              </span>
+            </div>
+            <div
+              class="preview-row"
+            >
+              <span
+                class="preview-icon"
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                  />
+                  <polyline
+                    points="12 6 12 12 16 14"
+                  />
+                </svg>
+              </span>
+              <div
+                class="progress-track"
+              >
+                <span
+                  class="progress-fill progress-fill--blue"
+                />
+              </div>
+              <span
+                class="progress-value"
+              >
+                42h 30m
+              </span>
+            </div>
+            <div
+              class="preview-row"
+            >
+              <span
+                class="preview-icon preview-icon--wand"
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                >
+                  <rect
+                    height="14"
+                    rx="2"
+                    width="20"
+                    x="2"
+                    y="7"
+                  />
+                  <path
+                    d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"
+                  />
+                </svg>
+              </span>
+              <div
+                class="progress-track"
+              >
+                <span
+                  class="progress-fill progress-fill--orange"
+                />
+              </div>
+              <span
+                class="progress-value"
+              >
+                28h 15m
+              </span>
+            </div>
+          </div>
+          <div
+            class="suggestion-card"
+          >
+            <span
+              aria-hidden="true"
+              class="spark-icon"
+            >
+              <svg
+                viewBox="0 0 24 24"
+              >
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27
+                                17 14.14 18.18 21.02 12 17.77
+                                5.82 21.02 7 14.14 2 9.27
+                                8.91 8.26 12 2"
+                />
+              </svg>
+            </span>
+            <div
+              class="suggestion-copy"
+            >
+              <strong>
+                AI Insight
+              </strong>
+              <p>
+                You're most productive between 9 AM – 12 PM. Keep it up!
+              </p>
+            </div>
+            <button
+              tabindex="-1"
+              type="button"
+            >
+              View full insights
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section
+      class="signup-panel"
+    >
+      <div
+        class="form-wrap"
+      >
+        <header
+          class="form-heading"
+        >
+          <h2
+            class="form-title"
+          >
+            Sign in to your account
+          </h2>
+          <p
+            class="form-subtitle"
+          >
+            Enter your details to access your workspace.
+          </p>
+        </header>
+        <form
+          class="ng-untouched ng-pristine ng-invalid"
+          novalidate=""
+        >
+          <div
+            class="field"
+          >
+            <label
+              class="field-label"
+              for="email"
+            >
+              Work Email
+            </label>
+            <span
+              class="input-shell"
+            >
+              <svg
+                aria-hidden="true"
+                class="field-icon"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4
+                        c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                />
+                <polyline
+                  points="22,6 12,13 2,6"
+                />
+              </svg>
+              <input
+                aria-invalid="false"
+                autocomplete="username"
+                class="ng-untouched ng-pristine ng-invalid"
+                formcontrolname="email"
+                id="email"
+                name="username"
+                placeholder="john@company.com"
+                type="email"
+              />
+            </span>
+            
+          </div>
+          <div
+            class="field"
+          >
+            <label
+              class="field-label"
+              for="password"
+            >
+              Password
+            </label>
+            <span
+              class="input-shell"
+            >
+              <svg
+                aria-hidden="true"
+                class="field-icon"
+                viewBox="0 0 24 24"
+              >
+                <rect
+                  height="11"
+                  rx="2"
+                  ry="2"
+                  width="18"
+                  x="3"
+                  y="11"
+                />
+                <path
+                  d="M7 11V7a5 5 0 0 1 10 0v4"
+                />
+              </svg>
+              <input
+                aria-invalid="false"
+                autocapitalize="none"
+                autocomplete="off"
+                class="ng-untouched ng-pristine ng-invalid"
+                formcontrolname="password"
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                spellcheck="false"
+                type="password"
+              />
+              <button
+                aria-label="Show password"
+                class="icon-button"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                  />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="3"
+                  />
+                </svg>
+              </button>
+            </span>
+            
+          </div>
+          <div
+            class="terms-block"
+          >
+            <label
+              class="terms"
+              for="remember"
+            >
+              <input
+                class="ng-untouched ng-pristine ng-valid"
+                formcontrolname="remember"
+                id="remember"
+                type="checkbox"
+              />
+              <span>
+                Remember me
+              </span>
+            </label>
+            <a
+              class="signin-copy"
+              href="#"
+              style="text-align: right; display: block; margin-top: 8px;"
+            >
+               Forgot password? 
+            </a>
+          </div>
+          
+          <button
+            class="submit-button"
+            type="submit"
+          >
+            <span>
+              Sign In
+            </span>
+            
+            
+          </button>
+        </form>
+        <div
+          aria-hidden="true"
+          class="divider"
+        >
+          <hr
+            class="divider-line"
+          />
+          <span
+            class="divider-label"
+          >
+            OR SIGN IN WITH
+          </span>
+          <hr
+            class="divider-line"
+          />
+        </div>
+        <div
+          class="social-grid"
+        >
+          <button
+            aria-label="Sign in with Google"
+            class="social-button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="social-logo"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92
+                c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77
+                c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84
+                C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35
+                -2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15
+                C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84
+                c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
+            </svg>
+             Google 
+          </button>
+          <button
+            aria-label="Sign in with Microsoft"
+            class="social-button"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="social-logo"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M1 1h10v10H1z"
+                fill="#F25022"
+              />
+              <path
+                d="M13 1h10v10H13z"
+                fill="#7FBA00"
+              />
+              <path
+                d="M1 13h10v10H1z"
+                fill="#00A4EF"
+              />
+              <path
+                d="M13 13h10v10H13z"
+                fill="#FFB900"
+              />
+            </svg>
+             Microsoft 
+          </button>
+        </div>
+        <p
+          class="signin-copy"
+        >
+           Don't have an account? 
+          <a
+            href="/signup"
+            routerlink="/signup"
+          >
+            Sign up here
+          </a>
+        </p>
+        
+        
+      </div>
+    </section>
+  </main>
+</div>
+`;
