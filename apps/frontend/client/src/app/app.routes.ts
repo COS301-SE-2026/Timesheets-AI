@@ -48,6 +48,14 @@ export const routes: Routes = [
       import('./pages/log-time-placeholder/log-time-placeholder.component')
         .then(m => m.LogTimePlaceholderComponent)
   },
+  /* Timesheets page */
+  {
+    path: 'timesheets',
+    loadComponent: () =>
+      import('./features/timesheets/timesheets.component')
+        .then(m => m.TimesheetsComponent)
+  },
+
   /* 404 fallback */
   {
     path: 'not-found',
