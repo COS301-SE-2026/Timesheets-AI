@@ -718,9 +718,9 @@ private createTaskId(): string {
   }
 
   // Local unique runtime identifier fallback algorithm
-  private createId(): string {
-    return `entry-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  }
+private createId(): string {
+  return `entry-${crypto.randomUUID()}`;
+}
 
   private clearTimerInterval(): void {
     if (this.timerIntervalId) {
