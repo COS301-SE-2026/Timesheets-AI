@@ -244,24 +244,26 @@ describe('LogtimeComponent', () => {
     expect(draftEntry).toBeTruthy();
     expect(rejectedEntry).toBeTruthy();
 
-    component.submitEntry(draftEntry!);
-
-    expect(
+if (draftEntry) {
+  component.submitEntry(draftEntry);
+}    expect(
       component.entries().find(
         (entry) => entry.id === draftEntry!.id
       )?.status
     ).toBe('SUBMITTED');
 
-    component.resubmitEntry(rejectedEntry!);
-
+    if (rejectedEntry) {
+  component.resubmitEntry(rejectedEntry);
+}
     expect(
       component.entries().find(
         (entry) => entry.id === rejectedEntry!.id
       )?.status
     ).toBe('SUBMITTED');
 
-    component.deleteEntry(draftEntry!);
-
+if (draftEntry) {
+  component.deleteEntry(draftEntry);
+}
     expect(
       component.entries().some(
         (entry) => entry.id === draftEntry!.id
