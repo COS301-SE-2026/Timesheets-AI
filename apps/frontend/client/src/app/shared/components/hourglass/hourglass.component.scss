@@ -1,0 +1,78 @@
+.hg-wrap {
+  position: relative;
+  animation: float 6s ease-in-out infinite;
+}
+
+.hg-flip {
+  animation: flip 12s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.glow {
+  position: absolute;
+  inset: -3rem;
+  border-radius: 999px;
+  filter: blur(40px);
+  opacity: 0.5;
+  background: radial-gradient(circle, rgba(224,120,48,0.4), transparent 70%);
+}
+
+/* sand animations */
+.hg-sand-top {
+  animation: topDrain 6s linear infinite;
+  transform-origin: top;
+}
+
+.hg-sand-bottom {
+  animation: bottomFill 6s linear infinite;
+}
+
+.hg-stream {
+  animation: stream 6s linear infinite;
+}
+
+/* grains */
+.grain {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: grain 1.4s linear infinite;
+}
+
+.g1 { left: 58%; top: 50%; background: #E07830; }
+.g2 { left: 42%; top: 55%; background: #1A65BF; animation-delay: 0.6s; }
+.g3 { left: 65%; top: 48%; background: #E07830; animation-delay: 1s; }
+
+/* keyframes */
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes flip {
+  0%,45% { transform: rotate(0deg); }
+  50%,95% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes topDrain {
+  0% { transform: scaleY(1); }
+  100% { transform: scaleY(0.2) translateY(38px); }
+}
+
+@keyframes bottomFill {
+  0% { transform: scaleY(0.2) translateY(28px); }
+  100% { transform: scaleY(1); }
+}
+
+@keyframes stream {
+  0%,100% { opacity: 0; transform: scaleY(0); }
+  10%,90% { opacity: 1; transform: scaleY(1); }
+}
+
+@keyframes grain {
+  0% { opacity: 0; transform: translateY(-4px); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(40px); }
+}
