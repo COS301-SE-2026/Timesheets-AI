@@ -33,6 +33,14 @@ export const routes: Routes = [
         .then(m => m.LoginComponent)
   },
 
+  /* Timesheets page */
+  {
+    path: 'timesheets',
+    loadComponent: () =>
+      import('./features/timesheets/timesheets.component')
+        .then(m => m.TimesheetsComponent)
+  },
+
   /* 404 fallback */
   {
     path: 'not-found',
@@ -41,6 +49,7 @@ export const routes: Routes = [
       import('./pages/not-found/not-found.component')
         .then(m => m.NotFoundComponent)
   },
+
   /* Catch-all wildcard (redirects to 404) */
   {
     path: '**',

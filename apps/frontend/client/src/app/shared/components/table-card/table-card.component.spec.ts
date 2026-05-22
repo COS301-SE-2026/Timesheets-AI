@@ -1,23 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { TableCardComponent } from './table-card.component';
+import { createComponentTest } from '../../testing/component-test-helper';
 
-describe('TableCardComponent', () => {
-  let component: TableCardComponent;
-  let fixture: ComponentFixture<TableCardComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [TableCardComponent]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(TableCardComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+createComponentTest(TableCardComponent, 'TableCardComponent');

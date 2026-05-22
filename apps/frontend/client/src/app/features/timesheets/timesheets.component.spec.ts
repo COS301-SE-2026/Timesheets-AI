@@ -1,23 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { TimesheetsComponent } from './timesheets.component';
+import { createComponentTest } from '../../shared/testing/component-test-helper';
 
-describe('TimesheetsComponent', () => {
-  let component: TimesheetsComponent;
-  let fixture: ComponentFixture<TimesheetsComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [TimesheetsComponent]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(TimesheetsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+createComponentTest(TimesheetsComponent, 'TimesheetsComponent');
