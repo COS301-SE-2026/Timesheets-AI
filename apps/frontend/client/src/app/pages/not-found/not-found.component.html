@@ -1,0 +1,43 @@
+<main class="nf-page">
+
+<!-- background -->
+<div class="bg-decor" aria-hidden="true"></div>
+
+<!-- header / brand (matches signup exactly) -->
+<header class="nf-header">
+    <a class="brand brand--hero" routerLink="/" aria-label="Momently home">
+    <img class="brand-logo" [src]="brandLogo" alt="" />
+    <span class="brand-copy">
+        <span class="brand-name">
+        <span class="brand-name__accent">m</span>omently
+        </span>
+        <span class="brand-tagline">Every moment counts</span>
+    </span>
+    </a>
+</header>
+
+<!-- main content -->
+<section class="nf-layout">
+
+    <!-- LEFT  (text) -->
+    <div class="nf-text">
+    <h1 class="nf-code">404</h1>
+    <h2 class="nf-title">This page is still finding its moment.</h2>
+    <p class="nf-body">
+        The sand is still falling on this one (a shiny new feature is on the way).
+    </p>
+    <div class="nf-buttons">
+        <a routerLink="/" class="submit-button">Take me home</a>
+        <button (click)="goBack()" class="btn-outline">Go back</button>
+    </div>
+    <p class="nf-footnote">Coming soon · feature in progress</p>
+    </div>
+
+    <!-- RIGHT  (hourglass) -->
+    <div class="nf-visual">
+    <app-hourglass></app-hourglass>
+    </div>
+
+</section>
+
+</main>
