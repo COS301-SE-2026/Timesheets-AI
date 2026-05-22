@@ -4,8 +4,8 @@ Momently  (404 fallback with animated hourglass)
 Uses design system tokens and shared mixins throughout
 ============================================================ */
 
-@use 'page-layouts' as *;
-@use 'mixins' as m;
+@use '../../layouts/page-layouts' as *;
+@use '../../shared/styles/mixins' as m;
 
 @include fullscreen-page;
 

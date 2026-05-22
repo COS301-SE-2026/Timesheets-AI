@@ -1,0 +1,30 @@
+// Import Font Awesome core styles and icon sets
+// These imports make the Font Awesome classes available globally
+@use '@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@use '@fortawesome/fontawesome-free/scss/solid.scss';
+@use '@fortawesome/fontawesome-free/scss/regular.scss';
+
+
+//Back navigation icon
+$icon-back: 'fa-solid fa-arrow-left';
+
+//the user profile icon
+$icon-user: 'fa-regular fa-user-circle';
+
+// calender icon
+$icon-calendar: 'fa-regular fa-calendar-days';
+
+// upload icon
+$icon-export: 'fa-solid fa-upload';
+
+//folder icon
+$icon-folder: 'fa-regular fa-folder';
+
+// simple chart
+$icon-task-chart: 'fa-solid fa-chart-simple';
+
+//setting icon
+$icon-task-setting: 'fa-solid fa-gear';
+
+//search icon 
+$icon-task-search: 'fa-solid fa-magnifying-glass';

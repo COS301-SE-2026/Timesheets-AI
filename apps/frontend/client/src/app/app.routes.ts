@@ -41,6 +41,14 @@ export const routes: Routes = [
         .then(m => m.LoginComponent)
   },
 
+  /* Timesheets page */
+  {
+    path: 'timesheets',
+    loadComponent: () =>
+      import('./features/timesheets/timesheets.component')
+        .then(m => m.TimesheetsComponent)
+  },
+
   /* 404 fallback */
   {
     path: 'not-found',

@@ -7,5 +7,6 @@ import { Component, input } from '@angular/core';
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  
+  // Added this line to be able track input for titles 
+  title = input<string>(''); 
 }
