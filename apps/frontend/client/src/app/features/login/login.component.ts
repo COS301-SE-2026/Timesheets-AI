@@ -24,6 +24,10 @@ export class LoginComponent {
   protected showPassword = false;
   protected submitted = false;
 
+  /* Toast state */
+  protected toastMessage = '';
+  protected showToast = false;
+
   // Login form
   protected readonly loginForm: FormGroup = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
@@ -35,6 +39,29 @@ export class LoginComponent {
   protected togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
+
+  /* Show a temporary demo toast message */
+  protected showDemoToast(message: string): void {
+    this.toastMessage = message;
+    this.showToast = true;
+    setTimeout(() => { this.showToast = false; }, 4000);
+  }
+
+  /* Forgot password handler */
+  protected onForgotPassword(event: Event): void {
+    event.preventDefault();
+    this.showDemoToast(
+      'Password reset is not available in Demo 1. Use the test credentials shared with your team.'
+    );
+  }
+
+  /* Social login handler */
+  protected onSocialLogin(provider: string): void {
+    this.showDemoToast(
+      `${provider} login is not available in Demo 1. Please use the email and password form.`
+    );
+  }
+  
 
   // Submit handler
   protected onSubmit(): void {
@@ -75,6 +102,7 @@ export class LoginComponent {
     return (control.touched || this.submitted) && control.invalid;
   }
 
+  
   protected get passwordErrorMessage(): string {
     const control = this.loginForm.controls['password'];
 

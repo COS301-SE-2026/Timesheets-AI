@@ -41,6 +41,13 @@ export const routes: Routes = [
         .then(m => m.LoginComponent)
   },
 
+  /* Log time page (placeholder for Demo 1) */
+  {
+    path: 'log-time',
+    loadComponent: () =>
+      import('./pages/log-time-placeholder/log-time-placeholder.component')
+        .then(m => m.LogTimePlaceholderComponent)
+  },
   /* Timesheets page */
   {
     path: 'timesheets',

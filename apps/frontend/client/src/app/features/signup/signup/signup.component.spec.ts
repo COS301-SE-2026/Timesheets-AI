@@ -190,12 +190,10 @@ describe('SignupComponent', () => {
     expect(componentInstance.passwordErrorMessage).toBe('');
   });
 
-  // Test successful form submission with valid data
-  it('should submit when the form is valid', () => {
+  /* Test successful form submission with valid data */
+it('should submit when the form is valid', () => {
 
-    const consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation();
-
-    // Fill the form with valid values
+    /* Fill the form with valid values */
     componentInstance.signupForm.setValue({
       name: 'John',
       surname: 'Doe',
@@ -204,19 +202,13 @@ describe('SignupComponent', () => {
       acceptedTerms: true
     });
 
-    componentInstance.createAccount();
-
-    // Verify form validity
+    /* Verify form is valid before submitting */
     expect(componentInstance.signupForm.valid).toBe(true);
 
-    // Verify submission logging
-    expect(consoleInfoSpy).toHaveBeenCalledWith('Sign up submitted', {
-      name: 'John',
-      surname: 'Doe',
-      email: 'john@company.com'
-    });
+    /* Call createAccount and verify submitted flag is set */
+    componentInstance.createAccount();
 
-    consoleInfoSpy.mockRestore();
+    expect(componentInstance.submitted).toBe(true);
   });
 
   // Test that important UI content renders correctly

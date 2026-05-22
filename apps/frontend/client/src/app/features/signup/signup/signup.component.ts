@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router} from '@angular/router';
 @Component({
   selector: 'app-signup',
   imports: [ReactiveFormsModule, RouterLink],
@@ -11,6 +11,12 @@ export class SignupComponent {
 
   // Form builder used to create reactive form structure
   private readonly formBuilder = inject(FormBuilder);
+
+  private readonly router = inject(Router);
+
+  /* Toast state */
+  protected toastMessage = '';
+  protected showToast = false;
 
   // Logo image
   protected readonly brandLogo = '/assets/momently.png';
@@ -46,18 +52,15 @@ export class SignupComponent {
   protected createAccount(): void {
     this.submitted = true;
 
-    // Stop submission if form is invalid
     if (this.signupForm.invalid) {
       this.signupForm.markAllAsTouched();
       return;
     }
 
-    // INTEGRATE API HERE 
-    console.info('Sign up submitted', {
-      name: this.signupForm.controls.name.value,
-      surname: this.signupForm.controls.surname.value,
-      email: this.signupForm.controls.email.value
-    });
+    /* Simulate API call for Demo 1 — navigate to log-time on success */
+    setTimeout(() => {
+      this.router.navigate(['/log-time']);
+    }, 800);
   }
 
   protected get showNameError(): boolean {
@@ -147,5 +150,19 @@ export class SignupComponent {
     return this.showTermsError
       ? 'You must accept the Terms of Service and Privacy Policy.'
       : '';
+  }
+
+    /* Show a temporary demo toast */
+  protected showDemoToast(message: string): void {
+    this.toastMessage = message;
+    this.showToast = true;
+    setTimeout(() => { this.showToast = false; }, 4000);
+  }
+
+  /* Social login handler */
+  protected onSocialLogin(provider: string): void {
+    this.showDemoToast(
+      `${provider} sign up is not available in Demo 1. Please use the email form.`
+    );
   }
 }
