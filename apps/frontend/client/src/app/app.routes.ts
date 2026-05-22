@@ -40,6 +40,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/not-found/not-found.component')
         .then(m => m.NotFoundComponent)
+  },
+  /* Catch-all wildcard (redirects to 404) */
+  {
+    path: '**',
+    redirectTo: 'not-found'
   }
 
 ];
