@@ -489,7 +489,7 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   // Custom visual modifier turning simple dynamic counts into compressed time descriptors
- ormatDuration(minutes?: number | null): string {
+ formatDuration(minutes?: number | null): string {
   const safeMinutes = minutes ?? 0;
     const hours = Math.floor(safeMinutes / 60);
     const remainingMinutes = safeMinutes % 60;
