@@ -488,17 +488,16 @@ closePanel(): void {
   }
 
   // Custom visual modifier turning simple dynamic counts into compressed time descriptors
- formatDuration(minutes?: number | null): string {
-  const safeMinutes = minutes ?? 0;
-    const hours = Math.floor(safeMinutes / 60);
-    const remainingMinutes = safeMinutes % 60;
+formatDuration(minutes: number | null = 0): string {
+  const hours = Math.floor((minutes ?? 0) / 60);
+  const remainingMinutes = (minutes ?? 0) % 60;
 
-    if (!hours) {
-      return `${remainingMinutes}m`;
-    }
-
-    return remainingMinutes ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
-  }
+  return !hours
+    ? `${remainingMinutes}m`
+    : remainingMinutes
+      ? `${hours}h ${remainingMinutes}m`
+      : `${hours}h`;
+}
 
   selectStatus(status: StatusOption): void {
     this.selectedStatus.set(status);
