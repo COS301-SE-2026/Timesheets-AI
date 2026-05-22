@@ -343,7 +343,6 @@ exports[`LoginComponent should match login page snapshot 1`] = `
           
           <button
             class="submit-button"
-            disabled=""
             type="submit"
           >
             <span>
@@ -448,6 +447,8 @@ exports[`LoginComponent should match login page snapshot 1`] = `
             Sign up here
           </a>
         </p>
+        
+        
       </div>
     </section>
   </main>
