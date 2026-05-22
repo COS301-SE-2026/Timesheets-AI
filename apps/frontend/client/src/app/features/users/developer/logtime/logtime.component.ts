@@ -336,10 +336,9 @@ export class LogtimeComponent implements OnDestroy {
     this.activePanel.set('timer');
   }
 
-  closePanel(): void {
-    this.activePanel.set(null);
-    this.openMenuEntryId.set(null);
-  }
+closePanel(): void {
+   this.activePanel.set(null);
+}
 
   /**
    * Persists log form values into the records array.
