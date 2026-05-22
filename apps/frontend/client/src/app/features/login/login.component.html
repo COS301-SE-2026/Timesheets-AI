@@ -187,7 +187,7 @@
             <button
             type="submit"
             class="submit-button"
-            [disabled]="loginForm.invalid || loading">
+            [disabled]="loading">
             <span *ngIf="!loading">Sign In</span>
             <span *ngIf="loading">Signing in...</span>
             </button>
@@ -244,7 +244,7 @@
 
         <!-- Demo toast notification -->
         @if (showToast) {
-        <div class="demo-toast" role="status" aria-live="polite">
+        <div class="demo-toast" output="status" aria-live="polite">
             {{ toastMessage }}
         </div>
 }
