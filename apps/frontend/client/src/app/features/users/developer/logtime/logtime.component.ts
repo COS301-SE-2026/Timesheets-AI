@@ -609,9 +609,9 @@ export class LogtimeComponent implements OnDestroy {
     return newTask.id;
   }
 
-  private createTaskId(): string {
-    return `task-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  }
+private createTaskId(): string {
+  return `task-${Date.now()}-${crypto.randomUUID()}`;
+}
 
   private updateDuration(): void {
     const duration = Math.max(0, this.calculateDuration(this.entryForm.controls.startTime.value, this.entryForm.controls.endTime.value));
