@@ -43,10 +43,10 @@
 
   <!-- Success toast banner, shown after a successful save or update -->
   @if (toastMessage()) {
-    <section class="banner banner--success" role="status">
+    <output class="banner banner--success">
       {{ toastMessage() }}
       <button type="button" class="banner__dismiss" (click)="dismissToast()">Dismiss</button>
-    </section>
+    </output>
   }
 
   <!-- Persistent timer banner, shown when timer is running but panel is closed -->
