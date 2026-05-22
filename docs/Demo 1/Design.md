@@ -223,6 +223,11 @@ The product preview card in the left panel remains identical across both screens
   <img src="../../assets/images/Wireframe%20%233.png" alt="Wireframe 3 — Log Time" />
 </p>
 
+
+<p align="center">
+  <img src="../../assets/images/Wireframe%20%234.png" alt="Wireframe 3 — Log Time" />
+</p>
+
 **Screen:** `Log Time` — the primary daily workflow screen
 
 This is the most complex screen in the application and the one users will visit most frequently. Every design decision here optimises for speed of comprehension and speed of action.
