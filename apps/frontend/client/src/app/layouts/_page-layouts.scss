@@ -1,0 +1,197 @@
+/* ============================================================
+   PAGE LAYOUT BASE MIXINS
+   Used by auth pages, 404 and fullscreen pages
+   ============================================================ */
+
+/* ============================================================
+   FULLSCREEN PAGE
+   ============================================================ */
+
+@mixin fullscreen-page {
+  :host {
+    display: block;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background: var(--color-white);
+  }
+
+  .page-shell {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* ============================================================
+   CENTERED 404 LAYOUT
+   Full viewport gradient background with centred card
+   ============================================================ */
+
+@mixin centered-404-layout {
+
+  .not-found-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-auth-panel);
+    padding: var(--space-4);
+  }
+
+  .not-found-card {
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-3);
+    padding: var(--space-8);
+    max-width: 480px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-4);
+  }
+
+  /* ---- Animated hourglass ---- */
+  .hourglass .sand-top {
+    animation: drain-top 3s ease-in-out infinite alternate;
+    transform-origin: center top;
+  }
+
+  .hourglass .sand-bot {
+    animation: fill-bot 3s ease-in-out infinite alternate;
+    transform-origin: center bottom;
+  }
+
+  .hourglass .drip   { animation: drip-fall 3s ease-in infinite; }
+  .hourglass .drip-2 {
+    animation: drip-fall 3s ease-in infinite;
+    animation-delay: 1.5s;
+  }
+
+  @keyframes drain-top {
+    0%   { transform: scaleY(1);   opacity: 1; }
+    100% { transform: scaleY(0.1); opacity: 0.6; }
+  }
+
+  @keyframes fill-bot {
+    0%   { transform: scaleY(0.3); }
+    100% { transform: scaleY(1); }
+  }
+
+  @keyframes drip-fall {
+    0%   { transform: translateY(0);    opacity: 1; }
+    80%  { transform: translateY(48px); opacity: 0.8; }
+    100% { transform: translateY(52px); opacity: 0; }
+  }
+
+  /* ---- Typography ---- */
+  .not-found__code {
+    font-family: var(--font-display);
+    font-size: 72px;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-primary);
+    line-height: 1;
+    margin: 0;
+  }
+
+  .not-found__title {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .not-found__body {
+    font-family: var(--font-body);
+    font-size: var(--font-size-body);
+    color: var(--color-text-muted);
+    line-height: var(--line-height-normal);
+    margin: 0;
+  }
+
+  /* ---- Actions ---- */
+  .not-found__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    width: 100%;
+    margin-top: var(--space-2);
+  }
+
+  .not-found__btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--space-3) var(--space-6);
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background var(--transition-fast);
+
+    &:hover { background: var(--color-primary-hover); }
+  }
+
+  .not-found__btn-outline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--space-3) var(--space-6);
+    background: transparent;
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background var(--transition-fast);
+
+    &:hover { background: var(--color-primary-surface); }
+  }
+
+  /* ---- Brand footer ---- */
+  .not-found__brand {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 480px) {
+    .not-found-card {
+      padding: var(--space-6);
+      border-radius: var(--radius-lg);
+    }
+
+    .not-found__code { font-size: 56px; }
+  }
+}
+
+/* ============================================================
+   CENTERED SIMPLE
+   Generic centred layout for fallback pages
+   ============================================================ */
+
+@mixin centered-simple {
+  .center-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--space-6);
+  }
+}
