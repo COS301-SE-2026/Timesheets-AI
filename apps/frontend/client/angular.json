@@ -25,6 +25,12 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/app/shared/styles",
+                "src/app/layouts"
+              ]
+            },
             "assets": [
               {
                 "glob": "**/*",

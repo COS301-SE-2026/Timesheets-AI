@@ -1,14 +1,17 @@
 <div class="app-layout">
-    
-    <app-sidebar></app-sidebar>
 
-    <div class="main-layout">
-        <app-header></app-header>
+  <app-sidebar *ngIf="showSidebar"></app-sidebar>
 
-        <main class="page-content">
-            <router-outlet></router-outlet>
-        </main>
+  <div class="main-layout">
 
-    </div>
+    <app-header *ngIf="showHeader"></app-header>
+
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+
+    <app-footer *ngIf="showFooter"></app-footer>
+
+  </div>
+
 </div>
-

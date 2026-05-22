@@ -1,0 +1,245 @@
+/* ============================================================
+NOT FOUND PAGE
+Momently  (404 fallback with animated hourglass)
+Uses design system tokens and shared mixins throughout
+============================================================ */
+
+@use 'page-layouts' as *;
+@use 'mixins' as m;
+
+@include fullscreen-page;
+
+/* ============================================================
+PAGE WRAPPER
+============================================================ */
+
+.nf-page {
+position: relative;
+width: 100%;
+height: 100vh;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+}
+
+/* ============================================================
+BACKGROUND (more blue, subtle orange accent bottom right)
+============================================================ */
+
+.bg-decor {
+position: fixed;
+inset: 0;
+z-index: 0;
+background:
+radial-gradient(
+    ellipse at 80% 90%,
+    rgba(224, 120, 48, 0.25) 0%,
+    transparent 55%
+),
+radial-gradient(
+    ellipse at 20% 50%,
+    rgba(15, 76, 145, 0.15) 0%,
+    transparent 60%
+),
+linear-gradient(160deg, #deeafa 0%, #eaf3ff 40%, #f0f6ff 100%);
+}
+
+/* ============================================================
+HEADER (uses auth-brand-lockup mixin)
+============================================================ */
+
+.nf-header {
+position: relative;
+z-index: 10;
+padding: var(--space-6) var(--space-8);
+flex-shrink: 0;
+}
+
+/* Brand lockup (uses auth-brand-lockup mixin) */
+.brand {
+@include m.auth-brand-lockup;
+}
+
+/* ============================================================
+MAIN LAYOUT
+============================================================ */
+
+.nf-layout {
+position: relative;
+z-index: 10;
+flex: 1;
+display: grid;
+grid-template-columns: 1.1fr 0.9fr;
+align-items: center;
+gap: var(--space-8);
+padding: 0 var(--space-8) var(--space-8) var(--space-16);
+overflow: hidden;
+}
+
+/* ============================================================
+LEFT  (text content)
+============================================================ */
+
+.nf-text {
+display: flex;
+flex-direction: column;
+gap: var(--space-4);
+padding-left: var(--space-6);
+}
+
+.nf-code {
+font-family: var(--font-display);
+font-size: clamp(96px, 14vw, 160px);
+font-weight: var(--font-weight-bold);
+color: var(--color-primary);
+line-height: 1;
+margin: 0;
+letter-spacing: -0.04em;
+}
+
+.nf-title {
+font-family: var(--font-heading);
+font-size: clamp(var(--font-size-h2), 2.2vw, 26px);
+font-weight: var(--font-weight-semibold);
+color: var(--color-text-body);
+margin: 0;
+max-width: 400px;
+line-height: var(--line-height-normal);
+}
+
+.nf-body {
+font-family: var(--font-body);
+font-size: var(--font-size-body);
+color: var(--color-text-muted);
+line-height: var(--line-height-normal);
+margin: 0;
+max-width: 360px;
+}
+
+/* ============================================================
+BUTTONS ( use design system classes from submit-button mixin)
+============================================================ */
+
+.nf-buttons {
+display: flex;
+gap: var(--space-3);
+flex-wrap: wrap;
+margin-top: var(--space-2);
+align-items: center;
+}
+
+/* Primary  (reuses submit-button from signup/login) */
+.submit-button {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+height: var(--space-12);
+padding: 0 var(--space-6);
+font-family: var(--font-body);
+font-size: var(--font-size-body);
+font-weight: var(--font-weight-semibold);
+color: var(--color-text-inverse);
+background: var(--color-primary);
+border: none;
+border-radius: var(--radius-button);
+cursor: pointer;
+text-decoration: none;
+transition: background var(--transition-fast);
+
+&:hover { background: var(--color-primary-hover); }
+}
+
+/* Outline secondary */
+.btn-outline {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+height: var(--space-12);
+padding: 0 var(--space-6);
+font-family: var(--font-body);
+font-size: var(--font-size-body);
+font-weight: var(--font-weight-semibold);
+color: var(--color-primary);
+background: transparent;
+border: 1.5px solid var(--color-primary);
+border-radius: var(--radius-button);
+cursor: pointer;
+transition: background var(--transition-fast);
+
+&:hover { background: var(--color-primary-surface); }
+}
+
+/* ============================================================
+FOOTNOTE
+============================================================ */
+
+.nf-footnote {
+font-family: var(--font-body);
+font-size: var(--font-size-caption);
+font-weight: var(--font-weight-semibold);
+color: var(--color-text-muted);
+letter-spacing: var(--letter-spacing-wider);
+text-transform: uppercase;
+margin: 0;
+}
+
+/* ============================================================
+RIGHT  (hourglass, pushed up and bigger)
+============================================================ */
+
+.nf-visual {
+display: flex;
+align-items: center;
+justify-content: center;
+transform: translateY(-40px) scale(1.15);
+}
+
+/* ============================================================
+RESPONSIVE (tablet)
+============================================================ */
+
+@media (max-width: 900px) {
+.nf-page {
+height: auto;
+min-height: 100vh;
+overflow-y: auto;
+}
+
+.nf-layout {
+grid-template-columns: 1fr;
+padding: var(--space-6);
+text-align: center;
+gap: var(--space-6);
+min-height: 0;
+}
+
+.nf-visual {
+order: -1;
+transform: translateY(0) scale(1);
+}
+
+.nf-text { padding-left: 0; }
+
+.nf-title,
+.nf-body { max-width: 100%; }
+
+.nf-buttons { justify-content: center; }
+}
+
+/* ============================================================
+RESPONSIVE (mobile)
+============================================================ */
+
+@media (max-width: 480px) {
+.nf-header { padding: var(--space-4); }
+
+.nf-buttons {
+flex-direction: column;
+width: 100%;
+}
+
+.submit-button,
+.btn-outline { width: 100%; }
+
+.nf-footnote { font-size: 10px; }
+}
