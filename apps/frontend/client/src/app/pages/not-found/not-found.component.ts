@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { Location, CommonModule } from '@angular/common';
 import { HourglassComponent } from '../../shared/components/hourglass/hourglass.component';
 
 @Component({
@@ -16,8 +16,10 @@ import { HourglassComponent } from '../../shared/components/hourglass/hourglass.
 })
 export class NotFoundComponent {
   protected readonly brandLogo = '/assets/momently.png';
-  
+
+  constructor(private readonly location: Location) {}
+
   goBack() {
-    window.history.back();
+    this.location.back();
   }
 }
