@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SignupComponent } from './signup.component';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('SignupComponent', () => {
 
@@ -12,7 +13,7 @@ describe('SignupComponent', () => {
 
     // Configure the testing module with the standalone SignupComponent
     await TestBed.configureTestingModule({
-      imports: [SignupComponent]
+      imports: [SignupComponent, RouterTestingModule]
     })
       .compileComponents();
 

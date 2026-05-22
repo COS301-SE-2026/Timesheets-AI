@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'log-time',
+    redirectTo: 'signup',
     pathMatch: 'full'
   },
   {
@@ -16,6 +16,13 @@ export const routes: Routes = [
   {
     path: 'signup',
     loadComponent: () =>
-      import('./features/signup/signup/signup.component').then((m) => m.SignupComponent)
+      import('./features/signup/signup/signup.component')
+        .then((m) => m.SignupComponent)
+  },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/login/login.component')
+        .then(m => m.LoginComponent)
   }
 ];
