@@ -38,7 +38,7 @@ interface TimeEntry {
 }
 
 /**
- * Interface representing the sanitized data structure 
+ * Interface representing the sanitized data structure
  * expected by external backend APIs.
  */
 interface TimeEntryRequest {
@@ -198,7 +198,7 @@ export class LogtimeComponent implements OnDestroy {
   ]);
 
   //Reactive from groups
-  
+
   // Scopes dashboard visibility metrics
   readonly filterForm = new FormGroup({
     from: new FormControl(this.today(), { nonNullable: true }),
@@ -225,7 +225,7 @@ export class LogtimeComponent implements OnDestroy {
   });
 
   //Computed signals (Reactive  derived state )
-  
+
   // Cascades tasks depending on the active project selected inside the manual logging form
   readonly filteredTasks = computed(() => this.tasks().filter((task) => !task.id || task.projectId === this.entryForm.controls.projectId.value));
 
@@ -239,10 +239,10 @@ export class LogtimeComponent implements OnDestroy {
 
   readonly isCreatingNewManualTask = computed(() => this.newTaskFormContext() === 'manual');
   readonly isCreatingNewTimerTask = computed(() => this.newTaskFormContext() === 'timer');
-  
+
   // Cascades tasks depending on the project selected inside the automated timer form
   readonly timerTasks = computed(() => this.tasks().filter((task) => !task.id || task.projectId === this.timerForm.controls.projectId.value));
-  
+
   // Multi variable matrix filter sorting out visible logs matching active global criteria
   readonly filteredEntries = computed(() => {
     const selectedProjectId = this.selectedProjectId();
@@ -268,20 +268,19 @@ export class LogtimeComponent implements OnDestroy {
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
-    // Cascade resets: Clear tasks selections immediately if a parent project reassignment occurs
+    // Cascade resets: clear task selection when project changes, but preserve
+    // an in-progress "create new task" entry so the user doesn't lose their typing.
     this.entryForm.controls.projectId.valueChanges.subscribe(() => {
-      this.entryForm.controls.taskId.setValue('');
-      if (this.newTaskFormContext() === 'manual') {
-        this.resetNewTaskState();
+      if (this.newTaskFormContext() !== 'manual') {
+        this.entryForm.controls.taskId.setValue('');
       }
     });
     this.timerForm.controls.projectId.valueChanges.subscribe(() => {
-      this.timerForm.controls.taskId.setValue('');
-      if (this.newTaskFormContext() === 'timer') {
-        this.resetNewTaskState();
+      if (this.newTaskFormContext() !== 'timer') {
+        this.timerForm.controls.taskId.setValue('');
       }
     });
-    
+
     // Dynamic calculation: Synchronize real-time total duration when inputs change
     this.entryForm.controls.startTime.valueChanges.subscribe(() => this.updateDuration());
     this.entryForm.controls.endTime.valueChanges.subscribe(() => this.updateDuration());
@@ -360,7 +359,7 @@ export class LogtimeComponent implements OnDestroy {
     }
 
     const entry = this.buildEntryFromForm();
-    
+
     // Collision checking evaluation logic
     const hasConflict = this.entries().some((existingEntry) => (
       existingEntry.id !== entry.id
@@ -393,7 +392,7 @@ export class LogtimeComponent implements OnDestroy {
   }
 
    // Instantiates the async timer interval loops, updating counters progressively.
-   
+
   startTimer(): void {
     if (this.newTaskFormContext() === 'timer' && !this.newTaskTitle().trim()) {
       this.newTaskTitleError.set(true);
@@ -412,7 +411,7 @@ export class LogtimeComponent implements OnDestroy {
     this.isTimerPaused.set(false);
     this.pausedElapsedSeconds.set(0);
     this.clearTimerInterval();
-    
+
     // Increment tracking properties sequentially per second pass
     this.timerIntervalId = setInterval(() => {
       this.elapsedSeconds.set(Math.floor((Date.now() - timer.startedAt.getTime()) / 1000));
