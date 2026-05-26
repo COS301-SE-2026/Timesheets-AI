@@ -6,7 +6,9 @@ WORKDIR /app/client
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 COPY client/package.json client/yarn.lock ./
-RUN yarn install --frozen-lockfile
+
+# add to clear the cache immediately after installing to save space
+RUN yarn install --frozen-lockfile && yarn cache clean
 COPY client/ .
 
 RUN chown -R appuser:appgroup /app
