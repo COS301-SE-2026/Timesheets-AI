@@ -10,10 +10,10 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# FIX: added curl so Spring Boot healthcheck works in container
+# added curl so Spring Boot healthcheck works in container
 RUN apk add --no-cache curl
 
-COPY --from=build /app/target/*.jar app.jar
-
+# replaced the target/*.jar with the exact artifact name (artifactId) from pom.xml
+COPY --from=build /app/target/timesheet-ai-0.0.1-SNAPSHOT.jar app.jar 
 EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]
