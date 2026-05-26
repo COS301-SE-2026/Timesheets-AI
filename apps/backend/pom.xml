@@ -37,6 +37,7 @@ it must end with:
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
         <maven.compiler.release>17</maven.compiler.release>
+        <flyway.version>10.11.0</flyway.version> <!-- to fix the flyway error: it is need version so Maven knows which flyway version to download-->
     </properties>
 
     <dependencies>
@@ -182,7 +183,7 @@ it must end with:
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
+                            <!-- <version>${lombok.version}</version>  removed  because Spring Boot 3.5.0 already dictates exactly which version of Lombok to use and if specified again, it can cuase version mismatch -->
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

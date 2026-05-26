@@ -1,8 +1,0 @@
-{
-  "buildCommand": "ng build --prod",
-  "outputDirectory": "dist/momently-timesheets-ai",
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
