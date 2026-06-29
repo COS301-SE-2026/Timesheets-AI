@@ -74,7 +74,7 @@ public class ReportsService {
                           .mapToDouble(e -> e.getDurationMinutes() / 60.0)
                           .sum();
 
-                  TimeEntry sample = entry.getValue().get(0);
+                  // TimeEntry sample = entry.getValue().get(0);
 
                   return ProductivityReportResponse.TaskBreakdown.builder()
                       .taskId(entry.getKey())

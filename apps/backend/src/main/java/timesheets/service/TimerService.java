@@ -50,12 +50,12 @@ public class TimerService {
   public TimerSession startTimer(UUID workspaceMemberId, StartTimerRequest request) {
 
     // I want to check if a memeber exists
-    WorkspaceMember member =
+
+    UUID userId =
         workspaceMemberRepository
             .findById(workspaceMemberId)
-            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
-
-    UUID userId = member.getUserId(); // gets the ID of the user
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"))
+            .getUserId(); // gets the ID of the user
 
     List<WorkspaceMember> userMemberships =
         workspaceMemberRepository.findAllByUserId(
@@ -123,11 +123,6 @@ public class TimerService {
   // this should be if a timer is stopped and a draft timer entry is created
   @Transactional
   public TimeEntry stopTimer(UUID workspaceMemberId) {
-
-    WorkspaceMember member =
-        workspaceMemberRepository
-            .findById(workspaceMemberId)
-            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     // to find an active timer
     TimerSession activeTimer =
