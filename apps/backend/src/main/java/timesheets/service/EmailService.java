@@ -8,15 +8,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    // sends a verification email with a link containing the token
-    public void sendVerificationEmail(String email, String firstName, String token) {
-        System.out.println("Sending verification email to: " + email);
-        System.out.println("Verification token: " + token);
-    }
+  // sends a verification email with a link containing the token
+  public void sendVerificationEmail(String email, String firstName, String token) {
+    System.out.println("Sending verification email to: " + email);
+    System.out.println("Verification token: " + token);
+  }
 
-    // sends a password reset email with a link containing the token
-    public void sendPasswordResetEmail(String email, String firstName, String token) {
-        System.out.println("Sending password reset email to: " + email);
-        System.out.println("Reset token: " + token);
-    }
+  // sends a password reset email with a link containing the token
+  public void sendPasswordResetEmail(String email, String firstName, String token) {
+    System.out.println("Sending password reset email to: " + email);
+    System.out.println("Reset token: " + token);
+  }
 }
