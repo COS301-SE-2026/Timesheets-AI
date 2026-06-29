@@ -243,9 +243,21 @@ it must end with:
 
                     <!-- the build should fail if the checks don't pass-->
                     <failsOnError>true</failsOnError>
-                    
+
                     <!--the test directory gets included-->
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                </configuration>
+            </plugin>
+
+            <!-- this is the PMD to look for bad coding practices and possible bugs: code from PDM user docs-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.23.0</version>
+                <configuration>
+                    <consoleOutput>true</consoleOutput>      
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory> 
+                    <failOnViolation>true</failOnViolation>
                 </configuration>
             </plugin>
         </plugins>
