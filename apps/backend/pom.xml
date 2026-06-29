@@ -215,6 +215,21 @@ it must end with:
                     </excludes>
                 </configuration>
             </plugin>
+
+            <!-- okay so below I am adding the things that are going to be related to backend code quality-->
+            <!-- this is the spotless is like Prettier in JS-->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.43.0</version>
+                <configuration>
+                    <java>
+                        <!-- it is using the google Java format and it removes unused imports to remove clutter and have clean code-->
+                        <googleJavaFormat/>
+                        <removeUnusedImports/>
+                    </java>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
