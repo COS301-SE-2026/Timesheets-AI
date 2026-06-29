@@ -260,6 +260,20 @@ it must end with:
                     <failOnViolation>true</failOnViolation>
                 </configuration>
             </plugin>
+
+            <!-- this is the SpotBugs it will help us to identify code that can crash the system-->
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>4.8.5.0</version>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>High</threshold>
+                    <!--<threshold>Medium</threshold>-->
+                    <failOnError>true</failOnError>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory> 
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
