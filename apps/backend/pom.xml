@@ -216,7 +216,7 @@ it must end with:
                 </configuration>
             </plugin>
 
-            <!-- okay so below I am adding the things that are going to be related to backend code quality-->
+            <!-- okay so below I am adding the things that are going to be related to backend code quality: code from Java Code Geeks-->
             <!-- this is the spotless is like Prettier in JS-->
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
@@ -228,6 +228,24 @@ it must end with:
                         <googleJavaFormat/>
                         <removeUnusedImports/>
                     </java>
+                </configuration>
+            </plugin>
+
+            <!-- this is the checkstyle this is what will be used to help the code behave consistently: code from Geek for Geeks-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <configLocation>google_checks.xml</configLocation>
+                    <encoding>UTF-8</encoding>
+                    <consoleOutput>true</consoleOutput>
+
+                    <!-- the build should fail if the checks don't pass-->
+                    <failsOnError>true</failsOnError>
+                    
+                    <!--the test directory gets included-->
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
                 </configuration>
             </plugin>
         </plugins>
