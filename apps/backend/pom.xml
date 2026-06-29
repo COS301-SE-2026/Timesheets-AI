@@ -229,6 +229,16 @@ it must end with:
                         <removeUnusedImports/>
                     </java>
                 </configuration>
+                <executions>
+                    <execution>
+                        <!-- we want it to be at the very early stage of the build-->
+                        <phase>validate</phase>
+                        <goals>
+                            <!-- we want it to simply check formatting, not auto-fix anything-->
+                            <goal>check</goal> 
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- this is the checkstyle this is what will be used to help the code behave consistently: code from Geek for Geeks-->
@@ -274,6 +284,8 @@ it must end with:
                     <includeTestSourceDirectory>true</includeTestSourceDirectory> 
                 </configuration>
             </plugin>
+            <!-- this is the end of the code quality stuff I added-->
+
         </plugins>
     </build>
 </project>
