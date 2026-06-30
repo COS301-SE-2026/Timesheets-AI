@@ -17,7 +17,7 @@ Please check the type of change this PR introduces:
  
 ## Screenshots (if applicable)
 
-Add screenshots or a screen recoridng of the visual changes associated with this PR
+Add screenshots or a screen recording of the visual changes associated with this PR
 
 You can remove this section if not applicable.
 
