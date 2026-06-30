@@ -201,8 +201,8 @@ it must end with:
             </plugin>
             
             <!-- Spring Boot Maven Plugin - packages the app into a runnable JAR and provides
-                 the spring-boot:run command. Lombok is excluded from the final JAR because
-                 it is only needed at compile time, not at runtime -->
+                the spring-boot:run command. Lombok is excluded from the final JAR because
+                it is only needed at compile time, not at runtime -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -227,6 +227,9 @@ it must end with:
                         <!-- it is using the google Java format and it removes unused imports to remove clutter and have clean code-->
                         <googleJavaFormat/>
                         <removeUnusedImports/>
+                        <!-- adding these so that there is consistency with how the files are cause I kept getting errors-->
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
                     </java>
                 </configuration>
                 <executions>
