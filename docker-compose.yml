@@ -79,7 +79,7 @@ services:
     build:
       context: ./apps/frontend
       dockerfile: Dockerfile
-      target: dev
+      target: prod
     container_name: momently-frontend
     restart: unless-stopped
     depends_on:
