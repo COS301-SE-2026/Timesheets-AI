@@ -7,7 +7,7 @@ assignees: ""
 
 ## Summary 
 
-A clear and concise desription of the bug
+A clear and concise description of the bug
 
 ## Steps to reproduce
 
@@ -19,7 +19,7 @@ A clear and concise desription of the bug
 What you expected to happen
 
 ## Actual Behaviour 
-What actually happended instead
+What actually happened instead
 
 ## Screenshots / Logs 
 Add screenshots or logs if availiable 
