@@ -13,7 +13,7 @@ Please check the type of change this PR introduces:
 - [ ] Docs change / refactoring / dependency upgrade
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality) 
-- [ ] Breaking change (fix or feature that would change exsiting functionality)
+- [ ] Breaking change (fix or feature that would change existing functionality)
  
 ## Screenshots (if applicable)
 
