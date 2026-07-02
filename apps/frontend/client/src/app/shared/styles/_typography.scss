@@ -12,7 +12,9 @@ It includes font imports, variables, base styles, and utility classes.
 These fonts are loaded from Google Fonts and used globally.
 ----------------------------------------------------------------------------- */
 
-@import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap');
+/* I removed this google font because the bundle is too big and its size goes over the Angular budget build error 
+ @import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap');
+*/
 
 /* -----------------------------------------------------------------------------
    2. CSS Custom Properties (Global Typography System)
@@ -22,6 +24,7 @@ These fonts are loaded from Google Fonts and used globally.
 
 :root {
 
+    // this will act like our default fonts 
     /* Font families */
     --font-display: 'Special Gothic Expanded One', 'DM Sans', sans-serif;
     --font-heading: 'DM Sans', sans-serif;
