@@ -1,5 +1,3 @@
 package timesheets.config;
 
-public class AuditConfig {
-    
-}
+public class AuditConfig {}
