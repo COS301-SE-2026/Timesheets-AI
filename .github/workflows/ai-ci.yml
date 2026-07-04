@@ -1,0 +1,10 @@
+# workflow configuration where it runs tests and etc for the backend
+# [Stack: Python (FastAPI)]
+
+on:
+  push:
+    branches: [main, dev]
+    pull_request: 
+      branches: [main, dev]
+
+  
