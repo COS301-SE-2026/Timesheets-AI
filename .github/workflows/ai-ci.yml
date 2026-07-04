@@ -34,5 +34,11 @@ jobs:
       # the cache will be invalid and destroyed when the textfil e
       cache-dependency-path: ai-service/requirements.txt
 
+-name: Install Dependencies 
+if: steps.filter.outputs.ai == 'true'
+run: |
+  cd ai-service 
+  python -m pip install --upgrade pip
+  pip install -r requirements.txt 
 
   
