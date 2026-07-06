@@ -5,7 +5,10 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import timesheets.enums.EmploymentType;
@@ -32,7 +35,7 @@ public class User implements UserDetails {
   @Column(name = "last_name", nullable = false, length = 100)
   private String lastName;
 
-  @Column(nullable = false, unique = true, length = 255)
+  @Column(name = "email", nullable = false, unique = true)
   private String email;
 
   @Column(name = "password_hash", nullable = false, length = 255)
@@ -52,20 +55,22 @@ public class User implements UserDetails {
   @Column(name = "employment_type", length = 20)
   private EmploymentType employmentType;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 20)
-  @Builder.Default
-  private UserStatus status = UserStatus.ACTIVE;
-
-  // added via V2 migration because it was not in the original schema
-  @Column(name = "email_verified", nullable = false)
+  @Column(name = "email_verified")
   @Builder.Default
   private Boolean emailVerified = false;
 
-  // added via V2 migration because it was not in the original schema
-  @Column(name = "login_attempts", nullable = false)
+  @Column(name = "failed_login_attempts", nullable = false)
   @Builder.Default
-  private Integer loginAttempts = 0;
+  private Integer failedLoginAttempts = 0;
+
+  @Column(name = "locked_until")
+  private LocalDateTime lockedUntil;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "status", nullable = false)
+  @Builder.Default
+  private UserStatus status = UserStatus.ACTIVE;
+
 
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
@@ -84,7 +89,6 @@ public class User implements UserDetails {
     updatedAt = LocalDateTime.now();
   }
 
-  // UserDetails methods for Spring Security
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return List.of();
@@ -107,7 +111,7 @@ public class User implements UserDetails {
 
   @Override
   public boolean isAccountNonLocked() {
-    return loginAttempts < 5;
+    return lockedUntil == null || lockedUntil.isBefore(LocalDateTime.now());
   }
 
   @Override
