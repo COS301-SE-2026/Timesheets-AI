@@ -1,94 +1,107 @@
-// package timesheets.service;
+package timesheets.service;
 
-// import java.time.LocalDateTime;
-// import java.util.UUID;
-// import lombok.RequiredArgsConstructor;
-// import org.springframework.security.crypto.password.PasswordEncoder;
-// import org.springframework.stereotype.Service;
-// import org.springframework.transaction.annotation.Transactional;
-// import timesheets.domain.*;
-// import timesheets.dto.request.AuthRequest;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
+import timesheets.domain.*;
+import timesheets.dto.request.AuthRequest;
+import timesheets.dto.request.RegisterRequest;
+import timesheets.dto.response.AuthResponse;
+import timesheets.dto.response.MessageResponse;
+import timesheets.dto.response.RegisterResponse;
+import timesheets.repository.*;
+import timesheets.util.TotpUtils;
+
 // import timesheets.dto.request.ForgotPasswordRequest;
-// import timesheets.dto.request.RegisterRequest;
 // import timesheets.dto.request.ResetPasswordRequest;
-// import timesheets.dto.response.AuthResponse;
-// import timesheets.dto.response.MessageResponse;
-// import timesheets.dto.response.RegisterResponse;
-// import timesheets.repository.*;
+// this is the file that has all my business logic, the control will call the service and the
+// service will call repo
+// it has all the functions for authentication, registration, email verification, password reset,
+// and logout
+// note some of these may be integrated after Demo 1 depending on time,
+// but I have them here for completeness and to show the full implementation of authentication
+// features
+@Service
+@RequiredArgsConstructor
+public class AuthService {
 
-// // this is the file that has all my business logic, the control will call the service and the
-// // service will call repo
-// // it has all the functions for authentication, registration, email verification, password reset,
-// // and logout
-// // note some of these may be integrated after Demo 1 depending on time,
-// // but I have them here for completeness and to show the full implementation of authentication
-// // features
-// @Service
-// @RequiredArgsConstructor
-// public class AuthService {
-
-//   private final UserRepository userRepository;
-//   private final PasswordEncoder passwordEncoder;
-//   private final JwtService jwtService;
-//   private final EmailService emailService;
-//   // private final OtpService otpService;
-//   private final TokenBlacklistService tokenBlacklistService;
+  private final UserRepository userRepository;
+  private UserMfaRepository userMfaRepository;
+  private final UserIdentityProvider userIdentityProviderRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
+  private final EmailService emailService;
+  private final TokenBlacklistService tokenBlacklistService;
+  private final TotpUtils totpUtils;
+  private final EmailVerificationTokenRepository emailVerificationTokenRepository;
+  // private final OtpService otpService;
 //   private final PasswordResetTokenRepository passwordResetTokenRepository;
-//   private final EmailVerificationTokenRepository emailVerificationTokenRepository;
 
-//   private static final String[] ACCEPTED_DOMAINS = {"momentum.co.za", "momentum.com"};
-//   private static final int MAX_LOGIN_ATTEMPTS = 5;
 
-//   @Transactional
-//   public RegisterResponse register(RegisterRequest request) {
-//     // validate email domain
-//     if (!isAcceptedDomain(request.getEmail())) {
-//       throw new IllegalArgumentException("email domain not accepted");
-//     }
 
-//     // check if email already exists
-//     if (userRepository.existsByEmail(request.getEmail())) {
-//       throw new IllegalArgumentException("email already exists");
-//     }
+  @Value("${app.google.client-id}")
+  private String googleClientId;
+  private static final String[] ACCEPTED_DOMAINS = {"momentum.co.za", "momentum.com"};
+  private static final int MAX_LOGIN_ATTEMPTS = 5;
+  private static final String ISSUER = "Timesheets AI";
 
-//     // create user
-//     User user =
-//         User.builder()
-//             // .id(UUID.randomUUID())
-//             .email(request.getEmail())
-//             .firstName(request.getFirstName())
-//             .lastName(request.getLastName())
-//             .passwordHash(passwordEncoder.encode(request.getPassword()))
-//             .emailVerified(false)
-//             .createdAt(LocalDateTime.now())
-//             .build();
+  @Transactional
+  public RegisterResponse register(RegisterRequest request) {
 
-//     user = userRepository.save(user);
+    // validate email domain
+    if (!isAcceptedDomain(request.getEmail())) {
+      throw new IllegalArgumentException("email domain not accepted");
+    }
 
-//     // generate verification token
-//     String token = UUID.randomUUID().toString();
-//     EmailVerificationToken verificationToken =
-//         EmailVerificationToken.builder()
-//             .token(token)
-//             .userId(user.getId())
-//             .expiresAt(LocalDateTime.now().plusHours(24))
-//             .verified(false)
-//             .build();
+    // check if email already exists
+    if (userRepository.existsByEmail(request.getEmail())) {
+      throw new IllegalArgumentException("email already exists");
+    }
 
-//     emailVerificationTokenRepository.save(verificationToken);
+    // create user
+    User user =
+        User.builder()
+            .email(request.getEmail())
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
+            .passwordHash(passwordEncoder.encode(request.getPassword()))
+            .emailVerified(false)
+            .createdAt(LocalDateTime.now())
+            .build();
 
-//     // send verification email
-//     emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), token);
+    user = userRepository.save(user);
 
-//     return RegisterResponse.builder()
-//         .id(user.getId().toString())
-//         .email(user.getEmail())
-//         .firstName(user.getFirstName())
-//         .lastName(user.getLastName())
-//         .createdAt(user.getCreatedAt())
-//         .message("Verification email sent. Please check your inbox.")
-//         .build();
-//   }
+
+    // generate verification token
+    String token = UUID.randomUUID().toString();
+    EmailVerificationToken verificationToken =
+        EmailVerificationToken.builder()
+            .token(token)
+            .userId(user.getId())
+            .expiresAt(LocalDateTime.now().plusHours(24))
+            .verified(false)
+            .build();
+
+    emailVerificationTokenRepository.save(verificationToken);
+
+
+    
+    // send verification email
+    emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), token);
+
+    return RegisterResponse.builder()
+        .id(user.getId().toString())
+        .email(user.getEmail())
+        .firstName(user.getFirstName())
+        .lastName(user.getLastName())
+        .createdAt(user.getCreatedAt())
+        .message("Verification email sent. Please check your inbox.")
+        .build();
+  }
 
 //   @Transactional
 //   public MessageResponse verifyEmail(String token) {
@@ -224,13 +237,13 @@
 //     tokenBlacklistService.blacklistToken(token);
 //   }
 
-//   private boolean isAcceptedDomain(String email) {
-//     String domain = email.substring(email.indexOf("@") + 1);
-//     for (String acceptedDomain : ACCEPTED_DOMAINS) {
-//       if (domain.equalsIgnoreCase(acceptedDomain)) {
-//         return true;
-//       }
-//     }
-//     return false;
-//   }
-// }
+  private boolean isAcceptedDomain(String email) {
+    String domain = email.substring(email.indexOf("@") + 1);
+    for (String acceptedDomain : ACCEPTED_DOMAINS) {
+      if (domain.equalsIgnoreCase(acceptedDomain)) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
