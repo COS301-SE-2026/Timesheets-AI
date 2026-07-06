@@ -71,7 +71,6 @@ public class User implements UserDetails {
   @Builder.Default
   private UserStatus status = UserStatus.ACTIVE;
 
-
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
