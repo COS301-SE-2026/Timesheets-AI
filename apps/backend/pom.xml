@@ -169,6 +169,14 @@ it must end with:
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+
+        <!--using the most commonly used Java libraries for TOTP-based 2FA -->
+        <!--code from a medium article-->
+        <dependency>
+            <groupId>com.warrenstrange</groupId>
+            <artifactId>googleauth</artifactId>
+            <version>1.5.0</version>
+        </dependency>
     </dependencies>
 
    <build>
