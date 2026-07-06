@@ -1,11 +1,11 @@
 package timesheets.dto.response;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.List;
 
 // this is the response object for authentication, which contains the JWT token,
 // its expiration time, and some basic user info.

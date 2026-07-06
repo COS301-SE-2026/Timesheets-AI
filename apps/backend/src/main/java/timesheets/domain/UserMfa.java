@@ -15,35 +15,35 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserMfa {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-    @Column(name = "secret_key", nullable = false)
-    private String secretKey;
+  @Column(name = "user_id", nullable = false)
+  private UUID userId;
 
-    @Column(name = "is_enabled")
-    @Builder.Default
-    private Boolean isEnabled = false;
+  @Column(name = "secret_key", nullable = false)
+  private String secretKey;
 
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+  @Column(name = "is_enabled")
+  @Builder.Default
+  private Boolean isEnabled = false;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+  @Column(name = "created_at", updatable = false)
+  private LocalDateTime createdAt;
 
-    @PrePersist
-    protected void onCreate(){
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
+  @Column(name = "updated_at")
+  private LocalDateTime updatedAt;
 
-    @PreUpdate
-    protected void onUpdate(){
-        updatedAt = LocalDateTime.now();
-    }
+  @PrePersist
+  protected void onCreate() {
+    createdAt = LocalDateTime.now();
+    updatedAt = LocalDateTime.now();
+  }
+
+  @PreUpdate
+  protected void onUpdate() {
+    updatedAt = LocalDateTime.now();
+  }
 }
