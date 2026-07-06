@@ -8,16 +8,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import timesheets.domain.*;
-import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.RegisterRequest;
-import timesheets.dto.response.AuthResponse;
-import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.repository.*;
 import timesheets.util.TotpUtils;
 
+// import timesheets.dto.request.AuthRequest;
+// import timesheets.dto.response.AuthResponse;
+// import timesheets.dto.response.MessageResponse;
 // import timesheets.dto.request.ForgotPasswordRequest;
 // import timesheets.dto.request.ResetPasswordRequest;
+
+
+
 // this is the file that has all my business logic, the control will call the service and the
 // service will call repo
 // it has all the functions for authentication, registration, email verification, password reset,
@@ -89,7 +92,7 @@ public class AuthService {
     emailVerificationTokenRepository.save(verificationToken);
 
 
-    
+
     // send verification email
     emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), token);
 
@@ -101,7 +104,7 @@ public class AuthService {
         .createdAt(user.getCreatedAt())
         .message("Verification email sent. Please check your inbox.")
         .build();
-  }
+}
 
 //   @Transactional
 //   public MessageResponse verifyEmail(String token) {

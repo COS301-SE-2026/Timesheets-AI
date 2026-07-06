@@ -1,33 +1,38 @@
-// package timesheets.controller;
+package timesheets.controller;
 
-// import jakarta.validation.Valid;
-// import lombok.RequiredArgsConstructor;
-// import org.springframework.http.HttpStatus;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import timesheets.dto.request.RegisterRequest; 
+import timesheets.dto.response.RegisterResponse;
+import timesheets.service.AuthService;
+
 // import timesheets.dto.request.AuthRequest;
-// import timesheets.dto.request.ForgotPasswordRequest;
-// import timesheets.dto.request.RegisterRequest;
-// import timesheets.dto.request.ResetPasswordRequest;
+// import timesheets.dto.request.GoogleAuthRequest;
+// import timesheets.dto.request.MfaVerifyRequest;
 // import timesheets.dto.response.AuthResponse;
 // import timesheets.dto.response.MessageResponse;
-// import timesheets.dto.response.RegisterResponse;
-// import timesheets.service.AuthService;
+// import java.util.UUID;
+//import timesheets.dto.request.ForgotPasswordRequest;
+//import timesheets.dto.request.ResetPasswordRequest;
 
-// // the controller is the entry point for all HTTP requests from the frontend
-// // it receives requests, gives work to the service layer, and returns responses
-// @RestController
-// @RequestMapping("/api/auth")
-// @RequiredArgsConstructor
-// public class AuthController {
 
-//   private final AuthService authService;
+// the controller is the entry point for all HTTP requests from the frontend
+// it receives requests, gives work to the service layer, and returns responses
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
 
-//   @PostMapping("/register")
-//   public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
-//     RegisterResponse response = authService.register(request);
-//     return ResponseEntity.status(HttpStatus.CREATED).body(response);
-//   }
+  private final AuthService authService;
+
+  @PostMapping("/register")
+  public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+    RegisterResponse response = authService.register(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
 
 //   @PostMapping("/verify-email")
 //   public ResponseEntity<MessageResponse> verifyEmail(@RequestParam String token) {
@@ -62,4 +67,4 @@
 //     authService.logout(authorization);
 //     return ResponseEntity.noContent().build();
 //   }
-// }
+}
