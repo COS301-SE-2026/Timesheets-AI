@@ -54,9 +54,7 @@ jobs:
 
       - name: Run Tests 
         if: steps.filter.outputs.ai == 'true'
-        working-directory: ai-service
-        env:
-          PYTHONPATH .
         run: |
+          cd ai-service
           pytest
 
