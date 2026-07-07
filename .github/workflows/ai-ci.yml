@@ -45,7 +45,7 @@ jobs:
 
         # ruff is recommended for Python FastAPI (made by Astral) 
         # it is fast and it ahndles linting, auto fix sytnax and formatting so no need for different kinds of tools 
-      - name: Install Lint (Ruff)
+      - name: Run Ruff Lint 
         if: steps.filter.outputs.ai == 'true' 
         run: |
           cd ai-service
@@ -54,7 +54,9 @@ jobs:
 
       - name: Run Tests 
         if: steps.filter.outputs.ai == 'true'
+        working-directory: ai-service
+        env:
+          PYTHONPATH: .
         run: |
-          cd ai-service
           pytest
 
