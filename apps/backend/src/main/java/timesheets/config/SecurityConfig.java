@@ -3,7 +3,6 @@ package timesheets.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -11,9 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import timesheets.repository.UserRepository;
 
 // this is where we set up our security configuration for the backend, using Spring Security
 // we define how users are authenticated and authorized to access different endpoints in our API
@@ -21,7 +17,7 @@ import timesheets.repository.UserRepository;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-  
+
   @Bean // this is how we encode passwords, using BCrypt which is a strong hashing
   // algorithm to
   // securely store user passwords in the database
