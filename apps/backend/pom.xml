@@ -177,6 +177,23 @@ it must end with:
             <artifactId>googleauth</artifactId>
             <version>1.5.0</version>
         </dependency>
+
+        <!-- this is a google API client library that we will use for OAuth2 authentication and will use for SSO-->
+        <!--code from maven central repository-->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
+        <!-- library to automatically load environment variable from the .env file to the application-->
+        <!-- was having trouble with manually loading things-->
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
     </dependencies>
 
    <build>
