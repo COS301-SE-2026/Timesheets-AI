@@ -264,7 +264,7 @@ Timesheest-AI/
 │   └── meeting-minutes/
 │
 ├── assets/
-│   └── images/           n       # Logos and team photos
+│   └── images/                  # Logos and team photos
 │
 ├── .devcontainer/
 │   ├── devcontainer.json
@@ -275,7 +275,9 @@ Timesheest-AI/
 │       ├── backend-ci.yml
 │       └── frontend-ci.yml
 │
+├── CONTRIBUTING.md
 ├── docker-compose.yml
+├── LOGS.md
 ├── package.json
 ├── turbo.json
 ├── yarn.lock
@@ -283,6 +285,7 @@ Timesheest-AI/
 ├── .gitignore
 ├── SETUP.md
 └── README.md
+
 ```
 
 ## Team Cybernauts
