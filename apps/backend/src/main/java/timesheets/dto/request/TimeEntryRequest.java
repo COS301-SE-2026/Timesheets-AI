@@ -3,89 +3,83 @@ package timesheets.dto.request;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
-import java.util.UUID; 
+import java.util.UUID;
 
-//DTO - data transfer object
+// DTO - data transfer object
 
-// this file will essentially be what the front-end sends to create the time-entry, so basically this is what backend expects
-// defines the JSON that frontend must send and then SpringBoot will automatically map the JSON to the object field getters and setters
+// this file will essentially be what the front-end sends to create the time-entry, so basically
+// this is what backend expects
+// defines the JSON that frontend must send and then SpringBoot will automatically map the JSON to
+// the object field getters and setters
 public class TimeEntryRequest {
 
-    @NotNull(message = "Project ID is required")
-    private UUID projectId;  
+  @NotNull(message = "Project ID is required")
+  private UUID projectId;
 
-    private UUID taskId;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+  private UUID taskId;
+  private LocalDateTime startTime;
+  private LocalDateTime endTime;
 
-    @Positive(message = "Duration must be positive")
-    private Integer durationMinutes;
-    private String entryType;
-    private String description;
+  @Positive(message = "Duration must be positive")
+  private Integer durationMinutes;
 
-    //the getters and setters are below
-    public UUID getProjectId() { 
-        return projectId; 
-    }
+  private String entryType;
+  private String description;
 
-    public void setProjectId(UUID projectId) { 
-        this.projectId = projectId; 
-    }
-    
+  // the getters and setters are below
+  public UUID getProjectId() {
+    return projectId;
+  }
 
-    public UUID getTaskId() { 
-        return taskId; 
-    }
+  public void setProjectId(UUID projectId) {
+    this.projectId = projectId;
+  }
 
-    public void setTaskId(UUID taskId) { 
-        this.taskId = taskId; 
-    }
-    
+  public UUID getTaskId() {
+    return taskId;
+  }
 
-    public LocalDateTime getStartTime() { 
-        return startTime; 
-    }
+  public void setTaskId(UUID taskId) {
+    this.taskId = taskId;
+  }
 
-    public void setStartTime(LocalDateTime startTime) { 
-        this.startTime = startTime; 
-    }
-    
+  public LocalDateTime getStartTime() {
+    return startTime;
+  }
 
-    public LocalDateTime getEndTime() { 
-        return endTime; 
-    }
+  public void setStartTime(LocalDateTime startTime) {
+    this.startTime = startTime;
+  }
 
-    public void setEndTime(LocalDateTime endTime) { 
-        this.endTime = endTime; 
-    }
-    
+  public LocalDateTime getEndTime() {
+    return endTime;
+  }
 
-    public Integer getDurationMinutes() { 
-        return durationMinutes; 
-    }
+  public void setEndTime(LocalDateTime endTime) {
+    this.endTime = endTime;
+  }
 
-    public void setDurationMinutes(Integer durationMinutes) { 
-        this.durationMinutes = durationMinutes; 
-    }
-    
+  public Integer getDurationMinutes() {
+    return durationMinutes;
+  }
 
+  public void setDurationMinutes(Integer durationMinutes) {
+    this.durationMinutes = durationMinutes;
+  }
 
-    public String getEntryType() { 
-        return entryType; 
-    }
+  public String getEntryType() {
+    return entryType;
+  }
 
-    public void setEntryType(String entryType) { 
-        this.entryType = entryType; 
-    }
-    
+  public void setEntryType(String entryType) {
+    this.entryType = entryType;
+  }
 
-    
-    public String getDescription() { 
-        return description; 
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public void setDescription(String description) { 
-        this.description = description; 
-    }
-    
+  public void setDescription(String description) {
+    this.description = description;
+  }
 }
