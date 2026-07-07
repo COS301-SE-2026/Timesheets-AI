@@ -21,18 +21,7 @@ import timesheets.repository.UserRepository;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-  @Lazy private final UserRepository userRepository;
-
-  @Bean // this is how we load user details for authentication, using the UserRepository to find users by email
-  public UserDetailsService userDetailsService() {
-  return username ->
-  userRepository
-  .findByEmail(username)
-  .orElseThrow(() -> new UsernameNotFoundException("user not found: " +
-  username));
-  }
-
+  
   @Bean // this is how we encode passwords, using BCrypt which is a strong hashing
   // algorithm to
   // securely store user passwords in the database
