@@ -1,6 +1,7 @@
 package timesheets.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,13 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.*;
 import timesheets.dto.request.RegisterRequest;
+import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.repository.*;
 import timesheets.util.TotpUtils;
 
 // import timesheets.dto.request.AuthRequest;
 // import timesheets.dto.response.AuthResponse;
-// import timesheets.dto.response.MessageResponse;
+
 // import timesheets.dto.request.ForgotPasswordRequest;
 // import timesheets.dto.request.ResetPasswordRequest;
 
@@ -60,9 +62,44 @@ public class AuthService {
       throw new IllegalArgumentException("email domain not accepted");
     }
 
-    // check if email already exists
-    if (userRepository.existsByEmail(request.getEmail())) {
-      throw new IllegalArgumentException("email already exists");
+    // this should check if the user exists
+    Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+
+    // checks to see if the user exists
+    if (existingUser.isPresent()) {
+      User user = existingUser.get();
+
+      // if the email already exists then they cannot register again
+      if (Boolean.TRUE.equals(user.getEmailVerified())) {
+        throw new IllegalArgumentException("email already exists");
+      }
+
+      // if they are not verified, then the email verification is sent again
+      emailVerificationTokenRepository.deleteByUserId(user.getId());
+
+      // generate verification token
+      String token = UUID.randomUUID().toString();
+      EmailVerificationToken verificationToken =
+          EmailVerificationToken.builder()
+              .token(token)
+              .userId(user.getId())
+              .expiresAt(LocalDateTime.now().plusHours(24))
+              .verified(false)
+              .build();
+
+      emailVerificationTokenRepository.save(verificationToken);
+
+      // send verification email
+      emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), token);
+
+      return RegisterResponse.builder()
+          .id(user.getId().toString())
+          .email(user.getEmail())
+          .firstName(user.getFirstName())
+          .lastName(user.getLastName())
+          .createdAt(user.getCreatedAt())
+          .message("Verification email sent. Please check your inbox.")
+          .build();
     }
 
     // create user
@@ -103,35 +140,35 @@ public class AuthService {
         .build();
   }
 
-  //   @Transactional
-  //   public MessageResponse verifyEmail(String token) {
-  //     EmailVerificationToken verificationToken =
-  //         emailVerificationTokenRepository
-  //             .findByToken(token)
-  //             .orElseThrow(() -> new IllegalArgumentException("token not found"));
+  @Transactional
+  public MessageResponse verifyEmail(String token) {
+    EmailVerificationToken verificationToken =
+        emailVerificationTokenRepository
+            .findByToken(token)
+            .orElseThrow(() -> new IllegalArgumentException("token not found"));
 
-  //     if (verificationToken.getVerified()) {
-  //       throw new IllegalArgumentException("token already used");
-  //     }
+    if (verificationToken.getVerified()) {
+      throw new IllegalArgumentException("token already used");
+    }
 
-  //     if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-  //       throw new IllegalArgumentException("token expired");
-  //     }
+    if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+      throw new IllegalArgumentException("token expired");
+    }
 
-  //     // mark token as verified
-  //     verificationToken.setVerified(true);
-  //     emailVerificationTokenRepository.save(verificationToken);
+    // mark token as verified
+    verificationToken.setVerified(true);
+    emailVerificationTokenRepository.save(verificationToken);
 
-  //     // update user email verification status
-  //     User user =
-  //         userRepository
-  //             .findById(verificationToken.getUserId())
-  //             .orElseThrow(() -> new IllegalArgumentException("user not found"));
-  //     user.setEmailVerified(true);
-  //     userRepository.save(user);
+    // update user email verification status
+    User user =
+        userRepository
+            .findById(verificationToken.getUserId())
+            .orElseThrow(() -> new IllegalArgumentException("user not found"));
+    user.setEmailVerified(true);
+    userRepository.save(user);
 
-  //     return new MessageResponse("Email verified successfully", "/dashboard");
-  //   }
+    return new MessageResponse("Email verified successfully", "/dashboard");
+  }
 
   //   @Transactional
   //   public AuthResponse login(AuthRequest request) {
