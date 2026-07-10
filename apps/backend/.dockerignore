@@ -1,0 +1,14 @@
+**/target/
+**/build/
+
+.mvn/
+.gradle/
+.git
+.vscode/
+
+
+*.class
+*.jar
+*.war
+*.zip
+
