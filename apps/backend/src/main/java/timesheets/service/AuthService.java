@@ -2,6 +2,7 @@ package timesheets.service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,14 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.*;
+import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.RegisterRequest;
+import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.repository.*;
 import timesheets.util.TotpUtils;
-
-// import timesheets.dto.request.AuthRequest;
-// import timesheets.dto.response.AuthResponse;
 
 // import timesheets.dto.request.ForgotPasswordRequest;
 // import timesheets.dto.request.ResetPasswordRequest;
@@ -43,9 +43,10 @@ public class AuthService {
   private final EmailVerificationTokenRepository emailVerificationTokenRepository;
 
   // private final TokenBlacklistService tokenBlacklistService;
-  // private final JwtService jwtService;
+  private final JwtService jwtService;
+
   // private final OtpService otpService;
-  //   private final PasswordResetTokenRepository passwordResetTokenRepository;
+  // private final PasswordResetTokenRepository passwordResetTokenRepository;
 
   @Value("${app.google.client-id}")
   private String googleClientId;
@@ -170,110 +171,132 @@ public class AuthService {
     return new MessageResponse("Email verified successfully", "/dashboard");
   }
 
-  //   @Transactional
-  //   public AuthResponse login(AuthRequest request) {
-  //     User user =
-  //         userRepository
-  //             .findByEmail(request.getEmail())
-  //             .orElseThrow(() -> new IllegalArgumentException("invalid credentials"));
+  @Transactional
+  public AuthResponse login(AuthRequest request) {
+    User user =
+        userRepository
+            .findByEmail(request.getEmail())
+            .orElseThrow(() -> new IllegalArgumentException("invalid credentials"));
 
-  //     // check if account is locked
-  //     if (user.getLoginAttempts() != null && user.getLoginAttempts() >= MAX_LOGIN_ATTEMPTS) {
-  //       throw new IllegalStateException("account locked after too many failed attempts");
-  //     }
+    //check if the account is locked, and for how long
+    if(user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())){
+      long minutesRemain = java.time.Duration.between(LocalDateTime.now(), user.getLockedUntil()).toMinutes();
+      throw new IllegalStateException("account locked. Please try again in " + minutesRemain + " minutes");
+    }
 
-  //     // verify password
-  //     if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-  //       // increment failed login attempts
-  //       user.setLoginAttempts((user.getLoginAttempts() == null ? 0 : user.getLoginAttempts()) +
-  // 1);
-  //       userRepository.save(user);
-  //       throw new IllegalArgumentException("invalid credentials");
-  //     }
+    // verify password
+    if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+      // increment failed login attempts
+      int attempts =
+          (user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts()) + 1;
 
-  //     // reset login attempts on successful password verification
-  //     user.setLoginAttempts(0);
-  //     userRepository.save(user);
+      user.setFailedLoginAttempts(attempts);
 
-  //     // generate jwt token
-  //     int expirationDays = 1; // token expires in 1 day, can be configured as needed
-  //     String token = jwtService.generateToken(user, expirationDays);
-  //     LocalDateTime expiresAt = LocalDateTime.now().plusDays(expirationDays);
+      if (attempts >= MAX_LOGIN_ATTEMPTS) {
+        user.setLockedUntil(LocalDateTime.now().plusMinutes(30));
+        userRepository.save(user);
+        throw new IllegalStateException("account locked after too many failed attempts. Try again in 30 minutes");
+      }
 
-  //     return AuthResponse.builder()
-  //         .token(token)
-  //         .expiresAt(expiresAt)
-  //         .user(
-  //             AuthResponse.UserInfo.builder()
-  //                 .id(user.getId().toString())
-  //                 .email(user.getEmail())
-  //                 .firstName(user.getFirstName())
-  //                 .lastName(user.getLastName())
-  //                 .build())
-  //         .build();
-  //   }
+      userRepository.save(user);
+      throw new IllegalArgumentException("invalid credentials");
+    }
 
-  //   @Transactional
-  //   public MessageResponse forgotPassword(ForgotPasswordRequest request) {
-  //     // always return success to prevent email enumeration
-  //     userRepository
-  //         .findByEmail(request.getEmail())
-  //         .ifPresent(
-  //             user -> {
-  //               String token = UUID.randomUUID().toString();
-  //               PasswordResetToken resetToken =
-  //                   PasswordResetToken.builder()
-  //                       .token(token)
-  //                       .userId(user.getId())
-  //                       .expiresAt(LocalDateTime.now().plusHours(1))
-  //                       .used(false)
-  //                       .build();
+    // reset login attempts on successful password verification
+    user.setFailedLoginAttempts(0);
+    userRepository.save(user);
 
-  //               passwordResetTokenRepository.save(resetToken);
-  //               emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), token);
-  //             });
+    if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+      throw new IllegalStateException("please verify your email before logging in");
+    }
 
-  //     return new MessageResponse("Password reset link sent to your email if the account exists");
-  //   }
+   
 
-  //   @Transactional
-  //   public MessageResponse resetPassword(ResetPasswordRequest request) {
-  //     PasswordResetToken resetToken =
-  //         passwordResetTokenRepository
-  //             .findByToken(request.getToken())
-  //             .orElseThrow(() -> new IllegalArgumentException("token not found"));
+    // generate jwt token
+    int expirationDays = 1; // token expires in 1 day, can be configured as needed
+    String token = jwtService.generateToken(user, expirationDays);
+    LocalDateTime expiresAt = LocalDateTime.now().plusDays(expirationDays);
 
-  //     if (resetToken.getUsed()) {
-  //       throw new IllegalArgumentException("token already used");
-  //     }
+    return AuthResponse.builder()
+        .token(token)
+        .expiresAt(expiresAt)
+        .user(
+            AuthResponse.UserInfo.builder()
+                .id(user.getId().toString())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .emailVerified(user.getEmailVerified())
+                .avatarUrl(user.getAvatarUrl())
+                .roles(List.of("USER"))
+                .mfaEnabled(false)
+                .build())
+        .build();
+  }
 
-  //     if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-  //       throw new IllegalArgumentException("token expired");
-  //     }
+  // @Transactional
+  // public MessageResponse forgotPassword(ForgotPasswordRequest request) {
+  // // always return success to prevent email enumeration
+  // userRepository
+  // .findByEmail(request.getEmail())
+  // .ifPresent(
+  // user -> {
+  // String token = UUID.randomUUID().toString();
+  // PasswordResetToken resetToken =
+  // PasswordResetToken.builder()
+  // .token(token)
+  // .userId(user.getId())
+  // .expiresAt(LocalDateTime.now().plusHours(1))
+  // .used(false)
+  // .build();
 
-  //     // mark token as used
-  //     resetToken.setUsed(true);
-  //     passwordResetTokenRepository.save(resetToken);
+  // passwordResetTokenRepository.save(resetToken);
+  // emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(),
+  // token);
+  // });
 
-  //     // update user password
-  //     User user =
-  //         userRepository
-  //             .findById(resetToken.getUserId())
-  //             .orElseThrow(() -> new IllegalArgumentException("user not found"));
-  //     user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-  //     userRepository.save(user);
+  // return new MessageResponse("Password reset link sent to your email if the
+  // account exists");
+  // }
 
-  //     return new MessageResponse("Password reset successfully", "/login");
-  //   }
+  // @Transactional
+  // public MessageResponse resetPassword(ResetPasswordRequest request) {
+  // PasswordResetToken resetToken =
+  // passwordResetTokenRepository
+  // .findByToken(request.getToken())
+  // .orElseThrow(() -> new IllegalArgumentException("token not found"));
 
-  //   public void logout(String token) {
-  //     // extract token from bearer string if needed
-  //     if (token.startsWith("Bearer ")) {
-  //       token = token.substring(7);
-  //     }
+  // if (resetToken.getUsed()) {
+  // throw new IllegalArgumentException("token already used");
+  // }
 
-  //     tokenBlacklistService.blacklistToken(token);
-  //   }
+  // if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+  // throw new IllegalArgumentException("token expired");
+  // }
+
+  // // mark token as used
+  // resetToken.setUsed(true);
+  // passwordResetTokenRepository.save(resetToken);
+
+  // // update user password
+  // User user =
+  // userRepository
+  // .findById(resetToken.getUserId())
+  // .orElseThrow(() -> new IllegalArgumentException("user not found"));
+  // user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+  // userRepository.save(user);
+
+  // return new MessageResponse("Password reset successfully", "/login");
+  // }
+
+  // public void logout(String token) {
+  // // extract token from bearer string if needed
+  // if (token.startsWith("Bearer ")) {
+  // token = token.substring(7);
+  // }
+
+  // tokenBlacklistService.blacklistToken(token);
+  // }
 
   private boolean isAcceptedDomain(String email) {
     String domain = email.substring(email.indexOf("@") + 1);

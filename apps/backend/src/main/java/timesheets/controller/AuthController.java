@@ -5,15 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.RegisterRequest;
+import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.service.AuthService;
 
-// import timesheets.dto.request.AuthRequest;
 // import timesheets.dto.request.GoogleAuthRequest;
 // import timesheets.dto.request.MfaVerifyRequest;
-// import timesheets.dto.response.AuthResponse;
 
 // import java.util.UUID;
 // import timesheets.dto.request.ForgotPasswordRequest;
@@ -34,17 +34,18 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
+  // a user will verify their email after registering
   @PostMapping("/verify-email")
   public ResponseEntity<MessageResponse> verifyEmail(@RequestParam String token) {
     MessageResponse response = authService.verifyEmail(token);
     return ResponseEntity.ok(response);
   }
 
-  //   @PostMapping("/login")
-  //   public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
-  //     AuthResponse response = authService.login(request);
-  //     return ResponseEntity.ok(response);
-  //   }
+  @PostMapping("/login")
+  public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
+    AuthResponse response = authService.login(request);
+    return ResponseEntity.ok(response);
+  }
 
   //   // optional for demo 1
   //   @PostMapping("/forgot-password")
