@@ -1,0 +1,16 @@
+_pycache_
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env*
+.tox
+.coverage
+.coverage.*
+.cache
+*.log
+.git*
+tests
+scripts
+postman
+./postgres-data
