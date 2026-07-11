@@ -173,7 +173,9 @@ public class AuthService {
     return new MessageResponse("Email verified successfully", "/dashboard");
   }
 
-  @Transactional
+  /*I am using no rollback such that there is no rollback for login failures.
+  I want the login attempts to still register in the DB*/
+  @Transactional(noRollbackFor = {IllegalArgumentException.class, IllegalStateException.class})
   public AuthResponse login(AuthRequest request) {
     User user =
         userRepository
@@ -194,14 +196,14 @@ public class AuthService {
       int attempts =
           (user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts()) + 1;
 
-      System.out.println("Incrementing attempts to: " + attempts);
+      // System.out.println("Incrementing attempts to: " + attempts);
       user.setFailedLoginAttempts(attempts);
 
-      System.out.println("Saved user");
+      // System.out.println("Saved user");
 
       if (attempts >= MAX_LOGIN_ATTEMPTS) {
         user.setLockedUntil(LocalDateTime.now().plusMinutes(30));
-        userRepository.saveAndFlush(user);
+        userRepository.save(user);
         throw new IllegalStateException(
             "account locked after too many failed attempts. Try again in 30 minutes");
       }
@@ -212,7 +214,8 @@ public class AuthService {
 
     // reset login attempts on successful password verification
     user.setFailedLoginAttempts(0);
-    userRepository.saveAndFlush(user);
+    user.setLockedUntil(null);
+    userRepository.save(user);
 
     if (!Boolean.TRUE.equals(user.getEmailVerified())) {
       throw new IllegalStateException("please verify your email before logging in");
