@@ -1,9 +1,10 @@
 package timesheets.service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +34,8 @@ import timesheets.util.TotpUtils;
 public class AuthService {
 
   private final UserRepository userRepository;
-  private UserMfaRepository userMfaRepository;
+  private final UserMfaRepository userMfaRepository;
+  private final WorkspaceMemberRepository workspaceMemberRepository;
   private final UserIdentityProviderRepository userIdentityProviderRepository;
   private final PasswordEncoder passwordEncoder;
 
@@ -178,10 +180,12 @@ public class AuthService {
             .findByEmail(request.getEmail())
             .orElseThrow(() -> new IllegalArgumentException("invalid credentials"));
 
-    //check if the account is locked, and for how long
-    if(user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())){
-      long minutesRemain = java.time.Duration.between(LocalDateTime.now(), user.getLockedUntil()).toMinutes();
-      throw new IllegalStateException("account locked. Please try again in " + minutesRemain + " minutes");
+    // check if the account is locked, and for how long
+    if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())) {
+      long minutesRemain =
+          java.time.Duration.between(LocalDateTime.now(), user.getLockedUntil()).toMinutes();
+      throw new IllegalStateException(
+          "account locked. Please try again in " + minutesRemain + " minutes");
     }
 
     // verify password
@@ -190,12 +194,16 @@ public class AuthService {
       int attempts =
           (user.getFailedLoginAttempts() == null ? 0 : user.getFailedLoginAttempts()) + 1;
 
+      System.out.println("Incrementing attempts to: " + attempts);
       user.setFailedLoginAttempts(attempts);
+
+      System.out.println("Saved user");
 
       if (attempts >= MAX_LOGIN_ATTEMPTS) {
         user.setLockedUntil(LocalDateTime.now().plusMinutes(30));
-        userRepository.save(user);
-        throw new IllegalStateException("account locked after too many failed attempts. Try again in 30 minutes");
+        userRepository.saveAndFlush(user);
+        throw new IllegalStateException(
+            "account locked after too many failed attempts. Try again in 30 minutes");
       }
 
       userRepository.save(user);
@@ -204,34 +212,17 @@ public class AuthService {
 
     // reset login attempts on successful password verification
     user.setFailedLoginAttempts(0);
-    userRepository.save(user);
+    userRepository.saveAndFlush(user);
 
     if (!Boolean.TRUE.equals(user.getEmailVerified())) {
       throw new IllegalStateException("please verify your email before logging in");
     }
 
-   
+    // check if MFA is enabled
+    boolean mfaEnabled =
+        userMfaRepository.findByUserId(user.getId()).map(UserMfa::getIsEnabled).orElse(false);
 
-    // generate jwt token
-    int expirationDays = 1; // token expires in 1 day, can be configured as needed
-    String token = jwtService.generateToken(user, expirationDays);
-    LocalDateTime expiresAt = LocalDateTime.now().plusDays(expirationDays);
-
-    return AuthResponse.builder()
-        .token(token)
-        .expiresAt(expiresAt)
-        .user(
-            AuthResponse.UserInfo.builder()
-                .id(user.getId().toString())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .emailVerified(user.getEmailVerified())
-                .avatarUrl(user.getAvatarUrl())
-                .roles(List.of("USER"))
-                .mfaEnabled(false)
-                .build())
-        .build();
+    return generateAuthResponse(user, mfaEnabled);
   }
 
   // @Transactional
@@ -298,6 +289,7 @@ public class AuthService {
   // tokenBlacklistService.blacklistToken(token);
   // }
 
+  // ! helper functions
   private boolean isAcceptedDomain(String email) {
     String domain = email.substring(email.indexOf("@") + 1);
     for (String acceptedDomain : ACCEPTED_DOMAINS) {
@@ -306,5 +298,49 @@ public class AuthService {
       }
     }
     return false;
+  }
+
+  private AuthResponse generateAuthResponse(User user, boolean requiresMfa) {
+    // need to see if Mfa is enabled
+    boolean mfaEnabled =
+        userMfaRepository.findByUserId(user.getId()).map(UserMfa::getIsEnabled).orElse(false);
+
+    // the workspace roles are taken from memberships
+    List<String> roles =
+        workspaceMemberRepository.findByUserId(user.getId()).stream()
+            .map(membership -> "ROLE_" + membership.getRole().name())
+            .collect(Collectors.toList());
+    if (roles.isEmpty()) {
+      roles = List.of("ROLE_USER");
+    }
+
+    // we should only generate the token only if MFA is not required
+    String token = null;
+    LocalDateTime expiresAt = null;
+
+    if (!requiresMfa) {
+      int expirationDays = 1;
+      token = jwtService.generateToken(user, expirationDays);
+      expiresAt = LocalDateTime.now().plusDays(expirationDays);
+    }
+
+    AuthResponse.UserInfo userInfo =
+        AuthResponse.UserInfo.builder()
+            .id(user.getId().toString())
+            .email(user.getEmail())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .emailVerified(user.getEmailVerified())
+            .avatarUrl(user.getAvatarUrl())
+            .roles(roles)
+            .mfaEnabled(mfaEnabled)
+            .build();
+
+    return AuthResponse.builder()
+        .token(token)
+        .expiresAt(expiresAt)
+        .user(userInfo)
+        .requiresMfa(requiresMfa && mfaEnabled)
+        .build();
   }
 }
