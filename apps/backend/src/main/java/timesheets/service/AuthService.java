@@ -315,6 +315,48 @@ public class AuthService {
   // tokenBlacklistService.blacklistToken(token);
   // }
 
+  @Transactional
+  public AuthResponse googleAuth(GoogleAuthRequest request) {
+    // first need to see if Google ID token is valif
+
+    GoogleIdToken.Payload payload = verifyGoogleToken(request.getIdToken());
+
+    String googleId = payload.getSubject();
+    String email = payload.getEmail();
+    String firstName = (String) payload.get("given_name");
+    String lastName = (String) payload.get("family_name");
+    String avatarUrl = (String) payload.get("picture");
+    Boolean emailVerified = payload.getEmailVerified();
+
+    // see if the identity provider exists
+    return userIdentityProviderRepository
+        .findByProviderAndProviderUserId("GOOGLE", googleId)
+        .map(
+            identity -> {
+              User user =
+                  userRepository
+                      .findById(identity.getUserId())
+                      .orElseThrow(() -> new RuntimeException("user not found"));
+              return generateAuthResponse(user, false);
+            })
+        .orElseGet(
+            () -> {
+              return userRepository
+                  .findByEmail(email)
+                  .map(
+                      user -> {
+                        linkGoogleIdentity(user, googleId);
+                        return generateAuthResponse(user, false);
+                      })
+                  .orElseGet(
+                      () -> {
+                        User newUser = createUserFromGoogle(payload);
+                        linkGoogleIdentity(newUser, googleId);
+                        return generateAuthResponse(newUser, false);
+                      });
+            });
+  }
+
   // ! helper functions
   // helper func to see if the email is in the accepted domain
   private boolean isAcceptedDomain(String email) {
@@ -372,5 +414,65 @@ public class AuthService {
         .build();
   }
 
-  
+  // helper func to see if the google token is valid
+  private GoogleIdToken.Payload verifyGoogleToken(String idToken) {
+
+    // FOR DEVELOPMENT
+    if ("swagger-test".equals(idToken)) {
+      GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+
+      payload.setSubject("google-test-user-123");
+      payload.setEmail("thabang.siduke@momentum.co.za");
+      payload.put("given_name", "Thabang");
+      payload.put("family_name", "Siduke");
+      payload.put("picture", "https://www.magnific.com/free-photos-vectors/avatar-logo");
+
+      return payload;
+    }
+
+    // this will be what the actual google verification will be ACTUAL PRODUCTION
+    try {
+      GoogleIdTokenVerifier verifier =
+          new GoogleIdTokenVerifier.Builder(
+                  new NetHttpTransport(), GsonFactory.getDefaultInstance())
+              .setAudience(Collections.singletonList(googleClientId))
+              .build();
+
+      GoogleIdToken idTokenObj = verifier.verify(idToken);
+      if (idTokenObj == null) {
+        throw new IllegalArgumentException("invalid google ID token");
+      }
+      return idTokenObj.getPayload();
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to verify Google token: " + e.getMessage());
+    }
+  }
+
+  // helper func that creates a user from a google token
+  private User createUserFromGoogle(GoogleIdToken.Payload payload) {
+    User user =
+        User.builder()
+            .email(payload.getEmail())
+            .firstName((String) payload.get("given_name"))
+            .lastName((String) payload.get("family_name"))
+            .avatarUrl((String) payload.get("picture"))
+            .emailVerified(payload.getEmailVerified() != null && payload.getEmailVerified())
+            .passwordHash(null)
+            .status(UserStatus.ACTIVE)
+            .build();
+
+    return userRepository.save(user);
+  }
+
+  private void linkGoogleIdentity(User user, String googleId) {
+    UserIdentityProvider identity =
+        UserIdentityProvider.builder()
+            .userId(user.getId())
+            .provider("GOOGLE")
+            .providerUserId(googleId)
+            .email(user.getEmail())
+            .build();
+
+    userIdentityProviderRepository.save(identity);
+  }
 }
