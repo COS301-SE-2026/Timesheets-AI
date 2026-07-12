@@ -21,3 +21,6 @@ httpx==0.27.0
 
 # Linting
 ruff==0.4.7
+
+#Ai API
+anthropic==0.28.0
