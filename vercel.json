@@ -1,7 +1,0 @@
-{
-  "buildCommand": "ng build --prod",
-  "outputDirectory": "dist/client",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
