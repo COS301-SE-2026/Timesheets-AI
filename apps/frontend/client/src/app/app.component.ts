@@ -1,3 +1,10 @@
+/**
+ * Author: Lerato Sibanda
+ * Date: 2026-07-13
+ * Purpose: Root application component that manages layout visibilitybased on route.
+ * Related Requirement: FR-01 - Application layout
+ */
+
 import { Component } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';

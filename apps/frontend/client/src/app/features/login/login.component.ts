@@ -1,3 +1,10 @@
+/**
+ * Author: Cleopatra Kwenda
+ * Date: 2026-05-15
+ * Purpose: Handles user authentication through login form with validation
+ * Related Requirement: -
+ */
+
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
