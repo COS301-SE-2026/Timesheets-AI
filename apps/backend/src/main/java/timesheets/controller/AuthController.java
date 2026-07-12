@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import timesheets.dto.request.AuthRequest;
+import timesheets.dto.request.GoogleAuthRequest;
 import timesheets.dto.request.RegisterRequest;
 import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.MessageResponse;
@@ -68,4 +69,10 @@ public class AuthController {
   //     authService.logout(authorization);
   //     return ResponseEntity.noContent().build();
   //   }
+
+  @PostMapping("/google")
+  public ResponseEntity<AuthResponse> googleAuth(@Valid @RequestBody GoogleAuthRequest request) {
+    AuthResponse response = authService.googleAuth(request);
+    return ResponseEntity.ok(response);
+  }
 }
