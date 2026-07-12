@@ -9,7 +9,7 @@ Date: 12/07/2026
 import uuid
 from datetime import datetime   
 
-from sqlalchemy import Datetime, ForeignKey, Numeric, String, Text
+from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -34,4 +34,4 @@ class AIInsight(Base):
     confidence: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     recommendation: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(Datetime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

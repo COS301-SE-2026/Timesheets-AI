@@ -21,10 +21,10 @@ class Task(Base):
         UUID(as_uuid=True), ForeignKey("workspace_members.id"), nullable=True
     )
     status: Mapped[str] = mapped_column(String(20))
-    estimated_hours: Mapped[float | None] = mapped_column(Numeric(9, 2), nullable=True)
+    estimated_hours: Mapped[float | None] = mapped_column(Numeric(8, 2), nullable=True)
     actual_hours: Mapped[float | None] = mapped_column(Numeric(8, 2), nullable=True)
-    due_Date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    due_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime)
     updated_at: Mapped[datetime] = mapped_column(DateTime)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
-    
+
