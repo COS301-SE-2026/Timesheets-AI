@@ -1,6 +1,11 @@
 package timesheets.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,10 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.*;
 import timesheets.dto.request.AuthRequest;
+import timesheets.dto.request.GoogleAuthRequest;
 import timesheets.dto.request.RegisterRequest;
 import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
+import timesheets.enums.UserStatus;
 import timesheets.repository.*;
 import timesheets.util.TotpUtils;
 
@@ -173,8 +180,10 @@ public class AuthService {
     return new MessageResponse("Email verified successfully", "/dashboard");
   }
 
-  /*I am using no rollback such that there is no rollback for login failures.
-  I want the login attempts to still register in the DB*/
+  /*
+   * I am using no rollback such that there is no rollback for login failures.
+   * I want the login attempts to still register in the DB
+   */
   @Transactional(noRollbackFor = {IllegalArgumentException.class, IllegalStateException.class})
   public AuthResponse login(AuthRequest request) {
     User user =
@@ -182,6 +191,20 @@ public class AuthService {
             .findByEmail(request.getEmail())
             .orElseThrow(() -> new IllegalArgumentException("invalid credentials"));
 
+    // check if the user is an SSO user(this means that they have no password)
+    if (user.getPasswordHash() == null) {
+      boolean hasGoogleProvider =
+          userIdentityProviderRepository
+              .findByProviderAndUserId("GOOGLE", user.getId())
+              .isPresent();
+
+      if (hasGoogleProvider) {
+        throw new IllegalArgumentException(
+            "this account uses Google SSO. So please sign in with Google.");
+      } else {
+        throw new IllegalArgumentException("account not properly configured. Contact support.");
+      }
+    }
     // check if the account is locked, and for how long
     if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())) {
       long minutesRemain =
@@ -293,6 +316,7 @@ public class AuthService {
   // }
 
   // ! helper functions
+  // helper func to see if the email is in the accepted domain
   private boolean isAcceptedDomain(String email) {
     String domain = email.substring(email.indexOf("@") + 1);
     for (String acceptedDomain : ACCEPTED_DOMAINS) {
@@ -303,6 +327,7 @@ public class AuthService {
     return false;
   }
 
+  // helper function that helps generate the authorisation response
   private AuthResponse generateAuthResponse(User user, boolean requiresMfa) {
     // need to see if Mfa is enabled
     boolean mfaEnabled =
@@ -346,4 +371,6 @@ public class AuthService {
         .requiresMfa(requiresMfa && mfaEnabled)
         .build();
   }
+
+  
 }
