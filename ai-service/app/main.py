@@ -11,6 +11,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+#imported the productivity router to the main app, so that it can be included in the main app
+from app.api.productivity import router as productivity_router
+
 
 app = FastAPI(
     title="Momently AI Service",
@@ -27,6 +30,8 @@ app.add_middleware(
 )
 
 app.include_router(health_router)
+#added a matching productivity router to the main app
+app.include_router(productivity_router)
 
 @app.get("/", include_in_schema=False)
 def root():
