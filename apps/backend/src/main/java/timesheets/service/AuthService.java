@@ -450,13 +450,18 @@ public class AuthService {
 
   // helper func that creates a user from a google token
   private User createUserFromGoogle(GoogleIdToken.Payload payload) {
+    String firstName =
+        payload.get("given_name") != null ? (String) payload.get("given_name") : "Google User";
+    String lastName =
+        payload.get("family_name") != null ? (String) payload.get("family_name") : "Unknown";
+
     User user =
         User.builder()
             .email(payload.getEmail())
-            .firstName((String) payload.get("given_name"))
-            .lastName((String) payload.get("family_name"))
+            .firstName(firstName)
+            .lastName(lastName)
             .avatarUrl((String) payload.get("picture"))
-            .emailVerified(payload.getEmailVerified() != null && payload.getEmailVerified())
+            .emailVerified(Boolean.TRUE.equals(payload.getEmailVerified()))
             .passwordHash(null)
             .status(UserStatus.ACTIVE)
             .build();
