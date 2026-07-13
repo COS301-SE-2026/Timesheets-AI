@@ -1,0 +1,62 @@
+# workflow configuration where it runs tests and etc for the backend
+# [Stack: Python (FastAPI)]
+
+# the trigger: this will run when there is a pull request or push on the main or dev branches
+name: AI Pipeline
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request: 
+      branches: [main, dev]
+
+jobs:
+  ai-check:
+    runs-on: ubuntu-latest 
+    steps: 
+      - uses: actions/checkout@v4
+
+    # Logic Gate: this is used to determine where the changes occur and if it occurs in the ai service folder, therefore the ai-check should run otherwise passed quickly 
+      - name: Check for AI Service Changes
+        id: filter
+        uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590
+        with:
+          filters: |
+            ai:
+              - 'ai-service/**'
+              - '.github/workflows/ai-ci.yml'
+
+    # Set up the required Python environment for this workflow 
+      - name: Set up Python 
+        if: steps.filter.outputs.ai == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip' 
+          # the cache will be invalid and destroyed when the textfil e
+          cache-dependency-path: ai-service/requirements.txt
+
+      - name: Install Dependencies 
+        if: steps.filter.outputs.ai == 'true'
+        run: |
+          cd ai-service 
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt 
+
+        # ruff is recommended for Python FastAPI (made by Astral) 
+        # it is fast and it ahndles linting, auto fix sytnax and formatting so no need for different kinds of tools 
+      - name: Run Ruff Lint 
+        if: steps.filter.outputs.ai == 'true' 
+        run: |
+          cd ai-service
+          ruff format --check .
+          ruff check .
+
+      - name: Run Tests 
+        if: steps.filter.outputs.ai == 'true'
+        working-directory: ai-service
+        env:
+          PYTHONPATH: .
+        run: |
+          pytest
+
