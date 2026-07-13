@@ -6,6 +6,7 @@ Please check my draft file for links/resources on FastAPI testing features and u
 Author: Zamokuhle Zwane
 Date: 12/07/2026
 """
+
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -16,20 +17,22 @@ client = TestClient(app)
 
 
 def test_health_db_up():
-    with patch("app.api.health.check_connection", return_value =True):
+    with patch("app.api.health.check_connection", return_value=True):
         response = client.get("/health")
         assert response.status_code == 200
         assert response.json() == {
             "status": "ok",
             "Service": "momently-ai",
-            "database": "connected"
+            "database": "connected",
         }
+
+
 def test_health_db_down():
-    with patch("app.api.health.check_connection", return_value = False):
+    with patch("app.api.health.check_connection", return_value=False):
         response = client.get("/health")
         assert response.status_code == 200
         assert response.json() == {
             "status": "degraded",
             "Service": "momently-ai",
-            "database": "disconnected"
+            "database": "disconnected",
         }

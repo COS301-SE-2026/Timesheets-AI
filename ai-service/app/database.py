@@ -12,19 +12,21 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.config import settings
 
-#In this file, I am setting up the db connection and session managing
-#it will be used in the health endpoint
+# In this file, I am setting up the db connection and session managing
+# it will be used in the health endpoint
 engine = create_engine(
     settings.database_url,
     pool_pre_ping=True,
-    pool_size = 5,
-    max_overflow = 10,
+    pool_size=5,
+    max_overflow=10,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+
 class Base(DeclarativeBase):
     pass
+
 
 def get_db():
     db = SessionLocal()
@@ -32,6 +34,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 def check_connection():
     try:

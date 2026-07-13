@@ -1,5 +1,5 @@
 """
-This handles the main application setup for the AI service, 
+This handles the main application setup for the AI service,
 including FastAPI initialization, middleware configuration, and route inclusion.
 Please check my draft file for links/resources on FastAPI features and usage.
 
@@ -28,6 +28,7 @@ app.add_middleware(
 
 app.include_router(health_router)
 
+
 @app.get("/", include_in_schema=False)
 def root():
-    return {"message": "Momently AI Service, visit /docs for Swagger UI"}   
+    return {"message": "Momently AI Service, visit /docs for Swagger UI"}
