@@ -1,6 +1,8 @@
 package timesheets.domain;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -46,16 +48,16 @@ public class Task {
   private String priority = "MEDIUM";
 
   @Column(name = "estimated_hours")
-  private Double estimatedHours;
+  private BigDecimal estimatedHours;
 
   @Column(name = "actual_hours")
-  private Double actualHours;
+  private BigDecimal actualHours;
 
   @Column(name = "assigned_workspace_member_id")
   private UUID assignedWorkspaceMemberId;
 
   @Column(name = "due_date")
-  private LocalDateTime dueDate;
+  private LocalDate dueDate;
 
   @Column(name = "completed_at")
   private LocalDateTime completedAt;

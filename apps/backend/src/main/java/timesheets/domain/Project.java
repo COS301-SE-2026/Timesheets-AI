@@ -1,6 +1,8 @@
 package timesheets.domain;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -37,19 +39,19 @@ public class Project {
   private String status = "ACTIVE";
 
   @Column(name = "budget_hours")
-  private Double budgetHours;
+  private BigDecimal budgetHours;
 
   @Column(name = "budget_cost")
-  private Double budgetCost;
+  private BigDecimal budgetCost;
 
   @Column(name = "hourly_rate")
-  private Double hourlyRate;
+  private BigDecimal hourlyRate;
 
   @Column(name = "start_date")
-  private LocalDateTime startDate;
+  private LocalDate startDate;
 
   @Column(name = "end_date")
-  private LocalDateTime endDate;
+  private LocalDate endDate;
 
   @Column(name = "is_deleted")
   @Builder.Default
