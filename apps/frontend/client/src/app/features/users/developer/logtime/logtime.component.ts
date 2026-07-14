@@ -488,19 +488,8 @@ closePanel(): void {
       return;
     }
 
-    const end = new Date();
-    const durationMinutes = Math.max(1, Math.round(this.elapsedSeconds() / 60)); // Standardizes round up minimum limits
-    const request = this.buildTimerRequest(timer, end, durationMinutes);
 
-    this.entries.update((entries) => [{
-      id: this.createId(),
-      ...request,
-      taskId: request.taskId ?? '',
-      status: 'DRAFT',
-      isLocked: false,
-      createdAt: new Date().toISOString().slice(0, 19),
-      updatedAt: new Date().toISOString().slice(0, 19)
-    }, ...entries]);
+    const stopAndReset = () => {
 
     this.activeTimer.set(null);
     this.elapsedSeconds.set(0);
@@ -509,6 +498,22 @@ closePanel(): void {
     this.clearTimerInterval();
     this.toastMessage.set('Timer entry saved.');
     this.closePanel();
+    };
+
+    if(!this.http) {
+      const end = new Date();
+      const durationMinutes = Math.max(1, Math.round(this.elapsedSeconds() / 60));
+      const request = this.buildTimerRequest(timer, end, durationMinutes);
+      this.entries.update((entries) => [{
+        id: this.createId(), ...request, status: 'DRAFT', isLocked: false, createdAt: new Date().toISOString().slice(0, 19), updatedAt: new Date().toISOString().slice(0, 19)}, ...entries ])
+        stopAndReset();
+        return;
+    }
+
+    this.http.post(`${this.apiBaseUrl}/timers/stop`, null, this.requestOptions()).subscribe({
+      next: () => { this.loadEntries(); stopAndReset();},
+      error: (error) => this.conflictMessage.set(error.error?.message ?? 'Unable to stop the timer.')
+    });
   }
 
   timerStartedLabel(): string {
@@ -553,7 +558,7 @@ formatDuration(minutes: number = 0): string {
     return this.projects().find((project) => project.id === projectId)?.name ?? 'Unknown project';
   }
 
-  getTaskTitle(taskId: string): string {
+  getTaskTitle(taskId: string | null): string {
     return this.tasks().find((task) => task.id === taskId)?.title ?? 'No task selected';
   }
 
@@ -564,7 +569,7 @@ formatDuration(minutes: number = 0): string {
     this.entryForm.setValue({
       id: entry.id,
       projectId: entry.projectId,
-      taskId: entry.taskId,
+      taskId: entry.taskId ?? '',
       entryType: entry.entryType,
       startTime: this.timeFromDateTime(entry.startTime),
       endTime: this.timeFromDateTime(entry.endTime),
@@ -579,16 +584,56 @@ formatDuration(minutes: number = 0): string {
     this.openMenuEntryId.set(this.openMenuEntryId() === entryId ? null : entryId);
   }
 
-  submitEntry(entry: TimeEntry): void {
-    this.updateEntryStatus(entry.id, 'SUBMITTED');
-    this.openMenuEntryId.set(null);
-    this.toastMessage.set('Time entry submitted.');
+  // submitEntry(entry: TimeEntry): void {
+  //   this.updateEntryStatus(entry.id, 'SUBMITTED');
+  //   this.openMenuEntryId.set(null);
+  //   this.toastMessage.set('Time entry submitted.');
+  // }
+
+  // deleteEntry(entry: TimeEntry): void {
+  //   this.entries.update((entries) => entries.filter((existingEntry) => existingEntry.id !== entry.id));
+  //   this.openMenuEntryId.set(null);
+  //   this.toastMessage.set('Time entry deleted.');
+  // }
+
+  submitTimeEntry(entry: TimeEntry): void {
+    const submitted = () => {
+      this.updateEntryStatus(entry.id, 'SUBMITTED');
+      this.openMenuEntryId.set(null);
+      this.toastMessage.set('Time entry submitted.');
+    };
+
+    if(!this.http) {
+      submitted();
+      return;
+    }
+
+    this.http.post<TimeEntry>(`${this.apiBaseUrl}/time-entries/${entry.id}/submit`, null, this.requestOptions()).subscribe({
+      next: (savedEntry) => {
+        this.entries.update((entries) => entries.map((existingEntry) => existingEntry.id === entry.id ? savedEntry : existingEntry));
+        this.openMenuEntryId.set(null);
+        this.toastMessage.set('Time entry submitted.');
+      },
+      error: (error) => this.conflictMessage.set(error.error?.message ?? 'Unable to submit the time entry.')
+    });
   }
 
-  deleteEntry(entry: TimeEntry): void {
-    this.entries.update((entries) => entries.filter((existingEntry) => existingEntry.id !== entry.id));
-    this.openMenuEntryId.set(null);
-    this.toastMessage.set('Time entry deleted.');
+  deleteEntry(entry: TimeEntry) : void {
+    const deleted = () => {
+      this.entries.update((entries) => entries.filter((existingEntry) => existingEntry.id !== entry.id));
+      this.openMenuEntryId.set(null);
+      this.toastMessage.set('Time entry deleted.');
+    };
+
+    if(!this.http) {
+      deleted();
+      return;
+    }
+
+    this.http.delete(`${this.apiBaseUrl}/time-entries/${entry.id}`, this.requestOptions()).subscribe({
+      next: deleted,
+      error: (error) => this.conflictMessage.set(error.error?.message ?? 'Unable to delete the time entry,')
+    });
   }
 
   resubmitEntry(entry: TimeEntry): void {
@@ -693,8 +738,8 @@ private createTaskId(): string {
       startTime: this.toDateTimeValue(this.dateFromDate(timer.startedAt), this.toTimeValue(timer.startedAt)),
       endTime: this.toDateTimeValue(this.dateFromDate(end), this.toTimeValue(end)),
       durationMinutes,
-      entryType: 'DEVELOPMENT',
-      description: timer.description || 'Timer entry'
+      entryType: 'timer',
+      description: timer.notes || 'Timer entry'
     };
   }
 
@@ -741,7 +786,26 @@ private createTaskId(): string {
   }
 
   private toDateTimeValue(date: string, time: string): string {
-    return `${date}T${time}:00`;
+    return `${date}T${time}:00Z`;
+  }
+
+  private requestOptions(): { headers : HttpHeaders } {
+    let headers = new HttpHeaders().set('X-Workspace-Member-Id', this.workspaceMemberId);
+    const token = localStorage.getItem('authToken');
+    if(token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return {headers};
+  }
+
+  private loadEntries(): void {
+    if(!this.http) {
+      return;
+    }
+    this.http.get<TimeEntry[]>(`${this.apiBaseUrl}/time-entries/me`, this.requestOptions()).subscribe({
+      next: (entries) => this.entries.set(entries),
+      error: (error) => this.conflictMessage.set(error.error?.message ?? 'Unable to load time entries.')
+    });
   }
 
   private formatDateLabel(dateValue: string): string {
