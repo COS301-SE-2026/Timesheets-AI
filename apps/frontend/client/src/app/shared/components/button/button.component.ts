@@ -1,5 +1,5 @@
 /**
- * Author: Khaugelo Matsena
+ * Author: Kgaugelo Matsena
  * Date: 2026-05-15
  * Purpose: Reusable button component with variant styling support.
  * Related Requirements: -
