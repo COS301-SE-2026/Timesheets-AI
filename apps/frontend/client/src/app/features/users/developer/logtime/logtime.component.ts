@@ -74,6 +74,7 @@ interface StartTmerRequest {
 })
 export class LogtimeComponent implements OnDestroy {
   private readonly http = inject(HttpClient, { optional: true});
+  private readonly backendEnabled = false;
   private readonly apiBaseUrl = '/api';
   private readonly workspaceMemberId = localStorage.getItem('workspaceMemberId') ?? '00000000-0000-0000-0003-000000000002';
 
@@ -400,7 +401,7 @@ closePanel(): void {
     this.closePanel();
    };
 
-   if(!this.http) {
+   if(!this.backendEnabled || !this.http) {
     onSaved(entry);
     return;
    }
@@ -442,7 +443,7 @@ closePanel(): void {
     }, 1000);
   };
 
-  if(!this.http) {
+  if(!this.backendEnabled || !this.http) {
     activateTimer(timer);
     return;
   }
@@ -453,7 +454,6 @@ closePanel(): void {
   });
 }
 
-//contine from here
 
   pauseTimer(): void {
     this.clearTimerInterval();
@@ -500,7 +500,7 @@ closePanel(): void {
     this.closePanel();
     };
 
-    if(!this.http) {
+    if(!this.backendEnabled || !this.http) {
       const end = new Date();
       const durationMinutes = Math.max(1, Math.round(this.elapsedSeconds() / 60));
       const request = this.buildTimerRequest(timer, end, durationMinutes);
@@ -582,19 +582,8 @@ formatDuration(minutes: number = 0): string {
 
   toggleEntryMenu(entryId: string): void {
     this.openMenuEntryId.set(this.openMenuEntryId() === entryId ? null : entryId);
-  }
+  } 
 
-  // submitEntry(entry: TimeEntry): void {
-  //   this.updateEntryStatus(entry.id, 'SUBMITTED');
-  //   this.openMenuEntryId.set(null);
-  //   this.toastMessage.set('Time entry submitted.');
-  // }
-
-  // deleteEntry(entry: TimeEntry): void {
-  //   this.entries.update((entries) => entries.filter((existingEntry) => existingEntry.id !== entry.id));
-  //   this.openMenuEntryId.set(null);
-  //   this.toastMessage.set('Time entry deleted.');
-  // }
 
   submitTimeEntry(entry: TimeEntry): void {
     const submitted = () => {
@@ -603,7 +592,7 @@ formatDuration(minutes: number = 0): string {
       this.toastMessage.set('Time entry submitted.');
     };
 
-    if(!this.http) {
+    if(!this.backendEnabled || !this.http) {
       submitted();
       return;
     }
@@ -625,7 +614,7 @@ formatDuration(minutes: number = 0): string {
       this.toastMessage.set('Time entry deleted.');
     };
 
-    if(!this.http) {
+    if(!this.backendEnabled || !this.http) {
       deleted();
       return;
     }
@@ -799,7 +788,7 @@ private createTaskId(): string {
   }
 
   private loadEntries(): void {
-    if(!this.http) {
+    if(!this.backendEnabled || !this.http) {
       return;
     }
     this.http.get<TimeEntry[]>(`${this.apiBaseUrl}/time-entries/me`, this.requestOptions()).subscribe({
