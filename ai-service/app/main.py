@@ -11,9 +11,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+
 #imported the productivity router to the main app, so that it can be included in the main app
 from app.api.productivity import router as productivity_router
-
 
 app = FastAPI(
     title="Momently AI Service",

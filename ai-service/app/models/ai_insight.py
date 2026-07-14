@@ -7,13 +7,14 @@ Date: 12/07/2026
 """
 
 import uuid
-from datetime import datetime   
+from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
+
 
 #During review, please double check the mapping with Nyasha's schema. I'll link it to the PR for reference.
 class AIInsight(Base):
