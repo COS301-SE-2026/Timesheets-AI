@@ -555,7 +555,7 @@ if (draftEntry) {
       startTime: '2026-05-21T09:30:00',
       endTime: '2026-05-21T10:45:00',
       durationMinutes: 75,
-      entryType: 'DEVELOPMENT',
+      entryType: 'manual',
       description: 'Backend payload check.'
     });
 
