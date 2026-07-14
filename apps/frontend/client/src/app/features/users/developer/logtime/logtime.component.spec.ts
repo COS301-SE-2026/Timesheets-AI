@@ -118,7 +118,7 @@ describe('LogtimeComponent', () => {
     component.entryForm.patchValue({
       projectId: projectThreeId,
       taskId: taskFourId,
-      entryType: 'DESIGN',
+      entryType: 'manual',
       startTime: '22:00',
       endTime: '23:00',
       description: 'Designed the log time page.'
@@ -245,7 +245,7 @@ describe('LogtimeComponent', () => {
     expect(rejectedEntry).toBeTruthy();
 
 if (draftEntry) {
-  component.submitEntry(draftEntry);
+  component.submitTimeEntry(draftEntry);
 }    expect(
       component.entries().find(
         (entry) => entry.id === draftEntry!.id
@@ -482,7 +482,7 @@ if (draftEntry) {
     expect(component.formatDuration(30)).toBe('30m');
     expect(component.formatDuration(60)).toBe('1h');
     expect(component.formatDuration(75)).toBe('1h 15m');
-    expect(component.formatDuration(null)).toBe('0m');
+    expect(component.formatDuration(0)).toBe('0m');
   });
 
   // Time formatting
@@ -542,7 +542,7 @@ if (draftEntry) {
       startTime: '09:30',
       endTime: '10:45',
       durationMinutes: 75,
-      entryType: 'DEVELOPMENT',
+      entryType: 'manual',
       description: 'Backend payload check.'
     });
 
