@@ -431,7 +431,7 @@
                       <!-- Dropdown shown when this entry's menu is open -->
                       @if (openMenuEntryId() === entry.id) {
                         <div class="action-menu__dropdown">
-                          <button type="button" (click)="submitEntry(entry)">Submit</button>
+                          <button type="button" (click)="resubmitEntry(entry)">Submit</button>
                           <button type="button" (click)="deleteEntry(entry)">Delete</button>
                         </div>
                       }
@@ -439,7 +439,7 @@
                   }
                   <!-- Resubmit button shown for rejected entries -->
                   @if (entry.status === 'REJECTED') {
-                    <button type="button" class="link-btn" (click)="resubmitEntry(entry)">Resubmit</button>
+                    <button type="button" class="link-btn" (click)="submitTimeEntry(entry)">Resubmit</button>
                   }
                 </td>
               </tr>
