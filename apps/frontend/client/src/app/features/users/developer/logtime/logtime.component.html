@@ -122,17 +122,11 @@
             </label>
           }
 
-          <!-- Entry type selector (e.g. Development, Meeting) -->
-          <label class="field">
-            <span class="field__label">Entry Type</span>
-            <select formControlName="entryType">
-              <option value="DEVELOPMENT">Development</option>
-              <option value="MEETING">Meeting</option>
-              <option value="DOCUMENTATION">Documentation</option>
-              <option value="DESIGN">Design</option>
-              <option value="BREAK">Break</option>
-            </select>
-          </label>
+       <!-- The api records the source of this entry -->
+       <label class="field">
+        <span class="field__label"> Entry Type </span>
+        <input type="text" value="Manual" readonly />
+       </label>
 
           <!-- Start time, end time, and auto calculated duration -->
           <div class="manual-form__row manual-form__row--3">
@@ -255,7 +249,7 @@
             }
 
             <label class="field">
-              <span class="field__label">Description (Optional)</span>
+              <span class="field__label">Notes (Optional)</span>
               <input
                 type="text"
                 formControlName="description"
