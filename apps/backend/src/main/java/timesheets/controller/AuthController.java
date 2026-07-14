@@ -48,31 +48,35 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
-  //   // optional for demo 1
-  //   @PostMapping("/forgot-password")
-  //   public ResponseEntity<MessageResponse> forgotPassword(
-  //       @Valid @RequestBody ForgotPasswordRequest request) {
-  //     MessageResponse response = authService.forgotPassword(request);
-  //     return ResponseEntity.ok(response);
-  //   }
+  // // optional for demo 1
+  // @PostMapping("/forgot-password")
+  // public ResponseEntity<MessageResponse> forgotPassword(
+  // @Valid @RequestBody ForgotPasswordRequest request) {
+  // MessageResponse response = authService.forgotPassword(request);
+  // return ResponseEntity.ok(response);
+  // }
 
-  //   // optional for demo 1
-  //   @PostMapping("/reset-password")
-  //   public ResponseEntity<MessageResponse> resetPassword(
-  //       @Valid @RequestBody ResetPasswordRequest request) {
-  //     MessageResponse response = authService.resetPassword(request);
-  //     return ResponseEntity.ok(response);
-  //   }
+  // // optional for demo 1
+  // @PostMapping("/reset-password")
+  // public ResponseEntity<MessageResponse> resetPassword(
+  // @Valid @RequestBody ResetPasswordRequest request) {
+  // MessageResponse response = authService.resetPassword(request);
+  // return ResponseEntity.ok(response);
+  // }
 
-  //   @PostMapping("/logout")
-  //   public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorization) {
-  //     authService.logout(authorization);
-  //     return ResponseEntity.noContent().build();
-  //   }
+  // @PostMapping("/logout")
+  // public ResponseEntity<Void> logout(@RequestHeader("Authorization") String
+  // authorization) {
+  // authService.logout(authorization);
+  // return ResponseEntity.noContent().build();
+  // }
 
   @PostMapping("/google")
   public ResponseEntity<AuthResponse> googleAuth(@Valid @RequestBody GoogleAuthRequest request) {
     AuthResponse response = authService.googleAuth(request);
     return ResponseEntity.ok(response);
   }
+
+  // TODO: I am going to do MFA support here- pausing it for now so I can fix the
+  // previous code changes
 }
