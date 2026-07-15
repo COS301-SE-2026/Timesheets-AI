@@ -1,64 +1,90 @@
-<div class="hg-wrap" 
-    aria-hidden="true">
+<div class="hg-wrap" aria-hidden="true">
+  <div class="glow"></div>
 
-<div class="glow"></div>
-
-<svg viewBox="0 0 240 320" width="320" height="420" class="hg-flip" >
-
+  <svg viewBox="0 0 240 320" width="320" height="420" class="hg-flip">
     <defs>
-    <linearGradient id="sandTop">
-        <stop offset="0%" stop-color="#F2A867"/>
-        <stop offset="100%" stop-color="#E07830"/>
-    </linearGradient>
+      <linearGradient id="sandTop">
+        <stop offset="0%" stop-color="#F2A867" />
+        <stop offset="100%" stop-color="#E07830" />
+      </linearGradient>
 
-    <linearGradient id="sandBottom">
-        <stop offset="0%" stop-color="#1A65BF"/>
-        <stop offset="100%" stop-color="#0F4C91"/>
-    </linearGradient>
+      <linearGradient id="sandBottom">
+        <stop offset="0%" stop-color="#1A65BF" />
+        <stop offset="100%" stop-color="#0F4C91" />
+      </linearGradient>
 
-    <linearGradient id="glass">
-        <stop offset="0%" stop-color="#E6F1FB" stop-opacity="0.9"/>
-        <stop offset="100%" stop-color="#BFD4F4" stop-opacity="0.5"/>
-    </linearGradient>
+      <linearGradient id="glass">
+        <stop offset="0%" stop-color="#E6F1FB" stop-opacity="0.9" />
+        <stop offset="100%" stop-color="#BFD4F4" stop-opacity="0.5" />
+      </linearGradient>
 
-    <clipPath id="topBulb">
-        <path d="M50 40 L190 40 C190 100 130 140 120 158 C110 140 50 100 50 40 Z"/>
-    </clipPath>
+      <clipPath id="topBulb">
+        <path
+          d="M50 40 L190 40 C190 100 130 140 120 158 C110 140 50 100 50 40 Z"
+        />
+      </clipPath>
 
-    <clipPath id="bottomBulb">
-        <path d="M120 162 C130 180 190 220 190 280 L50 280 C50 220 110 180 120 162 Z"/>
-    </clipPath>
+      <clipPath id="bottomBulb">
+        <path
+          d="M120 162 C130 180 190 220 190 280 L50 280 C50 220 110 180 120 162 Z"
+        />
+      </clipPath>
     </defs>
 
     <!-- caps -->
-    <rect x="38" y="28" width="164" height="14" rx="4" fill="#0F4C91"/>
-    <rect x="38" y="278" width="164" height="14" rx="4" fill="#0F4C91"/>
+    <rect x="38" y="28" width="164" height="14" rx="4" fill="#0F4C91" />
+    <rect x="38" y="278" width="164" height="14" rx="4" fill="#0F4C91" />
 
     <!-- glass -->
-    <path d="M50 40 L190 40 C190 100 130 140 120 158 C110 140 50 100 50 40 Z"
-    fill="url(#glass)" stroke="#0F4C91" stroke-width="3"/>
+    <path
+      d="M50 40 L190 40 C190 100 130 140 120 158 C110 140 50 100 50 40 Z"
+      fill="url(#glass)"
+      stroke="#0F4C91"
+      stroke-width="3"
+    />
 
-    <path d="M120 162 C130 180 190 220 190 280 L50 280 C50 220 110 180 120 162 Z"
-    fill="url(#glass)" stroke="#0F4C91" stroke-width="3"/>
+    <path
+      d="M120 162 C130 180 190 220 190 280 L50 280 C50 220 110 180 120 162 Z"
+      fill="url(#glass)"
+      stroke="#0F4C91"
+      stroke-width="3"
+    />
 
     <!-- sand -->
     <g clip-path="url(#topBulb)">
-    <rect class="hg-sand-top" x="50" y="42" width="140" height="116" fill="url(#sandTop)"/>
+      <rect
+        class="hg-sand-top"
+        x="50"
+        y="42"
+        width="140"
+        height="116"
+        fill="url(#sandTop)"
+      />
     </g>
 
-    <rect class="hg-stream" x="118" y="150" width="4" height="20" fill="#E07830"/>
+    <rect
+      class="hg-stream"
+      x="118"
+      y="150"
+      width="4"
+      height="20"
+      fill="#E07830"
+    />
 
     <g clip-path="url(#bottomBulb)">
-    <rect class="hg-sand-bottom" x="50" y="164" width="140" height="116" fill="url(#sandBottom)"/>
+      <rect
+        class="hg-sand-bottom"
+        x="50"
+        y="164"
+        width="140"
+        height="116"
+        fill="url(#sandBottom)"
+      />
     </g>
+  </svg>
 
-</svg>
-
-<!-- floating grains -->
-<span class="grain g1"></span>
-<span class="grain g2"></span>
-<span class="grain g3"></span>
-
+  <!-- floating grains -->
+  <span class="grain g1"></span>
+  <span class="grain g2"></span>
+  <span class="grain g3"></span>
 </div>
-
-<!-- <h1> Hourglass works!</h1> To test if angualar component was working, it does!-->

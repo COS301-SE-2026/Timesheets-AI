@@ -6,10 +6,9 @@
 .hg-flip {
   animation: flip 12s ease-in-out infinite;
   transform-origin: center;
-  width: min( 320px, 90vw);
+  width: min(320px, 90vw);
   height: auto;
   display: block;
-
 }
 
 .glow {
@@ -18,7 +17,7 @@
   border-radius: 999px;
   filter: blur(40px);
   opacity: 0.5;
-  background: radial-gradient(circle, rgba(224,120,48,0.4), transparent 70%);
+  background: radial-gradient(circle, rgba(224, 120, 48, 0.4), transparent 70%);
 }
 
 /* sand animations */
@@ -47,52 +46,132 @@
   animation: grain 1.4s linear infinite;
 }
 
-.g1 { left: 58%; top: 50%; background: #E07830; }
-.g2 { left: 42%; top: 55%; background: #1A65BF; animation-delay: 0.6s; }
-.g3 { left: 65%; top: 48%; background: #E07830; animation-delay: 1s; }
+.g1 {
+  left: 58%;
+  top: 50%;
+  background: #e07830;
+}
+.g2 {
+  left: 42%;
+  top: 55%;
+  background: #1a65bf;
+  animation-delay: 0.6s;
+}
+.g3 {
+  left: 65%;
+  top: 48%;
+  background: #e07830;
+  animation-delay: 1s;
+}
 
 /* keyframes */
 @keyframes float {
-  0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes flip {
-  0%,38% { transform: rotate(0deg); }
-  50%,88% { transform: rotate(180deg); }
-  100% { transform: rotate(0deg); }
+  0%,
+  38% {
+    transform: rotate(0deg);
+  }
+  50%,
+  88% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 @keyframes topDrain {
-  0%, 88%, 100% { transform: scaleY(1); }
-  38%, 50% {transform: scaleY(0);}
+  0%,
+  88%,
+  100% {
+    transform: scaleY(1);
+  }
+  38%,
+  50% {
+    transform: scaleY(0);
+  }
 }
 
 @keyframes bottomFill {
-  0% { transform: scaleY(0); }
-  38%,50% {transform: scaleY(1);}
-  88%,100% { transform: scaleY(0); }
+  0% {
+    transform: scaleY(0);
+  }
+  38%,
+  50% {
+    transform: scaleY(1);
+  }
+  88%,
+  100% {
+    transform: scaleY(0);
+  }
 }
 
 @keyframes stream {
-  // 40%, 38%, 91%, 100% { opacity: 0; fill: #E07830;  }
-  // 50%, 86% { opacity: 1; fill: #1A65BF; }
-  // 50%, 86% { opacity: 0; fill: #1A65BF; }
-  0%   { opacity: 1; fill: #E07830; }
-  36%  { opacity: 1; fill: #E07830; }
-  38%  { opacity: 0; fill: #E07830; } /* fades out still orange */
-  40%  { opacity: 0; fill: #E07830; } /* fully hidden during rotation */
-  41%  { opacity: 0; fill: #1A65BF; } /* color swap happens while invisible */
-  50%  { opacity: 1; fill: #1A65BF; }
-  86%  { opacity: 1; fill: #1A65BF; }
-  88%  { opacity: 0; fill: #1A65BF; }
-  90%  { opacity: 0; fill: #1A65BF; }
-  91%  { opacity: 0; fill: #E07830; } /* swap back, still invisible */
-  100% { opacity: 0; fill: #E07830; }
+  0% {
+    opacity: 1;
+    fill: #e07830;
+  }
+  36% {
+    opacity: 1;
+    fill: #e07830;
+  }
+  38% {
+    opacity: 0;
+    fill: #e07830;
+  } /* fades out still orange */
+  40% {
+    opacity: 0;
+    fill: #e07830;
+  } /* fully hidden during rotation */
+  41% {
+    opacity: 0;
+    fill: #1a65bf;
+  } /* color swap happens while invisible */
+  50% {
+    opacity: 1;
+    fill: #1a65bf;
+  }
+  86% {
+    opacity: 1;
+    fill: #1a65bf;
+  }
+  88% {
+    opacity: 0;
+    fill: #1a65bf;
+  }
+  90% {
+    opacity: 0;
+    fill: #1a65bf;
+  }
+  91% {
+    opacity: 0;
+    fill: #e07830;
+  } /* swap back, still invisible */
+  100% {
+    opacity: 0;
+    fill: #e07830;
+  }
 }
 
 @keyframes grain {
-  0% { opacity: 0; transform: translateY(-4px); }
-  20% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(40px); }
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
 }
