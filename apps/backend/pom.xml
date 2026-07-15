@@ -186,6 +186,14 @@ it must end with:
             <version>2.4.0</version>
         </dependency>
 
+        <!-- still part of the API client but it this is the parser implementation-->
+        <!--Gson dependancy from: https://developers.google.com/api-client-library/java/google-api-java-client/oauth2-->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client-gson</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
         <!-- library to automatically load environment variable from the .env file to the application-->
         <!-- was having trouble with manually loading things-->
         <dependency>
