@@ -24,7 +24,7 @@
 /* sand animations */
 .hg-sand-top {
   animation: topDrain 12s linear infinite;
-  transform-origin: top;
+  transform-origin: bottom;
 }
 
 .hg-sand-bottom {
@@ -62,8 +62,8 @@
 }
 
 @keyframes topDrain {
-  0%, 88%, 100% { transform: translateY(0); }
-  38%, 50% {transform: translateY(65px);}
+  0%, 88%, 100% { transform: scaleY(1); }
+  38%, 50% {transform: scaleY(0);}
 }
 
 @keyframes bottomFill {
