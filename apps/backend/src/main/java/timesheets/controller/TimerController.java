@@ -1,234 +1,254 @@
-// package timesheets.controller;
+package timesheets.controller;
 
-// import exception.ConflictException;
-// import jakarta.validation.Valid;
-// import java.time.LocalDate;
-// import java.time.LocalTime;
-// import java.util.UUID;
-// import org.springframework.http.HttpStatus;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.*;
-// import timesheets.domain.Project;
-// import timesheets.domain.Task;
-// import timesheets.domain.TimeEntry;
-// import timesheets.domain.TimerSession;
-// import timesheets.dto.request.StartTimerRequest;
-// import timesheets.dto.response.ActiveTimerResponse;
-// import timesheets.dto.response.CreatedTimeEntryResponse;
-// import timesheets.dto.response.ErrorResponse;
-// import timesheets.dto.response.StopTimerResponse;
-// import timesheets.repository.ProjectRepository;
-// import timesheets.repository.TaskRepository;
-// import timesheets.service.TimerService;
+import exception.ConflictException;
+import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+import timesheets.domain.Project;
+import timesheets.domain.Task;
+import timesheets.domain.TimeEntry;
+import timesheets.domain.TimerSession;
+import timesheets.domain.User;
+import timesheets.domain.WorkspaceMember;
+import timesheets.dto.request.StartTimerRequest;
+import timesheets.dto.response.ActiveTimerResponse;
+import timesheets.dto.response.CreatedTimeEntryResponse;
+import timesheets.dto.response.ErrorResponse;
+import timesheets.dto.response.StopTimerResponse;
+import timesheets.repository.ProjectRepository;
+import timesheets.repository.TaskRepository;
+import timesheets.repository.UserRepository;
+import timesheets.repository.WorkspaceMemberRepository;
+import timesheets.service.TimerService;
 
-// // the rest controller should handle the HTTP requests
-// @RestController
-// @RequestMapping("/api/timers") // my base URL it should be /api/timers
-// public class TimerController {
+// the rest controller should handle the HTTP requests
+@RestController
+@RequestMapping("/api/timers") // my base URL it should be /api/timers
+@RequiredArgsConstructor
+public class TimerController {
 
-//   private final TimerService timerService;
-//   private final ProjectRepository projectRepository;
-//   private final TaskRepository taskRepository;
+  private final TimerService timerService;
+  private final ProjectRepository projectRepository;
+  private final TaskRepository taskRepository;
+  private final WorkspaceMemberRepository workspaceMemberRepository;
+  private final UserRepository userRepository;
 
-//   public TimerController(
-//       TimerService timerService,
-//       ProjectRepository projectRepository,
-//       TaskRepository taskRepository) {
-//     this.timerService = timerService;
-//     this.projectRepository = projectRepository;
-//     this.taskRepository = taskRepository;
-//   } // the constructor
+  private UUID getCurrentWorkspaceMemberId() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-//   @PostMapping("/start") // the endpoint will look like POST /api/timers/start
-//   public ResponseEntity<?> startTimer(
-//       @Valid @RequestBody StartTimerRequest request,
-//       @RequestHeader("X-Workspace-Member-Id") UUID workspaceMemberId) {
-//     try {
-//       TimerSession timer = timerService.startTimer(workspaceMemberId, request);
+    // gets the Spring Security User
+    org.springframework.security.core.userdetails.User springUser =
+        (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
 
-//       ActiveTimerResponse response =
-//           convertToResponse(
-//               timer); // I am converting the entry to DTO for frontend, going to create a helper
-//       return ResponseEntity.ok(response);
+    // gets email from Spring Security User
+    String email = springUser.getUsername();
 
-//     } catch (ConflictException e) {
-//       return ResponseEntity.status(HttpStatus.CONFLICT)
-//           .body(new ErrorResponse(e.getUserMessage(), e.getActiveTimerId()));
-//       // if a user tries to start another time while one exists already
-//     }
-//   }
+    // finds your custom user from database
+    User user =
+        userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 
-//   @PostMapping("/stop") // the endpoint will look like POST /api/timers/stop
-//   public ResponseEntity<StopTimerResponse> stopTimer(
-//       @RequestHeader("X-Workspace-Member-Id") UUID workspaceMemberId) {
+    // gets workspace member
+    return workspaceMemberRepository.findByUserId(user.getId()).stream()
+        .findFirst()
+        .map(WorkspaceMember::getId)
+        .orElseThrow(() -> new RuntimeException("User is not a member of any workspace"));
+  }
 
-//     TimerSession activeTimer = timerService.getActiveTimer(workspaceMemberId);
+  @PostMapping("/start") // the endpoint will look like POST /api/timers/start
+  public ResponseEntity<?> startTimer(@Valid @RequestBody StartTimerRequest request) {
+    try {
+      UUID workspaceMemberId = getCurrentWorkspaceMemberId();
+      TimerSession timer = timerService.startTimer(workspaceMemberId, request);
 
-//     TimeEntry timeEntry = timerService.stopTimer(workspaceMemberId); // draft entry will be
-// created
+      ActiveTimerResponse response =
+          convertToResponse(
+              timer); // I am converting the entry to DTO for frontend, going to create a helper
+      return ResponseEntity.ok(response);
 
-//     StopTimerResponse response = convertToStopResponse(timeEntry, activeTimer.getId());
+    } catch (ConflictException e) {
+      ErrorResponse errorResponse =
+          ErrorResponse.conflict(e.getUserMessage(), e.getActiveTimerId());
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+      // if a user tries to start another time while one exists already
+    }
+  }
 
-//     return ResponseEntity.ok(response); // this should sent a 200 response
-//   }
+  @PostMapping("/stop") // the endpoint will look like POST /api/timers/stop
+  public ResponseEntity<StopTimerResponse> stopTimer() {
 
-//   // should get the currently running timer
-//   @GetMapping("/active") // endpoint will look like GET /api/timers/active
-//   public ResponseEntity<ActiveTimerResponse> getActiveTimer(
-//       @RequestHeader("X-Workspace-Member-Id") UUID workspaceMemberId) {
+    UUID workspaceMemberId = getCurrentWorkspaceMemberId();
 
-//     TimerSession timer = timerService.getActiveTimer(workspaceMemberId);
+    TimerSession activeTimer = timerService.getActiveTimer(workspaceMemberId);
 
-//     if (timer != null) {
-//       return ResponseEntity.ok(convertToResponse(timer)); // the timer is running
-//     }
-//     // No active timer - return 204 No Content (frontend knows no timer running)
-//     return ResponseEntity.noContent().build();
-//   }
+    TimeEntry timeEntry = timerService.stopTimer(workspaceMemberId); // draft entry will be created
 
-//   @DeleteMapping("/discard") // the endpoint will look like DELETE /api/timers/discard
-//   public ResponseEntity<Void> discardTimer(
-//       @RequestHeader("X-Workspace-Member-Id") UUID workspaceMemberId) {
+    StopTimerResponse response = convertToStopResponse(timeEntry, activeTimer.getId());
 
-//     TimerSession activeTimer =
-//         timerService.getActiveTimer(workspaceMemberId); // should see if there is an active timer
+    return ResponseEntity.ok(response); // this should sent a 200 response
+  }
 
-//     if (activeTimer == null) {
-//       return ResponseEntity.notFound().build(); // meaning no timer found
-//     }
+  // should get the currently running timer
+  @GetMapping("/active") // endpoint will look like GET /api/timers/active
+  public ResponseEntity<ActiveTimerResponse> getActiveTimer() {
+    UUID workspaceMemberId = getCurrentWorkspaceMemberId();
 
-//     timerService.discardTimer(workspaceMemberId); // should just discard the timer
+    TimerSession timer = timerService.getActiveTimer(workspaceMemberId);
 
-//     return ResponseEntity.noContent().build(); // no success cause nothing created
-//   }
+    if (timer != null) {
+      return ResponseEntity.ok(convertToResponse(timer)); // the timer is running
+    }
+    // No active timer - return 204 No Content (frontend knows no timer running)
+    return ResponseEntity.noContent().build();
+  }
 
-//   // ! so the database has more fields than we want the frontend to know about, so we are not
-// going
-//   // to send all those to frontend, so we need to only send what frontend needs
-//   // typically called private conversion methods
+  @DeleteMapping("/discard") // the endpoint will look like DELETE /api/timers/discard
+  public ResponseEntity<Void> discardTimer() {
 
-//   private ActiveTimerResponse convertToResponse(TimerSession timer) {
+    UUID workspaceMemberId = getCurrentWorkspaceMemberId();
 
-//     ActiveTimerResponse response = new ActiveTimerResponse();
+    TimerSession activeTimer =
+        timerService.getActiveTimer(workspaceMemberId); // should see if there is an active timer
 
-//     response.setId(timer.getId());
-//     response.setStartedAt(timer.getStartedAt());
-//     response.setActive(timer.getIsRunning());
+    if (activeTimer == null) {
+      return ResponseEntity.notFound().build(); // meaning no timer found
+    }
 
-//     // this will find the time that passed since the timer started
-//     if (timer.getIsRunning() && timer.getStartedAt() != null) {
+    timerService.discardTimer(workspaceMemberId); // should just discard the timer
 
-//       long minutes =
-//           java.time.Duration.between(timer.getStartedAt(), java.time.LocalDateTime.now())
-//               .toMinutes();
-//       response.setElapsedMinutes((int) minutes);
+    return ResponseEntity.noContent().build(); // no success cause nothing created
+  }
 
-//     } else {
-//       response.setElapsedMinutes(0);
-//     }
+  // ! so the database has more fields than we want the frontend to know about, so we are not going
+  // to send all those to frontend, so we need to only send what frontend needs
+  // typically called private conversion methods
 
-//     String projectName = "Unknown Project";
+  private ActiveTimerResponse convertToResponse(TimerSession timer) {
 
-//     if (timer.getProjectId() != null) {
-//       Project project =
-//           projectRepository
-//               .findById(timer.getProjectId())
-//               .orElse(null); // I can find the actual prject name!
+    ActiveTimerResponse response = new ActiveTimerResponse();
 
-//       if (project != null) {
-//         projectName = project.getName();
-//       }
-//     }
-//     // previously I wanted to put something loading, but since I can have a stub, and because of
-// JPA
-//     // I have the basic functions now I can do this yayyy!!
+    response.setId(timer.getId());
+    response.setStartedAt(timer.getStartedAt());
+    response.setActive(timer.getIsRunning());
 
-//     ActiveTimerResponse.SimpleProject simpleProject = new ActiveTimerResponse.SimpleProject();
+    // this will find the time that passed since the timer started
+    if (timer.getIsRunning() && timer.getStartedAt() != null) {
 
-//     simpleProject.setId(timer.getProjectId());
-//     simpleProject.setName(projectName);
-//     response.setProject(simpleProject);
+      long minutes =
+          java.time.Duration.between(timer.getStartedAt(), java.time.LocalDateTime.now())
+              .toMinutes();
+      response.setElapsedMinutes((int) minutes);
 
-//     if (timer.getTaskId() != null) {
-//       String taskTitle = "Unknown Task";
+    } else {
+      response.setElapsedMinutes(0);
+    }
 
-//       Task task = taskRepository.findById(timer.getTaskId()).orElse(null);
-//       if (task != null) {
-//         taskTitle = task.getTitle();
-//       }
+    String projectName = "Unknown Project";
 
-//       ActiveTimerResponse.SimpleTask simpleTask = new ActiveTimerResponse.SimpleTask();
+    if (timer.getProjectId() != null) {
+      Project project =
+          projectRepository
+              .findById(timer.getProjectId())
+              .orElse(null); // I can find the actual prject name!
 
-//       simpleTask.setId(timer.getTaskId());
-//       simpleTask.setTitle(taskTitle); // same thing where I can get the actual task name
-//       response.setTask(simpleTask);
-//     }
+      if (project != null) {
+        projectName = project.getName();
+      }
+    }
+    // previously I wanted to put something loading, but since I can have a stub, and because of JPA
+    // I have the basic functions now I can do this yayyy!!
 
-//     return response;
-//   }
+    ActiveTimerResponse.SimpleProject simpleProject = new ActiveTimerResponse.SimpleProject();
 
-//   // this will be what the shows when a timer is stopped
-//   private StopTimerResponse convertToStopResponse(TimeEntry timeEntry, UUID timerId) {
+    simpleProject.setId(timer.getProjectId());
+    simpleProject.setName(projectName);
+    response.setProject(simpleProject);
 
-//     StopTimerResponse response = new StopTimerResponse();
+    if (timer.getTaskId() != null) {
+      String taskTitle = "Unknown Task";
 
-//     response.setTimerId(timerId);
-//     response.setStoppedAt(timeEntry.getEndTime());
-//     response.setDurationMinutes(timeEntry.getDurationMinutes());
+      Task task = taskRepository.findById(timer.getTaskId()).orElse(null);
+      if (task != null) {
+        taskTitle = task.getTitle();
+      }
 
-//     // this creates the nested time entry
-//     CreatedTimeEntryResponse createdEntry = new CreatedTimeEntryResponse();
+      ActiveTimerResponse.SimpleTask simpleTask = new ActiveTimerResponse.SimpleTask();
 
-//     createdEntry.setId(timeEntry.getId());
-//     createdEntry.setDate(
-//         timeEntry.getStartTime() != null
-//             ? timeEntry.getStartTime().toLocalDate()
-//             : LocalDate.now());
+      simpleTask.setId(timer.getTaskId());
+      simpleTask.setTitle(taskTitle); // same thing where I can get the actual task name
+      response.setTask(simpleTask);
+    }
 
-//     createdEntry.setStartTime(
-//         timeEntry.getStartTime() != null
-//             ? timeEntry.getStartTime().toLocalTime()
-//             : LocalTime.now());
-//     createdEntry.setEndTime(
-//         timeEntry.getEndTime() != null ? timeEntry.getEndTime().toLocalTime() : LocalTime.now());
+    return response;
+  }
 
-//     createdEntry.setDurationMinutes(timeEntry.getDurationMinutes());
-//     createdEntry.setStatus(
-//         timeEntry.getStatus() != null ? timeEntry.getStatus().toString() : "DRAFT");
+  // this will be what the shows when a timer is stopped
+  private StopTimerResponse convertToStopResponse(TimeEntry timeEntry, UUID timerId) {
 
-//     String projectName = "Unknown Project";
+    StopTimerResponse response = new StopTimerResponse();
 
-//     if (timeEntry.getProjectId() != null) {
-//       Project project = projectRepository.findById(timeEntry.getProjectId()).orElse(null);
+    response.setTimerId(timerId);
+    response.setStoppedAt(timeEntry.getEndTime());
+    response.setDurationMinutes(timeEntry.getDurationMinutes());
 
-//       if (project != null) {
-//         projectName = project.getName();
-//       }
-//     }
+    // this creates the nested time entry
+    CreatedTimeEntryResponse createdEntry = new CreatedTimeEntryResponse();
 
-//     CreatedTimeEntryResponse.SimpleProject simpleProject =
-//         new CreatedTimeEntryResponse.SimpleProject();
+    createdEntry.setId(timeEntry.getId());
+    createdEntry.setDate(
+        timeEntry.getStartTime() != null
+            ? timeEntry.getStartTime().toLocalDate()
+            : LocalDate.now());
 
-//     simpleProject.setId(timeEntry.getProjectId());
-//     simpleProject.setName(projectName);
-//     createdEntry.setProject(simpleProject);
+    createdEntry.setStartTime(
+        timeEntry.getStartTime() != null
+            ? timeEntry.getStartTime().toLocalTime()
+            : LocalTime.now());
+    createdEntry.setEndTime(
+        timeEntry.getEndTime() != null ? timeEntry.getEndTime().toLocalTime() : LocalTime.now());
 
-//     if (timeEntry.getTaskId() != null) {
-//       String taskTitle = "Unknown Task";
-//       Task task = taskRepository.findById(timeEntry.getTaskId()).orElse(null);
+    createdEntry.setDurationMinutes(timeEntry.getDurationMinutes());
+    createdEntry.setStatus("DRAFT");
 
-//       if (task != null) {
-//         taskTitle = task.getTitle();
-//       }
+    String projectName = "Unknown Project";
 
-//       CreatedTimeEntryResponse.SimpleTask simpleTask = new CreatedTimeEntryResponse.SimpleTask();
+    if (timeEntry.getProjectId() != null) {
+      Project project = projectRepository.findById(timeEntry.getProjectId()).orElse(null);
 
-//       simpleTask.setId(timeEntry.getTaskId());
-//       simpleTask.setTitle(taskTitle);
-//       createdEntry.setTask(simpleTask);
-//     }
+      if (project != null) {
+        projectName = project.getName();
+      }
+    }
 
-//     response.setCreatedTimeEntry(createdEntry);
-//     return response;
-//   }
-// }
+    CreatedTimeEntryResponse.SimpleProject simpleProject =
+        new CreatedTimeEntryResponse.SimpleProject();
+
+    simpleProject.setId(timeEntry.getProjectId());
+    simpleProject.setName(projectName);
+    createdEntry.setProject(simpleProject);
+
+    if (timeEntry.getTaskId() != null) {
+      String taskTitle = "Unknown Task";
+      Task task = taskRepository.findById(timeEntry.getTaskId()).orElse(null);
+
+      if (task != null) {
+        taskTitle = task.getTitle();
+      }
+
+      CreatedTimeEntryResponse.SimpleTask simpleTask = new CreatedTimeEntryResponse.SimpleTask();
+
+      simpleTask.setId(timeEntry.getTaskId());
+      simpleTask.setTitle(taskTitle);
+      createdEntry.setTask(simpleTask);
+    }
+
+    response.setCreatedTimeEntry(createdEntry);
+    return response;
+  }
+}
