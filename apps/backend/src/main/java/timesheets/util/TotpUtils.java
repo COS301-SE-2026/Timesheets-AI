@@ -3,6 +3,7 @@ package timesheets.util;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 // this is a util package such that we can reuse in the AuthService and the Mfa services
@@ -11,6 +12,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class TotpUtils {
   private final GoogleAuthenticator googleAuthenticator;
+
+  @Value("${app.mfa.issuer:Timesheets AI}")
+  private String issuer;
+
+  @Value("${app.mfa.code-length:6}")
+  private int codeLength;
 
   public TotpUtils() {
     this.googleAuthenticator = new GoogleAuthenticator();
