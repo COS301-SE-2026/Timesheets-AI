@@ -4,8 +4,12 @@
 }
 
 .hg-flip {
-  animation: flip 12s ease-in-out infinite;
-  transform-origin: center;
+  // animation: flip 12s ease-in-out infinite;
+  // transform-origin: center;
+  width: min( 320px, 90vw);
+  height: auto;
+  display: block;
+
 }
 
 .glow {
