@@ -6,11 +6,14 @@ Please check my draft file for links/resources on FastAPI features and usage.
 Author: Zamokuhle Zwane
 Date: 12/07/2026
 """
-
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+
+#adding logging here as well
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(
     title="Momently AI Service",
