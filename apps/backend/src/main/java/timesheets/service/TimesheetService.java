@@ -144,7 +144,6 @@ public class TimesheetService {
         .orElseThrow(() -> new RuntimeException("Timesheet not found"));
   }
 
-
   // !helper functions
   private void lockEntries(UUID timesheetId) {
     List<TimeEntry> entries = timeEntryRepository.findByTimesheetId(timesheetId);
