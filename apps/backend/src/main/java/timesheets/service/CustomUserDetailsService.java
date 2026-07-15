@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
 import timesheets.enums.UserStatus;
@@ -24,6 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   private final WorkspaceMemberRepository workspaceMemberRepository;
 
   @Override
+  @Transactional(readOnly = true)
   public UserDetails loadUserByUsername(String email) {
     User user =
         userRepository
@@ -36,7 +38,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     for (WorkspaceMember membership : memberships) {
       authorities.add(new SimpleGrantedAuthority("ROLE_" + membership.getRole().name()));
 
-      authorities.add(new SimpleGrantedAuthority("WORKSPACE_ " + membership.getWorkspaceId()));
+      authorities.add(new SimpleGrantedAuthority("WORKSPACE_" + membership.getWorkspaceId()));
     }
 
     return new org.springframework.security.core.userdetails.User(
