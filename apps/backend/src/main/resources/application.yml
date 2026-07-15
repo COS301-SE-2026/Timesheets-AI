@@ -3,9 +3,9 @@ spring:
     name: momently-backend
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/momently_dev}
-    username: ${DB_USERNAME:momently}
-    password: ${DB_PASSWORD:momently_dev_password}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/momently_dev}
+    username: ${SPRING_DATASOURCE_USERNAME:momently}
+    password: ${SPRING_DATASOURCE_PASSWORD:momently_dev_password}
     driver-class-name: org.postgresql.Driver
 
   jpa:
