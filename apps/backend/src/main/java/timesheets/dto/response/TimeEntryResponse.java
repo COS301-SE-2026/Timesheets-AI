@@ -1,162 +1,51 @@
-// package timesheets.dto.response;
+package timesheets.dto.response;
 
-// import java.time.LocalDateTime;
-// import java.util.UUID;
-// import timesheets.domain.TimeEntry;
-// import timesheets.enums.TimeEntryStatus;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import timesheets.domain.TimeEntry;
 
-// // this is what the backend will send back to the frontend, when a time entry is created or
-// // retrieved
+// this is what the backend will send back to the frontend, when a time entry is created or
+// retrieved
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TimeEntryResponse {
 
-// public class TimeEntryResponse {
+  private UUID id;
+  private UUID timesheetId;
+  private UUID workspaceMemberId;
+  private UUID projectId;
+  private UUID taskId;
+  private LocalDateTime startTime;
+  private LocalDateTime endTime;
+  private Integer durationMinutes;
+  private String entryType;
+  private String description;
+  private Boolean isDeleted;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
-//   private UUID id;
-//   private UUID workspaceMemberId;
-//   private UUID projectId;
-//   private UUID taskId;
-//   private LocalDateTime startTime;
-//   private LocalDateTime endTime;
-//   private Integer durationMinutes;
-//   private String entryType;
-//   private String description;
-//   private TimeEntryStatus status;
-//   private Boolean isLocked;
-//   private LocalDateTime createdAt;
-//   private LocalDateTime updatedAt;
-//   private String rejectionReason;
+  public static TimeEntryResponse from(TimeEntry entry) {
 
-//   public static TimeEntryResponse from(TimeEntry entry) {
-
-//     TimeEntryResponse response = new TimeEntryResponse();
-
-//     response.setId(entry.getId());
-//     response.setWorkspaceMemberId(entry.getWorkspaceMemberId());
-//     response.setProjectId(entry.getProjectId());
-//     response.setTaskId(entry.getTaskId());
-//     response.setStartTime(entry.getStartTime());
-//     response.setEndTime(entry.getEndTime());
-//     response.setDurationMinutes(entry.getDurationMinutes());
-//     response.setEntryType(entry.getEntryType());
-//     response.setDescription(entry.getDescription());
-//     response.setStatus(entry.getStatus());
-//     response.setIsLocked(entry.getIsLocked());
-//     response.setCreatedAt(entry.getCreatedAt());
-//     response.setUpdatedAt(entry.getUpdatedAt());
-//     response.setRejectionReason(entry.getRejectionReason());
-
-//     return response;
-//   }
-
-//   // my getters and setters below
-//   public UUID getId() {
-//     return id;
-//   }
-
-//   public void setId(UUID id) {
-//     this.id = id;
-//   }
-
-//   public UUID getWorkspaceMemberId() {
-//     return workspaceMemberId;
-//   }
-
-//   public void setWorkspaceMemberId(UUID workspaceMemberId) {
-//     this.workspaceMemberId = workspaceMemberId;
-//   }
-
-//   public UUID getProjectId() {
-//     return projectId;
-//   }
-
-//   public void setProjectId(UUID projectId) {
-//     this.projectId = projectId;
-//   }
-
-//   public UUID getTaskId() {
-//     return taskId;
-//   }
-
-//   public void setTaskId(UUID taskId) {
-//     this.taskId = taskId;
-//   }
-
-//   public LocalDateTime getStartTime() {
-//     return startTime;
-//   }
-
-//   public void setStartTime(LocalDateTime startTime) {
-//     this.startTime = startTime;
-//   }
-
-//   public LocalDateTime getEndTime() {
-//     return endTime;
-//   }
-
-//   public void setEndTime(LocalDateTime endTime) {
-//     this.endTime = endTime;
-//   }
-
-//   public Integer getDurationMinutes() {
-//     return durationMinutes;
-//   }
-
-//   public void setDurationMinutes(Integer durationMinutes) {
-//     this.durationMinutes = durationMinutes;
-//   }
-
-//   public String getEntryType() {
-//     return entryType;
-//   }
-
-//   public void setEntryType(String entryType) {
-//     this.entryType = entryType;
-//   }
-
-//   public String getDescription() {
-//     return description;
-//   }
-
-//   public void setDescription(String description) {
-//     this.description = description;
-//   }
-
-//   public TimeEntryStatus getStatus() {
-//     return status;
-//   }
-
-//   public void setStatus(TimeEntryStatus status) {
-//     this.status = status;
-//   }
-
-//   public Boolean getIsLocked() {
-//     return isLocked;
-//   }
-
-//   public void setIsLocked(Boolean isLocked) {
-//     this.isLocked = isLocked;
-//   }
-
-//   public LocalDateTime getCreatedAt() {
-//     return createdAt;
-//   }
-
-//   public void setCreatedAt(LocalDateTime createdAt) {
-//     this.createdAt = createdAt;
-//   }
-
-//   public LocalDateTime getUpdatedAt() {
-//     return updatedAt;
-//   }
-
-//   public void setUpdatedAt(LocalDateTime updatedAt) {
-//     this.updatedAt = updatedAt;
-//   }
-
-//   public String getRejectionReason() {
-//     return rejectionReason;
-//   }
-
-//   public void setRejectionReason(String rejectionReason) {
-//     this.rejectionReason = rejectionReason;
-//   }
-// }
+    return TimeEntryResponse.builder()
+        .id(entry.getId())
+        .timesheetId(entry.getTimesheetId())
+        .workspaceMemberId(entry.getWorkspaceMemberId())
+        .projectId(entry.getProjectId())
+        .taskId(entry.getTaskId())
+        .startTime(entry.getStartTime())
+        .endTime(entry.getEndTime())
+        .durationMinutes(entry.getDurationMinutes())
+        .entryType(entry.getEntryType())
+        .description(entry.getDescription())
+        .isDeleted(entry.getIsDeleted())
+        .createdAt(entry.getCreatedAt())
+        .updatedAt(entry.getUpdatedAt())
+        .build();
+  }
+}
