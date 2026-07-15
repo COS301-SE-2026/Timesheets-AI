@@ -6,6 +6,7 @@ please check my draft file for links/resources on SQLAlchemy features and usage.
 Author: Zamokuhle Zwane
 Date: 12/07/2026
 """
+import logging
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
@@ -21,6 +22,7 @@ engine = create_engine(
     max_overflow=10,
 )
 
+logger = logging.getLogger(__name__)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -42,5 +44,5 @@ def check_connection():
             connection.execute(text("SELECT 1"))
         return True
     except Exception as e:
-        print(f"Database connection error: {e}")
+        logger.error("Database connection error: %s", e)
         return False
