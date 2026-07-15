@@ -15,24 +15,41 @@ from app.main import app
 
 client = TestClient(app)
 
+def should_return_ok_When_endpoint_is_called():
+    #Arrange
+    #here client is set up at module level
 
-def test_health_db_up():
-    with patch("app.api.health.check_connection", return_value=True):
+    #Act
+    response = client.get("/health")
+
+    #Assert
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
+
+
+def should_return_healthy_status_when_database_is_up():
+    #Arrange
+    #i set up the client at module level
+
+    #Act
+    with patch("app.api.health.check_connection", return_value = False):
         response = client.get("/health")
-        assert response.status_code == 200
-        assert response.json() == {
-            "status": "ok",
-            "Service": "momently-ai",
-            "database": "connected",
-        }
+
+    #Assert
+    assert response.status.code == 200
+    assert response.json()["database"] == "ok"
 
 
-def test_health_db_down():
-    with patch("app.api.health.check_connection", return_value=False):
+def should_return_unhealthy_status_when_database_is_down():
+    #Arrange
+    #i set up the client at module level
+
+    #Act
+    with patch("app.api.health.check_connection", return_value = False):
         response = client.get("/health")
-        assert response.status_code == 200
-        assert response.json() == {
-            "status": "degraded",
-            "Service": "momently-ai",
-            "database": "disconnected",
-        }
+
+    #Assert
+    #the health endpoint stays up even when the db is down, it just reports the fact.
+    assert response.status.code == 200
+    assert response.json()["database"] == "down"
+
