@@ -21,7 +21,8 @@ def should_return_ok_When_endpoint_is_called():
     # here client is set up at module level
 
     # Act
-    response = client.get("/health")
+    with patch("app.api.health.check_connection", return_value=True):
+        response = client.get("/health")
 
     # Assert
     assert response.status_code == 200
