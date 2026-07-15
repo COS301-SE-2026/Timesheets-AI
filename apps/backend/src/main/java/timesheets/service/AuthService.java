@@ -94,7 +94,6 @@ public class AuthService {
               .token(token)
               .userId(user.getId())
               .expiresAt(LocalDateTime.now().plusHours(24))
-              .verified(false)
               .build();
 
       emailVerificationTokenRepository.save(verificationToken);
@@ -132,7 +131,6 @@ public class AuthService {
             .token(token)
             .userId(user.getId())
             .expiresAt(LocalDateTime.now().plusHours(24))
-            .verified(false)
             .build();
 
     emailVerificationTokenRepository.save(verificationToken);
@@ -157,7 +155,7 @@ public class AuthService {
             .findByToken(token)
             .orElseThrow(() -> new IllegalArgumentException("token not found"));
 
-    if (verificationToken.getVerified()) {
+    if (verificationToken.getVerifiedAt() != null) {
       throw new IllegalArgumentException("token already used");
     }
 
@@ -166,7 +164,7 @@ public class AuthService {
     }
 
     // mark token as verified
-    verificationToken.setVerified(true);
+    verificationToken.setVerifiedAt(LocalDateTime.now());
     emailVerificationTokenRepository.save(verificationToken);
 
     // update user email verification status
