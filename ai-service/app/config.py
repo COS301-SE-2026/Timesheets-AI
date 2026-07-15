@@ -12,8 +12,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
-    # this is temporary database url,I'm not 100% sure about this, I will change this to a proper database url in the future.
-    database_url: str = "postgresql://localhost:5432/momently_ai"
+    # As suggested i moved the placeholder db url and moved it to .env.example
+    database_url: str
 
     # here i'll place the api key for whatever api we use for the ai service. As it stands we may use anthropic's api.
     anthropic_api_key: str = ""  # Replace with actual API key
