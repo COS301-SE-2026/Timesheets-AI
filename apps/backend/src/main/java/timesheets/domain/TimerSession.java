@@ -42,14 +42,8 @@ public class TimerSession {
   @Column(name = "paused_duration_seconds")
   private Long pausedDurationSeconds;
 
-  @Column(name = "source")
-  private String source;
-
   @Column(name = "is_running", nullable = false)
   private Boolean isRunning;
-
-  @Column(name = "notes")
-  private String notes;
 
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
