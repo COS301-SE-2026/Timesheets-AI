@@ -4,8 +4,8 @@
 }
 
 .hg-flip {
-  // animation: flip 12s ease-in-out infinite;
-  // transform-origin: center;
+  animation: flip 12s ease-in-out infinite;
+  transform-origin: center;
   width: min( 320px, 90vw);
   height: auto;
   display: block;
@@ -28,7 +28,8 @@
 }
 
 .hg-sand-bottom {
-  animation: bottomFill 6s ease-in-out infinite;
+  transform-origin: top center;
+  animation: bottomFill 6s linear infinite;
 }
 
 .hg-stream {
@@ -55,8 +56,8 @@
 }
 
 @keyframes flip {
-  0%,40% { transform: rotate(0deg); }
-  50%,90% { transform: rotate(180deg); }
+  0%,48% { transform: rotate(0deg); }
+  52%,98% { transform: rotate(180deg); }
   100% { transform: rotate(360deg); }
 }
 
@@ -66,7 +67,8 @@
 }
 
 @keyframes bottomFill {
-  0% { transform: scaleY(0.2) translateY(28px); }
+  0% { transform: scaleY(0); }
+  15% {transform: scaleY(0);}
   100% { transform: scaleY(1); }
 }
 
