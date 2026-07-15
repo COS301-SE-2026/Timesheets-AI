@@ -32,12 +32,12 @@ def should_return_healthy_status_when_database_is_up():
     #i set up the client at module level
 
     #Act
-    with patch("app.api.health.check_connection", return_value = False):
+    with patch("app.api.health.check_connection", return_value = True):
         response = client.get("/health")
 
     #Assert
-    assert response.status.code == 200
-    assert response.json()["database"] == "ok"
+    assert response.status_code == 200
+    assert response.json()["database"] == "connected"
 
 
 def should_return_unhealthy_status_when_database_is_down():
@@ -50,6 +50,6 @@ def should_return_unhealthy_status_when_database_is_down():
 
     #Assert
     #the health endpoint stays up even when the db is down, it just reports the fact.
-    assert response.status.code == 200
-    assert response.json()["database"] == "down"
+    assert response.status_code == 200
+    assert response.json()["database"] == "disconnected"
 
