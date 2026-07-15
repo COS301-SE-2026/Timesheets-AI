@@ -23,12 +23,12 @@
 
 /* sand animations */
 .hg-sand-top {
-  animation: topDrain 6s linear infinite;
+  animation: topDrain 6s ease-in-out infinite;
   transform-origin: top;
 }
 
 .hg-sand-bottom {
-  animation: bottomFill 6s linear infinite;
+  animation: bottomFill 6s ease-in-out infinite;
 }
 
 .hg-stream {
@@ -55,8 +55,8 @@
 }
 
 @keyframes flip {
-  0%,45% { transform: rotate(0deg); }
-  50%,95% { transform: rotate(180deg); }
+  0%,40% { transform: rotate(0deg); }
+  50%,90% { transform: rotate(180deg); }
   100% { transform: rotate(360deg); }
 }
 
