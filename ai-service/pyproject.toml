@@ -1,5 +1,6 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+python_functions = ["test_*", "should_*"]
 asyncio_mode = "auto"
 
 [tool.ruff]
