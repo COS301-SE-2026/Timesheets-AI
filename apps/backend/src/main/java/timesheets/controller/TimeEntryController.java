@@ -24,7 +24,7 @@ import timesheets.service.TimeEntryService;
 
 @RestController // this makes it a REST API controller
 // this will set the base URL such that all the methods start with that
-@RequestMapping("/api/time-entries") 
+@RequestMapping("/api/time-entries")
 @RequiredArgsConstructor
 public class TimeEntryController {
 
@@ -53,13 +53,11 @@ public class TimeEntryController {
         .orElseThrow(() -> new RuntimeException("User is not a member of any workspace"));
   }
 
-
-  //helper converts a string ID from URL to UUID
+  // helper converts a string ID from URL to UUID
   private UUID toUUID(String id) {
     try {
       return UUID.fromString(id);
-    } 
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       throw new RuntimeException("Invalid UUID format: " + id);
     }
   }
@@ -67,7 +65,7 @@ public class TimeEntryController {
   // this is what with handle the HTTP POST requests ie. POST /api/time-entries
   // RequestBody will take the JSON from frontend and converts to TimeEntryRequest object
   // Valid this will trigger validation for example @NotNull, @Positive
-  //create a new time entry for the authenticated user
+  // create a new time entry for the authenticated user
   @PostMapping
   public ResponseEntity<TimeEntryResponse> createTimeEntry(
       @Valid @RequestBody TimeEntryRequest request) {
@@ -78,10 +76,9 @@ public class TimeEntryController {
     return ResponseEntity.status(HttpStatus.CREATED).body(TimeEntryResponse.from(entry));
   }
 
-  
   // this will have the full URL GET /api/time-entries/me, it will handle the GET requests
-  //gets all the time entries of an authenticated user
-  @GetMapping("/me") 
+  // gets all the time entries of an authenticated user
+  @GetMapping("/me")
   public ResponseEntity<List<TimeEntryResponse>> getMyTimeEntries() {
 
     UUID memberId = getCurrentWorkspaceMemberId();
@@ -117,12 +114,12 @@ public class TimeEntryController {
   }
 
   // this will create a soft delete if the time entry is not locked
-  @DeleteMapping("/{id}") 
+  @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteTimeEntry(@PathVariable String id) {
 
     UUID entryId = toUUID(id);
     UUID memberId = getCurrentWorkspaceMemberId();
-    
+
     timeEntryService.deleteTimeEntry(entryId, memberId);
 
     return ResponseEntity.noContent().build();
