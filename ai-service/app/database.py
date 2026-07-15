@@ -6,6 +6,7 @@ please check my draft file for links/resources on SQLAlchemy features and usage.
 Author: Zamokuhle Zwane
 Date: 12/07/2026
 """
+
 import logging
 
 from sqlalchemy import create_engine, text
