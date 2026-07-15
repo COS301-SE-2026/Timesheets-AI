@@ -24,11 +24,13 @@
 /* sand animations */
 .hg-sand-top {
   animation: topDrain 12s linear infinite;
+  transform-box: fill-box;
   transform-origin: bottom;
 }
 
 .hg-sand-bottom {
   transform-origin: top center;
+  transform-box: fill-box;
   animation: bottomFill 12s linear infinite;
 }
 
