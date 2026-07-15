@@ -5,7 +5,8 @@
  * 404 not found page
  * Related Requirement:
  */
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { interval } from 'rxjs';
 
 @Component({
   selector: 'app-hourglass',
@@ -15,5 +16,30 @@ import { Component } from '@angular/core';
   styleUrl: './hourglass.component.scss'
 })
 export class HourglassComponent {
+  protected isFlipped=false;
+  protected isFlowing=true;
 
+  private intervalID?:number;
+
+  ngOnInit():void{
+    this.startAnimation();
+  }
+
+  ngOnDestroy():void{
+    if (this.intervalID){
+      window.clearInterval(this.intervalID);
+    }
+  }
+
+  /*helper function*/
+  private startAnimation():void{
+    this.intervalID=window.setInterval(()=>{
+      this.isFlowing= false;
+
+      setTimeout(()=>{
+        this.isFlipped=!this.isFlipped;
+        this.isFlowing=true;
+      },500);
+    },6000);
+  }
 }
