@@ -40,6 +40,6 @@ export class HourglassComponent {
         this.isFlipped=!this.isFlipped;
         this.isFlowing=true;
       },500);
-    },6000);
+    },5000);
   }
 }
