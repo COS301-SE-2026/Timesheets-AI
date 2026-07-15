@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import timesheets.domain.WorkspaceMember;
 import timesheets.enums.WorkspaceRole;
@@ -35,12 +33,6 @@ public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember
   // like
   //   // a drop down and stuff
   //   List<WorkspaceMember> findAllByUserId(UUID userId);
-
-  // this should find all the developers, within a specific workspace
-  @Query(
-      "SELECT wm FROM WorkspaceMember wm WHERE wm.workspaceId = :workspaceId AND wm.role =: role")
-  List<WorkspaceMember> findAllDevelopersByWorkspaceId(
-      @Param("workspaceId") UUID workspaceId, @Param("role") WorkspaceRole role);
 
   // this should find all the devs within a specific workspace
   default List<WorkspaceMember> findAllDevelopersByWorkspaceId(UUID workspaceId) {
