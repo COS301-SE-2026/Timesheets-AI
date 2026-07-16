@@ -48,8 +48,9 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
-  //TODO: temporarily commented out since another feature is taking priority for now, coming back to this
-  /* 
+  // TODO: temporarily commented out since another feature is taking priority for now, coming back
+  // to this
+  /*
   @PostMapping("/forgot-password")
   public ResponseEntity<MessageResponse> forgotPassword(
   @Valid @RequestBody ForgotPasswordRequest request) {
