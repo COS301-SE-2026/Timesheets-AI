@@ -17,7 +17,8 @@ import timesheets.repository.TimeEntryRepository;
 // service for generating various reports, currently implements productivity report generation based
 // on time entries for a given user and date range
 // the service will fetch the relevant time entries from the database, perform calculations to
-// summarize the data, and return a structured response that can be used by the frontend to display
+// summarize the data, and return a structured response that can be used by the frontend to clear
+// display
 // the report
 // we could easily extend this service in the future to add more types of reports, such as
 // project-based reports, team reports, etc.
