@@ -36,7 +36,7 @@ jobs:
                  - '.github/workflows/backend-ci.yml'
 
         - name: Retry 
-          if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
+          if: steps.filter.outcome == 'failure' 
           id: retry
           uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
           with:

@@ -1,4 +1,4 @@
-# workflow configuration where it runs tests and etc for the backend
+# workflow configuration where it runs tests and etc for the ai
 # [Stack: Python (FastAPI)]
 
 # the trigger: this will run when there is a pull request or push on the main or dev branches
@@ -20,7 +20,7 @@ jobs:
       - name: Check for AI Service Changes
         id: filter
         uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
-        continue-on-errors: true
+        continue-on-error: true
         with:
           filters: |
             ai:
@@ -28,7 +28,7 @@ jobs:
               - '.github/workflows/ai-ci.yml'
 
       - name: Retry 
-        if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
+        if: steps.filter.outcome == 'failure'
         id: retry
         uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
         with:
