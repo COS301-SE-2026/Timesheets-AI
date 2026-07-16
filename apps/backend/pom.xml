@@ -260,6 +260,19 @@ it must end with:
                     <!--the test directory gets included-->
                     <includeTestSourceDirectory>true</includeTestSourceDirectory>
                 </configuration>
+
+                <!-- the plugins are installed but not included in the Maven's build lifecycle -->
+                <!-- the plugin only runs automatically if it is in the one of Maven's phases and in <executions> block -->
+                <!-- without this block below Maven does not know when (in its lifecyle) to execute Checkstyle-->
+                <executions>
+                    <execution>
+                        <id>checkstyle-validation</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- this is the PMD to look for bad coding practices and possible bugs: code from PDM user docs-->
