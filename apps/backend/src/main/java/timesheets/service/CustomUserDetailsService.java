@@ -3,6 +3,7 @@ package timesheets.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +17,7 @@ import timesheets.domain.WorkspaceMember;
 import timesheets.enums.UserStatus;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
+import timesheets.security.CustomUserDetails;
 
 @Service
 @RequiredArgsConstructor
@@ -35,14 +37,24 @@ public class CustomUserDetailsService implements UserDetailsService {
     List<GrantedAuthority> authorities = new ArrayList<>();
     List<WorkspaceMember> memberships = workspaceMemberRepository.findByUserId(user.getId());
 
+    UUID defaultWorkspaceMemberId = null;
     for (WorkspaceMember membership : memberships) {
       authorities.add(new SimpleGrantedAuthority("ROLE_" + membership.getRole().name()));
 
       authorities.add(new SimpleGrantedAuthority("WORKSPACE_" + membership.getWorkspaceId()));
+
+      if (defaultWorkspaceMemberId == null) {
+        defaultWorkspaceMemberId = membership.getWorkspaceId();
+      }
     }
 
-    return new org.springframework.security.core.userdetails.User(
+    return new CustomUserDetails(
+        user.getId(),
         user.getEmail(),
+        user.getFirstName(),
+        user.getLastName(),
+        user.getEmailVerified(),
+        defaultWorkspaceMemberId,
         user.getPasswordHash(),
         user.getStatus() == UserStatus.ACTIVE && Boolean.TRUE.equals(user.getEmailVerified()),
         true,
@@ -52,10 +64,12 @@ public class CustomUserDetailsService implements UserDetailsService {
   }
 }
 
-/*1. spring security calls loadByUsername the email
+/*
+1. spring security calls loadByUsername with the email
 2. the service finds the user in the DB
 3. loads the workspace memberships - their roles
-4. builds a spring security user object with the email, password, the roles and workspace permissions, and the account account status
+4. builds the customobject user object with the email, password, the roles and workspace permissions, and the account account status
 5. spring security will then use that to authenticate the user
+6. the user info is now in the security context so no need to keep doing DB queries
 
 the two true, true means that the account and credential are not expired*/
