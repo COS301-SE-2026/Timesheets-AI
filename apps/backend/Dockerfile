@@ -3,6 +3,8 @@ WORKDIR /app
 
 COPY pom.xml .
 #RUN mvn dependency:go-offline
+#temporarily commented out mvn dependency:go-offline to prevent build hangs with network connection issues
+#uncomment it out if you want faster builds, but note it requires a stable connection
 
 COPY src ./src
 RUN mvn clean package -DskipTests
