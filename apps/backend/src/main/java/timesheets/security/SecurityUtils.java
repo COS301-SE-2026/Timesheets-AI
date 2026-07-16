@@ -1,5 +1,6 @@
 package timesheets.security;
 
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,5 +28,25 @@ public class SecurityUtils {
     }
 
     throw new RuntimeException("Invalid authentication principal. Expected CustomUserDetails");
+  }
+
+  public UUID getCurrentUserId() {
+    return getCurrentUser().getUserId();
+  }
+
+  public String getCurrentEmail() {
+    return getCurrentUser().getEmail();
+  }
+
+  public String getCurrentUserFirstName() {
+    return getCurrentUser().getFirstName();
+  }
+
+  public String getCurrentLastName() {
+    return getCurrentUser().getLastName();
+  }
+
+  public String getCurrentUserFullName() {
+    return getCurrentUser().getFullName();
   }
 }
