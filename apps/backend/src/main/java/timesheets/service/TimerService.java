@@ -3,6 +3,8 @@ package timesheets.service;
 import exception.ConflictException;
 import exception.ResourceNotFoundException;
 import exception.UnauthorizedException;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -29,6 +31,7 @@ public class TimerService {
   private final ProjectRepository projectRepository;
   private final TaskRepository taskRepository;
   private final ProjectMemberRepository projectMemberRepository;
+  private final TimesheetService timesheetService;
 
   // this will start a new timer, and in our system only one timer is allowed across the entire
   // workspace
@@ -91,13 +94,10 @@ public class TimerService {
 
     TimerSession timerSession = new TimerSession();
     timerSession.setWorkspaceMemberId(workspaceMemberId);
-
     timerSession.setProjectId(project.getId());
     timerSession.setTaskId(task != null ? task.getId() : null);
-
     timerSession.setStartedAt(LocalDateTime.now());
     timerSession.setIsRunning(true);
-
     timerSession.setPausedDurationSeconds(0L);
 
     return timerSessionRepository.save(
@@ -116,7 +116,6 @@ public class TimerService {
 
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime startedAt = activeTimer.getStartedAt();
-
     long durationMinutes = ChronoUnit.MINUTES.between(startedAt, now); // I am calculating how long
 
     if (activeTimer.getPausedDurationSeconds() != null) {
@@ -129,16 +128,21 @@ public class TimerService {
 
     timerSessionRepository.save(activeTimer);
 
-    // draft timer created
+    //creates or gets timesheet ofr the week
+    LocalDate entryDate = now.toLocalDate();
+    LocalDate weekStart = entryDate.with(java.time.DayOfWeek.MONDAY);
+    LocalDate weekEnd = entryDate.with(java.time.DayOfWeek.SUNDAY);
+    Timesheet timesheet = timesheetService.getOrCreateTimesheet(workspaceMemberId, weekStart, weekEnd);
+
+    // draft timer created, and it links to a timesheet
     TimeEntry timeEntry = new TimeEntry();
     timeEntry.setWorkspaceMemberId(workspaceMemberId);
+    timeEntry.setTimesheetId(timesheet.getId());
     timeEntry.setProjectId(activeTimer.getProjectId());
     timeEntry.setTaskId(activeTimer.getTaskId());
-
     timeEntry.setStartTime(startedAt);
     timeEntry.setEndTime(now);
     timeEntry.setDurationMinutes((int) durationMinutes);
-
     timeEntry.setEntryType("TIMER");
     timeEntry.setIsLocked(false);
 
