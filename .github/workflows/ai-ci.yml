@@ -20,15 +20,26 @@ jobs:
       - name: Check for AI Service Changes
         id: filter
         uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
+        continue-on-errors: true
         with:
           filters: |
             ai:
               - 'ai-service/**'
               - '.github/workflows/ai-ci.yml'
 
+      - name: Retry 
+        if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
+        id: retry
+        uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
+        with:
+          filters: |
+              ai:
+                  - 'ai-service/**'
+                  - '.github/workflows/ai-ci.yml'
+
     # Set up the required Python environment for this workflow 
       - name: Set up Python 
-        if: steps.filter.outputs.ai == 'true'
+        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -37,7 +48,7 @@ jobs:
           cache-dependency-path: ai-service/requirements.txt
 
       - name: Install Dependencies 
-        if: steps.filter.outputs.ai == 'true'
+        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
         run: |
           cd ai-service 
           python -m pip install --upgrade pip
@@ -46,14 +57,14 @@ jobs:
         # ruff is recommended for Python FastAPI (made by Astral) 
         # it is fast and it ahndles linting, auto fix sytnax and formatting so no need for different kinds of tools 
       - name: Run Ruff Lint 
-        if: steps.filter.outputs.ai == 'true' 
+        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
         run: |
           cd ai-service
           ruff format --check .
           ruff check .
 
       - name: Run Tests 
-        if: steps.filter.outputs.ai == 'true'
+        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
         working-directory: ai-service
         env:
           PYTHONPATH: .
