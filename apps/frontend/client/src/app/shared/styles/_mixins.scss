@@ -54,8 +54,8 @@
     display: block;
     flex: 1 1 auto;
     width: 100%;
-    height: 100%;
-    overflow: hidden;
+    min-height: 100dvh;
+    overflow-x : hidden;
     background: var(--color-white);
     }
 
@@ -64,9 +64,9 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     width: 100%;
-    min-height: 100%;
-    height: 100%;
-    overflow: hidden;
+    min-height: 100dvh;
+    //height: 100%;
+    overflow: visible;
     font-family: var(--font-body);
     color: var(--color-text-body);
     background: var(--color-white);
@@ -589,7 +589,7 @@
     // Tablet responsive layout adjustments
     @media (max-width: 980px) {
         :host {
-            overflow: auto;
+            overflow-x: hidden;
         }
 
         .signup-shell {
