@@ -1,4 +1,4 @@
-package timesheets.service;
+package timesheets.security;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,7 +17,6 @@ import timesheets.domain.WorkspaceMember;
 import timesheets.enums.UserStatus;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
-import timesheets.security.CustomUserDetails;
 
 @Service
 @RequiredArgsConstructor
