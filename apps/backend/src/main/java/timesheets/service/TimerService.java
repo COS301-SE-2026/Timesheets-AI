@@ -3,7 +3,6 @@ package timesheets.service;
 import exception.ConflictException;
 import exception.ResourceNotFoundException;
 import exception.UnauthorizedException;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -128,11 +127,12 @@ public class TimerService {
 
     timerSessionRepository.save(activeTimer);
 
-    //creates or gets timesheet ofr the week
+    // creates or gets timesheet ofr the week
     LocalDate entryDate = now.toLocalDate();
     LocalDate weekStart = entryDate.with(java.time.DayOfWeek.MONDAY);
     LocalDate weekEnd = entryDate.with(java.time.DayOfWeek.SUNDAY);
-    Timesheet timesheet = timesheetService.getOrCreateTimesheet(workspaceMemberId, weekStart, weekEnd);
+    Timesheet timesheet =
+        timesheetService.getOrCreateTimesheet(workspaceMemberId, weekStart, weekEnd);
 
     // draft timer created, and it links to a timesheet
     TimeEntry timeEntry = new TimeEntry();
