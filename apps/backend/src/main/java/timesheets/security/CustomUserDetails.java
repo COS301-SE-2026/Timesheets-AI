@@ -42,7 +42,7 @@ public class CustomUserDetails extends User {
         enabled,
         accountNonExpired,
         credentialsNonExpired,
-        accountNonExpired,
+        accountNonLocked,
         authorities);
 
     this.userId = userId;
