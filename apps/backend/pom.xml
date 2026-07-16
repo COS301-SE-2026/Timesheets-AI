@@ -137,7 +137,7 @@ it must end with:
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.6.0</version>
+            <version>2.8.5</version>
         </dependency>
 
         <!-- So flyway is not working right now, will keep this for future reference  -->
@@ -169,6 +169,39 @@ it must end with:
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+
+        <!--using the most commonly used Java libraries for TOTP-based 2FA -->
+        <!--code from a medium article-->
+        <dependency>
+            <groupId>com.warrenstrange</groupId>
+            <artifactId>googleauth</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        <!-- this is a google API client library that we will use for OAuth2 authentication and will use for SSO-->
+        <!--code from maven central repository-->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
+        <!-- still part of the API client but it this is the parser implementation-->
+        <!--Gson dependancy from: https://developers.google.com/api-client-library/java/google-api-java-client/oauth2-->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client-gson</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
+        <!-- library to automatically load environment variable from the .env file to the application-->
+        <!-- was having trouble with manually loading things-->
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
     </dependencies>
 
    <build>
