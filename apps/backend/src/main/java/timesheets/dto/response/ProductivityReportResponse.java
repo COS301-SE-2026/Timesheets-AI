@@ -9,15 +9,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// dto for productivity report response, contains overall summary of time entries for the given
-// period,
-// as well as breakdowns by task and weekly trends
+/*  dto for productivity report response, contains overall summary of time entries for the given period, as well as breakdowns by task and weekly trends */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductivityReportResponse {
-  // this is the response dto for the productivity report, it contains overall summary of time
+  // this is the response dto for the productivity report, it contains overall
+  // summary of time
   // entries for the given period,
   // as well as breakdowns by task and weekly trends
   private LocalDateTime generatedAt;
@@ -31,7 +30,8 @@ public class ProductivityReportResponse {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class Period {
-    // this is the period for which the report was generated, contains from and to dates
+    // this is the period for which the report was generated, contains from and to
+    // dates
     private LocalDate from;
     private LocalDate to;
   }
@@ -42,7 +42,8 @@ public class ProductivityReportResponse {
   @AllArgsConstructor
   public static class Summary {
     // this is the overall summary of time entries for the given period
-    // contains total hours logged, total entries logged, number of unique tasks worked on, and
+    // contains total hours logged, total entries logged, number of unique tasks
+    // worked on, and
     // number of unique projects worked on
     private Double totalHoursLogged;
     private Integer totalEntriesLogged;
@@ -55,7 +56,8 @@ public class ProductivityReportResponse {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class TaskBreakdown {
-    // this is the breakdown of time entries by task, contains task id, title, project name, total
+    // this is the breakdown of time entries by task, contains task id, title,
+    // project name, total
     // hours logged, and entry count
     private UUID taskId;
     private String taskTitle;
@@ -69,7 +71,8 @@ public class ProductivityReportResponse {
   @NoArgsConstructor
   @AllArgsConstructor
   public static class WeeklyBreakdown {
-    // this is the breakdown of time entries by week, contains week identifier, total hours logged,
+    // this is the breakdown of time entries by week, contains week identifier,
+    // total hours logged,
     // and entry count
     private String week;
     private Double hours;

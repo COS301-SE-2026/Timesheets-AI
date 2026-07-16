@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.User;
 import timesheets.dto.request.ProductivityReportRequest;
-import timesheets.dto.response.InsightsSummaryResponse;
+import timesheets.dto.response.PersonalInsightsResponse;
 import timesheets.repository.TimeEntryRepository;
 
 // service for generating insights and analytics based on time entries,
@@ -24,7 +24,7 @@ public class InsightsService {
 
   private final TimeEntryRepository timeEntryRepository;
 
-  public InsightsSummaryResponse getInsightsSummary(
+  public PersonalInsightsResponse getInsightsSummary(
       ProductivityReportRequest request, User currentUser) {
 
     // fetch all time entries for the developer in the date range
@@ -55,7 +55,7 @@ public class InsightsService {
     // ));
 
     // hours per project
-    List<InsightsSummaryResponse.ProjectHours> hoursPerProject =
+    List<PersonalInsightsResponse.ProjectHours> hoursPerProject =
         entries.stream().collect(Collectors.groupingBy(TimeEntry::getProjectId)).entrySet().stream()
             .map(
                 entry -> {
@@ -64,7 +64,7 @@ public class InsightsService {
                           .mapToDouble(e -> e.getDurationMinutes() / 60.0)
                           .sum();
 
-                  return InsightsSummaryResponse.ProjectHours.builder()
+                  return PersonalInsightsResponse.ProjectHours.builder()
                       .projectId(entry.getKey())
                       .projectName("Project " + entry.getKey()) // TODO: join with projects table
                       .hours(hours)
@@ -75,7 +75,7 @@ public class InsightsService {
             .collect(Collectors.toList());
 
     // hours per task
-    List<InsightsSummaryResponse.TaskHours> hoursPerTask =
+    List<PersonalInsightsResponse.TaskHours> hoursPerTask =
         entries.stream()
             .filter(entry -> entry.getTaskId() != null)
             .collect(Collectors.groupingBy(TimeEntry::getTaskId))
@@ -88,7 +88,7 @@ public class InsightsService {
                           .mapToDouble(e -> e.getDurationMinutes() / 60.0)
                           .sum();
 
-                  return InsightsSummaryResponse.TaskHours.builder()
+                  return PersonalInsightsResponse.TaskHours.builder()
                       .taskId(entry.getKey())
                       .taskTitle("Task " + entry.getKey()) // TODO: join with tasks table
                       .hours(hours)
@@ -104,7 +104,7 @@ public class InsightsService {
         entries.stream()
             .collect(Collectors.groupingBy(entry -> entry.getStartTime().toLocalDate()));
 
-    List<InsightsSummaryResponse.DailyTrend> dailyTrend =
+    List<PersonalInsightsResponse.DailyTrend> dailyTrend =
         dailyGroups.entrySet().stream()
             .map(
                 entry -> {
@@ -113,7 +113,7 @@ public class InsightsService {
                           .mapToDouble(e -> e.getDurationMinutes() / 60.0)
                           .sum();
 
-                  return InsightsSummaryResponse.DailyTrend.builder()
+                  return PersonalInsightsResponse.DailyTrend.builder()
                       .date(entry.getKey().format(DateTimeFormatter.ISO_DATE))
                       .hours(hours)
                       .entryCount(entry.getValue().size())
@@ -122,7 +122,7 @@ public class InsightsService {
             .sorted((a, b) -> a.getDate().compareTo(b.getDate()))
             .collect(Collectors.toList());
     // build and return response
-    return InsightsSummaryResponse.builder()
+    return PersonalInsightsResponse.builder()
         .totalHoursLogged(totalHours)
         .averageHoursPerDay(avgHoursPerDay)
         .totalDaysLogged((int) uniqueDays)

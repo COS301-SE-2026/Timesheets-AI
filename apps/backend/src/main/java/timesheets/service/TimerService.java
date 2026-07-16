@@ -9,17 +9,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.*;
 import timesheets.dto.request.StartTimerRequest;
-import timesheets.enums.TimeEntryStatus;
 import timesheets.repository.*;
 
 // this is the file that has all my timer business logic
 // the controller will call the service and the service will call the repositories
 
 @Service
+@RequiredArgsConstructor
 public class TimerService {
 
   private final TimerSessionRepository timerSessionRepository;
@@ -28,21 +29,6 @@ public class TimerService {
   private final ProjectRepository projectRepository;
   private final TaskRepository taskRepository;
   private final ProjectMemberRepository projectMemberRepository;
-
-  public TimerService(
-      TimerSessionRepository timerSessionRepository,
-      TimeEntryRepository timeEntryRepository,
-      WorkspaceMemberRepository workspaceMemberRepository,
-      ProjectRepository projectRepository,
-      TaskRepository taskRepository,
-      ProjectMemberRepository projectMemberRepository) {
-    this.timerSessionRepository = timerSessionRepository;
-    this.timeEntryRepository = timeEntryRepository;
-    this.workspaceMemberRepository = workspaceMemberRepository;
-    this.projectRepository = projectRepository;
-    this.taskRepository = taskRepository;
-    this.projectMemberRepository = projectMemberRepository;
-  }
 
   // this will start a new timer, and in our system only one timer is allowed across the entire
   // workspace
@@ -58,7 +44,7 @@ public class TimerService {
             .getUserId(); // gets the ID of the user
 
     List<WorkspaceMember> userMemberships =
-        workspaceMemberRepository.findAllByUserId(
+        workspaceMemberRepository.findByUserId(
             userId); // to find all the workspace memberships for this user
 
     // finds all the workspace member IDs
@@ -113,8 +99,6 @@ public class TimerService {
     timerSession.setIsRunning(true);
 
     timerSession.setPausedDurationSeconds(0L);
-    timerSession.setSource("timer");
-    timerSession.setNotes(request.getNotes());
 
     return timerSessionRepository.save(
         timerSession); // so I am creating and getting a timer session
@@ -155,10 +139,7 @@ public class TimerService {
     timeEntry.setEndTime(now);
     timeEntry.setDurationMinutes((int) durationMinutes);
 
-    timeEntry.setEntryType("timer");
-    timeEntry.setDescription(activeTimer.getNotes());
-    timeEntry.setStatus(TimeEntryStatus.DRAFT);
-
+    timeEntry.setEntryType("TIMER");
     timeEntry.setIsLocked(false);
 
     return timeEntryRepository.save(timeEntry);
