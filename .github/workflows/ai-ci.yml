@@ -19,7 +19,7 @@ jobs:
     # Logic Gate: this is used to determine where the changes occur and if it occurs in the ai service folder, therefore the ai-check should run otherwise passed quickly 
       - name: Check for AI Service Changes
         id: filter
-        uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590
+        uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
         with:
           filters: |
             ai:
