@@ -136,8 +136,7 @@ public class TimerService {
     LocalDate entryDate = now.toLocalDate();
     LocalDate weekStart = entryDate.with(java.time.DayOfWeek.MONDAY);
     LocalDate weekEnd = entryDate.with(java.time.DayOfWeek.SUNDAY);
-    Timesheet timesheet =
-        timesheetService.getOrCreateTimesheet(workspaceMemberId, weekStart, weekEnd);
+    Timesheet timesheet = timesheetService.getOrCreateTimesheet(weekStart, weekEnd);
 
     // draft timer created, and it links to a timesheet
     TimeEntry timeEntry = new TimeEntry();
