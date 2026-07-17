@@ -50,7 +50,7 @@ public class ReportsService {
 
     // calculate summary
     double totalHours =
-        entries.stream().mapToDouble(entry -> entry.getDurationMinutes() / 60.0).sum();
+        entries.stream().mapToDouble(entry -> entry.getDurationSeconds() / 3600.0).sum();
 
     int totalEntries = entries.size();
 
@@ -74,7 +74,7 @@ public class ReportsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationMinutes() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
                           .sum();
 
                   // TimeEntry sample = entry.getValue().get(0);
@@ -113,7 +113,7 @@ public class ReportsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationMinutes() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
                           .sum();
 
                   return ProductivityReportResponse.WeeklyBreakdown.builder()

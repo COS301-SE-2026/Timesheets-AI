@@ -162,7 +162,7 @@ public class TimerController {
 
     response.setTimerId(timerId);
     response.setStoppedAt(timeEntry.getEndTime());
-    response.setDurationMinutes(timeEntry.getDurationMinutes());
+    response.setDurationMinutes(timeEntry.getDurationSeconds());
 
     // this creates the nested time entry
     CreatedTimeEntryResponse createdEntry = new CreatedTimeEntryResponse();
@@ -180,7 +180,7 @@ public class TimerController {
     createdEntry.setEndTime(
         timeEntry.getEndTime() != null ? timeEntry.getEndTime().toLocalTime() : LocalTime.now());
 
-    createdEntry.setDurationMinutes(timeEntry.getDurationMinutes());
+    createdEntry.setDurationMinutes(timeEntry.getDurationSeconds());
     createdEntry.setStatus("DRAFT");
 
     String projectName = "Unknown Project";

@@ -41,7 +41,7 @@ public class InsightsService {
 
     // total hours logged
     double totalHours =
-        entries.stream().mapToDouble(entry -> entry.getDurationMinutes() / 60.0).sum();
+        entries.stream().mapToDouble(entry -> entry.getDurationSeconds() / 3600.0).sum();
 
     // count unique days with entries
     long uniqueDays =
@@ -55,7 +55,7 @@ public class InsightsService {
     // Map<LocalDate, Double> hoursPerDay = entries.stream()
     // .collect(Collectors.groupingBy(
     //         entry -> entry.getStartTime().toLocalDate(),
-    //         Collectors.summingDouble(entry -> entry.getDurationMinutes() / 60.0)
+    //         Collectors.summingDouble(entry -> entry.getDurationSeconds() / 60.0)
     // ));
 
     // hours per project
@@ -65,7 +65,7 @@ public class InsightsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationMinutes() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
                           .sum();
 
                   return PersonalInsightsResponse.ProjectHours.builder()
@@ -89,7 +89,7 @@ public class InsightsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationMinutes() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
                           .sum();
 
                   return PersonalInsightsResponse.TaskHours.builder()
@@ -114,7 +114,7 @@ public class InsightsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationMinutes() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
                           .sum();
 
                   return PersonalInsightsResponse.DailyTrend.builder()
