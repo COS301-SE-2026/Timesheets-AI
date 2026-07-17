@@ -1,4 +1,4 @@
-package timesheets.dto.response;
+package timesheets.dto.request;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,7 +11,7 @@ import lombok.Data;
 
 
 @Data
-public class CreateProjectResponse {
+public class CreateProjectRequest {
 
     @NotBlank(message = "Project name is required")
     private String name;
