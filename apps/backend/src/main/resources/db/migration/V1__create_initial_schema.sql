@@ -167,7 +167,7 @@ CREATE TABLE time_entries (
     task_id UUID REFERENCES tasks(id) ON DELETE RESTRICT,
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP,
-    duration_minutes INTEGER,
+    duration_seconds INTEGER,
     entry_type VARCHAR(10) DEFAULT 'MANUAL' CHECK(entry_type IN ('MANUAL','TIMER')),
     description TEXT,
     is_locked BOOLEAN DEFAULT FALSE,
