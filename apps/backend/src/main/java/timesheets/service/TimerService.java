@@ -120,10 +120,10 @@ public class TimerService {
 
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime startedAt = activeTimer.getStartedAt();
-    long durationMinutes = ChronoUnit.MINUTES.between(startedAt, now); // I am calculating how long
+    long durationSeconds = ChronoUnit.SECONDS.between(startedAt, now); // I am calculating how long
 
     if (activeTimer.getPausedDurationSeconds() != null) {
-      durationMinutes -= (activeTimer.getPausedDurationSeconds() / 60);
+      durationSeconds -= (activeTimer.getPausedDurationSeconds() / 60);
     } // so this should subtract the paused duration to see the actual time- I made the mistake of
     // not cosidering this properlly
 
@@ -146,7 +146,7 @@ public class TimerService {
     timeEntry.setTaskId(activeTimer.getTaskId());
     timeEntry.setStartTime(startedAt);
     timeEntry.setEndTime(now);
-    timeEntry.setDurationMinutes((int) durationMinutes);
+    timeEntry.setDurationSeconds((int) durationSeconds);
     timeEntry.setEntryType("TIMER");
     timeEntry.setIsLocked(false);
 
