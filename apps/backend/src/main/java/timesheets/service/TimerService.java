@@ -34,7 +34,6 @@ public class TimerService {
   private final SecurityUtils securityUtils;
   private final TimesheetService timesheetService;
 
-
   // this will start a new timer, and in our system only one timer is allowed across the entire
   // workspace
   @Transactional
