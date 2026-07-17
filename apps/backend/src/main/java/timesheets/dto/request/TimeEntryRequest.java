@@ -24,7 +24,7 @@ public class TimeEntryRequest {
   private LocalDateTime endTime;
 
   @Positive(message = "Duration must be positive")
-  private Integer durationMinutes;
+  private Integer durationSeconds;
 
   private String entryType;
   private String description;

@@ -40,7 +40,7 @@ public class TimeEntryResponse {
         .taskId(entry.getTaskId())
         .startTime(entry.getStartTime())
         .endTime(entry.getEndTime())
-        .durationMinutes(entry.getDurationMinutes())
+        .durationMinutes(entry.getDurationSeconds())
         .entryType(entry.getEntryType())
         .description(entry.getDescription())
         .isDeleted(entry.getIsDeleted())

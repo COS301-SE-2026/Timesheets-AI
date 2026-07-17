@@ -53,7 +53,7 @@ public class TimeEntryService {
     entry.setTaskId(request.getTaskId());
     entry.setStartTime(request.getStartTime());
     entry.setEndTime(request.getEndTime());
-    entry.setDurationMinutes(request.getDurationMinutes());
+    entry.setDurationSeconds(request.getDurationSeconds());
     entry.setEntryType(
         request
             .getEntryType()); // this will show if a time entry was manual or started with a timer
@@ -117,7 +117,7 @@ public class TimeEntryService {
     entry.setTaskId(request.getTaskId());
     entry.setStartTime(request.getStartTime());
     entry.setEndTime(request.getEndTime());
-    entry.setDurationMinutes(request.getDurationMinutes());
+    entry.setDurationSeconds(request.getDurationSeconds());
     entry.setEntryType(request.getEntryType());
     entry.setDescription(request.getDescription());
 
