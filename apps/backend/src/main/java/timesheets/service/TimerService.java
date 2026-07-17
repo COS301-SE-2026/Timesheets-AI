@@ -32,6 +32,8 @@ public class TimerService {
   private final TaskRepository taskRepository;
   private final ProjectMemberRepository projectMemberRepository;
   private final SecurityUtils securityUtils;
+  private final TimesheetService timesheetService;
+
 
   // this will start a new timer, and in our system only one timer is allowed across the entire
   // workspace
