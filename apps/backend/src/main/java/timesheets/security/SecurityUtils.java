@@ -30,6 +30,7 @@ public class SecurityUtils {
     throw new RuntimeException("Invalid authentication principal. Expected CustomUserDetails");
   }
 
+  // user info
   public UUID getCurrentUserId() {
     return getCurrentUser().getUserId();
   }
@@ -48,5 +49,52 @@ public class SecurityUtils {
 
   public String getCurrentUserFullName() {
     return getCurrentUser().getFullName();
+  }
+
+  // workspace checks
+  // gets the default workspace member id from the security context
+  public UUID getDefaultWorkspaceMemberId() {
+    return getCurrentUser().getDefaultWorkspaceMemberId();
+  }
+
+  public boolean belongsToWorkspace(UUID workspaceId) {
+    return getCurrentUser().belongsToWorkspace(workspaceId);
+  }
+
+  public long getWorkspaceCount() {
+    return getCurrentUser().getWorkspaceCount();
+  }
+
+  // role checks
+  public boolean hasRole(String role) {
+    return getCurrentUser().hasRole(role);
+  }
+
+  public boolean isAdmin() {
+    return getCurrentUser().isAdmin();
+  }
+
+  public boolean isManager() {
+    return getCurrentUser().isManager();
+  }
+
+  public boolean isDeveloper() {
+    return getCurrentUser().isDeveloper();
+  }
+
+  public boolean isUser() {
+    return getCurrentUser().isUser();
+  }
+
+  // auth stuff
+  public Authentication getAuthentication() {
+    return SecurityContextHolder.getContext().getAuthentication();
+  }
+
+  public boolean isAuthenticated() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return authentication != null
+        && authentication.isAuthenticated()
+        && !(authentication.getPrincipal() instanceof String);
   }
 }
