@@ -39,6 +39,12 @@ it must end with:
         <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
+    <properties>
+        <!-- SonarQube exclusion where we want it to ignore the migration files -->
+        <!-- solution from: https://www.baeldung.com/sonar-exclude-violations-->
+        <sonar.exclusions>**/db/migration/**/*.sql</sonar.exclusions>
+    </properties>
+
     <dependencies>
         <!-- Spring Boot Web - REST APIs -->
         <dependency>
