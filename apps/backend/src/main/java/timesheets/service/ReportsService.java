@@ -5,14 +5,15 @@ import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import timesheets.domain.TimeEntry;
-import timesheets.domain.User;
 import timesheets.dto.request.ProductivityReportRequest;
 import timesheets.dto.response.ProductivityReportResponse;
 import timesheets.repository.TimeEntryRepository;
+import timesheets.security.SecurityUtils;
 
 // service for generating various reports, currently implements productivity report generation based
 // on time entries for a given user and date range
@@ -33,18 +34,19 @@ import timesheets.repository.TimeEntryRepository;
 public class ReportsService {
 
   private final TimeEntryRepository timeEntryRepository;
+  private final SecurityUtils securityUtils;
 
   // we could inject other repositories here as needed, for example if we want to join with projects
   // or tasks to get more detailed report data
-  public ProductivityReportResponse generateProductivityReport(
-      ProductivityReportRequest request, User currentUser) {
+  public ProductivityReportResponse generateProductivityReport(ProductivityReportRequest request) {
+
+    // the user ID from the security context and no DB
+    UUID userId = securityUtils.getCurrentUserId();
 
     // fetch all time entries for the developer in the date range
     List<TimeEntry> entries =
         timeEntryRepository.findByUserIdAndDateRange(
-            currentUser.getId(),
-            request.getFrom().atStartOfDay(),
-            request.getTo().atTime(23, 59, 59));
+            userId, request.getFrom().atStartOfDay(), request.getTo().atTime(23, 59, 59));
 
     // calculate summary
     double totalHours =

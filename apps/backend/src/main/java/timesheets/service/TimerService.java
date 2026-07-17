@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.*;
 import timesheets.dto.request.StartTimerRequest;
 import timesheets.repository.*;
+import timesheets.security.SecurityUtils;
 
 // this is the file that has all my timer business logic
 // the controller will call the service and the service will call the repositories
@@ -29,13 +30,15 @@ public class TimerService {
   private final ProjectRepository projectRepository;
   private final TaskRepository taskRepository;
   private final ProjectMemberRepository projectMemberRepository;
+  private final SecurityUtils securityUtils;
 
   // this will start a new timer, and in our system only one timer is allowed across the entire
   // workspace
   @Transactional
-  public TimerSession startTimer(UUID workspaceMemberId, StartTimerRequest request) {
+  public TimerSession startTimer(StartTimerRequest request) {
 
     // I want to check if a memeber exists
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     UUID userId =
         workspaceMemberRepository
@@ -106,7 +109,9 @@ public class TimerService {
 
   // this should be if a timer is stopped and a draft timer entry is created
   @Transactional
-  public TimeEntry stopTimer(UUID workspaceMemberId) {
+  public TimeEntry stopTimer() {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     // to find an active timer
     TimerSession activeTimer =
@@ -145,7 +150,10 @@ public class TimerService {
     return timeEntryRepository.save(timeEntry);
   }
 
-  public TimerSession getActiveTimer(UUID workspaceMemberId) {
+  public TimerSession getActiveTimer() {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     return timerSessionRepository
         .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId)
         .orElse(null);
@@ -156,7 +164,9 @@ public class TimerService {
 
   // ! we want our users to be able to discard a timer without without it creating a time entry
   @Transactional
-  public void discardTimer(UUID workspaceMemberId) {
+  public void discardTimer() {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     // should find an active timer
     TimerSession activeTimer =

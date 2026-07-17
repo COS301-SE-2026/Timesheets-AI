@@ -12,6 +12,7 @@ import timesheets.domain.Timesheet;
 import timesheets.dto.request.TimesheetRequest;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.repository.TimesheetRepository;
+import timesheets.security.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +20,13 @@ public class TimesheetService {
 
   private final TimesheetRepository timesheetRepository;
   private final TimeEntryRepository timeEntryRepository;
+  private final SecurityUtils securityUtils;
 
   @Transactional
-  public Timesheet createTimesheet(UUID workspaceMemberId, TimesheetRequest request) {
+  public Timesheet createTimesheet(TimesheetRequest request) {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     Timesheet timesheet = new Timesheet();
     timesheet.setWorkspaceMemberId(workspaceMemberId);
     timesheet.setPeriodStart(request.getPeriodStart());
@@ -34,8 +39,10 @@ public class TimesheetService {
 
   // get existing timesheet or create a new one
   @Transactional
-  public Timesheet getOrCreateTimesheet(
-      UUID workspaceMemberId, LocalDate periodStart, LocalDate periodEnd) {
+  public Timesheet getOrCreateTimesheet(LocalDate periodStart, LocalDate periodEnd) {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     return timesheetRepository
         .findByWorkspaceMemberIdAndPeriodStartAndPeriodEnd(
             workspaceMemberId, periodStart, periodEnd)
@@ -44,17 +51,20 @@ public class TimesheetService {
               TimesheetRequest request = new TimesheetRequest();
               request.setPeriodStart(periodStart);
               request.setPeriodEnd(periodEnd);
-              return createTimesheet(workspaceMemberId, request);
+              return createTimesheet(request);
             });
   }
 
   // get current week's timesheet
   @Transactional
-  public Timesheet getOrCreateCurrentTimesheet(UUID workspaceMemberId) {
+  public Timesheet getOrCreateCurrentTimesheet() {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     LocalDate today = LocalDate.now();
     LocalDate periodStart = today.with(java.time.DayOfWeek.MONDAY);
     LocalDate periodEnd = today.with(java.time.DayOfWeek.SUNDAY);
-    return getOrCreateTimesheet(workspaceMemberId, periodStart, periodEnd);
+    return getOrCreateTimesheet(periodStart, periodEnd);
   }
 
   @Transactional
