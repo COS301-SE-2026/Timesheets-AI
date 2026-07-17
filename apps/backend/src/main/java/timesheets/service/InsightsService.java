@@ -5,14 +5,15 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import timesheets.domain.TimeEntry;
-import timesheets.domain.User;
 import timesheets.dto.request.ProductivityReportRequest;
 import timesheets.dto.response.PersonalInsightsResponse;
 import timesheets.repository.TimeEntryRepository;
+import timesheets.security.SecurityUtils;
 
 // service for generating insights and analytics based on time entries,
 // currently implements a summary report with various metrics and breakdowns
@@ -23,14 +24,17 @@ import timesheets.repository.TimeEntryRepository;
 public class InsightsService {
 
   private final TimeEntryRepository timeEntryRepository;
+  private final SecurityUtils securityUtils;
 
-  public PersonalInsightsResponse getInsightsSummary(
-      ProductivityReportRequest request, User currentUser) {
+  public PersonalInsightsResponse getInsightsSummary(ProductivityReportRequest request) {
+
+    // get user ID from the security context
+    UUID userId = securityUtils.getCurrentUserId();
 
     // fetch all time entries for the developer in the date range
     List<TimeEntry> entries =
         timeEntryRepository.findByUserIdAndDateRange(
-            currentUser.getId(),
+            userId,
             request.getFrom().atStartOfDay(),
             request.getTo().atTime(23, 59, 59) // include entire end day
             );

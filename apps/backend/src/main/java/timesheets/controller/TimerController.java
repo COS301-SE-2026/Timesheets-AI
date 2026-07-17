@@ -8,15 +8,11 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import timesheets.domain.Project;
 import timesheets.domain.Task;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.TimerSession;
-import timesheets.domain.User;
-import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.StartTimerRequest;
 import timesheets.dto.response.ActiveTimerResponse;
 import timesheets.dto.response.CreatedTimeEntryResponse;
@@ -24,8 +20,7 @@ import timesheets.dto.response.ErrorResponse;
 import timesheets.dto.response.StopTimerResponse;
 import timesheets.repository.ProjectRepository;
 import timesheets.repository.TaskRepository;
-import timesheets.repository.UserRepository;
-import timesheets.repository.WorkspaceMemberRepository;
+import timesheets.security.SecurityUtils;
 import timesheets.service.TimerService;
 
 // the rest controller should handle the HTTP requests
@@ -37,35 +32,12 @@ public class TimerController {
   private final TimerService timerService;
   private final ProjectRepository projectRepository;
   private final TaskRepository taskRepository;
-  private final WorkspaceMemberRepository workspaceMemberRepository;
-  private final UserRepository userRepository;
-
-  private UUID getCurrentWorkspaceMemberId() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    // gets the Spring Security User
-    org.springframework.security.core.userdetails.User springUser =
-        (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
-
-    // gets email from Spring Security User
-    String email = springUser.getUsername();
-
-    // finds your custom user from database
-    User user =
-        userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-
-    // gets workspace member
-    return workspaceMemberRepository.findByUserId(user.getId()).stream()
-        .findFirst()
-        .map(WorkspaceMember::getId)
-        .orElseThrow(() -> new RuntimeException("User is not a member of any workspace"));
-  }
+  private final SecurityUtils securityUtils;
 
   @PostMapping("/start") // the endpoint will look like POST /api/timers/start
   public ResponseEntity<?> startTimer(@Valid @RequestBody StartTimerRequest request) {
     try {
-      UUID workspaceMemberId = getCurrentWorkspaceMemberId();
-      TimerSession timer = timerService.startTimer(workspaceMemberId, request);
+      TimerSession timer = timerService.startTimer(request);
 
       ActiveTimerResponse response =
           convertToResponse(
@@ -83,11 +55,9 @@ public class TimerController {
   @PostMapping("/stop") // the endpoint will look like POST /api/timers/stop
   public ResponseEntity<StopTimerResponse> stopTimer() {
 
-    UUID workspaceMemberId = getCurrentWorkspaceMemberId();
+    TimerSession activeTimer = timerService.getActiveTimer();
 
-    TimerSession activeTimer = timerService.getActiveTimer(workspaceMemberId);
-
-    TimeEntry timeEntry = timerService.stopTimer(workspaceMemberId); // draft entry will be created
+    TimeEntry timeEntry = timerService.stopTimer(); // draft entry will be created
 
     StopTimerResponse response = convertToStopResponse(timeEntry, activeTimer.getId());
 
@@ -97,9 +67,8 @@ public class TimerController {
   // should get the currently running timer
   @GetMapping("/active") // endpoint will look like GET /api/timers/active
   public ResponseEntity<ActiveTimerResponse> getActiveTimer() {
-    UUID workspaceMemberId = getCurrentWorkspaceMemberId();
 
-    TimerSession timer = timerService.getActiveTimer(workspaceMemberId);
+    TimerSession timer = timerService.getActiveTimer();
 
     if (timer != null) {
       return ResponseEntity.ok(convertToResponse(timer)); // the timer is running
@@ -111,16 +80,14 @@ public class TimerController {
   @DeleteMapping("/discard") // the endpoint will look like DELETE /api/timers/discard
   public ResponseEntity<Void> discardTimer() {
 
-    UUID workspaceMemberId = getCurrentWorkspaceMemberId();
-
     TimerSession activeTimer =
-        timerService.getActiveTimer(workspaceMemberId); // should see if there is an active timer
+        timerService.getActiveTimer(); // should see if there is an active timer
 
     if (activeTimer == null) {
       return ResponseEntity.notFound().build(); // meaning no timer found
     }
 
-    timerService.discardTimer(workspaceMemberId); // should just discard the timer
+    timerService.discardTimer(); // should just discard the timer
 
     return ResponseEntity.noContent().build(); // no success cause nothing created
   }
