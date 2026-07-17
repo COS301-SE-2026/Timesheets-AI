@@ -43,7 +43,7 @@ public class CustomUserDetailsService implements UserDetailsService {
       authorities.add(new SimpleGrantedAuthority("WORKSPACE_" + membership.getWorkspaceId()));
 
       if (defaultWorkspaceMemberId == null) {
-        defaultWorkspaceMemberId = membership.getWorkspaceId();
+        defaultWorkspaceMemberId = membership.getId();
       }
     }
 
