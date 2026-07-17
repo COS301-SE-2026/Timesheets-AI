@@ -16,6 +16,7 @@ import timesheets.domain.Timesheet;
 import timesheets.dto.request.TimeEntryRequest;
 import timesheets.dto.response.TimeEntryResponse;
 import timesheets.repository.TimeEntryRepository;
+import timesheets.security.SecurityUtils;
 
 // this is the file that has all my business logic, the control will call the service and the
 // service will call repo
@@ -26,10 +27,13 @@ public class TimeEntryService {
 
   private final TimeEntryRepository timeEntryRepository;
   private final TimesheetService timesheetService;
+  private final SecurityUtils securityUtils;
 
   // this would be if they need to create a time entry manually
   @Transactional
-  public TimeEntry createTimeEntry(UUID workspaceMemberId, TimeEntryRequest request) {
+  public TimeEntry createTimeEntry(TimeEntryRequest request) {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     LocalDate entryDate = request.getStartTime().toLocalDate();
 
@@ -38,8 +42,7 @@ public class TimeEntryService {
     LocalDate weekEnd = entryDate.with(DayOfWeek.SUNDAY);
 
     // to get or create timesheet for this period
-    Timesheet timesheet =
-        timesheetService.getOrCreateTimesheet(workspaceMemberId, weekStart, weekEnd);
+    Timesheet timesheet = timesheetService.getOrCreateTimesheet(weekStart, weekEnd);
 
     TimeEntry entry = new TimeEntry();
 
@@ -61,7 +64,10 @@ public class TimeEntryService {
   }
 
   // to get all the time entries of a particular workspace member
-  public List<TimeEntry> getMyTimeEntries(UUID workspaceMemberId) {
+  public List<TimeEntry> getMyTimeEntries() {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     return timeEntryRepository.findByWorkspaceMemberIdOrderByStartTimeDesc(workspaceMemberId);
   }
 
@@ -71,7 +77,9 @@ public class TimeEntryService {
   }
 
   @Transactional
-  public void deleteTimeEntry(UUID id, UUID workspaceMemberId) {
+  public void deleteTimeEntry(UUID id) {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     TimeEntry entry = getTimeEntryById(id);
 
     if (Boolean.TRUE.equals(entry.getIsLocked())) {
@@ -91,7 +99,10 @@ public class TimeEntryService {
 
   // this will allow a user to edit time entries as long as if they are not locked
   @Transactional
-  public TimeEntry updateTimeEntry(UUID id, UUID workspaceMemberId, TimeEntryRequest request) {
+  public TimeEntry updateTimeEntry(UUID id, TimeEntryRequest request) {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     TimeEntry entry = getTimeEntryById(id);
 
     if (Boolean.TRUE.equals(entry.getIsLocked())) {
