@@ -37,9 +37,7 @@ it must end with:
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
         <maven.compiler.release>17</maven.compiler.release>
-    </properties>
 
-    <properties>
         <!-- SonarQube exclusion where we want it to ignore the migration files -->
         <!-- solution from: https://www.baeldung.com/sonar-exclude-violations-->
         <sonar.exclusions>**/db/migration/**/*.sql</sonar.exclusions>
