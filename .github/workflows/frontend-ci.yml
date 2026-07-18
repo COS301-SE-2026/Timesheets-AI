@@ -64,4 +64,6 @@ jobs:
               working-directory: apps/frontend/client
               run: yarn lint 
 
-        
+            - name: Run Jest tests
+              working-directory: apps/frontend/client
+              run: yarn test --watch=false
