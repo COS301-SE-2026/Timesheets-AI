@@ -119,8 +119,44 @@ HEADER
                         </span>
                     }
                 </div>
+
+                <!--
+                PROGRESS OF PROJECTS??
+                -->
+                <app-progress-bar
+                    [progress]="(project.hoursLogged / project.totalHours)*100">
+                </app-progress-bar>
+
+                <!--
+                FOOTER OF CARD
+                -->
+                <div class="project-card-footer">
+                    <span>
+                        {{project.hoursLogged}} / {{project.totalHours}} hrs
+                    </span>
+
+                    <span>
+                        {{project.role}}
+                    </span>
+                </div>
+
+                <!--
+                TEAM MEMEBERS
+                -->
+                <div class="project-team">
+                    <strong>
+                        Team
+                    </strong>
+
+                    <div class="team-members">
+                        @for (member of project.teamMembers; track member){
+                            <span class="team-member">
+                                {{member}}
+                            </span>
+                        }
+                    </div>
+                </div>
             </article>
         }
     </section>
 </div>
-<p>projects works!</p>

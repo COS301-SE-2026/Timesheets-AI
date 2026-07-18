@@ -20,7 +20,6 @@ import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { StatsCardComponent } from '../../shared/components/stats-card/stats-card.component';
 import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar.component';
-import { StatusChipComponent } from '../../shared/components/status-chip/status-chip.component';
 
 @Component({
   selector: 'app-projects',
@@ -30,7 +29,6 @@ import { StatusChipComponent } from '../../shared/components/status-chip/status-
     HeaderComponent,
     StatsCardComponent,
     ProgressBarComponent,
-    StatusChipComponent,
   ],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss',
