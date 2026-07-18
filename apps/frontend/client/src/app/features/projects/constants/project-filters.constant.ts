@@ -12,7 +12,7 @@
 export const PROJECT_FILTERS: string[] = [
   'All',
   'Active',
-  'On hold',
+  'On Hold',
   'Completed',
   'Archived',
 ];

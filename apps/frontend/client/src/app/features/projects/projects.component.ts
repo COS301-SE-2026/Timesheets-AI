@@ -16,11 +16,22 @@ import { Project } from './models/project.model';
 import { ProjectStatus } from './enums/project-status.enum';
 import { PROJECT_FILTERS } from './constants/project-filters.constant';
 import { PROJECTS } from './mock/projects.mock';
+import { CommonModule } from '@angular/common';
+import { HeaderComponent } from '../../shared/components/header/header.component';
+import { StatsCardComponent } from '../../shared/components/stats-card/stats-card.component';
+import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar.component';
+import { StatusChipComponent } from '../../shared/components/status-chip/status-chip.component';
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [],
+  imports: [
+    CommonModule,
+    HeaderComponent,
+    StatsCardComponent,
+    ProgressBarComponent,
+    StatusChipComponent,
+  ],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss',
 })
@@ -63,7 +74,7 @@ export class ProjectsComponent {
   protected filterProjects(selectedFilter: string): void {
     this.selectedFilter = selectedFilter;
 
-    if (selectedFilter === 'ALL') {
+    if (selectedFilter === 'All') {
       this.filteredProjects = [...this.projects];
       return;
     }

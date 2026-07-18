@@ -1,5 +1,5 @@
 /**
- * PROJECTS COMPONENT
+ * PROJECTS MODEL
  * ---------------------------------
  * Author: Cleopatra Kwenda
  * Date: 2026-07-17
