@@ -203,7 +203,7 @@
 
         <!-- Social buttons -->
         <div class="social-grid">
-            <button type="button" class="social-button" aria-label="Sign in with Google" (click)="onSocialLogin('Google')">
+            <button type="button" class="social-button" aria-label="Sign in with Google" (click)="triggerGoogleLogin()">
             <svg class="social-logo" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92
                 c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -218,7 +218,8 @@
             </svg>
             Google
             </button>
-
+            <!-- Hidden container for Googles real button to render into -->
+            <div #googleBtn style="position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0;"></div>
             <button type="button" class="social-button" aria-label="Sign in with Microsoft" (click)="onSocialLogin('Microsoft')">
             <svg class="social-logo" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#F25022" d="M1 1h10v10H1z"/>
