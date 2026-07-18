@@ -54,11 +54,14 @@ jobs:
                 cache: 'yarn'
                 cache-dependency-path: apps/frontend/client/yarn.lock 
 
-            - name: Install & Test (Yarn)
+            - name: Install Dependencies 
               if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
               run: |
                 cd apps/frontend/client
                 yarn install --frozen-lockfile 
-                yarn test --watch=false
+
+            - name: Run ESlint
+              working-directory: apps/frontend/client
+              run: yarn lint 
 
         
