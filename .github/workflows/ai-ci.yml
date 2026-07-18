@@ -37,6 +37,8 @@ jobs:
                   - 'ai-service/**'
                   - '.github/workflows/ai-ci.yml'
 
+#===================== BUILD stage ================================
+
     # Set up the required Python environment for this workflow 
       - name: Set up Python 
         if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
@@ -54,6 +56,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt 
 
+#===================== PLAN stage ================================
+
         # ruff is recommended for Python FastAPI (made by Astral) 
         # it is fast and it ahndles linting, auto fix sytnax and formatting so no need for different kinds of tools 
       - name: Run Ruff Lint 
@@ -63,6 +67,8 @@ jobs:
           ruff format --check .
           ruff check .
 
+#===================== TEST stage ================================
+
       - name: Run Tests 
         if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
         working-directory: ai-service
@@ -71,3 +77,11 @@ jobs:
         run: |
           pytest
 
+#===================== RELEASE stage ================================
+      
+      # build docker image to deploy 
+      - name: Build Docker Image
+        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
+        working-directory: ai-service 
+        run:  |
+         docker build -t momently-ai:${{ github.sha}} .

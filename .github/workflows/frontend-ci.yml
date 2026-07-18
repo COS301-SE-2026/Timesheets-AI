@@ -43,6 +43,7 @@ jobs:
                         - 'apps/frontend/**'
                         - '.github/workflows/frontend-ci.yml'
 
+#===================== BUILD stage ================================
 
             # Only runs if frontend filter is true on the first run or retry step 
             - name: Set up Node.js
@@ -60,17 +61,23 @@ jobs:
                 cd apps/frontend/client
                 yarn install --frozen-lockfile 
 
+#===================== PLAN stage ================================
+
             # this checks for code quality and help to detect for potential bugs 
             - name: Run ESlint
               working-directory: apps/frontend/client
               run: yarn lint 
+
+#===================== TEST stage ================================
 
             # runs frontend unit tests using Jest 
             - name: Run Jest tests
               working-directory: apps/frontend/client
               run: yarn test --watch=false
 
+#===================== RELEASE stage ================================
+
             # ensure that the Angular builds successfully 
             - name: Build Angular
               working-directory: apps/frontend/client
-              run: yarn build
+              run: docker build -t momently-frontend:${{ github.sha }} .
