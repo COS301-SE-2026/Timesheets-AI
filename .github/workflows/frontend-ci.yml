@@ -60,10 +60,17 @@ jobs:
                 cd apps/frontend/client
                 yarn install --frozen-lockfile 
 
+            # this checks for code quality and help to detect for potential bugs 
             - name: Run ESlint
               working-directory: apps/frontend/client
               run: yarn lint 
 
+            # runs frontend unit tests using Jest 
             - name: Run Jest tests
               working-directory: apps/frontend/client
               run: yarn test --watch=false
+
+            # ensure that the Angular builds successfully 
+            - name: Build Angular
+              working-directory: apps/frontend/client
+              run: yarn build
