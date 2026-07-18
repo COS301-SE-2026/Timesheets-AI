@@ -1,0 +1,8 @@
+client/node_modules
+client/angular
+client/dist
+
+.git
+.gitignore
+
+Dockerfile 
