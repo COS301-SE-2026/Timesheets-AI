@@ -5,12 +5,10 @@ name: Frontend Pipeline
 on:
     push:
         branches: [main, dev]
-        # paths:
-        #     - 'apps/frontend/**' 
+
     pull_request:
         branches: [main, dev]
-        # paths: 
-        #     - 'apps/frontend/**'
+       
 
 jobs:
     # this is only for frontend check only and provide job access to the code in the repo 
@@ -62,3 +60,5 @@ jobs:
                 cd apps/frontend/client
                 yarn install --frozen-lockfile 
                 yarn test --watch=false
+
+        
