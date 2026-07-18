@@ -53,4 +53,14 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, UUID> {
   @Modifying
   @Query("UPDATE TimeEntry te SET te.isLocked = false WHERE te.timesheetId = :timesheetId")
   void unlockAllByTimesheetId(@Param("timesheetId") UUID timesheetId);
+
+  // finds the time entries of a member in a specific project
+  List<TimeEntry> findByWorkspaceMemberIdAndProjectId(UUID workspaceMemberId, UUID projectId);
+
+  // finds all the time entries on a particular project
+  List<TimeEntry> findByProjectId(UUID projectId);
+
+  // finds all the time entries on a project based on a timeframe
+  List<TimeEntry> findByProjectIdAndStartTimeBetween(
+      UUID projectId, LocalDateTime start, LocalDateTime end);
 }
