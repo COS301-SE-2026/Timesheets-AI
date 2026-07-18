@@ -6,17 +6,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import timesheets.domain.Timesheet;
-import timesheets.domain.User;
-import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.RejectRequest;
 import timesheets.dto.response.TimeEntryResponse;
 import timesheets.dto.response.TimesheetResponse;
-import timesheets.repository.UserRepository;
-import timesheets.repository.WorkspaceMemberRepository;
+import timesheets.security.SecurityUtils;
 import timesheets.service.TimeEntryService;
 import timesheets.service.TimesheetService;
 
@@ -27,29 +22,7 @@ public class TimesheetController {
 
   private final TimesheetService timesheetService;
   private final TimeEntryService timeEntryService;
-  private final WorkspaceMemberRepository workspaceMemberRepository;
-  private final UserRepository userRepository;
-
-  private UUID getCurrentWorkspaceMemberId() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    // gets the Spring Security User
-    org.springframework.security.core.userdetails.User springUser =
-        (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
-
-    // gets email from Spring Security User
-    String email = springUser.getUsername();
-
-    // finds your custom user from database
-    User user =
-        userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-
-    // gets workspace member
-    return workspaceMemberRepository.findByUserId(user.getId()).stream()
-        .findFirst()
-        .map(WorkspaceMember::getId)
-        .orElseThrow(() -> new RuntimeException("User is not a member of any workspace"));
-  }
+  private final SecurityUtils securityUtils;
 
   // TODO: Replace with actual reviewerId from JWT token after security is implemented
   private UUID getCurrentReviewerId() {
@@ -59,10 +32,13 @@ public class TimesheetController {
   // getting all the timesheets for a logged in user
   @GetMapping("/me")
   public ResponseEntity<List<TimesheetResponse>> getMyTimesheets() {
-    UUID memberId = getCurrentWorkspaceMemberId();
+
+    UUID memberId = securityUtils.getDefaultWorkspaceMemberId();
+
     List<Timesheet> timesheets = timesheetService.getTimesheetsByMember(memberId);
     List<TimesheetResponse> responses =
         timesheets.stream().map(TimesheetResponse::from).collect(Collectors.toList());
+
     return ResponseEntity.ok(responses);
   }
 
@@ -70,7 +46,7 @@ public class TimesheetController {
   @GetMapping("/me/status/{status}")
   public ResponseEntity<List<TimesheetResponse>> getMyTimesheetsByStatus(
       @PathVariable String status) {
-    UUID memberId = getCurrentWorkspaceMemberId();
+    UUID memberId = securityUtils.getDefaultWorkspaceMemberId();
     List<Timesheet> timesheets = timesheetService.getTimesheetsByMemberAndStatus(memberId, status);
     List<TimesheetResponse> responses =
         timesheets.stream().map(TimesheetResponse::from).collect(Collectors.toList());
@@ -101,7 +77,10 @@ public class TimesheetController {
   // when a timesheet gets approved
   @PostMapping("/{id}/approve")
   public ResponseEntity<TimesheetResponse> approveTimesheet(@PathVariable UUID id) {
-    UUID reviewerId = getCurrentReviewerId();
+
+    // TODO: need to replace it with an actual reviewer maybe from security context?
+    UUID reviewerId = securityUtils.getCurrentUserId();
+
     Timesheet timesheet = timesheetService.approveTimesheet(id, reviewerId);
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
   }
