@@ -11,8 +11,8 @@ It includes font imports, variables, base styles, and utility classes.
 -----------------------------------------------------------------------------
 These fonts are loaded from Google Fonts and used globally.
 ----------------------------------------------------------------------------- */
-
-@import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap');
+// I commented this out because it exceed Angular Budgets 
+// @import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap');
 
 /* -----------------------------------------------------------------------------
    2. CSS Custom Properties (Global Typography System)
