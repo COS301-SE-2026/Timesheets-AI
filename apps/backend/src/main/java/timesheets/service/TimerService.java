@@ -3,6 +3,7 @@ package timesheets.service;
 import exception.ConflictException;
 import exception.ResourceNotFoundException;
 import exception.UnauthorizedException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.*;
 import timesheets.dto.request.StartTimerRequest;
 import timesheets.repository.*;
+import timesheets.security.SecurityUtils;
 
 // this is the file that has all my timer business logic
 // the controller will call the service and the service will call the repositories
@@ -29,13 +31,16 @@ public class TimerService {
   private final ProjectRepository projectRepository;
   private final TaskRepository taskRepository;
   private final ProjectMemberRepository projectMemberRepository;
+  private final SecurityUtils securityUtils;
+  private final TimesheetService timesheetService;
 
   // this will start a new timer, and in our system only one timer is allowed across the entire
   // workspace
   @Transactional
-  public TimerSession startTimer(UUID workspaceMemberId, StartTimerRequest request) {
+  public TimerSession startTimer(StartTimerRequest request) {
 
     // I want to check if a memeber exists
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     UUID userId =
         workspaceMemberRepository
@@ -91,13 +96,10 @@ public class TimerService {
 
     TimerSession timerSession = new TimerSession();
     timerSession.setWorkspaceMemberId(workspaceMemberId);
-
     timerSession.setProjectId(project.getId());
     timerSession.setTaskId(task != null ? task.getId() : null);
-
     timerSession.setStartedAt(LocalDateTime.now());
     timerSession.setIsRunning(true);
-
     timerSession.setPausedDurationSeconds(0L);
 
     return timerSessionRepository.save(
@@ -106,7 +108,9 @@ public class TimerService {
 
   // this should be if a timer is stopped and a draft timer entry is created
   @Transactional
-  public TimeEntry stopTimer(UUID workspaceMemberId) {
+  public TimeEntry stopTimer() {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     // to find an active timer
     TimerSession activeTimer =
@@ -116,11 +120,10 @@ public class TimerService {
 
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime startedAt = activeTimer.getStartedAt();
-
-    long durationMinutes = ChronoUnit.MINUTES.between(startedAt, now); // I am calculating how long
+    long durationSeconds = ChronoUnit.SECONDS.between(startedAt, now); // I am calculating how long
 
     if (activeTimer.getPausedDurationSeconds() != null) {
-      durationMinutes -= (activeTimer.getPausedDurationSeconds() / 60);
+      durationSeconds -= (activeTimer.getPausedDurationSeconds() / 60);
     } // so this should subtract the paused duration to see the actual time- I made the mistake of
     // not cosidering this properlly
 
@@ -129,23 +132,31 @@ public class TimerService {
 
     timerSessionRepository.save(activeTimer);
 
-    // draft timer created
+    // creates or gets timesheet ofr the week
+    LocalDate entryDate = now.toLocalDate();
+    LocalDate weekStart = entryDate.with(java.time.DayOfWeek.MONDAY);
+    LocalDate weekEnd = entryDate.with(java.time.DayOfWeek.SUNDAY);
+    Timesheet timesheet = timesheetService.getOrCreateTimesheet(weekStart, weekEnd);
+
+    // draft timer created, and it links to a timesheet
     TimeEntry timeEntry = new TimeEntry();
     timeEntry.setWorkspaceMemberId(workspaceMemberId);
+    timeEntry.setTimesheetId(timesheet.getId());
     timeEntry.setProjectId(activeTimer.getProjectId());
     timeEntry.setTaskId(activeTimer.getTaskId());
-
     timeEntry.setStartTime(startedAt);
     timeEntry.setEndTime(now);
-    timeEntry.setDurationMinutes((int) durationMinutes);
-
+    timeEntry.setDurationSeconds((int) durationSeconds);
     timeEntry.setEntryType("TIMER");
     timeEntry.setIsLocked(false);
 
     return timeEntryRepository.save(timeEntry);
   }
 
-  public TimerSession getActiveTimer(UUID workspaceMemberId) {
+  public TimerSession getActiveTimer() {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     return timerSessionRepository
         .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId)
         .orElse(null);
@@ -156,7 +167,9 @@ public class TimerService {
 
   // ! we want our users to be able to discard a timer without without it creating a time entry
   @Transactional
-  public void discardTimer(UUID workspaceMemberId) {
+  public void discardTimer() {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     // should find an active timer
     TimerSession activeTimer =

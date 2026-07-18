@@ -7,16 +7,11 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import timesheets.domain.TimeEntry;
-import timesheets.domain.User;
-import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.TimeEntryRequest;
 import timesheets.dto.response.TimeEntryResponse;
-import timesheets.repository.UserRepository;
-import timesheets.repository.WorkspaceMemberRepository;
+import timesheets.security.SecurityUtils;
 import timesheets.service.TimeEntryService;
 
 // the controller is the entry point for all HTTP requests from the frontend
@@ -29,29 +24,7 @@ import timesheets.service.TimeEntryService;
 public class TimeEntryController {
 
   private final TimeEntryService timeEntryService;
-  private final WorkspaceMemberRepository workspaceMemberRepository;
-  private final UserRepository userRepository;
-
-  private UUID getCurrentWorkspaceMemberId() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    // gets the Spring Security User
-    org.springframework.security.core.userdetails.User springUser =
-        (org.springframework.security.core.userdetails.User) authentication.getPrincipal();
-
-    // gets email from Spring Security User
-    String email = springUser.getUsername();
-
-    // finds your custom user from database
-    User user =
-        userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-
-    // gets workspace member
-    return workspaceMemberRepository.findByUserId(user.getId()).stream()
-        .findFirst()
-        .map(WorkspaceMember::getId)
-        .orElseThrow(() -> new RuntimeException("User is not a member of any workspace"));
-  }
+  private final SecurityUtils securityUtils;
 
   // helper converts a string ID from URL to UUID
   private UUID toUUID(String id) {
@@ -70,8 +43,7 @@ public class TimeEntryController {
   public ResponseEntity<TimeEntryResponse> createTimeEntry(
       @Valid @RequestBody TimeEntryRequest request) {
 
-    UUID memberId = getCurrentWorkspaceMemberId();
-    TimeEntry entry = timeEntryService.createTimeEntry(memberId, request);
+    TimeEntry entry = timeEntryService.createTimeEntry(request);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(TimeEntryResponse.from(entry));
   }
@@ -81,9 +53,7 @@ public class TimeEntryController {
   @GetMapping("/me")
   public ResponseEntity<List<TimeEntryResponse>> getMyTimeEntries() {
 
-    UUID memberId = getCurrentWorkspaceMemberId();
-
-    List<TimeEntry> entries = timeEntryService.getMyTimeEntries(memberId);
+    List<TimeEntry> entries = timeEntryService.getMyTimeEntries();
     List<TimeEntryResponse> responses =
         entries.stream().map(TimeEntryResponse::from).collect(Collectors.toList());
 
@@ -106,9 +76,8 @@ public class TimeEntryController {
       @PathVariable String id, @RequestBody TimeEntryRequest request) {
 
     UUID entryId = toUUID(id);
-    UUID memberId = getCurrentWorkspaceMemberId();
 
-    TimeEntry entry = timeEntryService.updateTimeEntry(entryId, memberId, request);
+    TimeEntry entry = timeEntryService.updateTimeEntry(entryId, request);
 
     return ResponseEntity.ok(TimeEntryResponse.from(entry));
   }
@@ -118,9 +87,8 @@ public class TimeEntryController {
   public ResponseEntity<Void> deleteTimeEntry(@PathVariable String id) {
 
     UUID entryId = toUUID(id);
-    UUID memberId = getCurrentWorkspaceMemberId();
 
-    timeEntryService.deleteTimeEntry(entryId, memberId);
+    timeEntryService.deleteTimeEntry(entryId);
 
     return ResponseEntity.noContent().build();
   }
