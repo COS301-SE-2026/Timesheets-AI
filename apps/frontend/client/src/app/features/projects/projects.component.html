@@ -10,12 +10,17 @@ Related Requirements: N/A
 HEADER
 -->
 <app-header [title="'Projects'"]>
+    <label for="project-search" class="visually-hid">
+        Search projects
+    </label>
+    
     <input
+        id="project-search"
         class="project-search-input"
         type="text"
         placeholder="Search projects..."
         [value]="searchTerm"
-        [input]="searchProjects($any($event.target).value)"
+        (input)="searchProjects($any($event.target).value)"
     >
 </app-header>
 
