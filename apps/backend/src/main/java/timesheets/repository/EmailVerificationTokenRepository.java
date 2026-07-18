@@ -14,4 +14,6 @@ import timesheets.domain.EmailVerificationToken;
 public interface EmailVerificationTokenRepository
     extends JpaRepository<EmailVerificationToken, UUID> {
   Optional<EmailVerificationToken> findByToken(String token);
+
+  void deleteByUserId(UUID userId);
 }

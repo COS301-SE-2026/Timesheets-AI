@@ -3,9 +3,7 @@ package timesheets.controller;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import timesheets.domain.User;
 import timesheets.dto.request.ProductivityReportRequest;
 import timesheets.dto.response.ProductivityReportResponse;
 import timesheets.service.ReportsService;
@@ -28,16 +26,13 @@ public class ReportsController {
       "/productivity") // endpoint for generating productivity report, accepts from and to dates as
   // query parameters
   public ResponseEntity<ProductivityReportResponse> getProductivityReport(
-      @RequestParam LocalDate from,
-      @RequestParam LocalDate to,
-      @AuthenticationPrincipal User currentUser) {
+      @RequestParam LocalDate from, @RequestParam LocalDate to) {
     // build request object
     ProductivityReportRequest request = new ProductivityReportRequest();
     request.setFrom(from);
     request.setTo(to);
 
-    ProductivityReportResponse report =
-        reportsService.generateProductivityReport(request, currentUser);
+    ProductivityReportResponse report = reportsService.generateProductivityReport(request);
     return ResponseEntity.ok(report);
   }
 }

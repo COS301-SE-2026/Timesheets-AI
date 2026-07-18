@@ -6,7 +6,8 @@
 
     <app-header *ngIf="showHeader"></app-header>
 
-    <main class="page-content">
+  
+    <main class="page-content" [class.page-content--fullscreen]="isFullscreenPage">
       <router-outlet></router-outlet>
     </main>
 

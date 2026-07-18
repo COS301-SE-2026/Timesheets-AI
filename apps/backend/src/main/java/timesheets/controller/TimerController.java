@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,32 +20,24 @@ import timesheets.dto.response.ErrorResponse;
 import timesheets.dto.response.StopTimerResponse;
 import timesheets.repository.ProjectRepository;
 import timesheets.repository.TaskRepository;
+import timesheets.security.SecurityUtils;
 import timesheets.service.TimerService;
 
 // the rest controller should handle the HTTP requests
 @RestController
 @RequestMapping("/api/timers") // my base URL it should be /api/timers
+@RequiredArgsConstructor
 public class TimerController {
 
   private final TimerService timerService;
   private final ProjectRepository projectRepository;
   private final TaskRepository taskRepository;
-
-  public TimerController(
-      TimerService timerService,
-      ProjectRepository projectRepository,
-      TaskRepository taskRepository) {
-    this.timerService = timerService;
-    this.projectRepository = projectRepository;
-    this.taskRepository = taskRepository;
-  } // the constructor
+  private final SecurityUtils securityUtils;
 
   @PostMapping("/start") // the endpoint will look like POST /api/timers/start
-  public ResponseEntity<?> startTimer(
-      @Valid @RequestBody StartTimerRequest request,
-      @RequestHeader("X-Workspace-Member-Id") UUID workspaceMemberId) {
+  public ResponseEntity<?> startTimer(@Valid @RequestBody StartTimerRequest request) {
     try {
-      TimerSession timer = timerService.startTimer(workspaceMemberId, request);
+      TimerSession timer = timerService.startTimer(request);
 
       ActiveTimerResponse response =
           convertToResponse(
@@ -52,19 +45,19 @@ public class TimerController {
       return ResponseEntity.ok(response);
 
     } catch (ConflictException e) {
-      return ResponseEntity.status(HttpStatus.CONFLICT)
-          .body(new ErrorResponse(e.getUserMessage(), e.getActiveTimerId()));
+      ErrorResponse errorResponse =
+          ErrorResponse.conflict(e.getUserMessage(), e.getActiveTimerId());
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
       // if a user tries to start another time while one exists already
     }
   }
 
   @PostMapping("/stop") // the endpoint will look like POST /api/timers/stop
-  public ResponseEntity<StopTimerResponse> stopTimer(
-      @RequestHeader("X-Workspace-Member-Id") UUID workspaceMemberId) {
+  public ResponseEntity<StopTimerResponse> stopTimer() {
 
-    TimerSession activeTimer = timerService.getActiveTimer(workspaceMemberId);
+    TimerSession activeTimer = timerService.getActiveTimer();
 
-    TimeEntry timeEntry = timerService.stopTimer(workspaceMemberId); // draft entry will be created
+    TimeEntry timeEntry = timerService.stopTimer(); // draft entry will be created
 
     StopTimerResponse response = convertToStopResponse(timeEntry, activeTimer.getId());
 
@@ -73,10 +66,9 @@ public class TimerController {
 
   // should get the currently running timer
   @GetMapping("/active") // endpoint will look like GET /api/timers/active
-  public ResponseEntity<ActiveTimerResponse> getActiveTimer(
-      @RequestHeader("X-Workspace-Member-Id") UUID workspaceMemberId) {
+  public ResponseEntity<ActiveTimerResponse> getActiveTimer() {
 
-    TimerSession timer = timerService.getActiveTimer(workspaceMemberId);
+    TimerSession timer = timerService.getActiveTimer();
 
     if (timer != null) {
       return ResponseEntity.ok(convertToResponse(timer)); // the timer is running
@@ -86,17 +78,16 @@ public class TimerController {
   }
 
   @DeleteMapping("/discard") // the endpoint will look like DELETE /api/timers/discard
-  public ResponseEntity<Void> discardTimer(
-      @RequestHeader("X-Workspace-Member-Id") UUID workspaceMemberId) {
+  public ResponseEntity<Void> discardTimer() {
 
     TimerSession activeTimer =
-        timerService.getActiveTimer(workspaceMemberId); // should see if there is an active timer
+        timerService.getActiveTimer(); // should see if there is an active timer
 
     if (activeTimer == null) {
       return ResponseEntity.notFound().build(); // meaning no timer found
     }
 
-    timerService.discardTimer(workspaceMemberId); // should just discard the timer
+    timerService.discardTimer(); // should just discard the timer
 
     return ResponseEntity.noContent().build(); // no success cause nothing created
   }
@@ -171,7 +162,7 @@ public class TimerController {
 
     response.setTimerId(timerId);
     response.setStoppedAt(timeEntry.getEndTime());
-    response.setDurationMinutes(timeEntry.getDurationMinutes());
+    response.setDurationMinutes(timeEntry.getDurationSeconds());
 
     // this creates the nested time entry
     CreatedTimeEntryResponse createdEntry = new CreatedTimeEntryResponse();
@@ -189,9 +180,8 @@ public class TimerController {
     createdEntry.setEndTime(
         timeEntry.getEndTime() != null ? timeEntry.getEndTime().toLocalTime() : LocalTime.now());
 
-    createdEntry.setDurationMinutes(timeEntry.getDurationMinutes());
-    createdEntry.setStatus(
-        timeEntry.getStatus() != null ? timeEntry.getStatus().toString() : "DRAFT");
+    createdEntry.setDurationMinutes(timeEntry.getDurationSeconds());
+    createdEntry.setStatus("DRAFT");
 
     String projectName = "Unknown Project";
 
