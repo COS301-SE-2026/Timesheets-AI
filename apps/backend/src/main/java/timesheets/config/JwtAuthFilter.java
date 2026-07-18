@@ -31,7 +31,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   private final UserDetailsService userDetailsService;
   private final TokenBlacklistService tokenBlacklistService;
 
-  // intercept each request and check for valid JWT token
+  // intercept each HTTP request and check for valid JWT token
   @Override
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -47,7 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     String token = authHeader.substring(7); // 7 is length of "Bearer "
 
     if (tokenBlacklistService.isBlacklisted(
-        token)) { // 'blacklist' check to prevent use of tokens that have been invalidated (e.g. on
+        token)) { // 'blacklist' check to prevent use of tokens that have been invalidated (e.g.on
       // logout)
       filterChain.doFilter(request, response);
       return;

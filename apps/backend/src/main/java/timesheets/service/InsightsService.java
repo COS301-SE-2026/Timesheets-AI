@@ -5,14 +5,15 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import timesheets.domain.TimeEntry;
-import timesheets.domain.User;
 import timesheets.dto.request.ProductivityReportRequest;
-import timesheets.dto.response.InsightsSummaryResponse;
+import timesheets.dto.response.PersonalInsightsResponse;
 import timesheets.repository.TimeEntryRepository;
+import timesheets.security.SecurityUtils;
 
 // service for generating insights and analytics based on time entries,
 // currently implements a summary report with various metrics and breakdowns
@@ -23,21 +24,24 @@ import timesheets.repository.TimeEntryRepository;
 public class InsightsService {
 
   private final TimeEntryRepository timeEntryRepository;
+  private final SecurityUtils securityUtils;
 
-  public InsightsSummaryResponse getInsightsSummary(
-      ProductivityReportRequest request, User currentUser) {
+  public PersonalInsightsResponse getInsightsSummary(ProductivityReportRequest request) {
+
+    // get user ID from the security context
+    UUID userId = securityUtils.getCurrentUserId();
 
     // fetch all time entries for the developer in the date range
     List<TimeEntry> entries =
         timeEntryRepository.findByUserIdAndDateRange(
-            currentUser.getId(),
+            userId,
             request.getFrom().atStartOfDay(),
             request.getTo().atTime(23, 59, 59) // include entire end day
             );
 
     // total hours logged
     double totalHours =
-        entries.stream().mapToDouble(entry -> entry.getDurationMinutes() / 60.0).sum();
+        entries.stream().mapToDouble(entry -> entry.getDurationSeconds() / 3600.0).sum();
 
     // count unique days with entries
     long uniqueDays =
@@ -51,20 +55,20 @@ public class InsightsService {
     // Map<LocalDate, Double> hoursPerDay = entries.stream()
     // .collect(Collectors.groupingBy(
     //         entry -> entry.getStartTime().toLocalDate(),
-    //         Collectors.summingDouble(entry -> entry.getDurationMinutes() / 60.0)
+    //         Collectors.summingDouble(entry -> entry.getDurationSeconds() / 60.0)
     // ));
 
     // hours per project
-    List<InsightsSummaryResponse.ProjectHours> hoursPerProject =
+    List<PersonalInsightsResponse.ProjectHours> hoursPerProject =
         entries.stream().collect(Collectors.groupingBy(TimeEntry::getProjectId)).entrySet().stream()
             .map(
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationMinutes() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
                           .sum();
 
-                  return InsightsSummaryResponse.ProjectHours.builder()
+                  return PersonalInsightsResponse.ProjectHours.builder()
                       .projectId(entry.getKey())
                       .projectName("Project " + entry.getKey()) // TODO: join with projects table
                       .hours(hours)
@@ -75,7 +79,7 @@ public class InsightsService {
             .collect(Collectors.toList());
 
     // hours per task
-    List<InsightsSummaryResponse.TaskHours> hoursPerTask =
+    List<PersonalInsightsResponse.TaskHours> hoursPerTask =
         entries.stream()
             .filter(entry -> entry.getTaskId() != null)
             .collect(Collectors.groupingBy(TimeEntry::getTaskId))
@@ -85,10 +89,10 @@ public class InsightsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationMinutes() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
                           .sum();
 
-                  return InsightsSummaryResponse.TaskHours.builder()
+                  return PersonalInsightsResponse.TaskHours.builder()
                       .taskId(entry.getKey())
                       .taskTitle("Task " + entry.getKey()) // TODO: join with tasks table
                       .hours(hours)
@@ -104,16 +108,16 @@ public class InsightsService {
         entries.stream()
             .collect(Collectors.groupingBy(entry -> entry.getStartTime().toLocalDate()));
 
-    List<InsightsSummaryResponse.DailyTrend> dailyTrend =
+    List<PersonalInsightsResponse.DailyTrend> dailyTrend =
         dailyGroups.entrySet().stream()
             .map(
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationMinutes() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
                           .sum();
 
-                  return InsightsSummaryResponse.DailyTrend.builder()
+                  return PersonalInsightsResponse.DailyTrend.builder()
                       .date(entry.getKey().format(DateTimeFormatter.ISO_DATE))
                       .hours(hours)
                       .entryCount(entry.getValue().size())
@@ -122,7 +126,7 @@ public class InsightsService {
             .sorted((a, b) -> a.getDate().compareTo(b.getDate()))
             .collect(Collectors.toList());
     // build and return response
-    return InsightsSummaryResponse.builder()
+    return PersonalInsightsResponse.builder()
         .totalHoursLogged(totalHours)
         .averageHoursPerDay(avgHoursPerDay)
         .totalDaysLogged((int) uniqueDays)

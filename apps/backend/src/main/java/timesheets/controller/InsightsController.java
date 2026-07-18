@@ -3,11 +3,9 @@ package timesheets.controller;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import timesheets.domain.User;
 import timesheets.dto.request.ProductivityReportRequest;
-import timesheets.dto.response.InsightsSummaryResponse;
+import timesheets.dto.response.PersonalInsightsResponse;
 import timesheets.service.InsightsService;
 
 // controller for handling insights-related endpoints,
@@ -25,19 +23,15 @@ public class InsightsController {
   @GetMapping(
       "/summary") // endpoint for generating insights summary, accepts from and to dates as query
   // parameters
-  public ResponseEntity<InsightsSummaryResponse> getInsightsSummary(
-      @RequestParam LocalDate from,
-      @RequestParam LocalDate to,
-      @AuthenticationPrincipal User currentUser) {
+  public ResponseEntity<PersonalInsightsResponse> getInsightsSummary(
+      @RequestParam LocalDate from, @RequestParam LocalDate to) {
 
     ProductivityReportRequest request = new ProductivityReportRequest();
     request.setFrom(from);
     request.setTo(to);
 
-    InsightsSummaryResponse response =
-        insightsService.getInsightsSummary(
-            request,
-            currentUser); // call service to generate insights summary based on time entries for the
+    // call service to generate insights summary based on time entries for the
+    PersonalInsightsResponse response = insightsService.getInsightsSummary(request);
     // authenticated user in the specified date range
     return ResponseEntity.ok(response);
   }
