@@ -1,1 +1,126 @@
+<!--
+Author: Cleopatra Kwenda
+Date: 2026-07-17
+Purpose: will display our desired wireframe of 
+all the project that specific user is on.
+Related Requirements: N/A
+-->
+
+<!--
+HEADER
+-->
+<app-header [title="'Projects'"]>
+    <input
+        class="project-search-input"
+        type="text"
+        placeholder="Search projects..."
+        [value]="searchTerm"
+        [input]="searchProjects($any($event.target).value)"
+    >
+</app-header>
+
+<div class="project-page-container">
+    <!--
+    PAGE HEADING
+    -->
+    <section class="projects-heading">
+        <h1 class="page-title">
+            Projects
+        </h1>
+
+        <p class="page-description">
+            Manage and monitor all projects assigned to you.
+        </p>
+    </section>
+
+    <!--
+    STATS CARDS
+    -->
+    <section class="projects-stats grid">
+        <app-stats-card
+            label="Projects"
+            [value]="totalProjects.toString()"
+            description="Total assigned projects"
+            [progress]="100">
+        </app-stats-card>
+
+        <app-stats-card
+            label="Active"
+            [value]="activeProjects.toString()"
+            description="Currently active"
+            [progress]="75">
+        </app-stats-card>
+
+        <app-stats-card
+            label="Completed"
+            [value]="completedProjects.toString()"
+            description="Completed projects"
+            [progress]="100">
+        </app-stats-card>
+
+        <app-stats-card
+            label="On Hold"
+            [value]="onHoldProjects.toString()"
+            description="Awating action"
+            [progress]="25">
+        </app-stats-card>
+    </section>
+
+    <!--
+    FILTER BUTTONS SECTION
+    -->
+    <section class="project-filter-row">
+        @for (filter of filters; track filter){
+            <button 
+                class="project-filter-buton"
+                [class.selected-filter]="selectedFilter===filter"
+                (click)="filterProjects(filter)">
+                {{filter}}
+            </button>
+        }
+    </section>
+
+    <!--
+    PROJECTS :)
+    -->
+    <section class="projects-grid">
+        @for (project of filteredProjects; track project.id){
+            <article class="project-card">
+                <div class="project-card-header">
+                    <div>
+                        <h2 class="project-name">
+                            {{project.name}}
+                        </h2>
+
+                        <p class="project-client">
+                            {{project.client}}
+                        </p>
+                    </div>
+
+                    <span class="project-status-badge">
+                        {{project.status}}
+                    </span>
+                </div>
+
+                <!--
+                DESCRIPTIONS
+                -->
+                <p class="project-description">
+                    {{project.description}}
+                </p>
+
+                <!--
+                TAGS
+                -->
+                <div class="project-tags">
+                    @for (tag of project.tags; track tag){
+                        <span class="project-tag">
+                            {{tag}}
+                        </span>
+                    }
+                </div>
+            </article>
+        }
+    </section>
+</div>
 <p>projects works!</p>
