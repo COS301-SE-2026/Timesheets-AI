@@ -79,5 +79,5 @@ jobs:
 
             # ensure that the Angular builds successfully 
             - name: Build Angular
-              working-directory: apps/frontend/client
+              working-directory: apps/frontend/
               run: docker build -t momently-frontend:${{ github.sha }} .
