@@ -1,4 +1,19 @@
 /*
+PROJECTS PAGE STYLING
+-----------------------------
+Author: Cleopatra Kwenda
+Date: 2026-07-19
+Purpose: styling the projects page dashboard.
+Related Requirement: N/A
+*/
+
+:host{
+    display: block;
+    background: #f7f8fc;
+    min-height: 100vh;
+}
+
+/*
 FOR ACCESSIBILITY
 */
 
@@ -12,4 +27,220 @@ FOR ACCESSIBILITY
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+}
+
+/*
+MAIN LAYOUT OF THE PAGE
+*/
+.projects-page-container{
+    padding: 2rem 2.5rem;
+}
+
+/*
+HEADING OF PAGE
+*/
+.projects-heading{
+    margin-bottom: 2rem;
+}
+
+.page-title{
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.page-description{
+    margin-top: 0.4rem;
+    color: #6b7280;
+}
+
+/*
+SEARCH
+*/
+.project-search-input{
+    width: 320px;
+    padding: 0.8rem 1rem;
+    border: 1px solid #d9dde7;
+    border-radius: 10px;
+    outline: none;
+    font-size: 0.95rem;
+    transition: 0.2s;
+}
+
+.project-search-input:focus{
+    border-color: #5f62ff;
+}
+
+/*
+STATS
+*/
+.projects-statistic-grid{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/*
+FILTERS
+*/
+.project-filter-row{
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.project-filter-button{
+    border: none;
+    background: white;
+    border-radius: 25px;
+    padding: 0.7rem 1.3rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.project-filter-button:hover{
+    transform: translateY(-2px);
+}
+
+.selected-filter{
+    background: #5f62ff;
+    color: white;
+}
+
+/*
+PROJECT CARDS
+*/
+.projects-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 1.5rem;
+}
+
+.project-card{
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+    transition: 0.25s;
+}
+
+.project-card:hover{
+    transform: translateY(-5px);
+}
+
+.project-card-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.project-name{
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.project-client{
+    margin-top: 0.3rem;
+    color: #7b7b7b;
+}
+
+/*
+STATUS BADGES
+*/
+.project-status-badge{
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 0.45rem 0.9rem;
+    border-radius: 25px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/*
+DESCRIPTION
+*/
+.project-description{
+    margin: 1rem 0;
+    line-height: 1.6;
+    color: #555;
+}
+
+/*
+TAGS
+*/
+.project-tags{
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.2rem;
+}
+
+.project-tag{
+    background: #f1f5f9;
+    padding: 0.35rem 0.75rem;
+    border-radius: 30px;
+    font-size: 0.75rem;
+}
+
+/*
+FOOTER
+*/
+.project-card-footer{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    font-weight: 600;
+}
+
+/*
+TEAM MEMBERS
+*/
+.project-team{
+    margin-top: 1.4rem;
+}
+
+.team-members{
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+}
+
+.team-member{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #5f62ff;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+}
+
+/*
+RESPONSE
+*/
+@media (max-width: 992px){
+    .projects-statistic-grid{
+        grid-template-columns: repeat(2,1fr);
+    }
+}
+
+@media (max-width: 768px){
+    .projects-statistic-grid{
+        grid-template-columns: 1fr;
+    }
+
+    .projects-grid{
+        grid-template-columns: 1fr;
+    }
+
+    .project-search-input{
+        width: 100%;
+    }
 }
