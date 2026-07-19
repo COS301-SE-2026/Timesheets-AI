@@ -9,7 +9,6 @@ import timesheets.domain.Task;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, UUID> {
 
-  // all the tasks belonging to a specific project (found by ID), will be gotten and stored in the
-  // list
+  /*all the tasks belonging to a specific project (found by ID), will be gotten and stored in the list*/
   List<Task> findByProjectId(UUID projectId);
 }

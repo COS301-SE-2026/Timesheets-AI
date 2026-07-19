@@ -27,15 +27,27 @@ jobs:
         # The SHA is version 3 (v3.0.3)
         - name: Check for Backend Changes
           id: filter
-          uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590 
+          uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c 
+          continue-on-error: true
           with:
             filters: |
                 backend:
                  - 'apps/backend/**'
                  - '.github/workflows/backend-ci.yml'
+
+        - name: Retry 
+          if: steps.filter.outcome == 'failure' 
+          id: retry
+          uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
+          with:
+            filters: |
+                backend:
+                    - 'apps/backend/**'
+                    - '.github/workflows/backend-ci.yml'
+
         # Only runs if backend changes 
         - name: Set up JDK 17
-          if: steps.filter.outputs.backend == 'true'
+          if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
           uses: actions/setup-java@v4
           with:
             # these lines tell Github Actions which installer and distribution to install
@@ -45,5 +57,5 @@ jobs:
             cache: 'maven'
             cache-dependency-path: apps/backend/pom.xml
         - name: Build with Maven 
-          if: steps.filter.outputs.backend == 'true'
+          if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
           run: mvn -f apps/backend/pom.xml clean verify 
