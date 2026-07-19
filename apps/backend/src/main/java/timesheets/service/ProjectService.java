@@ -1,25 +1,23 @@
 package timesheets.service;
 
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.Project;
 import timesheets.domain.ProjectMember;
 import timesheets.dto.response.ProjectResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
-import timesheets.repository.WorkspaceMemberRepository;
 import timesheets.security.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
 
-  private final WorkspaceMemberRepository workspaceMemberRepository;
   private final ProjectRepository projectRepository;
   private final ProjectMemberRepository projectMemberRepository;
   private final SecurityUtils securityUtils;
@@ -64,7 +62,11 @@ public class ProjectService {
   private WorkspaceRole getProjectRole(UUID projectId, UUID workspaceMemberId) {
     return projectMemberRepository
         .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
-        .map(pm -> pm.getIsProjectManager() ? WorkspaceRole.MANAGER : WorkspaceRole.DEVELOPER)
+        .map(
+            projectMembership ->
+                projectMembership.getIsProjectManager()
+                    ? WorkspaceRole.MANAGER
+                    : WorkspaceRole.DEVELOPER)
         .orElse(null);
   }
 
@@ -73,19 +75,25 @@ public class ProjectService {
       Project project, UUID workspaceMemberId, boolean showCostInfo) {
     WorkspaceRole role = getProjectRole(project.getId(), workspaceMemberId);
 
-    return ProjectResponse.builder()
-        .id(project.getId())
-        .name(project.getName())
-        .description(project.getDescription())
-        .status(project.getStatus())
-        .budgetHours(project.getBudgetHours())
-        .hourlyRate(project.getHourlyRate())
-        .budgetCost(showCostInfo ? project.getBudgetCost() : null)
-        .startDate(project.getStartDate())
-        .endDate(project.getEndDate())
-        .myRole(role)
-        .createdAt(project.getCreatedAt())
-        .updatedAt(project.getUpdatedAt())
-        .build();
+    ProjectResponse.ProjectResponseBuilder builder =
+        ProjectResponse.builder()
+            .id(project.getId())
+            .name(project.getName())
+            .description(project.getDescription())
+            .status(project.getStatus())
+            .startDate(project.getStartDate())
+            .endDate(project.getEndDate())
+            .myRole(role)
+            .createdAt(project.getCreatedAt())
+            .updatedAt(project.getUpdatedAt());
+
+    if (showCostInfo) {
+      builder
+          .budgetHours(project.getBudgetHours())
+          .hourlyRate(project.getHourlyRate())
+          .budgetCost(project.getBudgetCost());
+    }
+
+    return builder.build();
   }
 }

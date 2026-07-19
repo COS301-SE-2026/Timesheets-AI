@@ -46,6 +46,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
       if (defaultWorkspaceMemberId == null) {
         defaultWorkspaceMemberId = membership.getId();
+        workspaceId = membership.getWorkspaceId();
       }
     }
 
