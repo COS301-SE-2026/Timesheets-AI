@@ -6,20 +6,6 @@ This file defines all typography styles used across the application.
 It includes font imports, variables, base styles, and utility classes.
 ============================================================================= */
 
-/* -----------------------------------------------------------------------------
-1. Font Imports (Google Fonts)
------------------------------------------------------------------------------
-These fonts are loaded from Google Fonts and used globally.
------------------------------------------------------------------------------ */
-// I commented this out because it exceed Angular Budgets 
-// @import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap');
-
-/* -----------------------------------------------------------------------------
-   2. CSS Custom Properties (Global Typography System)
-   -----------------------------------------------------------------------------
-   These are used throughout the application via var(--...)
------------------------------------------------------------------------------ */
-
 :root {
 
     /* Font families */
