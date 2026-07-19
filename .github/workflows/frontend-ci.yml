@@ -53,13 +53,11 @@ jobs:
                 node-version: '22' # current node.js version - recommeded 
                 # uses yarn NOT npm to store downloaded dependencies, dependency-path: means rebuild cache only if yarn.lock changes
                 cache: 'yarn'
-                cache-dependency-path: apps/frontend/client/yarn.lock 
+                cache-dependency-path: yarn.lock 
 
             - name: Install Dependencies 
               if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
-              run: |
-                cd apps/frontend/client
-                yarn install --frozen-lockfile 
+              run: yarn install --frozen-lockfile 
 
 #===================== PLAN stage ================================
 
