@@ -5,7 +5,8 @@
  * Related requirement: -
  */
 
-import { Component, computed, OnDestroy, signal } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 // Type definitions and interface
@@ -14,7 +15,7 @@ type ViewOption = 'Day' | 'Week' | 'Month';
 type StatusOption = 'All' | TimeEntryStatus;
 type PanelType = 'manual' | 'timer' | null;
 type TimeEntryStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
-type EntryType = 'DEVELOPMENT' | 'MEETING' | 'DOCUMENTATION' | 'DESIGN' | 'BREAK';
+type EntryType = 'manual' | 'timer' | 'import' | 'api' ;
 
 interface Project {
   id: string;
@@ -31,7 +32,7 @@ interface TimeEntry {
   id: string;
   workspaceMemberId?: string;
   projectId: string;
-  taskId: string;
+  taskId: string | null;
   entryType: EntryType;
   startTime: string; // ISO String (YYYY-MM-DDTHH:mm:ss)
   endTime: string;   // ISO String (YYYY-MM-DDTHH:mm:ss)
@@ -59,10 +60,17 @@ interface TimeEntryRequest {
 }
 
 interface ActiveTimer {
+  id?: string;
   projectId: string;
-  taskId: string;
-  description: string;
+  taskId: string | null;
+  notes: string;
   startedAt: Date;
+}
+
+interface StartTmerRequest {
+  projectId: string;
+  taskId: string | null;
+  notes: string;
 }
 
 @Component({
@@ -72,6 +80,11 @@ interface ActiveTimer {
   styleUrl: './logtime.component.scss'
 })
 export class LogtimeComponent implements OnDestroy {
+  private readonly http = inject(HttpClient, { optional: true});
+  private readonly backendEnabled = false;
+  private readonly apiBaseUrl = '/api';
+  private readonly workspaceMemberId = localStorage.getItem('workspaceMemberId') ?? '00000000-0000-0000-0003-000000000002';
+
   // Static configuration options for template elements
   readonly viewOptions: ViewOption[] = ['Day', 'Week', 'Month'];
   readonly statusOptions: StatusOption[] = ['All', 'DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED'];
@@ -116,7 +129,7 @@ export class LogtimeComponent implements OnDestroy {
       workspaceMemberId: '00000000-0000-0000-0003-000000000002',
       projectId: '00000000-0000-0000-0001-000000000001',
       taskId: '00000000-0000-0000-0002-000000000001',
-      entryType: 'DEVELOPMENT',
+      entryType: 'manual',
       startTime: `${this.today()}T09:00:00`,
       endTime: `${this.today()}T11:30:00`,
       durationMinutes: 150,
@@ -131,7 +144,7 @@ export class LogtimeComponent implements OnDestroy {
       workspaceMemberId: '00000000-0000-0000-0003-000000000002',
       projectId: '00000000-0000-0000-0001-000000000002',
       taskId: '00000000-0000-0000-0002-000000000003',
-      entryType: 'MEETING',
+      entryType: 'manual',
       startTime: `${this.today()}T12:00:00`,
       endTime: `${this.today()}T13:00:00`,
       durationMinutes: 60,
@@ -146,7 +159,7 @@ export class LogtimeComponent implements OnDestroy {
       workspaceMemberId: '00000000-0000-0000-0003-000000000002',
       projectId: '00000000-0000-0000-0001-000000000003',
       taskId: '00000000-0000-0000-0002-000000000004',
-      entryType: 'DOCUMENTATION',
+      entryType: 'manual',
       startTime: `${this.today()}T14:00:00`,
       endTime: `${this.today()}T15:15:00`,
       durationMinutes: 75,
@@ -162,7 +175,7 @@ export class LogtimeComponent implements OnDestroy {
       workspaceMemberId: '00000000-0000-0000-0003-000000000002',
       projectId: '00000000-0000-0000-0001-000000000001',
       taskId: '00000000-0000-0000-0002-000000000002',
-      entryType: 'DESIGN',
+      entryType: 'manual',
       startTime: `${this.today()}T15:30:00`,
       endTime: `${this.today()}T17:00:00`,
       durationMinutes: 90,
@@ -177,7 +190,7 @@ export class LogtimeComponent implements OnDestroy {
       workspaceMemberId: '00000000-0000-0000-0003-000000000002',
       projectId: '00000000-0000-0000-0001-000000000002',
       taskId: '00000000-0000-0000-0002-000000000003',
-      entryType: 'DEVELOPMENT',
+      entryType: 'manual',
       startTime: `${this.today()}T17:15:00`,
       endTime: `${this.today()}T18:45:00`,
       durationMinutes: 90,
@@ -192,7 +205,7 @@ export class LogtimeComponent implements OnDestroy {
       workspaceMemberId: '00000000-0000-0000-0003-000000000002',
       projectId: '00000000-0000-0000-0001-000000000001',
       taskId: '00000000-0000-0000-0002-000000000001',
-      entryType: 'BREAK',
+      entryType: 'manual',
       startTime: `${this.today()}T19:00:00`,
       endTime: `${this.today()}T19:30:00`,
       durationMinutes: 30,
@@ -217,7 +230,7 @@ export class LogtimeComponent implements OnDestroy {
     id: new FormControl('', { nonNullable: true }),
     projectId: new FormControl('00000000-0000-0000-0001-000000000001', { nonNullable: true }),
     taskId: new FormControl('', { nonNullable: true }),
-    entryType: new FormControl<EntryType>('DEVELOPMENT', { nonNullable: true }),
+    entryType: new FormControl<EntryType>('manual', { nonNullable: true }),
     startTime: new FormControl('09:00', { nonNullable: true }),
     endTime: new FormControl('10:00', { nonNullable: true }),
     durationMinutes: new FormControl(60, { nonNullable: true }),
@@ -383,18 +396,30 @@ closePanel(): void {
       return;
     }
 
-    if (this.isEditMode()) {
-      // Functional state updating: replaces array entity if unique matching structural target matches
-      this.entries.update((entries) => entries.map((existingEntry) => existingEntry.id === entry.id ? entry : existingEntry));
+   const onSaved = (savedEntry: TimeEntry) => {
+    if(this.isEditMode()) {
+      this.entries.update((entries) => entries.map((existingEntry) => existingEntry.id === savedEntry.id ? savedEntry : existingEntry));
       this.toastMessage.set('Time entry updated.');
     } else {
-      // Standard prepend operation for completely fresh objects
-      this.entries.update((entries) => [entry, ...entries]);
+      this.entries.update((entries) => [savedEntry, ...entries]);
       this.toastMessage.set('Time entry saved.');
     }
-
     this.conflictMessage.set('');
     this.closePanel();
+   };
+
+   if(!this.backendEnabled || !this.http) {
+    onSaved(entry);
+    return;
+   }
+
+   const request = this.buildTimeEntryRequestFromForm();
+   const response = this.isEditMode() ? this.http.put<TimeEntry>(`${this.apiBaseUrl}/time-entries/${entry.id}`, request, this.requestOptions()) : this.http.post<TimeEntry>(`${this.apiBaseUrl}/time-entries`, request, this.requestOptions());
+
+   response.subscribe({
+    next: (savedEntry) => onSaved(savedEntry),
+    error: (error) => this.conflictMessage.set(error.error?.message ?? 'Unable to save the time entry.')
+   });
   }
 
    // Instantiates the async timer interval loops, updating counters progressively.
@@ -405,14 +430,15 @@ closePanel(): void {
       return;
     }
 
-    const timer = {
+    const timer: ActiveTimer = {
       projectId: this.timerForm.controls.projectId.value,
-      taskId: this.resolveTaskId('timer'),
-      description: this.timerForm.controls.description.value,
+      taskId: this.resolveTaskId('timer') || null,
+      notes: this.timerForm.controls.description.value,
       startedAt: new Date()
     };
 
-    this.activeTimer.set(timer);
+    const activateTimer = (activeTimer: ActiveTimer) => {
+    this.activeTimer.set(activeTimer);
     this.elapsedSeconds.set(0);
     this.isTimerPaused.set(false);
     this.pausedElapsedSeconds.set(0);
@@ -420,9 +446,21 @@ closePanel(): void {
 
     // Increment tracking properties sequentially per second pass
     this.timerIntervalId = setInterval(() => {
-      this.elapsedSeconds.set(Math.floor((Date.now() - timer.startedAt.getTime()) / 1000));
+      this.elapsedSeconds.set(Math.floor((Date.now() - activeTimer.startedAt.getTime()) / 1000));
     }, 1000);
+  };
+
+  if(!this.backendEnabled || !this.http) {
+    activateTimer(timer);
+    return;
   }
+  const request: StartTmerRequest = {projectId: timer.projectId, taskId: timer.taskId, notes: timer.notes};
+  this.http.post<{id: string; startedAt: string}>(`${this.apiBaseUrl}/timers/start`, request, this.requestOptions()).subscribe({
+    next: (response) => activateTimer({...timer, id: response.id, startedAt: new Date(response.startedAt)}),
+    error: (error) => this.conflictMessage.set(error.error?.message ?? 'Unable to start the timer.')
+  });
+}
+
 
   pauseTimer(): void {
     this.clearTimerInterval();
@@ -457,19 +495,8 @@ closePanel(): void {
       return;
     }
 
-    const end = new Date();
-    const durationMinutes = Math.max(1, Math.round(this.elapsedSeconds() / 60)); // Standardizes round up minimum limits
-    const request = this.buildTimerRequest(timer, end, durationMinutes);
 
-    this.entries.update((entries) => [{
-      id: this.createId(),
-      ...request,
-      taskId: request.taskId ?? '',
-      status: 'DRAFT',
-      isLocked: false,
-      createdAt: new Date().toISOString().slice(0, 19),
-      updatedAt: new Date().toISOString().slice(0, 19)
-    }, ...entries]);
+    const stopAndReset = () => {
 
     this.activeTimer.set(null);
     this.elapsedSeconds.set(0);
@@ -478,6 +505,22 @@ closePanel(): void {
     this.clearTimerInterval();
     this.toastMessage.set('Timer entry saved.');
     this.closePanel();
+    };
+
+    if(!this.backendEnabled || !this.http) {
+      const end = new Date();
+      const durationMinutes = Math.max(1, Math.round(this.elapsedSeconds() / 60));
+      const request = this.buildTimerRequest(timer, end, durationMinutes);
+      this.entries.update((entries) => [{
+        id: this.createId(), ...request, status: 'DRAFT', isLocked: false, createdAt: new Date().toISOString().slice(0, 19), updatedAt: new Date().toISOString().slice(0, 19)}, ...entries ])
+        stopAndReset();
+        return;
+    }
+
+    this.http.post(`${this.apiBaseUrl}/timers/stop`, null, this.requestOptions()).subscribe({
+      next: () => { this.loadEntries(); stopAndReset();},
+      error: (error) => this.conflictMessage.set(error.error?.message ?? 'Unable to stop the timer.')
+    });
   }
 
   timerStartedLabel(): string {
@@ -522,7 +565,7 @@ formatDuration(minutes = 0): string {
     return this.projects().find((project) => project.id === projectId)?.name ?? 'Unknown project';
   }
 
-  getTaskTitle(taskId: string): string {
+  getTaskTitle(taskId: string | null): string {
     return this.tasks().find((task) => task.id === taskId)?.title ?? 'No task selected';
   }
 
@@ -533,7 +576,7 @@ formatDuration(minutes = 0): string {
     this.entryForm.setValue({
       id: entry.id,
       projectId: entry.projectId,
-      taskId: entry.taskId,
+      taskId: entry.taskId ?? '',
       entryType: entry.entryType,
       startTime: this.timeFromDateTime(entry.startTime),
       endTime: this.timeFromDateTime(entry.endTime),
@@ -546,18 +589,47 @@ formatDuration(minutes = 0): string {
 
   toggleEntryMenu(entryId: string): void {
     this.openMenuEntryId.set(this.openMenuEntryId() === entryId ? null : entryId);
+  } 
+
+
+  submitTimeEntry(entry: TimeEntry): void {
+    const submitted = () => {
+      this.updateEntryStatus(entry.id, 'SUBMITTED');
+      this.openMenuEntryId.set(null);
+      this.toastMessage.set('Time entry submitted.');
+    };
+
+    if(!this.backendEnabled || !this.http) {
+      submitted();
+      return;
+    }
+
+    this.http.post<TimeEntry>(`${this.apiBaseUrl}/time-entries/${entry.id}/submit`, null, this.requestOptions()).subscribe({
+      next: (savedEntry) => {
+        this.entries.update((entries) => entries.map((existingEntry) => existingEntry.id === entry.id ? savedEntry : existingEntry));
+        this.openMenuEntryId.set(null);
+        this.toastMessage.set('Time entry submitted.');
+      },
+      error: (error) => this.conflictMessage.set(error.error?.message ?? 'Unable to submit the time entry.')
+    });
   }
 
-  submitEntry(entry: TimeEntry): void {
-    this.updateEntryStatus(entry.id, 'SUBMITTED');
-    this.openMenuEntryId.set(null);
-    this.toastMessage.set('Time entry submitted.');
-  }
+  deleteEntry(entry: TimeEntry) : void {
+    const deleted = () => {
+      this.entries.update((entries) => entries.filter((existingEntry) => existingEntry.id !== entry.id));
+      this.openMenuEntryId.set(null);
+      this.toastMessage.set('Time entry deleted.');
+    };
 
-  deleteEntry(entry: TimeEntry): void {
-    this.entries.update((entries) => entries.filter((existingEntry) => existingEntry.id !== entry.id));
-    this.openMenuEntryId.set(null);
-    this.toastMessage.set('Time entry deleted.');
+    if(!this.backendEnabled || !this.http) {
+      deleted();
+      return;
+    }
+
+    this.http.delete(`${this.apiBaseUrl}/time-entries/${entry.id}`, this.requestOptions()).subscribe({
+      next: deleted,
+      error: (error) => this.conflictMessage.set(error.error?.message ?? 'Unable to delete the time entry,')
+    });
   }
 
   resubmitEntry(entry: TimeEntry): void {
@@ -573,7 +645,7 @@ formatDuration(minutes = 0): string {
       id: '',
       projectId: this.projects()[0]?.id ?? '',
       taskId: '',
-      entryType: 'DEVELOPMENT',
+      entryType: 'manual',
       startTime: '09:00',
       endTime: '10:00',
       durationMinutes: 60,
@@ -662,8 +734,8 @@ private createTaskId(): string {
       startTime: this.toDateTimeValue(this.dateFromDate(timer.startedAt), this.toTimeValue(timer.startedAt)),
       endTime: this.toDateTimeValue(this.dateFromDate(end), this.toTimeValue(end)),
       durationMinutes,
-      entryType: 'DEVELOPMENT',
-      description: timer.description || 'Timer entry'
+      entryType: 'timer',
+      description: timer.notes || 'Timer entry'
     };
   }
 
@@ -711,6 +783,25 @@ private createTaskId(): string {
 
   private toDateTimeValue(date: string, time: string): string {
     return `${date}T${time}:00`;
+  }
+
+  private requestOptions(): { headers : HttpHeaders } {
+    let headers = new HttpHeaders().set('X-Workspace-Member-Id', this.workspaceMemberId);
+    const token = localStorage.getItem('authToken');
+    if(token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return {headers};
+  }
+
+  private loadEntries(): void {
+    if(!this.backendEnabled || !this.http) {
+      return;
+    }
+    this.http.get<TimeEntry[]>(`${this.apiBaseUrl}/time-entries/me`, this.requestOptions()).subscribe({
+      next: (entries) => this.entries.set(entries),
+      error: (error) => this.conflictMessage.set(error.error?.message ?? 'Unable to load time entries.')
+    });
   }
 
   private formatDateLabel(dateValue: string): string {
