@@ -1,3 +1,10 @@
+/**
+ * Author: Lerato Sibanda
+ * Date: 2026-05-17
+ * Purpose: Handles new user registration with form validation.
+ * Related Requirement: -
+ */
+
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink, Router} from '@angular/router';
