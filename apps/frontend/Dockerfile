@@ -51,10 +51,10 @@ RUN yarn build --configuration production
 FROM nginxinc/nginx-unprivileged:alpine AS prod
 
 # Copy angular application 
-COPY --from=build /app/client/dist/client/browser/ /usr/share/nginx/html/
+COPY --from=build /app/apps/frontend/client/dist/client/browser/ /usr/share/nginx/html/
 
 COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Nginx port 
 EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]                                                      
+CMD ["nginx", "-g", "daemo n off;"]                                                      
