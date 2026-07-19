@@ -19,6 +19,7 @@ public class CustomUserDetails extends User {
   private final String lastName;
   private final Boolean emailVerified;
   private final UUID defaultWorkspaceMemberId;
+  private final UUID workspaceId;
   private final Collection<GrantedAuthority> authorities;
 
   public CustomUserDetails(
@@ -28,6 +29,7 @@ public class CustomUserDetails extends User {
       String lastName,
       Boolean emailVerified,
       UUID defaultWorkspaceMemberId,
+      UUID workspaceId,
       String passwordHash,
       boolean enabled,
       boolean accountNonExpired,
@@ -51,6 +53,7 @@ public class CustomUserDetails extends User {
     this.lastName = lastName;
     this.emailVerified = emailVerified;
     this.defaultWorkspaceMemberId = defaultWorkspaceMemberId;
+    this.workspaceId = workspaceId;
     this.authorities = authorities;
   }
 

@@ -65,6 +65,10 @@ public class SecurityUtils {
     return getCurrentUser().getWorkspaceCount();
   }
 
+  public UUID getCurrentWorkspaceId(){
+    return getCurrentUser().getWorkspaceId();
+  }
+
   // role checks
   public boolean hasRole(String role) {
     return getCurrentUser().hasRole(role);
