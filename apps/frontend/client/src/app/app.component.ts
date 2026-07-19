@@ -1,3 +1,10 @@
+/**
+ * Author: Lerato Sibanda
+ * Date: 2026-07-13
+ * Purpose: Root application component that manages layout visibilitybased on route.
+ * Related Requirement: FR-01 - Application layout
+ */
+
 import { Component } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -24,22 +31,27 @@ export class AppComponent {
   showSidebar = true;
   showHeader = true;
   showFooter = true;
+  isFullscreenPage = false;
 
   private readonly hideLayoutRoutes = ['/login', '/signup', '/not-found'];
 
   constructor(private readonly router: Router) {
+    this.updateLayout(this.router.url);
+    
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
-        const url = this.router.url;
-
-        const isAuthPage = this.hideLayoutRoutes.some(r =>
-          url.startsWith(r)
-        );
-
-        this.showSidebar = !isAuthPage;
-        this.showHeader = !isAuthPage;
-        this.showFooter = !isAuthPage;
+        this.updateLayout(this.router.url); 
       });
+    }
+
+
+    private updateLayout(url: string) : void {
+        const isFullscreenPage = this.hideLayoutRoutes.some(r => url.startsWith(r));
+          this.showSidebar = !isFullscreenPage;
+          this.showHeader = !isFullscreenPage;
+          this.showFooter = !isFullscreenPage;
+          this.isFullscreenPage = isFullscreenPage;
+
   }
 }

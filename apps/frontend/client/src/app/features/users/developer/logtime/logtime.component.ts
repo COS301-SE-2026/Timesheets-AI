@@ -1,3 +1,10 @@
+/**
+ * Author: Lerato Sibanda
+ * Date: 2026-05-17
+ * Purpose: Handles time entry logging with manual and timer based entry methods.
+ * Related requirement: -
+ */
+
 import { Component, computed, OnDestroy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
