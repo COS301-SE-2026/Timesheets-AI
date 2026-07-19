@@ -65,7 +65,7 @@ public class SecurityUtils {
     return getCurrentUser().getWorkspaceCount();
   }
 
-  public UUID getCurrentWorkspaceId(){
+  public UUID getCurrentWorkspaceId() {
     return getCurrentUser().getWorkspaceId();
   }
 
