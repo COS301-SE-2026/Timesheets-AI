@@ -33,7 +33,11 @@ FOR ACCESSIBILITY
 MAIN LAYOUT OF THE PAGE
 */
 .projects-page-container{
-    padding: 2rem 2.5rem;
+    padding: 2rem 3rem 3rem;
+    display: flex;
+    flex-direction: column;
+    max-width: 1500px;
+    gap: 2rem;
 }
 
 /*
@@ -58,13 +62,14 @@ HEADING OF PAGE
 SEARCH
 */
 .project-search-input{
-    width: 320px;
-    padding: 0.8rem 1rem;
-    border: 1px solid #d9dde7;
-    border-radius: 10px;
-    outline: none;
-    font-size: 0.95rem;
+    width: 340px;
+    height: 48px;
+    padding: 0rem 1rem;
+    border: 1px solid #e4e7ec;
+    border-radius: 12px;
+    font-size: 15px;
     transition: 0.2s;
+    background: white;
 }
 
 .project-search-input:focus{
@@ -74,11 +79,12 @@ SEARCH
 /*
 STATS
 */
-.projects-statistic-grid{
+.projects-statistics-grid{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    gap: 24px;
+    margin-top: 10px;
+    margin-bottom: 28px;
 }
 
 /*
@@ -86,17 +92,19 @@ FILTERS
 */
 .project-filter-row{
     display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
+    gap: 2rem;
+    border-bottom: 1px solid #ececec;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
 }
 
 .project-filter-button{
     border: none;
-    background: white;
-    border-radius: 25px;
-    padding: 0.7rem 1.3rem;
+    background: none;
+    padding: 0;
+    color: #6b7280;
     cursor: pointer;
+    font-size: 15px;
     font-weight: 600;
     transition: 0.2s;
 }
@@ -106,8 +114,9 @@ FILTERS
 }
 
 .selected-filter{
-    background: #5f62ff;
-    color: white;
+    color: #2854c5;
+    border-bottom: 3px solid #2854c5;
+    padding-bottom: 12px;
 }
 
 /*
@@ -115,16 +124,17 @@ PROJECT CARDS
 */
 .projects-grid{
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
 }
 
 .project-card{
     background: white;
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
-    transition: 0.25s;
+    border-radius: 18px;
+    padding: 22px;
+    border: 1px solid #e8edf5;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+    transition: 0.2s;
 }
 
 .project-card:hover{
@@ -226,13 +236,13 @@ TEAM MEMBERS
 RESPONSE
 */
 @media (max-width: 992px){
-    .projects-statistic-grid{
+    .projects-statistics-grid{
         grid-template-columns: repeat(2,1fr);
     }
 }
 
 @media (max-width: 768px){
-    .projects-statistic-grid{
+    .projects-statistics-grid{
         grid-template-columns: 1fr;
     }
 

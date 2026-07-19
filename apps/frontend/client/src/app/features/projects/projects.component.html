@@ -9,26 +9,38 @@ Related Requirements: N/A
 <!--
 HEADER
 -->
-<app-header [title="'Projects'"]>
-    <label for="project-search" class="visually-hid">
-        Search projects
-    </label>
-    
-    <input
-        id="project-search"
-        class="project-search-input"
-        type="text"
-        placeholder="Search projects..."
-        [value]="searchTerm"
-        (input)="searchProjects($any($event.target).value)"
-    >
+<app-header [title] ="'Projects'">
+    <div class="header-search">
+        <label for="project-search" class="visually-hid">
+            Search projects
+        </label>
+        
+        <input
+            id="project-search"
+            class="project-search-input"
+            type="search"
+            placeholder="Search projects..."
+            [value]="searchTerm"
+            (input)="searchProjects($any($event.target).value)"
+        >
+        <select class="status-dropdown">
+
+            <option>All Status</option>
+            <option>Active</option>
+            <option>On Hold</option>
+            <option>Completed</option>
+            <option>Archived</option>
+
+        </select>
+
+    </div>
 </app-header>
 
-<div class="project-page-container">
+<div class="projects-page-container">
     <!--
     PAGE HEADING
     -->
-    <section class="projects-heading">
+    <!-- <section class="projects-heading">
         <h1 class="page-title">
             Projects
         </h1>
@@ -36,12 +48,12 @@ HEADER
         <p class="page-description">
             Manage and monitor all projects assigned to you.
         </p>
-    </section>
+    </section> -->
 
     <!--
     STATS CARDS
     -->
-    <section class="projects-stats grid">
+    <section class="projects-statistics-grid">
         <app-stats-card
             label="Projects"
             [value]="totalProjects.toString()"
@@ -77,13 +89,26 @@ HEADER
     <section class="project-filter-row">
         @for (filter of filters; track filter){
             <button 
-                class="project-filter-buton"
+                class="project-filter-button"
                 [class.selected-filter]="selectedFilter===filter"
                 (click)="filterProjects(filter)">
                 {{filter}}
             </button>
         }
     </section>
+
+    <div class="project-tags-filter">
+        <span class="tags-title">
+            Tags:
+        </span>
+
+        <span class="project-tag">api</span>
+        <span class="project-tag">design</span>
+        <span class="project-tag">internal</span>
+        <span class="project-tag">mobile</span>
+        <span class="project-tag">angular</span>
+        
+    </div>
 
     <!--
     PROJECTS :)
@@ -101,6 +126,10 @@ HEADER
                             {{project.client}}
                         </p>
                     </div>
+
+                    <!-- <app-status-chip
+                        [status]="$any(project.status)">
+                    </app-status-chip> -->
 
                     <span class="project-status-badge">
                         {{project.status}}
@@ -149,9 +178,13 @@ HEADER
                 TEAM MEMEBERS
                 -->
                 <div class="project-team">
-                    <strong>
+                    <!-- <strong>
                         Team
-                    </strong>
+                    </strong> -->
+                    <span class="team-count">
+                        {{project.teamMembers.length}}
+                        members
+                    </span>
 
                     <div class="team-members">
                         @for (member of project.teamMembers; track member){
