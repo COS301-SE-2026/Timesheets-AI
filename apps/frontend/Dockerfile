@@ -7,32 +7,42 @@ WORKDIR /app/client
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copy the dependency files 
-COPY client/package.json client/yarn.lock ./
+COPY package.json yarn.lock ./
+
+# copy frontend package.json so Yarn is aware of the workspace we using 
+COPY apps/frontend/client/package.json apps/frontend/client/package.json
 
 # Install dependencies 
 RUN yarn install --frozen-lockfile
 
 # Copy angular application 
-COPY client/ .
+COPY apps/frontend/client/ apps/frontend/client
 
 RUN chown -R appuser:appgroup /app
 USER appuser
 
+WORKDIR /aap/apps/frontend/client 
+
 EXPOSE 4200
 CMD ["yarn", "start", "--host", "0.0.0.0"]
 
-# Build stage
+# Build stagea
 FROM node:22-alpine AS build
-WORKDIR /app/client
+WORKDIR /app
 
 # Copy the dependency files 
-COPY client/package.json client/yarn.lock ./
+COPY package.json yarn.lock ./
+
+# copy frontend package.json so Yarn is aware of the workspace we using 
+COPY apps/frontend/client/package.json apps/frontend/client/package.json
 
 # Install dependencies 
 RUN yarn install --frozen-lockfile
 
 # Copy angular application 
-COPY client/ .
+COPY apps/frontend/client/ apps/frontend/client
+
+WORKDIR /app/apps/frontend/client 
 
 # Create a build 
 RUN yarn build --configuration production
@@ -41,9 +51,9 @@ RUN yarn build --configuration production
 FROM nginxinc/nginx-unprivileged:alpine AS prod
 
 # Copy angular application 
-COPY --from=build /app/client/dist/client/browser/ /usr/share/nginx/html
+COPY --from=build /app/client/dist/client/browser/ /usr/share/nginx/html/
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Nginx port 
 EXPOSE 8080
