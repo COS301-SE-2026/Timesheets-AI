@@ -13,6 +13,7 @@ import timesheets.domain.ProjectMember;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
+import timesheets.dto.request.CreateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
 import timesheets.dto.response.ProjectResponse;
 import timesheets.enums.WorkspaceRole;
@@ -68,6 +69,54 @@ public class ProjectService {
     return projects.stream()
         .map(project -> buildProjectResponse(project, workspaceMemberId, showCostInfo))
         .collect(Collectors.toList());
+  }
+
+  // creates a new project in the current workspace
+  @Transactional
+  public ProjectResponse createProject(
+      CreateProjectRequest request, UUID createdByWorkspaceMemberId) {
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+
+    // to build the project from the request
+    Project project = new Project();
+    project.setWorkspaceId(workspaceId);
+    project.setName(request.getName());
+    project.setDescription(request.getDescription());
+    project.setBudgetHours(request.getBudgetHours());
+    project.setHourlyRate(request.getHourlyRate());
+    project.setStatus("ACTIVE");
+    project.setIsDeleted(false);
+    project.setCreatedByWorkspaceMemberId(createdByWorkspaceMemberId);
+    project.setStartDate(request.getStartDate());
+    project.setEndDate(request.getEndDate());
+
+    // this will calculate the budget cost
+    BigDecimal budgetCost = request.getBudgetCost();
+    if (budgetCost == null && request.getBudgetHours() != null && request.getHourlyRate() != null) {
+      budgetCost = request.getBudgetHours().multiply(request.getHourlyRate());
+    }
+    project.setBudgetCost(budgetCost);
+
+    Project savedProject = projectRepository.save(project); // saving project to the DB
+
+    // to assign project managers if they are assigned - mostly for admin
+    if (request.getManagerIds() != null && !request.getManagerIds().isEmpty()) {
+      for (UUID managerId : request.getManagerIds()) {
+        workspaceMemberRepository
+            .findById(managerId)
+            .orElseThrow(() -> new RuntimeException("Workspace member not found: " + managerId));
+
+        ProjectMember member = new ProjectMember();
+        member.setProjectId(savedProject.getId());
+        member.setWorkspaceMemberId(managerId);
+        member.setIsProjectManager(true);
+        member.setIsActive(true);
+        projectMemberRepository.save(member);
+      }
+    }
+
+    // made the show cost info true since only an admin or manager can create a project anyway
+    return buildProjectResponse(savedProject, createdByWorkspaceMemberId, true);
   }
 
   // gets detailed information about a project

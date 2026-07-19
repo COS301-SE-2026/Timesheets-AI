@@ -1,13 +1,18 @@
 package timesheets.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import timesheets.dto.request.CreateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
 import timesheets.dto.response.ProjectResponse;
 import timesheets.security.SecurityUtils;
@@ -48,5 +53,22 @@ public class ProjectController {
     ProjectDetailResponse response = projectService.getProjectDetail(projectId, workspaceMemberId);
 
     return ResponseEntity.ok(response);
+  }
+
+  @PostMapping
+  public ResponseEntity<ProjectResponse> createProject(
+      @Valid @RequestBody CreateProjectRequest request) {
+
+    boolean isAdmin = securityUtils.isAdmin();
+    boolean isManager = securityUtils.isManager();
+
+    if (!isAdmin && !isManager) {
+      throw new RuntimeException("Only Admins and Managers can create projects");
+    }
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    ProjectResponse response = projectService.createProject(request, workspaceMemberId);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 }
