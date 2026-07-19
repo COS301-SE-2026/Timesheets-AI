@@ -1,3 +1,10 @@
+/**
+ * Author: Kgaugelo Matsena & Lerato Sibanda
+ * Date: 2026-05-19
+ * Purpose: Display weekly timesheets overview with task breakdown and totals.
+ * Related Requirement: -
+ */
+
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../shared/components/header/header.component';

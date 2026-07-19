@@ -3,11 +3,22 @@ package timesheets.domain;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import timesheets.enums.WorkspaceRole;
 
 // links a user to a specific workspace with a specific role
 
 @Entity
 @Table(name = "workspace_members")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class WorkspaceMember {
 
   @Id
@@ -20,17 +31,9 @@ public class WorkspaceMember {
   @Column(name = "user_id", nullable = false)
   private UUID userId;
 
-  @Column(name = "workspace_role_id")
-  private Integer workspaceRoleId;
-
-  @Column(name = "is_locked")
-  private Boolean isLocked = false;
-
-  @Column(name = "locked_at")
-  private LocalDateTime lockedAt;
-
-  @Column(name = "locked_by")
-  private UUID lockedBy;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role", nullable = false)
+  private WorkspaceRole role;
 
   @Column(name = "joined_at")
   private LocalDateTime joinedAt;
@@ -54,81 +57,5 @@ public class WorkspaceMember {
   @PreUpdate
   protected void onUpdate() {
     updatedAt = LocalDateTime.now();
-  }
-
-  public UUID getId() {
-    return id;
-  }
-
-  public void setId(UUID id) {
-    this.id = id;
-  }
-
-  public UUID getWorkspaceId() {
-    return workspaceId;
-  }
-
-  public void setWorkspaceId(UUID workspaceId) {
-    this.workspaceId = workspaceId;
-  }
-
-  public UUID getUserId() {
-    return userId;
-  }
-
-  public void setUserId(UUID userId) {
-    this.userId = userId;
-  }
-
-  public Integer getWorkspaceRoleId() {
-    return workspaceRoleId;
-  }
-
-  public void setWorkspaceRoleId(Integer workspaceRoleId) {
-    this.workspaceRoleId = workspaceRoleId;
-  }
-
-  public Boolean getIsLocked() {
-    return isLocked;
-  }
-
-  public void setIsLocked(Boolean isLocked) {
-    this.isLocked = isLocked;
-  }
-
-  public LocalDateTime getLockedAt() {
-    return lockedAt;
-  }
-
-  public void setLockedAt(LocalDateTime lockedAt) {
-    this.lockedAt = lockedAt;
-  }
-
-  public UUID getLockedBy() {
-    return lockedBy;
-  }
-
-  public void setLockedBy(UUID lockedBy) {
-    this.lockedBy = lockedBy;
-  }
-
-  public LocalDateTime getJoinedAt() {
-    return joinedAt;
-  }
-
-  public void setJoinedAt(LocalDateTime joinedAt) {
-    this.joinedAt = joinedAt;
-  }
-
-  public LocalDateTime getCreatedAt() {
-    return createdAt;
-  }
-
-  public LocalDateTime getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public void setUpdatedAt(LocalDateTime updatedAt) {
-    this.updatedAt = updatedAt;
   }
 }
