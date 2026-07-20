@@ -1,15 +1,9 @@
--- ============================================================
--- V2__seed_test_data.sql
--- ============================================================
+
 
 -- Enable UUID generation if not already enabled
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
--- ============================================================
--- 1. USERS (South African names + Thabang Siduke)
--- ============================================================
-
--- User 1: Thabang Siduke (Original user)
+-- User 1: Thabang Siduke- he is MFA enabled so use User 2 if you need JWT token
 INSERT INTO users (
     id,
     first_name,
@@ -32,7 +26,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 2: Enzokuhle Khumalo (isiZulu)
+-- User 2: Enzokuhle Khumalo
 INSERT INTO users (
     id,
     first_name,
@@ -55,7 +49,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 3: Lethabo Maseko (Sesotho/Setswana)
+-- User 3: Lethabo Maseko 
 INSERT INTO users (
     id,
     first_name,
@@ -78,7 +72,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 4: Amahle Dlamini (isiZulu/Eswatini)
+-- User 4: Amahle Dlamini
 INSERT INTO users (
     id,
     first_name,
@@ -101,7 +95,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 5: Karabo Mathebula (Sepedi/Tsonga)
+-- User 5: Karabo Mathebula
 INSERT INTO users (
     id,
     first_name,
@@ -124,7 +118,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 6: Lubanzi Gcabashe (isiXhosa)
+-- User 6: Lubanzi Gcabashe
 INSERT INTO users (
     id,
     first_name,
@@ -147,7 +141,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 7: Naledi Mphahlele (Sepedi)
+-- User 7: Naledi Mphahlele
 INSERT INTO users (
     id,
     first_name,
@@ -170,7 +164,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 8: Joshua Botes (Afrikaans)
+-- User 8: Joshua Botes
 INSERT INTO users (
     id,
     first_name,
@@ -193,7 +187,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 9: Faith Solomons (Cape Coloured/Western Cape)
+-- User 9: Faith Solomons
 INSERT INTO users (
     id,
     first_name,
@@ -216,7 +210,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 10: Isabella Cassiem (Cape Malay)
+-- User 10: Isabella Cassiem
 INSERT INTO users (
     id,
     first_name,
@@ -239,7 +233,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 11: Thato Moosa (South African Indian/Muslim)
+-- User 11: Thato Moosa
 INSERT INTO users (
     id,
     first_name,
@@ -262,11 +256,7 @@ INSERT INTO users (
     NOW()
 );
 
--- ============================================================
 -- 2. WORKSPACE MEMBERS (All users in Workspace 1)
--- ============================================================
-
--- Create workspace
 INSERT INTO workspaces (
     id,
     name,
@@ -281,7 +271,6 @@ INSERT INTO workspaces (
     NOW()
 );
 
--- Add all users to workspace with different roles
 INSERT INTO workspace_members (id, workspace_id, user_id, role, joined_at, created_at, updated_at) VALUES
 -- Thabang Siduke (DEVELOPER)
 ('00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0001-000000000010', '00000000-0000-0000-0001-000000000001', 'DEVELOPER', NOW(), NOW(), NOW()),
@@ -306,20 +295,18 @@ INSERT INTO workspace_members (id, workspace_id, user_id, role, joined_at, creat
 -- Thato Moosa (DEVELOPER)
 ('00000000-0000-0000-0011-000000000030', '00000000-0000-0000-0001-000000000010', '00000000-0000-0000-0011-000000000011', 'DEVELOPER', NOW(), NOW(), NOW());
 
--- ============================================================
--- 3. PROJECTS
--- ============================================================
 
+
+-- 3. PROJECTS
 INSERT INTO projects (id, workspace_id, name, description, status, budget_hours, hourly_rate, created_by_workspace_member_id, created_at, updated_at) VALUES
 ('00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0001-000000000010', 'Mobile App Development', 'Building the React Native mobile application', 'ACTIVE', 500.00, 75.00, '00000000-0000-0000-0003-000000000022', NOW(), NOW()),
 ('00000000-0000-0000-0002-000000000041', '00000000-0000-0000-0001-000000000010', 'Backend API', 'Spring Boot REST API development', 'ACTIVE', 300.00, 90.00, '00000000-0000-0000-0002-000000000021', NOW(), NOW()),
 ('00000000-0000-0000-0003-000000000042', '00000000-0000-0000-0001-000000000010', 'Design System', 'Building the company design system', 'ON_HOLD', 150.00, 65.00, '00000000-0000-0000-0001-000000000020', NOW(), NOW()),
 ('00000000-0000-0000-0004-000000000043', '00000000-0000-0000-0001-000000000010', 'DevOps Pipeline', 'CI/CD pipeline setup and maintenance', 'ACTIVE', 200.00, 85.00, '00000000-0000-0000-0006-000000000025', NOW(), NOW());
 
--- ============================================================
--- 4. PROJECT MEMBERS
--- ============================================================
 
+
+-- 4. PROJECT MEMBERS
 INSERT INTO project_members (id, project_id, workspace_member_id, is_project_manager, is_active, created_at, updated_at) VALUES
 -- Mobile App project members
 ('00000000-0000-0000-0001-000000000050', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0001-000000000020', false, true, NOW(), NOW()),
@@ -341,10 +328,9 @@ INSERT INTO project_members (id, project_id, workspace_member_id, is_project_man
 ('00000000-0000-0000-0011-000000000060', '00000000-0000-0000-0004-000000000043', '00000000-0000-0000-0010-000000000029', false, true, NOW(), NOW()),
 ('00000000-0000-0000-0012-000000000061', '00000000-0000-0000-0004-000000000043', '00000000-0000-0000-0009-000000000028', true, true, NOW(), NOW());  -- Faith is PM
 
--- ============================================================
--- 5. TASKS
--- ============================================================
 
+
+-- 5. TASKS
 INSERT INTO tasks (id, project_id, title, description, status, priority, estimated_hours, assigned_workspace_member_id, created_at, updated_at) VALUES
 -- Mobile App tasks
 ('00000000-0000-0000-0001-000000000070', '00000000-0000-0000-0001-000000000040', 'Implement Login Screen', 'Design and implement the login screen with Google SSO', 'IN_PROGRESS', 'HIGH', 8.0, '00000000-0000-0000-0001-000000000020', NOW(), NOW()),
@@ -364,10 +350,9 @@ INSERT INTO tasks (id, project_id, title, description, status, priority, estimat
 ('00000000-0000-0000-0009-000000000078', '00000000-0000-0000-0004-000000000043', 'Setup GitHub Actions', 'Configure CI/CD pipeline', 'IN_PROGRESS', 'HIGH', 8.0, '00000000-0000-0000-0007-000000000026', NOW(), NOW()),
 ('00000000-0000-0000-0010-000000000079', '00000000-0000-0000-0004-000000000043', 'AWS Infrastructure', 'Setup AWS resources', 'TODO', 'HIGH', 10.0, '00000000-0000-0000-0010-000000000029', NOW(), NOW());
 
--- ============================================================
--- 6. TIMESHEETS (Only for active developers)
--- ============================================================
 
+
+-- 6. TIMESHEETS (Only for active devs)
 -- Thabang Siduke's timesheets
 INSERT INTO timesheets (id, workspace_member_id, period_start, period_end, status, created_at, updated_at) VALUES
 ('00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '2026-07-13', '2026-07-19', 'DRAFT', NOW(), NOW()),
@@ -383,55 +368,48 @@ INSERT INTO timesheets (id, workspace_member_id, period_start, period_end, statu
 ('00000000-0000-0000-0005-000000000084', '00000000-0000-0000-0005-000000000024', '2026-07-13', '2026-07-19', 'DRAFT', NOW(), NOW()),
 ('00000000-0000-0000-0006-000000000085', '00000000-0000-0000-0005-000000000024', '2026-07-20', '2026-07-26', 'DRAFT', NOW(), NOW());
 
--- ============================================================
--- 7. TIME ENTRIES (Thabang's Week 29)
--- ============================================================
 
-INSERT INTO time_entries (id, timesheet_id, workspace_member_id, project_id, task_id, start_time, end_time, duration_minutes, entry_type, description, created_at, updated_at) VALUES
+
+-- 7. TIME ENTRIES
+INSERT INTO time_entries (id, timesheet_id, workspace_member_id, project_id, task_id, start_time, end_time, duration_seconds, entry_type, description, created_at, updated_at) VALUES
 -- Thabang's time entries
-('00000000-0000-0000-0001-000000000090', '00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0001-000000000070', '2026-07-13 09:00:00', '2026-07-13 12:00:00', 180, 'MANUAL', 'Working on login screen UI', NOW(), NOW()),
-('00000000-0000-0000-0002-000000000091', '00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0002-000000000041', '00000000-0000-0000-0004-000000000073', '2026-07-14 10:00:00', '2026-07-14 12:30:00', 150, 'TIMER', 'JWT authentication implementation', NOW(), NOW()),
-('00000000-0000-0000-0003-000000000092', '00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0002-000000000041', '00000000-0000-0000-0004-000000000073', '2026-07-15 14:00:00', '2026-07-15 17:00:00', 180, 'MANUAL', 'Testing JWT token validation', NOW(), NOW()),
-('00000000-0000-0000-0004-000000000093', '00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0003-000000000072', '2026-07-16 09:00:00', '2026-07-16 10:00:00', 60, 'MANUAL', 'Navigation implementation review', NOW(), NOW()),
+('00000000-0000-0000-0001-000000000090', '00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0001-000000000070', '2026-07-13 09:00:00', '2026-07-13 12:00:00', 10800, 'MANUAL', 'Working on login screen UI', NOW(), NOW()),
+('00000000-0000-0000-0002-000000000091', '00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0002-000000000041', '00000000-0000-0000-0004-000000000073', '2026-07-14 10:00:00', '2026-07-14 12:30:00', 9000, 'TIMER', 'JWT authentication implementation', NOW(), NOW()),
+('00000000-0000-0000-0003-000000000092', '00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0002-000000000041', '00000000-0000-0000-0004-000000000073', '2026-07-15 14:00:00', '2026-07-15 17:00:00', 10800, 'MANUAL', 'Testing JWT token validation', NOW(), NOW()),
+('00000000-0000-0000-0004-000000000093', '00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0003-000000000072', '2026-07-16 09:00:00', '2026-07-16 10:00:00', 3600, 'MANUAL', 'Navigation implementation review', NOW(), NOW()),
 
 -- Enzokuhle's time entries
-('00000000-0000-0000-0005-000000000094', '00000000-0000-0000-0003-000000000082', '00000000-0000-0000-0002-000000000021', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0002-000000000071', '2026-07-13 11:00:00', '2026-07-13 14:00:00', 180, 'MANUAL', 'Dashboard UI design', NOW(), NOW()),
-('00000000-0000-0000-0006-000000000095', '00000000-0000-0000-0003-000000000082', '00000000-0000-0000-0002-000000000021', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0002-000000000071', '2026-07-15 09:00:00', '2026-07-15 12:00:00', 180, 'TIMER', 'Dashboard UI wireframes', NOW(), NOW()),
+('00000000-0000-0000-0005-000000000094', '00000000-0000-0000-0003-000000000082', '00000000-0000-0000-0002-000000000021', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0002-000000000071', '2026-07-13 11:00:00', '2026-07-13 14:00:00', 10800, 'MANUAL', 'Dashboard UI design', NOW(), NOW()),
+('00000000-0000-0000-0006-000000000095', '00000000-0000-0000-0003-000000000082', '00000000-0000-0000-0002-000000000021', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0002-000000000071', '2026-07-15 09:00:00', '2026-07-15 12:00:00', 10800, 'TIMER', 'Dashboard UI wireframes', NOW(), NOW()),
 
 -- Karabo's time entries
-('00000000-0000-0000-0007-000000000096', '00000000-0000-0000-0005-000000000084', '00000000-0000-0000-0005-000000000024', '00000000-0000-0000-0003-000000000042', '00000000-0000-0000-0007-000000000076', '2026-07-14 09:00:00', '2026-07-14 11:30:00', 150, 'MANUAL', 'Creating color system', NOW(), NOW()),
-('00000000-0000-0000-0008-000000000097', '00000000-0000-0000-0005-000000000084', '00000000-0000-0000-0005-000000000024', '00000000-0000-0000-0003-000000000042', '00000000-0000-0000-0008-000000000077', '2026-07-16 14:00:00', '2026-07-16 15:30:00', 90, 'MANUAL', 'Typography research', NOW(), NOW());
+('00000000-0000-0000-0007-000000000096', '00000000-0000-0000-0005-000000000084', '00000000-0000-0000-0005-000000000024', '00000000-0000-0000-0003-000000000042', '00000000-0000-0000-0007-000000000076', '2026-07-14 09:00:00', '2026-07-14 11:30:00', 9000, 'MANUAL', 'Creating color system', NOW(), NOW()),
+('00000000-0000-0000-0008-000000000097', '00000000-0000-0000-0005-000000000084', '00000000-0000-0000-0005-000000000024', '00000000-0000-0000-0003-000000000042', '00000000-0000-0000-0008-000000000077', '2026-07-16 14:00:00', '2026-07-16 15:30:00', 5400, 'MANUAL', 'Typography research', NOW(), NOW());
 
--- ============================================================
+
+
 -- 8. USER PREFERENCES
--- ============================================================
-
 INSERT INTO user_preferences (id, user_id, theme, email_notifications, jira_enabled, calendar_enabled, git_enabled, created_at, updated_at) VALUES
 ('00000000-0000-0000-0001-000000000100', '00000000-0000-0000-0001-000000000001', 'DARK', true, false, true, false, NOW(), NOW()),
 ('00000000-0000-0000-0002-000000000101', '00000000-0000-0000-0002-000000000002', 'LIGHT', true, true, false, true, NOW(), NOW()),
 ('00000000-0000-0000-0003-000000000102', '00000000-0000-0000-0004-000000000004', 'DARK', true, false, true, false, NOW(), NOW()),
 ('00000000-0000-0000-0004-000000000103', '00000000-0000-0000-0005-000000000005', 'LIGHT', false, true, false, true, NOW(), NOW());
 
--- ============================================================
--- 9. USER MFA (For Thabang - enabled)
--- ============================================================
 
+
+-- 9. USER MFA (For Thabang - enabled)
 INSERT INTO user_mfa (id, user_id, secret_key, is_enabled, created_at, updated_at) VALUES
 ('00000000-0000-0000-0001-000000000110', '00000000-0000-0000-0001-000000000001', 'JBSWY3DPEHPK3PXP', true, NOW(), NOW());
 
--- ============================================================
--- 10. EMAIL VERIFICATION TOKENS (All verified)
--- ============================================================
 
+-- 10. EMAIL VERIFICATION TOKENS (All verified)
 INSERT INTO email_verification_tokens (id, user_id, token, expires_at, verified_at, created_at) VALUES
 ('00000000-0000-0000-0001-000000000120', '00000000-0000-0000-0001-000000000001', 'thabang-verify-token-001', NOW() + INTERVAL '24 hours', NOW(), NOW()),
 ('00000000-0000-0000-0002-000000000121', '00000000-0000-0000-0002-000000000002', 'enzokuhle-verify-token-002', NOW() + INTERVAL '24 hours', NOW(), NOW()),
 ('00000000-0000-0000-0003-000000000122', '00000000-0000-0000-0003-000000000003', 'lethabo-verify-token-003', NOW() + INTERVAL '24 hours', NOW(), NOW());
 
--- ============================================================
--- 11. USER IDENTITY PROVIDERS (Google SSO)
--- ============================================================
 
+-- 11. USER IDENTITY PROVIDERS (Google SSO)
 INSERT INTO user_identity_providers (id, user_id, provider, provider_user_id, email, created_at) VALUES
 ('00000000-0000-0000-0001-000000000130', '00000000-0000-0000-0001-000000000001', 'GOOGLE', 'thabang-google-id-001', 'thabang.siduke@gmail.com', NOW()),
 ('00000000-0000-0000-0002-000000000131', '00000000-0000-0000-0003-000000000003', 'GOOGLE', 'lethabo-google-id-002', 'lethabo.maseko@gmail.com', NOW());

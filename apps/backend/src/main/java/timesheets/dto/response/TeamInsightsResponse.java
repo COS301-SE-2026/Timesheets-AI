@@ -1,4 +1,4 @@
-package timesheets.dto.request;
+package timesheets.dto.response;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InsightsSummaryResponse {
+public class TeamInsightsResponse {
   // dto for insights summary response, contains overall summary of time entries for a given period,
   // as well as breakdowns by project, task, and daily trends
   private Double totalHoursLogged;
