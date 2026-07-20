@@ -1,0 +1,10 @@
+**/node_modules
+**/angular
+**/dist
+
+.git
+.gitignore
+
+Dockerfile 
+
+coverage
