@@ -21,6 +21,8 @@ public class ProjectDetailResponse {
   private String status;
   private BigDecimal budgetHours;
   private BigDecimal hourlyRate;
+  private BigDecimal budgetCost;
+  private BigDecimal totalCost;
   private List<MemberInfo> members;
   private BigDecimal hoursLogged;
   private BigDecimal progressPercentage; // hoursLogged / budgetHours * 100
