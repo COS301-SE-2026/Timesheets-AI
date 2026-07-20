@@ -16,6 +16,10 @@ import lombok.Data;
         because this can overwhelm frontend, as well as overwhelm myself
 */
 
+
+/*
+- update task request is a container class for all the task update DTO
+- each innner class will handle a specific type of request */
 @Data
 public class UpdateTaskRequest {
 
@@ -23,7 +27,7 @@ public class UpdateTaskRequest {
   @Data
   public static class UpdatePriority {
     @Pattern(
-        regexp = "LOW|MEDIUM|HIGH| CRITICAL",
+        regexp = "LOW|MEDIUM|HIGH|CRITICAL",
         message = "Priority must be LOW, MEDIUM, HIGH or CRITICAL")
     private String priority = "MEDIUM";
   }
@@ -32,7 +36,7 @@ public class UpdateTaskRequest {
   @Data
   public static class UpdateStatus {
     @Pattern(
-        regexp = "TODO|IN_PROGESS|DONE|BLOCKED",
+        regexp = "TODO|IN_PROGRESS|DONE|BLOCKED",
         message = "Status must be TODO, IN_PROGRESS, DONE or BLOCKED")
     private String status;
   }

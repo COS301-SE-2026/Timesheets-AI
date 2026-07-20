@@ -32,7 +32,7 @@ public class CreateTaskRequest {
   private UUID parentTaskId;
 
   @Pattern(
-      regexp = "TODO|IN_PROGESS|DONE|BLOCKED",
+      regexp = "TODO|IN_PROGRESS|DONE|BLOCKED",
       message = "Status must be TODO, IN_PROGRESS, DONE or BLOCKED")
   @Builder.Default
   private String status = "TODO";
@@ -46,7 +46,7 @@ public class CreateTaskRequest {
   private LocalDate dueDate;
 
   @Pattern(
-      regexp = "LOW|MEDIUM|HIGH| CRITICAL",
+      regexp = "LOW|MEDIUM|HIGH|CRITICAL",
       message = "Priority must be LOW, MEDIUM, HIGH or CRITICAL")
   @Builder.Default
   private String priority = "MEDIUM";
