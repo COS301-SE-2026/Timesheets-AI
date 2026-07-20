@@ -25,27 +25,33 @@ describe('TimesheetsComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  //ensure title loads
   it('should render the page title', () => {
       const title= fixture.debugElement.query(By.css('.page-header__title'));
       expect(title.nativeElement.textContent.trim()).toBe('Timesheets');
   });
 
+  //ensures status chips load
   it('it should render status filter chips', () => {
     const chips = fixture.debugElement.queryAll(By.css('.status-filters__chip'));
     expect(chips.length).toBe(component.statusFilters.length);
     })
 
-    expect(dayCells.length).toBe(component.days.length);
   });
 
-  // checks that each task in the dataset is rendered in the table
-  it('should render all task rows', () => {
-    const rows = fixture.debugElement.queryAll(
-      By.css('.tracking-data-entry-item-row')
-    );
-
-    expect(rows.length).toBe(component.tasks.length);
+  //ensures summary cards load
+  it('should render the summary card for the selected week', () => {
+    const card = fixture.debugElement.query(By.css('.summary-card'));
+    expect(card).toBeTruthy();
+    expect(card.nativeElement.textContent).toCobtain('Week 29');
   });
+
+  it('should render weekly columns in the entry table', () => {
+    const dayHeaders = fixture.debugElement.queryAll(By.css('.col-day__name'));
+    expect(dayHeaders.length).toBe(component.days().length);
+  });
+
+
 
   // ensures the current day column is visually highlighted
   it('should highlight today column', () => {
