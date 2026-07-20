@@ -27,8 +27,7 @@
             "inlineStyleLanguage": "scss",
             "stylePreprocessorOptions": {
               "includePaths": [
-                "src/app/shared/styles",
-                "src/app/layouts"
+                "node_modules"
               ]
             },
             "assets": [
@@ -45,38 +44,33 @@
             "styles": [
               "src/styles.scss"
             ],
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "node_modules"
-              ]
-            },
             "scripts": []
           },
           "configurations": {
-         "production": {
-  "budgets": [
-    {
-      "type": "initial",
-      "maximumWarning": "500kB",
-      "maximumError": "1MB"
-    },
-    {
-      "type": "anyComponentStyle",
-      "maximumWarning": "8kB",
-      "maximumError": "12kB"
-    }
-  ],
-  "outputHashing": "all",
-  "fileReplacements": [
-    {
-      "replace": "src/environments/environment.ts",
-      "with": "src/environments/environment.prod.ts"
-    }
-  ],
-  "define": {
-    "process.env.ANGULAR_APP_API_URL": "window.env.ANGULAR_APP_API_URL"
-  }
-},
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "100kB",
+                  "maximumError": "120kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "define": {
+                "process.env.ANGULAR_APP_API_URL": "window.env.ANGULAR_APP_API_URL"
+              }
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -105,12 +99,23 @@
           "options": {
             "tsConfig": "tsconfig.spec.json"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   }
 }
-

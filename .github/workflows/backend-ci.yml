@@ -45,6 +45,8 @@ jobs:
                     - 'apps/backend/**'
                     - '.github/workflows/backend-ci.yml'
 
+#===================== BUILD stage ================================
+       
         # Only runs if backend changes 
         - name: Set up JDK 17
           if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
@@ -56,6 +58,18 @@ jobs:
             # maven (pom.xml) will be used to download dependencies and it will be cache so it will spped up with the builds
             cache: 'maven'
             cache-dependency-path: apps/backend/pom.xml
+
+#===================== PLAN, BUILD & TEST stage ================================
+          # clean verify does all 3 stages 
         - name: Build with Maven 
           if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
           run: mvn -f apps/backend/pom.xml clean verify 
+
+#===================== RELEASE stage ================================
+
+        # ensure that the docker image is built successfully and that it can be containerized and deployed 
+        # github sha - so every build image created, it will be associated with a hash (commit number) - which will helps us to know which commit created an image
+        - name: Build Docker Image
+          if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
+          working-directory: apps/backend
+          run: docker build -t momently-backend:${{ github.sha}} .

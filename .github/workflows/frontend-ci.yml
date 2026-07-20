@@ -5,12 +5,10 @@ name: Frontend Pipeline
 on:
     push:
         branches: [main, dev]
-        # paths:
-        #     - 'apps/frontend/**' 
+
     pull_request:
         branches: [main, dev]
-        # paths: 
-        #     - 'apps/frontend/**'
+       
 
 jobs:
     # this is only for frontend check only and provide job access to the code in the repo 
@@ -45,6 +43,7 @@ jobs:
                         - 'apps/frontend/**'
                         - '.github/workflows/frontend-ci.yml'
 
+#===================== BUILD stage ================================
 
             # Only runs if frontend filter is true on the first run or retry step 
             - name: Set up Node.js
@@ -54,11 +53,28 @@ jobs:
                 node-version: '22' # current node.js version - recommeded 
                 # uses yarn NOT npm to store downloaded dependencies, dependency-path: means rebuild cache only if yarn.lock changes
                 cache: 'yarn'
-                cache-dependency-path: apps/frontend/client/yarn.lock 
+                cache-dependency-path: yarn.lock 
 
-            - name: Install & Test (Yarn)
+            - name: Install Dependencies 
               if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
-              run: |
-                cd apps/frontend/client
-                yarn install --frozen-lockfile 
-                yarn test --watch=false
+              run: yarn install --frozen-lockfile 
+
+#===================== PLAN stage ================================
+
+            # this checks for code quality and help to detect for potential bugs 
+            # - name: Run ESlint
+            #   working-directory: apps/frontend/client
+            #   run: yarn lint 
+
+#===================== TEST stage ================================
+
+            # runs frontend unit tests using Jest 
+            - name: Run Jest tests
+              working-directory: apps/frontend/client
+              run: yarn test --watch=false
+
+#===================== RELEASE stage ================================
+
+            # ensure that the Angular builds successfully 
+            - name: Build Angular
+              run: docker build -f apps/frontend/Dockerfile -t momently-frontend:${{ github.sha }} .

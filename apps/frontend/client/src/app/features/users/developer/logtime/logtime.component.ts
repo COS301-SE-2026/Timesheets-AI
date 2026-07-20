@@ -538,7 +538,7 @@ closePanel(): void {
   }
 
   // Custom visual modifier turning simple dynamic counts into compressed time descriptors
-formatDuration(minutes: number = 0): string {
+formatDuration(minutes = 0): string {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
 
