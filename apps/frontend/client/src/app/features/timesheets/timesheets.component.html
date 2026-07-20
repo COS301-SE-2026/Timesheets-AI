@@ -138,10 +138,89 @@
          </article>
       }
 
-  
+      <!-- Entries table or empty entries -->
+       <div class="entry-table-wrapper" role="region" aria-hidden="Weekly time entries">
+        <table class="entry-table">
+          <thead>
+            <tr>
+              <th class="col-task">Task</th>
+              @for (day of days(); track day.isoDate) {
+                <th class="col-day">
+                  <span class="col-day-name"> {{ day.label }} </span>
+                  <span class="col-day-date"> {{ day.dateLabel }} </span>
+                </th>
+              }
+              <th class="col-total">Total</th>
+              <th class="col-action">Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (task of tasks(); track task.taskId) {
+              <tr>
+                <td class="col-task">
+                  <div class="task-cell">
+                    <span class="task-cell-dot" [style.background-color]="task.colorCode" aria-hidden="true"></span>
+                    <div class="task-cell-text">
+                      <strong class="task-cell-title"> {{ task.title }} </strong>
+                      <span class="task-cell-meta">
+                        {{ task.project }}
+                        <span class="task-cell-pipe"> | </span>
+                        {{ task.categoty }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+
+                @for (hours of task.dailyHours; track $index) {
+                  <td class="col-day" [class.is-empty]="!hours">
+                    {{ displayHours(hours) }}
+                  </td>
+                }
+                
+                <td class="col-total">
+                  <strong> {{ task.total }} </strong>
+                </td>
+
+                <td class="col-action">
+                  <!-- INTEGRATION: Open task/entry detail for this row -->
+                   <button type="button" class="btn btn--view" (click)="onViewTask(task)"> View </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+
+          <tfoot>
+            <tr class="daily-tatal-row">
+              <td class="col-task"> 
+                <strong>Daily Total</strong>
+              </td>
+              @for (total of dailyTotals(); track $index) {
+                <td class="col-day">
+                  <strong> {{ total }}</strong>
+                </td>
+              }
+              <td class="col-total grand-total"> 
+                <strong> {{ grandTotal() }} </strong>
+              </td>
+              <td class="col-action"></td>
+            </tr>
+          </tfoot>
+        </table>
+       </div>
+
+       <!-- Role / status actions -->
+        
+       <div class="detail-actions">
+        @if (canSubmit()) {
+          <!-- INTEGRATION: POST /api/timesheets/{id}/submit -->
+
+          <button type="button" class="btn btn--primary" [disabled]="actionPending()" (click)="onSubmitTimesheet()"> Submit Timesheet</button>
+        }
+
         @if (canApproveOrReject()) {
           <!-- INTEGRATION: POST /api/timesheets.{id}/approve or reject-->
-           
+          
         }
-     
+
 
