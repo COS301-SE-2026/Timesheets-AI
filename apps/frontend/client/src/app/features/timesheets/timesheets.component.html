@@ -1,15 +1,34 @@
-<app-header [title]="'Timesheet'">
-  <div class="header-timeline-picker text-body">
-    <i class="fa-regular fa-calendar-days cal-icon"></i>
-    <strong>Current Week</strong>
-    <!-- Previous / current / next week navigation -->
-    <!-- <div class="chevron-navigation-buttons">
-      <span>&lt;</span>
-      <span class="active-dot">&bull;</span>
-      <span>&gt;</span>
-    </div> -->
-  </div>
-</app-header>
+<div class="timesheets-page">
+
+  <!-- Page header -->
+   <header class="page-header">
+    <div class="page-header-titles">
+      <h1 class="page-header-title"> Timesheets </h1>
+      <p class="page-header-subtitles"> View and manage your timesheets.</p>
+    </div>
+
+    <div class="page-header-actions" >
+
+      <!-- INTEGRATION: Oprions come from GET /api/timesheets/me (or status filter), changing selection should load GET /api/timesheets/{id} + /entries -->
+       <label class="week-picker">
+        <i class="fa-regualar fa-calender-days" arial-hidden="true"></i>
+        <select 
+          class="week-picker-select"
+          [ngModel]="selectedTimesheetId()"
+          (ngModelChange)="onWeekChange($event)"
+          [disabled]="uiState() === 'loading' || filteredTimesheets().length === 0"
+          arial-label="Select timesheet week">
+          @for (week of filteredTimesheets(); track week.summary.id) {
+            <option [value]="week.summary.id">
+              Week {{ week.summary.weekNumber }} . {{ week.summary.periodLabel }}
+            </option>
+          }
+        </select>
+        <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
+       </label>
+    </div>
+   </header>
+</div>
 
 
   <!-- created to these cards to add nice visual insights and make the page less tableyy  -->
