@@ -51,32 +51,21 @@ describe('TimesheetsComponent', () => {
     expect(dayHeaders.length).toBe(component.days().length);
   });
 
-
-
-  // ensures the current day column is visually highlighted
-  it('should highlight today column', () => {
-    const highlightedCells = fixture.debugElement.queryAll(
-      By.css('.highlighted-today-column')
-    );
-
-    expect(highlightedCells.length).toBeGreaterThan(0);
+  // Test if task rows get rendered
+  it('should render all task rows', () => {
+    const rows = fixture.debugElement.queryAll(By.css('.entry-table tbody tr'));
+    expect(rows.length).toBe(component.tasks().length);
   });
 
-  // confirms that the progress bar component is rendered
-  it('should render progress bar component', () => {
-    const progress = fixture.debugElement.query(
-      By.css('app-progress-bar')
-    );
-
-    expect(progress).toBeTruthy();
+  // Test if grand total renders
+  it('should show the grand total in the footer', () => {
+    const grandTotal = fixture.debugElement.query(By.css('.grand-total'));
+    expect(grandTotal.nativeElement.textContent).toContain(component.grandTotal());
   });
 
-  // confirms that the header component is rendered
-  it('should render header component', () => {
-    const header = fixture.debugElement.query(
-      By.css('app-header')
-    );
-
-    expect(header).toBeTruthy();
-  });
+  // Test if the submit timesheet button renders
+it('should show Submit Timesheets for drafts', () => {
+  const submit = ComponentFixture.debugElement.query(By.css('.detail-actions .btn--primary'));
+  expect(submit).toBeTruthy();
+  expect(submit.nativeElement.textContent).toContain('Submit Timesheet');
 });
