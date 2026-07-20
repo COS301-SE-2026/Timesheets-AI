@@ -26,6 +26,38 @@
     letter-spacing: 0.08em;
 }
 
+.status-icon{
+    width: 52px;
+    height: 52px;
+
+    border-radius: 14px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.blue{
+    background: #e8f0ff;
+    color: #3b82f6;
+}
+
+.green{
+    background: #e8f0ff;
+    color: #16a34a;
+}
+
+.orange{
+    background: #e8f0ff;
+    color: #ea580c;
+}
+
+.purple{
+    background: #e8f0ff;
+    color: #6366f1;
+}
+
 h2 {
     margin: 0;
 

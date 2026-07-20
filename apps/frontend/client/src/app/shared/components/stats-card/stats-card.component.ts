@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressBarComponent } from '../progress-bar/progress-bar.component';
 @Component({
@@ -13,4 +13,6 @@ export class StatsCardComponent {
   @Input() value = '';
   @Input() description = '';
   @Input() progress = 0;
+  @Input() icon = '';
+  @Input() iconClass ='';
 } 

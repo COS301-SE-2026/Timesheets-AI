@@ -2,22 +2,35 @@
 
     <div class="stats-top">
 
-        <span class="stats-label">
-            {{ label }}
-        </span>
+        <!-- this is so when a stats card is used and doesnt use icon that it doesnt affect that stats card
+            previous code-->
+        @if (icon){
+            <div class="status-icon" [class]="iconClass">
+                <i [class]="icon"></i>
+            </div>
+        }
+
+        <div>
+
+            <span class="stats-label">
+                {{ label }}
+            </span>
+
+            <h2>
+                {{ value }}
+            </h2>
+
+            <p>
+                {{ description }}
+            </p>
+
+        </div>
 
     </div>
 
-    <h2>
-        {{ value }}
-    </h2>
 
-    <p>
-        {{ description }}
-    </p>
-
-    <app-progress-bar
+    <!-- <app-progress-bar
         [progress]="progress">
-    </app-progress-bar>
+    </app-progress-bar> -->
 
 </div>
