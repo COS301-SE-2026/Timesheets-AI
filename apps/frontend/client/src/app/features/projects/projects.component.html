@@ -58,28 +58,36 @@ HEADER
             label="Projects"
             [value]="totalProjects.toString()"
             description="Total assigned projects"
-            [progress]="100">
+            [progress]="100"
+            icon="fa-regular fa-folder-open"
+            iconClass="blue">
         </app-stats-card>
 
         <app-stats-card
             label="Active"
             [value]="activeProjects.toString()"
             description="Currently active"
-            [progress]="75">
+            [progress]="75"
+            icon="fa-solid fa-play"
+            iconClass="green">
         </app-stats-card>
 
         <app-stats-card
             label="Completed"
             [value]="completedProjects.toString()"
             description="Completed projects"
-            [progress]="100">
+            [progress]="100"
+            icon="fa-solid fa-check"
+            iconClass="purple">
         </app-stats-card>
 
         <app-stats-card
             label="On Hold"
             [value]="onHoldProjects.toString()"
             description="Awating action"
-            [progress]="25">
+            [progress]="25"
+            icon="fa-solid fa-pause"
+            iconClass="orange">
         </app-stats-card>
     </section>
 
