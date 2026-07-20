@@ -8,9 +8,15 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateTaskRequest {
 
   @NotBlank(message = "Task title is required")
@@ -26,8 +32,9 @@ public class CreateTaskRequest {
   private UUID parentTaskId;
 
   @Pattern(
-      regexp = "TODO | IN_PROGESS | DONE | BLOCKED",
+      regexp = "TODO|IN_PROGESS|DONE|BLOCKED",
       message = "Status must be TODO, IN_PROGRESS, DONE or BLOCKED")
+  @Builder.Default
   private String status = "TODO";
 
   @Positive(message = "Estimated hours must be positive")
@@ -39,7 +46,8 @@ public class CreateTaskRequest {
   private LocalDate dueDate;
 
   @Pattern(
-      regexp = "LOW | MEDIUM | HIGH | CRITICAL",
+      regexp = "LOW|MEDIUM|HIGH| CRITICAL",
       message = "Priority must be LOW, MEDIUM, HIGH or CRITICAL")
+  @Builder.Default
   private String priority = "MEDIUM";
 }
