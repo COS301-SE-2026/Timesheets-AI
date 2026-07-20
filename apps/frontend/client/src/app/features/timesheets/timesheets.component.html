@@ -88,60 +88,54 @@
   </div>
 }
 
-    @for (taskItem of tasks; track taskItem.title) {
-      <div class="table-grid-row tracking-data-entry-item-row">
-        <div class="grid-cell alignment-left-column task-meta-identity-details">
-          <div class="item-primary-row">
-            <span class="colored-badge-dot" [style.background-color]="taskItem.colorCode"></span>
-            <span class="interactive-task-link text-body-strong">{{ taskItem.title }}</span>
-          </div>
-          <div class="item-sub-metadata-row text-caption">
-            <span class="project-tag-text">{{ taskItem.project }}</span>
-            @if (taskItem.category) {
-              <span class="separator-pipe">|</span>
-              <span class="category-text-label">{{ taskItem.category }}</span>
-            }
-          </div>
-        </div>
-
-         <!-- Time box -->
-        <!-- Filled style only applied if time exists -->
-        @for (hourValue of taskItem.loggedHours; track $index) {
-          <div class="grid-cell segment-time-value" 
-               [class.highlighted-today-column]="days[$index].isToday"
-               [attr.data-intensity]="hourValue !== '-' ? 'high' : 'none'">
-            <div class="time-input-box" [class.filled-box]="hourValue !== '-'">
-              <!-- no time then replaced with a dash -->
-              {{ hourValue === '-' ? '–' : hourValue }}
+   <!-- Weekly detail -->
+    @else {
+      @if (summary(); as s) {
+        <!-- Summary card -->
+         <article class="summary-card" aria-label="Timesheet summary">
+          <div class="summary-card-main">
+            <div class="summary-card-period">
+              <span class="summary-card-icon" aria-hidden="true">
+                <i class="fa-regular fa-calendar-days"></i>
+              </span>
+              <div>
+                <strong class="summary-card-week"> Week {{ s.weekNumber }} </strong>
+                <span class="summary-card-dates"> {{ s.periodLabel }} </span>
+              </div>
             </div>
+            <dl class="summary-card-meta">
+              <div>
+                <dt>Status</dt>
+                <dd>
+                  <span class="status-badge" [attr.data-status]="s.status">{{ s.status }} </span>
+                </dd>
+              </div>
+              <div>
+                <dt>Submitted On </dt>
+                <dd> {{ formatDate(s.submittedAt) }} </dd>
+              </div>
+              <div>
+                <dt>Locked</dt>
+                <dd class="summary-card-locked"> {{ s.isLocked ? 'Yes' : 'No' }}  
+                  <i class="fa-solid" [class.fa-lock]="s.isLocked" [class.fa-lock-open]="!s.isLocked" aria-hidden="true"></i>
+                </dd>
+              </div>
+              <div>
+               <dt> Created At </dt>
+               <dd>{{ formatDateTime(s.createdAt) }}</dd>
+              </div>
+              <div>
+                <dt>Updated At</dt>
+                <dd>{{ formatDateTime(s.updatedAt) }} </dd>
+              </div>
+            </dl>
           </div>
-        }
-      </div>
+
+          <div class="summary-card-reason">
+            <strong> Reason (if applicable) </strong>
+            <span> {{ s.rejectionReason || '-' }} </span>
+          </div>
+         </article>
+      }
     }
 
-    <!-- daily summary row-->
-    <div class="table-grid-row aggregate-summary-values-row text-mono">
-      <div class="grid-cell alignment-left-column text-body-strong summary-title-accent">Total Summary</div>
-      @for (totalAmount of dailyTotals; track $index) {
-        <div class="grid-cell computed-sum-cell" [class.highlighted-today-column]="days[$index].isToday">
-          {{ totalAmount === '-' ? '0:00' : totalAmount }}
-        </div>
-      }
-    </div>
-
-  </div>
-
-  <!--- Submit CTA -->
-  <div class="timesheet-action-footer-toolbar">
-    <div class="left-action-cluster">
-      <!-- using the font awesome icons -->
-      <button class="btn btn-secondary"><i class="fa-solid fa-plus btn-icon"></i>Add new row</button>
-      <button class="btn btn-secondary"><i class="fa-regular fa-copy btn-icon"></i>Copy last week</button>
-      <button class="btn btn-secondary"><i class="fa-regular fa-floppy-disk btn-icon"></i>Save as template</button>
-    </div>
-    <div class="right-action-cluster">
-      <button class="btn btn-primary">Submit for approval</button>
-    </div>
-  </div>
-
-</div>
