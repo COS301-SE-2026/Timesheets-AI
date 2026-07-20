@@ -10,6 +10,8 @@
     <div class="page-header-actions" >
 
       <!-- INTEGRATION: Oprions come from GET /api/timesheets/me (or status filter), changing selection should load GET /api/timesheets/{id} + /entries -->
+
+      <!-- Week picker -->
        <label class="week-picker">
         <i class="fa-regualar fa-calender-days" arial-hidden="true"></i>
         <select 
@@ -26,62 +28,65 @@
         </select>
         <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
        </label>
+
+       @if (summary(); as s) {
+        <span class="status-badge" [attr.data-status]="s.status">
+          {{ s.status }}
+        </span>
+       }
     </div>
-   </header>
-</div>
+  </header>
 
+  <!-- Status filters : Integrate GET /api/timesheets/me/status/{status}
+   UI focuses on weekly detail status chips
+    -->
 
-  <!-- created to these cards to add nice visual insights and make the page less tableyy  -->
-  <!-- make use of the shared component progress -->
-
-<div class="timesheet-outer-dashboard-frame">
-  <div class="metrics-summary-overview-grid">
-    <div class="metric-card-widget">
-      <span class="widget-label text-caption">Total Hours</span>
-      <div class="widget-value-row">
-        <h3>27h 30m</h3>
-          <!-- Weekly trend indicator -->
-        <span class="trending-badge upward"><i class="fa-solid fa-arrow-trend-up"></i> +4.2h</span>
-      </div>
-    </div>
-    
-   <!-- Uses shared reusable progress component -->
-   <div class="metric-card-widget">
-    <span class="widget-label text-caption">Weekly Goal Progress</span>
-    <div class="widget-value-row">
-      <app-progress-bar [progress]="68.7" class="weekly-progress-wrapper"></app-progress-bar>
-    </div>
-  </div>
-
-    <div class="metric-card-widget">
-      <span class="widget-label text-caption">Most Active Project</span>
-      <div class="widget-value-row">
-        <h3>Project Data Room </h3>
-        <span class="project-indicator" style="background-color: var(--color-secondary)"></span>
-      </div>
-    </div>
-
-    <div class="metric-card-widget">
-      <span class="widget-label text-caption">Approval Status</span>
-      <div class="widget-value-row">
-        <span class="status-badge-pill state-draft">In Review</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- timesheet table shows weekday and dates -->
-  <div class="timesheet-data-table-grid-card">
-    
-    <div class="table-grid-row structural-header-columns text-label">
-      <div class="grid-cell alignment-left-column">TASKS</div>
-
-    <!-- days array in the .ts -->
-      @for (day of days; track day.label) {
-        <div class="grid-cell date-cell" [class.highlighted-today-column]="day.isToday">
-          {{ day.label }}
-        </div>
+    <div class="status-filters" role="tablist" aria-label="Filter timesheets by status">
+      @for (filter of statusFilters; track filter) {
+        <button type="button" role="tab" class="status-filters-chip" [class.is-active]="selectedFilter() === filter" [attr.aria.selected]="selectedFilter() === filter" (click)="onFilterChange(filter)">
+          {{ filter === 'ALL' ? 'All' : statusLabel(filter) }}
+        </button>
       }
     </div>
+
+    <!-- Loading -->
+
+    @if (uiState() === 'loading') {
+      <div class="state-panel state-panel--loading" role="status">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Loading timesheets...</p>
+      </div>
+    }
+
+   <!-- Error -->
+
+   @else if (uiState() === 'error') {
+   <div class=""state-panel state-panel--error role="alert">
+    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+    <p>{{ errorMessage() || 'Something went wrong.'}}</p>
+    <button type="button" class="btn btn--secondary" (click)="loadTimesheets()">Try again</button>
+   </div>
+   }
+
+<!-- Empty (no timesheets for filter) -->
+
+@else if (uiState() === 'empty' || !summary()) {
+  <div class="state-panel state-panel--empty">
+    <i class="fa-regular fa-clipboard" aria-hidden="true"></i>
+    <h2>No timesheets found</h2>
+    <p>
+      @if (selectedFilter() !== 'ALL') {
+        No timesheets match the "{{ statusLabel(selectedFilter()) }}" filter.
+      } @else {
+        Timesheets appear automatically when you log time.
+      }
+    </p>
+    <a class="btn btn--primary" routerLink="/log-time">
+      <i class="fa-regular fa-clock" aria-hidden="true"></i>
+      Log Time
+    </a>
+  </div>
+}
 
     @for (taskItem of tasks; track taskItem.title) {
       <div class="table-grid-row tracking-data-entry-item-row">
