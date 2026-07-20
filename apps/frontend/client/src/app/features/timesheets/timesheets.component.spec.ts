@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TimesheetsComponent } from './timesheets.component';
+import { provideRouter } from '@angular/router';
 import { By } from '@angular/platform-browser';
+import {TimesheetsComponent } from './timesheets.component'
 
 describe('TimesheetsComponent', () => {
   let fixture: ComponentFixture<TimesheetsComponent>;
@@ -8,11 +9,14 @@ describe('TimesheetsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TimesheetsComponent]
+      imports: [TimesheetsComponent],
+      providers: [provideRouter([])]
     }).compileComponents();
 
     fixture = TestBed.createComponent(TimesheetsComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
+    await fixture.whenStable();
     fixture.detectChanges();
   });
 
@@ -21,11 +25,15 @@ describe('TimesheetsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // verifies that all 7 days are rendered in the header row
-  it('should render all days in header row', () => {
-    const dayCells = fixture.debugElement.queryAll(
-      By.css('.date-cell')
-    );
+  it('should render the page title', () => {
+      const title= fixture.debugElement.query(By.css('.page-header__title'));
+      expect(title.nativeElement.textContent.trim()).toBe('Timesheets');
+  });
+
+  it('it should render status filter chips', () => {
+    const chips = fixture.debugElement.queryAll(By.css('.status-filters__chip'));
+    expect(chips.length).toBe(component.statusFilters.length);
+    })
 
     expect(dayCells.length).toBe(component.days.length);
   });
