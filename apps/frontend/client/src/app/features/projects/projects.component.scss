@@ -9,7 +9,6 @@ Related Requirement: N/A
 
 :host{
     display: block;
-    background: #f7f8fc;
     min-height: 100vh;
 }
 
@@ -170,7 +169,18 @@ STATUS BADGES
     font-size: 0.8rem;
     font-weight: 600;
 }
-
+/*
+STATUS DROPDOWN
+*/
+.status-dropdown{
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    border: 1px solid #d9dde7;
+    background: white;
+    font-size: 0.95rem;
+    cursor: pointer;
+    min-width: 170px;
+}
 /*
 DESCRIPTION
 */
@@ -192,8 +202,10 @@ TAGS
 
 .project-tag{
     background: #f1f5f9;
-    padding: 0.35rem 0.75rem;
-    border-radius: 30px;
+    color: #64748b;
+    border-radius: 1px solid #e2e8f0;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
     font-size: 0.75rem;
 }
 
