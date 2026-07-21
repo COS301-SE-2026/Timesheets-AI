@@ -65,7 +65,7 @@ return match ?? list[0];
 readonly summary = computed<TimesheetSummary | null> (
   () => this.selectedWeek()?.summary ?? null );
 
-readonly task = computed<TaskRow[]>(() => this.selectedWeek()?.task ?? []);
+readonly tasks = computed<TaskRow[]>(() => this.selectedWeek()?.tasks ?? []);
 readonly days = computed(() => this.selectedWeek()?.days ?? []);
 readonly dailyTotals = computed(() => this.selectedWeek()?.grandTotal ?? '0h 00m');
 readonly hasEntries = computed(() => this.tasks().length > 0);
@@ -109,5 +109,89 @@ construct() {
 loadTimesheets(): void {
   this.uiState.set('loading');
   this.errorMessage.set(null);
+
+  //Simulated load - remove when wiring HTTP
+
+  queueMicrotask(() => {
+    try{
+      const list = this.filteredTimesheets();
+      if(list.length === 0) {
+        this.uiState.set('empty');
+        return;
+      }
+      if(!list.some((ts) => ts.summary.id === this.selectedTimesheetId())) {
+        this.selectedTimesheetId.set(list[0].summary.id);
+      }
+      this.uiState.set('idle');
+    } catch {
+      this.uiState.set('error');
+      this.errorMessage.set('Failed to load timesheets. Please try again.');
+    }
+  });
 }
+
+onFilterChange(filter: StatusFilter): void {
+  this.selectedFilter.set(filter);
+  // INTEGRATION: GET /api/timesheets/me/status/{status} when filter !== ALL
+  //              GET /api/timesheets/me when filter === ALL
+
+  this.loadTimesheets();
+}
+
+onWeekChange(timesheetId: string): void {
+  this.selectedTimesheetId.set(timesheetId);
+  // INTEGRATION: GET /api/timesjeets/{id} + GET /api/timesheets/{id}/entries
+}
+
+statusLabel(status: StatusFilter | TimesheetStatus) : string {
+  if(status === 'ALL') {
+    return 'ALL';
+  }
+  return status.charAt(0) + status.slice(1).toLowerCase();
+}
+
+formatDateTime(value: string | null): string {
+  if(!value) {
+    return '-';
+  }
+  const date = new Date(value);
+  return date.toLocaleString('en-ZA', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  })
+}
+
+formatDate(value: string | null): string {
+  if(!value) {
+    return '-';
+  }
+  const date = new Date(value);
+  return date.toLocaleDateString('en-ZA', {
+    month:'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+
+displayHours(value: string | null): string {
+  return value ?? '-';
+}
+
+// INTEGRATION: Navigate to task/entry detail or open a side panel listiing entries for this task withing the selected timesheet period.
+
+onViewTask(task: TaskRow): void {
+  this.showToast(`View entries for "${task.title}" (wire up navigation).`);
+}
+
+// INTEGRATION: Conftim, then POST /api/timesheets/{id}/submit
+
+onSubmitTimesheet(): void {
+  const s = this.summary();
+  
+}
+
 }
