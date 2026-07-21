@@ -216,7 +216,7 @@ TEAM MEMBERS
 
 .team-members{
     display: flex;
-    gap: 0.5rem;
+    // gap: 0.5rem;
     flex-wrap: wrap;
     margin-top: 0.75rem;
 }
@@ -225,12 +225,17 @@ TEAM MEMBERS
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    margin-left: -10px;
     background: #5f62ff;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: 700;
+}
+
+.team-member :first-child{
+    margin: left 0;
 }
 
 /*
