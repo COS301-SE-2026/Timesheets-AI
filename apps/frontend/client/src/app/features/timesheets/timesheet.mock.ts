@@ -1,109 +1,70 @@
-export interface Day {
+/**
+ * Author : Lerato Sibanda
+ * Date : 2026-07-21
+ * Related requirement : -
+ */
+
+//Mock data for timesheet page UI
+
+export type TimesheetStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+
+export interface WeekDay {
   label: string;
-  dateStr: string;
-  isToday?: boolean;
+  shortLabel: string;
+  dateLabel: string;
+  isoDate: string;
 }
 
-export interface Task {
+export interface TimesheetSummary {
   id: string;
+  weekNumber: number;
+  periodStart: string;
+  periodEnd: string;
+  periodLabel: string;
+  status: TimesheetStatus;
+  submittedAt: string | null;
+  approvedAt: string | null;
+  rejectedAt: string | null;
+  rejectionReason: string | null;
+  isLocked: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskRow {
+  taskId: string;
   title: string;
   project: string;
   category: string;
-  iconClass: string;
   colorCode: string;
-  loggedHours: string[];
+  dailyHours: (string | null)[];
   total: string;
 }
 
-/* ============================================================
-   DAYS (generated to avoid duplication)
-   ============================================================ */
-const dayLabels = [
-  'Mon, May 18',
-  'Tue, May 19',
-  'Wed, May 20',
-  'Thu, May 21',
-  'Fri, May 22',
-  'Sat, May 23',
-  'Sun, May 24'
+export interface TimesheetWeekView {
+  summary: TimesheetSummary;
+  days: WeekDay[];
+  task: TaskRow[];
+  dailyTotals: string[];
+  grandTotal: string;
+}
+
+export const STATUS_FILTERS: Array<'ALL' | TimesheetStatus> = [
+  'ALL',
+  'DRAFT',
+  'SUBMITTED',
+  'APPROVED',
+  'REJECTED'
 ];
 
-export const DAYS: Day[] = dayLabels.map((label, index) => ({
-  label,
-  dateStr: String(18 + index),
-  isToday: index === 3
-}));
+const WEEK_29_DAYS: WeekDay[] = [
+  { label:'MON', shortLabel: 'Mon', dateLabel: 'JUL 13', isoDate: '2026-07-13'},
+  { label:'TUE', shortLabel: 'Tue', dateLabel: 'JUL 14', isoDate: '2026-07-14'},
+  { label:'WED', shortLabel: 'Wed', dateLabel: 'JUL 15', isoDate: '2026-07-15'},
+  { label:'THU', shortLabel: 'Thu', dateLabel: 'JUL 16', isoDate: '2026-07-16'},
+  { label:'FRI', shortLabel: 'Fri', dateLabel: 'JUL 17', isoDate: '2026-07-17'},
+  { label:'SAT', shortLabel: 'Sat', dateLabel: 'JUL 18', isoDate: '2026-07-18'},
+  { label:'SUN', shortLabel: 'Sun', dateLabel: 'JUL 19', isoDate: '2026-07-19'}
 
-/* ============================================================
-   SUMMARY DATA
-   ============================================================ */
-export const DAILY_TOTALS = [
-  '5hr 30 m',
-  '9hr 30 m',
-  '6hr 12 m',
-  '9hr 7 m',
-  '8hr 25min',
-  '4hr 8min',
-  '12hr 56min'
 ];
 
-export const GRAND_TOTAL = '55hr 48 m';
-
-/* ============================================================
-   TASK FACTORY 
-   ============================================================ */
-const createTask = (
-  id: string,
-  title: string,
-  project: string,
-  category: string,
-  iconClass: string,
-  colorCode: string,
-  loggedHours: string[],
-  total: string
-): Task => ({
-  id,
-  title,
-  project,
-  category,
-  iconClass,
-  colorCode,
-  loggedHours,
-  total
-});
-
-/* ============================================================
-   TASKS
-   ============================================================ */
-export const TASKS: Task[] = [
-  createTask(
-    'FE-101',
-    'Build Login & Signup Screens',
-    'Client Portal',
-    'Software Development',
-    'fa-solid fa-code',
-    '#7C8CF8',
-    ['2hr 15m', '3hr 40m', '1hr 20m', '-', '1hr 20m', '-', '-'],
-    '7hr 15m'
-  ),
-  createTask(
-    'FE-118',
-    'Develop Dashboard Components',
-    'Analytics Dashboard',
-    'Software Development',
-    'fa-solid fa-laptop-code',
-    '#F59E9E',
-    ['-', '2hr 30m', '4hr 10m', '1hr 45m', '-', '1hr 20m', '-'],
-    '8hr 25m'
-  ),
-  createTask(
-    'BE-204',
-    'Create Authentication API',
-    'Client Portal',
-    'Software Development',
-    'fa-solid fa-server',
-    '#F7C66F',
-    ['1hr 10m', '-', '2hr 00m', '2hr 20m', '-', '-', '1hr 20m'],
-    '5hr 30m'
-  )
-];
