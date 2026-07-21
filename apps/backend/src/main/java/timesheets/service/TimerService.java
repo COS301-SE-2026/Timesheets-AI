@@ -39,7 +39,7 @@ public class TimerService {
   @Transactional
   public TimerSession startTimer(StartTimerRequest request) {
 
-    // I want to check if a memeber exists
+    // I want to check if a member exists
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     UUID userId =
