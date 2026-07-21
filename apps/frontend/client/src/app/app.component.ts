@@ -5,7 +5,7 @@
  * Related Requirement: FR-01 - Application layout
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
@@ -33,9 +33,11 @@ export class AppComponent {
   showFooter = true;
   isFullscreenPage = false;
 
+  private readonly router = inject(Router);
+
   private readonly hideLayoutRoutes = ['/login', '/signup', '/not-found'];
 
-  constructor(private readonly router: Router) {
+  constructor() {
     this.updateLayout(this.router.url);
     
     this.router.events
