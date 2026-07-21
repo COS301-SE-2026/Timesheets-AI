@@ -37,6 +37,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     List<WorkspaceMember> memberships = workspaceMemberRepository.findByUserId(user.getId());
 
     UUID defaultWorkspaceMemberId = null;
+    UUID workspaceId = null;
+
     for (WorkspaceMember membership : memberships) {
       authorities.add(new SimpleGrantedAuthority("ROLE_" + membership.getRole().name()));
 
@@ -44,6 +46,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
       if (defaultWorkspaceMemberId == null) {
         defaultWorkspaceMemberId = membership.getId();
+        workspaceId = membership.getWorkspaceId();
       }
     }
 
@@ -54,6 +57,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         user.getLastName(),
         user.getEmailVerified(),
         defaultWorkspaceMemberId,
+        workspaceId,
         user.getPasswordHash(),
         user.getStatus() == UserStatus.ACTIVE && Boolean.TRUE.equals(user.getEmailVerified()),
         true,

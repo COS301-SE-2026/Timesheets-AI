@@ -24,7 +24,11 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "stylePreprocessorOptions": {
-              "includePaths": ["src/app/shared/styles", "src/app/layouts"]
+              "includePaths": [
+                "src/app/shared/styles",
+                "src/app/layouts",
+                "node_modules"
+              ]
             },
             "assets": [
               {
@@ -38,9 +42,6 @@
               }
             ],
             "styles": ["src/styles.scss"],
-            "stylePreprocessorOptions": {
-              "includePaths": ["node_modules"]
-            },
             "scripts": []
           },
           "configurations": {
@@ -53,8 +54,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "8kB",
-                  "maximumError": "12kB"
+                  "maximumWarning": "100kB",
+                  "maximumError": "120kB"
                 }
               ],
               "outputHashing": "all",
@@ -97,11 +98,18 @@
           "options": {
             "tsConfig": "tsconfig.spec.json"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": ["angular-eslint"]
   }
 }

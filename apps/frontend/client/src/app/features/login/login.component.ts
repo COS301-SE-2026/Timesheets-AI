@@ -1,3 +1,10 @@
+/**
+ * Author: Cleopatra Kwenda
+ * Date: 2026-05-15
+ * Purpose: Handles user authentication through login form with validation
+ * Related Requirement: -
+ */
+
 import {
   AfterViewInit,
   Component,
@@ -5,6 +12,7 @@ import {
   inject,
   ViewChild,
 } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
@@ -91,8 +99,9 @@ export class LoginComponent implements AfterViewInit {
       width: 320,
     });
   }
-  protected triggerGoogleLogin(): void{
-    const hiddenGoogleButton = this.googleBtn.nativeElement.querySelector('div[role="button"]');
+  protected triggerGoogleLogin(): void {
+    const hiddenGoogleButton =
+      this.googleBtn.nativeElement.querySelector('div[role="button"]');
     hiddenGoogleButton?.click();
   }
 

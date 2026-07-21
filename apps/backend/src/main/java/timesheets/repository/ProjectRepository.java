@@ -14,4 +14,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
   // finds all the projects for the workspace, this will also be the soft deleted ones
   List<Project> findByWorkspaceId(UUID workspaceId);
+
+  // find all the projects (for an admin)
+  List<Project> findAllByIsDeletedFalse();
 }
