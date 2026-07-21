@@ -54,6 +54,7 @@ public class TaskService {
         .collect(Collectors.toList());
   }
 
+  // gets a task by it's id with the full details for display
   @Transactional(readOnly = true)
   public TaskResponse getTaskResponseById(UUID taskId, UUID workspaceMemberId) {
     Task task = getTaskById(taskId);
@@ -75,11 +76,31 @@ public class TaskService {
     return TaskResponse.fromWithDetails(task, projectName, assignedToName);
   }
 
+  // this gets the task by the id - internal entity
   @Transactional
   public Task getTaskById(UUID taskId) {
     return taskRepository
         .findById(taskId)
         .orElseThrow(() -> new RuntimeException("Task not found"));
+  }
+
+  @Transactional(readOnly = true)
+  public List<TaskResponse> getMyTasks(UUID workspaceMemberId) {
+    List<Task> tasks =
+        taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId);
+
+    return tasks.stream()
+        .map(
+            task -> {
+              String projectName =
+                  projectRepository
+                      .findById(task.getProjectId())
+                      .map(Project::getName)
+                      .orElse("Unknown Project");
+              String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
+              return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+            })
+        .collect(Collectors.toList());
   }
 
   // ! helper functions
