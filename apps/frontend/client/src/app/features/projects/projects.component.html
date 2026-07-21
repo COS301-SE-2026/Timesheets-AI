@@ -106,16 +106,30 @@ HEADER
     </section>
 
     <div class="project-tags-filter">
-        <i class="fa-solid fa-tags"></i>
-        <span class="tags-title">
-            Tags:
-        </span>
+        <div class="tags-heading">
+            <i class="fa-solid fa-tags"></i>
+            <span class="tags-title">
+                Tags:
+            </span>
+        </div>
+        
+        @for(tag of avaiableTags; track tag){
+            <button
+                type="button"
+                class="filter-tag"
+                [class.selected-tag]="selectedTags.includes(tag)"
+                (click)="filterByTag(tag)">
 
-        <span class="project-tag">api</span>
-        <span class="project-tag">design</span>
-        <span class="project-tag">internal</span>
-        <span class="project-tag">mobile</span>
-        <span class="project-tag">angular</span>
+                {{tag}}
+            
+            </button>
+        }
+
+        <!-- <span class="filter-tag">api</span>
+        <span class="filter-tag">design</span>
+        <span class="filter-tag">internal</span>
+        <span class="filter-tag">mobile</span>
+        <span class="filter-tag">angular</span> -->
         
     </div>
 
@@ -127,20 +141,21 @@ HEADER
             <article class="project-card">
                 <div class="project-card-header">
 
-                    <div class="project-avatar"> 
-                        {{project.initials}}
+                    <div class="project-title-row">
+                        <div class="project-avatar"> 
+                            {{project.initials}}
+                        </div>
+
+                        <div class="project-title-content">
+                            <h2 class="project-name">
+                                {{project.name}}
+                            </h2>
+
+                            <p class="project-client">
+                                {{project.client}}
+                            </p>
+                        </div>
                     </div>
-
-                    <div>
-                        <h2 class="project-name">
-                            {{project.name}}
-                        </h2>
-
-                        <p class="project-client">
-                            {{project.client}}
-                        </p>
-                    </div>
-
                     <!-- <app-status-chip
                         [status]="$any(project.status)">
                     </app-status-chip> -->

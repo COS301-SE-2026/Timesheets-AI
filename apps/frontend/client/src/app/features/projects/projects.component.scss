@@ -65,6 +65,17 @@ HEADING OF PAGE
     &:nth-child(4n+0){background: #34d399;}
 }
 
+.project-title-row{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-title-content{
+    display: flex;
+    flex-direction: column;
+}
+
 .page-title{
     margin: 0;
     font-size: 2rem;
@@ -233,6 +244,29 @@ TAGS
     padding: 0.35rem 0.8rem;
     border-radius: 999px;
     font-size: 0.75rem;
+}
+
+.filter-tag{
+    border: none;
+    margin-right: 0.4rem;
+    margin-bottom: 0.5rem;
+    background: #EEF2FF;
+    color: #4F46E5;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 2s;
+}
+
+.selected-tag{
+    background: var(--color-primary);
+    color: white;}
+
+.filter-tag:hover{
+    background: #4f46e5;
+    color: white;
 }
 
 /*

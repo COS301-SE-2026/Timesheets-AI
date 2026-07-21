@@ -39,6 +39,7 @@ export class ProjectsComponent {
   protected readonly filters = PROJECT_FILTERS;
   protected selectedFilter = 'All';
   protected searchTerm = '';
+  protected selectedTags:string[]=[];
 
   protected get totalProjects(): number {
     return this.projects.length;
@@ -87,5 +88,35 @@ export class ProjectsComponent {
     this.filteredProjects = this.projects.filter((project) =>
       project.name.toLowerCase().includes(searchValue.toLowerCase()),
     );
+  }
+
+  protected filterByTag(tag:string): void{
+    const tagIndex=this.selectedTags.indexOf(tag);
+
+    //removing tag if it was already selected
+    if(tagIndex> -1){
+      this.selectedTags.splice(tagIndex,1);
+    }else{
+      this.selectedTags.push(tag)
+    }
+
+    //no tags are selected= show everything
+    if(this.selectedTags.length===0){
+      this.filteredProjects=[...this.projects];
+      return;
+    }
+
+    this.filteredProjects=this.projects.filter(
+      project=>
+        this.selectedTags.every(
+          tag=>project.tags.includes(tag),
+        ),
+    );
+  }
+
+  protected get avaiableTags(): string[]{
+    return[... new Set(
+      this.projects.flatMap(project=> project.tags),
+    )];
   }
 }
