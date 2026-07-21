@@ -188,8 +188,12 @@
             type="submit"
             class="submit-button"
             [disabled]="loading">
-            <span *ngIf="!loading">Sign In</span>
-            <span *ngIf="loading">Signing in...</span>
+            @if (!loading) {
+                <span>Sign In</span>
+            }
+            @if (loading) {
+                <span>Signing in...</span>
+            }
             </button>
 
         </form>
