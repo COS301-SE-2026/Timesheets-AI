@@ -39,7 +39,8 @@ public class SecurityConfig {
                         "/api/auth/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
-                        // update to match what was set prior in application.yml: refer to springdoc.api-docs.path=/v3/api-docs
+                        // update to match what was set prior in application.yml:
+                        //  refer to springdoc.api-docs.path=/v3/api-docs
                         "/v3/api-docs/**",
                         "/v3/api-docs",
                         "/api/auth/register",
