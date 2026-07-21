@@ -22,6 +22,7 @@ public class ProjectResponse {
   private String status;
   private BigDecimal budgetHours;
   private BigDecimal hourlyRate;
+  private BigDecimal budgetCost;
   private LocalDate startDate;
   private LocalDate endDate;
   private WorkspaceRole myRole; // the role that the user has on the project
@@ -36,6 +37,7 @@ public class ProjectResponse {
         .status(project.getStatus())
         .budgetHours(project.getBudgetHours())
         .hourlyRate(project.getHourlyRate())
+        .budgetCost(project.getBudgetCost())
         .startDate(project.getStartDate())
         .endDate(project.getEndDate())
         .myRole(myRole)

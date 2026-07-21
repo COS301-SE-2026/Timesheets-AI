@@ -1,3 +1,10 @@
+/**
+ * Author: Kgaugelo Matsena
+ * Date: 2026-05-15
+ * Purpose: Reusable input field component with validation error support.
+ * Related Requirement: -
+ */
+
 import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 

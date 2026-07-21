@@ -2,7 +2,7 @@
   "name": "momently",
   "private": true,
   "workspaces": [
-    "apps/frontend",
+    "apps/frontend/client",
     "ai-service"
   ],
   "scripts": {
@@ -17,12 +17,12 @@
     "backend:test": "cd apps/backend && mvn test",
     "backend:coverage": "cd apps/backend && mvn verify -P coverage",
     "backend:lint": "cd apps/backend && mvn checkstyle:check",
-    "frontend:dev": "cd apps/frontend && yarn start",
-    "frontend:build": "cd apps/frontend && yarn build",
-    "frontend:test": "cd apps/frontend && yarn test",
-    "frontend:lint": "cd apps/frontend && yarn lint",
-    "frontend:coverage": "cd apps/frontend && yarn test:coverage",
-    "frontend:e2e": "cd apps/frontend && yarn e2e",
+    "frontend:dev": "cd apps/frontend/client && yarn start",
+    "frontend:build": "cd apps/frontend/client && yarn build",
+    "frontend:test": "cd apps/frontend/client && yarn test",
+    "frontend:lint": "cd apps/frontend/client && yarn lint",
+    "frontend:coverage": "cd apps/frontend/client && yarn test:coverage",
+    "frontend:e2e": "cd apps/frontend/client && yarn e2e",
     "ai:dev": "cd ai-service && uvicorn main:app --reload --port 8000",
     "ai:test": "cd ai-service && pytest",
     "ai:coverage": "cd ai-service && pytest --cov=. --cov-report=html",
