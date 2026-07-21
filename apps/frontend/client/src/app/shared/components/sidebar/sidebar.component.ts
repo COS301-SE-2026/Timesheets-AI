@@ -5,7 +5,7 @@
  * Related Requirement: -
  */
 
-import { Component, signal } from '@angular/core'; // UI componenet and signal store state, uodate UI changes automatically 
+import { Component, inject, signal } from '@angular/core'; // UI componenet and signal store state, uodate UI changes automatically 
 import { CommonModule } from '@angular/common'; //to be able use ngIf and ngFor 
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
@@ -27,7 +27,7 @@ interface NavItem {
 export class SidebarComponent {
 
   //since it is not reassigned
-  constructor(private readonly router: Router) {}
+  private readonly router = inject(Router);
 
   // create reactive state variable so it stores state, update UI automatically when changed 
   navItems = signal<NavItem[]>([

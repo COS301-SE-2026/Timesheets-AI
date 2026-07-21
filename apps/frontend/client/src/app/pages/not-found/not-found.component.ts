@@ -5,7 +5,7 @@
  * Related Requirement: -
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Location, CommonModule } from '@angular/common';
 import { HourglassComponent } from '../../shared/components/hourglass/hourglass.component';
@@ -24,9 +24,9 @@ import { HourglassComponent } from '../../shared/components/hourglass/hourglass.
 export class NotFoundComponent {
   protected readonly brandLogo = '/assets/momently.png';
 
-  constructor(private readonly location: Location) {}
+  private readonly location =inject(Location) ;
 
-  goBack() {
+  goBack(): void {
     this.location.back();
   }
 }
