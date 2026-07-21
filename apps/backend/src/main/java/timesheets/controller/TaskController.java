@@ -26,4 +26,12 @@ public class TaskController {
     List<TaskResponse> tasks = taskService.getTasksForProject(projectId, workspaceMemberId);
     return ResponseEntity.ok(tasks);
   }
+
+  @GetMapping("/{taskId}")
+  public ResponseEntity<TaskResponse> getTaskById(@PathVariable UUID taskId) {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    TaskResponse task = taskService.getTaskResponseById(taskId, workspaceMemberId);
+    return ResponseEntity.ok(task);
+  }
 }

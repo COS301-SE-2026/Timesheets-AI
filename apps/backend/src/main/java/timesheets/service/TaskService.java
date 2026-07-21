@@ -28,7 +28,8 @@ public class TaskService {
   private final WorkspaceMemberRepository workspaceMemberRepository;
   private final UserRepository userRepository;
 
-  // this gets all the active tasks of a project - only if the user has access to that project
+  // this gets all the active tasks of a project - only if the user has access to
+  // that project
   @Transactional(readOnly = true)
   public List<TaskResponse> getTasksForProject(UUID projectId, UUID workspaceMemberId) {
 
@@ -51,6 +52,34 @@ public class TaskService {
               return TaskResponse.fromWithDetails(task, projectName, assignedToName);
             })
         .collect(Collectors.toList());
+  }
+
+  @Transactional(readOnly = true)
+  public TaskResponse getTaskResponseById(UUID taskId, UUID workspaceMemberId) {
+    Task task = getTaskById(taskId);
+
+    // checks if the task has been deleted
+    if (Boolean.TRUE.equals(task.getIsDeleted())) {
+      throw new RuntimeException("Task has been deleted");
+    }
+
+    if (!userHasAccessToProject(taskId, workspaceMemberId)) {
+      throw new RuntimeException("You do not have access to this task");
+    }
+
+    String projectName =
+        projectRepository.findById(task.getProjectId()).map(Project::getName).orElse("Unknown Pro");
+
+    String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
+
+    return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+  }
+
+  @Transactional
+  public Task getTaskById(UUID taskId) {
+    return taskRepository
+        .findById(taskId)
+        .orElseThrow(() -> new RuntimeException("Task not found"));
   }
 
   // ! helper functions
