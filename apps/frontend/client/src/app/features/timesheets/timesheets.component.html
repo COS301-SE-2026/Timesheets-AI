@@ -13,7 +13,7 @@
 
       <!-- Week picker -->
        <label class="week-picker">
-        <i class="fa-regualar fa-calender-days" arial-hidden="true"></i>
+        <i class="fa-regular fa-calender-days" arial-hidden="true"></i>
         <select 
           class="week-picker-select"
           [ngModel]="selectedTimesheetId()"
@@ -61,7 +61,7 @@
    <!-- Error -->
 
    @else if (uiState() === 'error') {
-   <div class=""state-panel state-panel--error role="alert">
+   <div class="state-panel state-panel--error" role="alert">
     <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
     <p>{{ errorMessage() || 'Something went wrong.'}}</p>
     <button type="button" class="btn btn--secondary" (click)="loadTimesheets()">Try again</button>
@@ -218,9 +218,62 @@
           <button type="button" class="btn btn--primary" [disabled]="actionPending()" (click)="onSubmitTimesheet()"> Submit Timesheet</button>
         }
 
-        @if (canApproveOrReject()) {
-          <!-- INTEGRATION: POST /api/timesheets.{id}/approve or reject-->
-          
+        @if (summary()?.status === 'SUBMITTED' && !isManager()) {
+            <p class="awaiting-review">
+              <i class="fa-regular fa-clock" aria-hidden="true"></i>
+              Awaiting review
+            </p>          
         }
+
+        @if (canApproveOrReject()) {
+          <!-- INTEGRATION: POST /api/timesheets/{id}/approvr or reject -->
+           <button type="button" class="btn btn--primary" [disabled]="actionPending()" (click)="onApproveTimesheet()"> Approve</button>
+           <button type="button" class="btn btn--danger" [disabled]="actionPending()" (click)="openRejectDialog()"> Reject</button>
+        }
+
+        @if (isReadOnly() && summary()?.status === 'APPROVED') {
+          <p class="read-only-note"> This timesheet is approved and locked </p>
+        }
+        </div>
+      } @else {
+        <!-- Timesheets exist but not entries yet -->
+         <section class="state-panel state-panel--empty">
+          <i class="fa-regular fa-clock" aria-hidden="true"></i>
+          <h2>No time entries yet</h2>
+          <p>You haven't logged any time entries for this week. Log time to populate this timesheet.</p>
+          <a class="btn btn--ptimary" routerLink="/log-time">
+            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+            Log Time
+          </a>
+         </section>
+      }
+
+      <!-- Rject Reason dialog -->
+
+      @if (showRejectDialog()) {
+        <div class="dialog-backdrop" (click)="closeRejectionDialog" role="presentation"></div>
+        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="reject-dialog-title">
+          <h2 id="reject-dialog-title"> Reject Timesheet </h2>
+          <p>Please proved a reason for rejection. The employee will see this on their timesheet.</p>
+          <label class="dialog-label" for="reject-reason">Reason</label>
+          <textarea id="reject-reason" class="dialog-textarea" rows="4" [ngModel]="rejectReason()" (ngModelChange)="rejectReason.set($event)" placeholder="Enter rejection reason..."></textarea>
+          <div class="dialog-actions">
+            <button type="button" class="btn btn--secondary" (click)="closeRejectionDialog()">Cancel</button>
+            <button type="button" class="btn btn--danger" [disabled]="!rejectReason().trim() || actionPending()"> Confirm Reject </button>
+          </div>
+        </div>
+      }
+
+   <!-- Success toast -->
+
+   @if (toastMessage(); as toast) {
+    <div class="toast" role="status">
+      <span> {{ toast }} </span>
+      <button type="nutton" class="toast-dismiss" (click)="dismissToast()" aria-label="Dismiss">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+   }
+    
 
 
