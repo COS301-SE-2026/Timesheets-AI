@@ -21,4 +21,7 @@ export interface Project {
   role: ProjectRole;
   teamMembers: string[];
   tags: string[];
+
+  //will ask nyasha to add edpoint i guess
+  initials: string;
 }

@@ -125,6 +125,11 @@ HEADER
         @for (project of filteredProjects; track project.id){
             <article class="project-card">
                 <div class="project-card-header">
+
+                    <div class="project-avatar"> 
+                        {{project.initials}}
+                    </div>
+                    
                     <div>
                         <h2 class="project-name">
                             {{project.name}}

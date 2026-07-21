@@ -26,5 +26,6 @@ export const PROJECTS: Project[] = [
     role: ProjectRole.DEVELOPER,
     teamMembers: ['JD', 'SK', 'MR', 'CK', 'LS', 'KM'],
     tags: ['web', 'angular'],
+    initials: 'PA'
   },
 ];
