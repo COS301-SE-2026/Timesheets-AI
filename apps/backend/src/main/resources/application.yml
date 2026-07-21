@@ -3,7 +3,8 @@ spring:
     name: momently-backend
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/momently_dev}
+  # changed th port to 5433 because docker compose file exposes 5432 for the host and inside the docker containers is 5432
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/momently_dev}
     username: ${SPRING_DATASOURCE_USERNAME:momently}
     password: ${SPRING_DATASOURCE_PASSWORD:momently_dev_password}
     driver-class-name: org.postgresql.Driver
