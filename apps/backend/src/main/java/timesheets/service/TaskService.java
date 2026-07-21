@@ -1,5 +1,6 @@
 package timesheets.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -7,8 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.Project;
+import timesheets.domain.ProjectMember;
 import timesheets.domain.Task;
 import timesheets.domain.WorkspaceMember;
+import timesheets.dto.request.CreateTaskRequest;
 import timesheets.dto.response.TaskResponse;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
@@ -103,6 +106,67 @@ public class TaskService {
         .collect(Collectors.toList());
   }
 
+  //this creates a new task
+  @Transactional
+  public TaskResponse createTask(CreateTaskRequest request, UUID workspaceMemberId) {
+    UUID projectId = request.getProjectId();
+
+    // to verify that the user has access to create tasks on the project
+    if (!isProjectManager(projectId, workspaceMemberId)
+        && !securityUtils.isAdmin()
+        && !securityUtils.isManager()) {
+      throw new RuntimeException("You don't have permission to create tasks on this project");
+    }
+
+    // to verify that the project exists and is not archived
+    Project project =
+        projectRepository
+            .findById(projectId)
+            .orElseThrow(() -> new RuntimeException("Project not found"));
+
+    if ("ARCHIVED".equals(project.getStatus())) {
+      throw new RuntimeException("Cannot create tasks on an archived project");
+    }
+
+    //this checks if there is a valid parent task and if that parent task is part of the same project
+    if (request.getParentTaskId() != null) {
+      Task parentTask =
+          taskRepository
+              .findById(request.getParentTaskId())
+              .orElseThrow(() -> new RuntimeException("Parent task not found"));
+
+      if (!parentTask.getProjectId().equals(projectId)) {
+        throw new RuntimeException("Parent task does not belong to this project");
+      }
+    }
+
+    //builds the task
+    Task task = new Task();
+    task.setProjectId(projectId);
+    task.setTitle(request.getTitle());
+    task.setDescription(request.getDescription());
+    task.setJiraTicketKey(request.getJiraTicketId());
+    task.setParentTaskId(request.getParentTaskId());
+    task.setEstimatedHours(request.getEstimatedHours());
+    task.setAssignedWorkspaceMemberId(request.getAssignedWorkspaceMemberId());
+    task.setDueDate(request.getDueDate());
+    task.setPriority(request.getPriority() != null ? request.getPriority() : "MEDIUM");
+    task.setStatus(request.getStatus() != null ? request.getStatus() : "TODO");
+    task.setIsDeleted(false);
+
+    //if the task gets marked as done right away, then the timestamp is updated
+    if ("DONE".equals(task.getStatus())) {
+      task.setCompletedAt(LocalDateTime.now());
+    }
+
+    Task savedTask = taskRepository.save(task);
+
+    String projectName = project.getName();
+    String assignedToName = getAssignedToName(savedTask.getAssignedWorkspaceMemberId());
+
+    return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName);
+  }
+
   // ! helper functions
   // checks if the user has access to the project
   private boolean userHasAccessToProject(UUID projectId, UUID workspaceMemeberId) {
@@ -132,5 +196,13 @@ public class TaskService {
         .flatMap(userRepository::findById)
         .map(user -> user.getFirstName() + " " + user.getLastName())
         .orElse("Unknown user");
+  }
+
+  // checks if the user is a project manager for a particular project
+  private boolean isProjectManager(UUID projectId, UUID workspaceMemberId) {
+    return projectMemberRepository
+        .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
+        .map(ProjectMember::getIsProjectManager)
+        .orElse(false);
   }
 }
