@@ -191,7 +191,70 @@ onViewTask(task: TaskRow): void {
 
 onSubmitTimesheet(): void {
   const s = this.summary();
-  
+  if (!s || !this.canSubmit()) {
+    return;
+  }
+  const confirmed = window.confirm(
+    'Submit this timesheet for approval? You will not be able to edit it while it is under review.'
+  );
+  if(!confirmed) {
+    return;
+  }
+
+  this.actionPending.set(true);
+  // INTEGRATION: this.timesheetService.submit(s.id).subscribe({...})
+  this.patchLocalStatus(s.id, 'SUBMITTED', {submittedAt: new Date().toISOString(), isLocked: true });
+  this.actionPending.set(false);
+  this.showToast('Timesheet submitted successfully.');
+}
+
+// INTEGRATION: Confirm then POST /api/timesheets/{id}/approve
+
+onApproveTimesheet(): void {
+  const s = this.summary();
+  if (!s || !this.canApproveOrReject()) {
+    return;
+  }
+  const confirmed = window.confirm('Approve this timesheet?');
+  if(!confirmed){
+    return;
+  }
+  this.actionPending.set(true);
+  // INTEGRATION: this.timesheetService.approve(s.id).subscribe({...})
+  this.patchLocalStatus(s.id, 'APPROVED', {
+    approvedAt: new Date().toISOString(), isLocked: true
+  });
+  this.actionPending.set(false);
+  this.showToast('Timesheet Approved');
+}
+
+openRejectDialog(): void {
+  if(!this.canApproveOrReject()) {
+    return;
+  }
+  this.rejectReason.set('');
+  this.showRejectDialog.set(true);
+}
+
+closeRejectDialog(): void {
+  this.showRejectDialog.set(false);
+  this.rejectReason.set('');
+}
+
+// INTEGRATION POST /api/timesheets/{id} reject with body {reason}
+
+onConfrimReject(): void {
+  const s = this.summary();
+  const reason = this.rejectReason().trim();
+  if (!s || !reason) {
+    return;
+  }
+  this.actionPending.set(true);
+  // INTEGRATIOON: this.timesheetService.reject(s.id, reasons).subscribe({...})
+  this.patchLoacalStatus(s.id, 'REJECTED', { rejectedAt: new Date().toISOString(), rejectionReason: reason, isLocked: false});
+  this.actionPending.set(false);
+  this.closeRejectDialog();
+  this.showToast('Timesheet Rejected.');
 }
 
 }
