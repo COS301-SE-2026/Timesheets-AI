@@ -1,12 +1,13 @@
 <div class="input-field">
 
+    @if (label()) { 
     <label
         class="field-label"
-        *ngIf="label()"
         [for]="inputId">
 
         {{ label() }}
     </label>
+}
 
     <input
         type="text"
