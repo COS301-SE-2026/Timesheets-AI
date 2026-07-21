@@ -70,9 +70,8 @@ jobs:
 
             # runs frontend unit tests using Jest 
             - name: Run Jest tests
-
-              working-directory: apps/frontend/client
               if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
+              working-directory: apps/frontend/client
               run: yarn test --watch=false
 
 #===================== RELEASE stage ================================
