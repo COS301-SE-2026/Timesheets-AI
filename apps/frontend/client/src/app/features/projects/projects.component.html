@@ -195,9 +195,15 @@ HEADER
                     </span>
 
                     <div class="team-members">
-                        @for (member of project.teamMembers; track member){
+                        @for (member of project.teamMembers.slice(0,3); track member){
                             <span class="team-member">
                                 {{member}}
+                            </span>
+                        }
+
+                        @if(project.teamMembers.length >3){
+                            <span class="team-member-more">
+                                +{{project.teamMembers.length -3}}
                             </span>
                         }
                     </div>

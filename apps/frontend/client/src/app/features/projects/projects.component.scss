@@ -238,6 +238,19 @@ TEAM MEMBERS
     margin: left 0;
 }
 
+.team-member{
+    &:nth-child(4n+1){background-color: #4f8ef7;}
+    &:nth-child(4n+2){background-color: #f9a826;}
+    &:nth-child(4n+3){background-color: #4caf50;}
+    &:nth-child(4n+0){background-color: #9c27b0;}
+}
+
+.team-member-more{
+    background-color: #6b7280;
+    color: #ffffff;
+    font-size: 0.7rem;
+}
+
 /*
 RESPONSE
 */
