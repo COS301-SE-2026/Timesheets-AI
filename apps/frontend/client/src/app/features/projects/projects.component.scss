@@ -68,12 +68,13 @@ HEADING OF PAGE
 .project-title-row{
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1rem;
 }
 
 .page-title-content{
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
 .page-title{
@@ -174,7 +175,7 @@ PROJECT CARDS
 .project-card-header{
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .project-name{
@@ -184,7 +185,7 @@ PROJECT CARDS
 }
 
 .project-client{
-    margin-top: 0.3rem;
+    margin: 0;
     color: #7b7b7b;
 }
 
