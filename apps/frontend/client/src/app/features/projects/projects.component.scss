@@ -188,6 +188,58 @@ PROJECT CARDS
     color: #7b7b7b;
 }
 
+.project-progress{
+    margin: 1.25rem 0;
+}
+
+.progress-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.progress-title{
+    color: #475467;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.progress-value{
+    color: #475467;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.role-chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+.developer-chip{
+    background: #EEF2FF;
+    border-color: #c7d2fe;
+    color: #4f46e5;
+}
+
+.manager-chip{
+    background: #ecfdf5;
+    border-color: #bbf7d0;
+    color: #15803d;
+}
+
+.admin-chip{
+    background: #fef3c7;
+    border-color: #fde68a;
+    color: #b45309;
+}
+
 /*
 STATUS BADGES
 */

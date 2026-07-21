@@ -186,21 +186,41 @@ HEADER
                 <!--
                 PROGRESS OF PROJECTS??
                 -->
-                <app-progress-bar
-                    [progress]="(project.hoursLogged / project.totalHours)*100">
-                </app-progress-bar>
+                <div class="project-progress">
+                    <div class="progress-header">
+                        <span class="progress-title">
+                            Hours
+                        </span>
+
+                        <span class="progress-value">
+                            {{project.hoursLogged }}h / {{project.totalHours}}
+                        </span>
+
+                    </div>
+                    
+                    <app-progress-bar
+                        [progress]="(project.hoursLogged / project.totalHours)*100">
+                    </app-progress-bar>
+                </div>
+                    
 
                 <!--
                 FOOTER OF CARD
                 -->
                 <div class="project-card-footer">
-                    <span>
+                    <!-- <span>
                         {{project.hoursLogged}} / {{project.totalHours}} hrs
-                    </span>
+                    </span> -->
 
-                    <span>
+                    <span 
+                        class="role-chip"
+                        [ngClass]="{
+                            'developer-chip': project.role ==='Developer',
+                            'manager-chip': project.role ==='Manager',
+                            'admin-chip': project.role ==='Admin'
+                        }">
                         {{project.role}}
-                    </span>
+                    </span> 
                 </div>
 
                 <!--
