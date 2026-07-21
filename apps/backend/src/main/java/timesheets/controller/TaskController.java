@@ -49,11 +49,11 @@ public class TaskController {
     return ResponseEntity.ok(tasks);
   }
 
-  //this will create a new task 
+  // this will create a new task
   @PostMapping
   public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody CreateTaskRequest request) {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    
+
     TaskResponse response = taskService.createTask(request, workspaceMemberId);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);

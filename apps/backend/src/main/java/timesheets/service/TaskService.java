@@ -67,7 +67,7 @@ public class TaskService {
       throw new RuntimeException("Task has been deleted");
     }
 
-    if (!userHasAccessToProject(taskId, workspaceMemberId)) {
+    if (!userHasAccessToProject(task.getProjectId(), workspaceMemberId)) {
       throw new RuntimeException("You do not have access to this task");
     }
 
@@ -106,7 +106,7 @@ public class TaskService {
         .collect(Collectors.toList());
   }
 
-  //this creates a new task
+  // this creates a new task
   @Transactional
   public TaskResponse createTask(CreateTaskRequest request, UUID workspaceMemberId) {
     UUID projectId = request.getProjectId();
@@ -128,7 +128,8 @@ public class TaskService {
       throw new RuntimeException("Cannot create tasks on an archived project");
     }
 
-    //this checks if there is a valid parent task and if that parent task is part of the same project
+    // this checks if there is a valid parent task and if that parent task is part of the same
+    // project
     if (request.getParentTaskId() != null) {
       Task parentTask =
           taskRepository
@@ -140,7 +141,7 @@ public class TaskService {
       }
     }
 
-    //builds the task
+    // builds the task
     Task task = new Task();
     task.setProjectId(projectId);
     task.setTitle(request.getTitle());
@@ -154,7 +155,7 @@ public class TaskService {
     task.setStatus(request.getStatus() != null ? request.getStatus() : "TODO");
     task.setIsDeleted(false);
 
-    //if the task gets marked as done right away, then the timestamp is updated
+    // if the task gets marked as done right away, then the timestamp is updated
     if ("DONE".equals(task.getStatus())) {
       task.setCompletedAt(LocalDateTime.now());
     }
