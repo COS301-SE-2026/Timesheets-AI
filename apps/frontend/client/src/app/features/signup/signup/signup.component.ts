@@ -22,20 +22,20 @@ export class SignupComponent {
   private readonly router = inject(Router);
 
   /* Toast state */
-  protected toastMessage = '';
-  protected showToast = false;
+   toastMessage = '';
+   showToast = false;
 
   // Logo image
-  protected readonly brandLogo = '/assets/momently.png';
+   readonly brandLogo = '/assets/momently.png';
 
   // Toggles password visibility
-  protected showPassword = false;
+   showPassword = false;
 
   // Tracks whether form has been submitted (used for validation display)
-  protected submitted = false;
+   submitted = false;
 
   // Reactive signup form definition
-  protected readonly signupForm = this.formBuilder.nonNullable.group({
+   readonly signupForm = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     surname: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
@@ -51,12 +51,12 @@ export class SignupComponent {
   });
 
   // Toggles password visibility in the input field
-  protected togglePasswordVisibility(): void {
+   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
   // Handles form submission and validation flow
-  protected createAccount(): void {
+   createAccount(): void {
     this.submitted = true;
 
     if (this.signupForm.invalid) {
@@ -70,12 +70,12 @@ export class SignupComponent {
     }, 800);
   }
 
-  protected get showNameError(): boolean {
+   get showNameError(): boolean {
     const control = this.signupForm.controls.name;
     return (control.touched || this.submitted) && control.invalid;
   }
 
-  protected get nameErrorMessage(): string {
+   get nameErrorMessage(): string {
     const control = this.signupForm.controls.name;
 
     if (control.hasError('required')) {
@@ -88,12 +88,12 @@ export class SignupComponent {
     return '';
   }
 
-  protected get showSurnameError(): boolean {
+   get showSurnameError(): boolean {
     const control = this.signupForm.controls.surname;
     return (control.touched || this.submitted) && control.invalid;
   }
 
-  protected get surnameErrorMessage(): string {
+   get surnameErrorMessage(): string {
     const control = this.signupForm.controls.surname;
 
     if (control.hasError('required')) {
@@ -107,13 +107,13 @@ export class SignupComponent {
   }
 
   // Determines when email error should be shown
-  protected get showEmailError(): boolean {
+   get showEmailError(): boolean {
     const control = this.signupForm.controls.email;
     return (control.touched || this.submitted) && control.invalid;
   }
 
   // Returns appropriate email validation error message
-  protected get emailErrorMessage(): string {
+   get emailErrorMessage(): string {
     const control = this.signupForm.controls.email;
 
     if (control.hasError('required')) {
@@ -127,13 +127,13 @@ export class SignupComponent {
   }
 
   // Determines when password error should be shown
-  protected get showPasswordError(): boolean {
+   get showPasswordError(): boolean {
     const control = this.signupForm.controls.password;
     return (control.touched || this.submitted) && control.invalid;
   }
 
   // Returns appropriate password validation error message
-  protected get passwordErrorMessage(): string {
+   get passwordErrorMessage(): string {
     const control = this.signupForm.controls.password;
 
     if (control.hasError('required')) {
@@ -147,27 +147,27 @@ export class SignupComponent {
   }
 
   // Determines when terms validation error should be shown
-  protected get showTermsError(): boolean {
+   get showTermsError(): boolean {
     const control = this.signupForm.controls.acceptedTerms;
     return (control.touched || this.submitted) && control.invalid;
   }
 
   // Returns terms validation error message
-  protected get termsErrorMessage(): string {
+   get termsErrorMessage(): string {
     return this.showTermsError
       ? 'You must accept the Terms of Service and Privacy Policy.'
       : '';
   }
 
     /* Show a temporary demo toast */
-  protected showDemoToast(message: string): void {
+   showDemoToast(message: string): void {
     this.toastMessage = message;
     this.showToast = true;
     setTimeout(() => { this.showToast = false; }, 4000);
   }
 
   /* Social login handler */
-  protected onSocialLogin(provider: string): void {
+   onSocialLogin(provider: string): void {
     this.showDemoToast(
       `${provider} sign up is not available in Demo 1. Please use the email form.`
     );

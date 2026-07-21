@@ -39,7 +39,7 @@ describe('LoginComponent', () => {
   it('should submit form when valid', () => {
     jest.useFakeTimers();
 
-    const comp = component as any;
+    const comp = component ;
     const spy = jest.spyOn(console, 'info').mockImplementation();
 
     comp.loginForm.setValue({
@@ -64,7 +64,7 @@ describe('LoginComponent', () => {
   });
 
   it('should show email error for invalid email format', () => {
-    const comp = component as any;
+    const comp = component;
 
     comp.loginForm.controls['email'].setValue('wrong-email');
     comp.loginForm.controls['email'].markAsTouched();
@@ -74,7 +74,7 @@ describe('LoginComponent', () => {
   });
 
   it('should clear email error when email becomes valid', () => {
-    const comp = component as any;
+    const comp = component;
 
     comp.loginForm.controls['email'].setValue('john@company.com');
     comp.loginForm.controls['email'].markAsTouched();
@@ -84,7 +84,7 @@ describe('LoginComponent', () => {
   });
 
   it('should show password required error', () => {
-    const comp = component as any;
+    const comp = component;
 
     comp.loginForm.controls['password'].setValue('');
     comp.loginForm.controls['password'].markAsTouched();
@@ -94,7 +94,7 @@ describe('LoginComponent', () => {
   });
 
   it('should clear password error when valid password is entered', () => {
-    const comp = component as any;
+    const comp = component;
 
     comp.loginForm.controls['password'].setValue('Password1');
     comp.loginForm.controls['password'].markAsTouched();
@@ -104,7 +104,7 @@ describe('LoginComponent', () => {
   });
 
   it('should toggle password visibility', () => {
-    const comp = component as any;
+    const comp = component;
 
     expect(comp.showPassword).toBe(false);
 
@@ -116,7 +116,7 @@ describe('LoginComponent', () => {
   });
 
   it('should submit form when valid', () => {
-    const comp = component as any;
+    const comp = component;
     const spy = jest.spyOn(console, 'info').mockImplementation();
 
     comp.loginForm.setValue({
@@ -135,7 +135,7 @@ describe('LoginComponent', () => {
   });
 
   it('should show validation errors when submitting invalid form', () => {
-    const comp = component as any;
+    const comp = component;
 
     comp.onSubmit();
 
@@ -144,7 +144,7 @@ describe('LoginComponent', () => {
   });
 
   it('should trigger validation when submit is clicked', () => {
-    const comp = component as any;
+    const comp = component;
 
     comp.onSubmit();
 

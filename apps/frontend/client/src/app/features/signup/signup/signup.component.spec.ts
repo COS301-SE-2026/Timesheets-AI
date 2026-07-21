@@ -6,7 +6,7 @@ describe('SignupComponent', () => {
 
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
-  let componentInstance: any;
+  let componentInstance: SignupComponent;
 
   // Runs before each test case
   beforeEach(async () => {
@@ -22,7 +22,7 @@ describe('SignupComponent', () => {
 
     component = fixture.componentInstance;
 
-    componentInstance = component as any;
+    componentInstance = component;
 
     fixture.detectChanges();
   });

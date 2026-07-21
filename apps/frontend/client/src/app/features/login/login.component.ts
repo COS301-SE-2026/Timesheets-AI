@@ -23,39 +23,39 @@ export class LoginComponent {
   private readonly formBuilder = inject(FormBuilder);
 
   // Logo (fixes your NG error + allows reuse in template)
-  protected readonly brandLogo = '/assets/momently.png';
+   readonly brandLogo = '/assets/momently.png';
 
   // UI state
-  protected loading = false;
-  protected errorMessage = '';
-  protected showPassword = false;
-  protected submitted = false;
+   loading = false;
+   errorMessage = '';
+   showPassword = false;
+   submitted = false;
 
   /* Toast state */
-  protected toastMessage = '';
-  protected showToast = false;
+   toastMessage = '';
+   showToast = false;
 
   // Login form
-  protected readonly loginForm: FormGroup = this.formBuilder.group({
+   readonly loginForm: FormGroup = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
     remember: [false]
   });
 
   // Toggle password visibility
-  protected togglePassword(): void {
+   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
 
   /* Show a temporary demo toast message */
-  protected showDemoToast(message: string): void {
+   showDemoToast(message: string): void {
     this.toastMessage = message;
     this.showToast = true;
     setTimeout(() => { this.showToast = false; }, 4000);
   }
 
   /* Forgot password handler */
-  protected onForgotPassword(event: Event): void {
+   onForgotPassword(event: Event): void {
     event.preventDefault();
     this.showDemoToast(
       'Password reset is not available in Demo 1. Use the test credentials shared with your team.'
@@ -63,7 +63,7 @@ export class LoginComponent {
   }
 
   /* Social login handler */
-  protected onSocialLogin(provider: string): void {
+   onSocialLogin(provider: string): void {
     this.showDemoToast(
       `${provider} login is not available in Demo 1. Please use the email and password form.`
     );
@@ -71,7 +71,7 @@ export class LoginComponent {
   
 
   // Submit handler
-  protected onSubmit(): void {
+   onSubmit(): void {
     this.submitted = true;
 
     if (this.loginForm.invalid) {
@@ -89,12 +89,12 @@ export class LoginComponent {
   }
 
   // Email error logic
-  protected get showEmailError(): boolean {
+   get showEmailError(): boolean {
     const control = this.loginForm.controls['email'];
     return (control.touched || this.submitted) && control.invalid;
   }
 
-  protected get emailErrorMessage(): string {
+   get emailErrorMessage(): string {
     const control = this.loginForm.controls['email'];
 
     if (control.hasError('required')) return 'Email is required.';
@@ -104,13 +104,13 @@ export class LoginComponent {
   }
 
   // Password error logic
-  protected get showPasswordError(): boolean {
+   get showPasswordError(): boolean {
     const control = this.loginForm.controls['password'];
     return (control.touched || this.submitted) && control.invalid;
   }
 
   
-  protected get passwordErrorMessage(): string {
+   get passwordErrorMessage(): string {
     const control = this.loginForm.controls['password'];
 
     if (control.hasError('required')) return 'Password is required.';
