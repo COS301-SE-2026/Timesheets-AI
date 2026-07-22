@@ -44,7 +44,7 @@ export interface TaskRow {
 export interface TimesheetWeekView {
   summary: TimesheetSummary;
   days: WeekDay[];
-  task: TaskRow[];
+  tasks: TaskRow[];
   dailyTotals: string[];
   grandTotal: string;
 }
@@ -99,7 +99,7 @@ export const MOCK_TIMESHEET_WEEK_28: TimesheetWeekView = {
   },
   days: WEEK_28_DAYS,
 
-  task: [
+  tasks: [
     {
     taskId: 'task-login',
     title: 'Build login & Signup screens',
@@ -152,7 +152,7 @@ export const MOCK_TIMESHEET_WEEK_29: TimesheetWeekView = {
   },
   days: WEEK_29_DAYS,
 
-  task: [
+  tasks: [
     {
     taskId: 'task-login',
     title: 'Build login & Signup screens',

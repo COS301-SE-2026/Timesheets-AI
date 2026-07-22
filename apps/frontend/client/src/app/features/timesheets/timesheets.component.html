@@ -13,13 +13,13 @@
 
       <!-- Week picker -->
        <label class="week-picker">
-        <i class="fa-regular fa-calender-days" arial-hidden="true"></i>
+        <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
         <select 
           class="week-picker-select"
           [ngModel]="selectedTimesheetId()"
           (ngModelChange)="onWeekChange($event)"
           [disabled]="uiState() === 'loading' || filteredTimesheets().length === 0"
-          arial-label="Select timesheet week">
+          aria-label="Select timesheet week">
           @for (week of filteredTimesheets(); track week.summary.id) {
             <option [value]="week.summary.id">
               Week {{ week.summary.weekNumber }} . {{ week.summary.periodLabel }}
@@ -139,7 +139,8 @@
       }
 
       <!-- Entries table or empty entries -->
-       <div class="entry-table-wrapper" role="region" aria-hidden="Weekly time entries">
+       @if(hasEntries()) {
+       <div class="entry-table-wrapper" role="region" aria-label="Weekly time entries">
         <table class="entry-table">
           <thead>
             <tr>
@@ -166,7 +167,7 @@
                       <span class="task-cell-meta">
                         {{ task.project }}
                         <span class="task-cell-pipe"> | </span>
-                        {{ task.categoty }}
+                        {{ task.category }}
                       </span>
                     </div>
                   </div>
@@ -191,7 +192,7 @@
           </tbody>
 
           <tfoot>
-            <tr class="daily-tatal-row">
+            <tr class="daily-total-row">
               <td class="col-task"> 
                 <strong>Daily Total</strong>
               </td>
@@ -241,25 +242,26 @@
           <i class="fa-regular fa-clock" aria-hidden="true"></i>
           <h2>No time entries yet</h2>
           <p>You haven't logged any time entries for this week. Log time to populate this timesheet.</p>
-          <a class="btn btn--ptimary" routerLink="/log-time">
+          <a class="btn btn--primary" routerLink="/log-time">
             <i class="fa-regular fa-clock" aria-hidden="true"></i>
             Log Time
           </a>
          </section>
       }
+    }
 
       <!-- Rject Reason dialog -->
 
       @if (showRejectDialog()) {
-        <div class="dialog-backdrop" (click)="closeRejectionDialog" role="presentation"></div>
+        <div class="dialog-backdrop" (click)="closeRejectDialog()" role="presentation"></div>
         <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="reject-dialog-title">
           <h2 id="reject-dialog-title"> Reject Timesheet </h2>
-          <p>Please proved a reason for rejection. The employee will see this on their timesheet.</p>
+          <p>Please provide a reason for rejection. The employee will see this on their timesheet.</p>
           <label class="dialog-label" for="reject-reason">Reason</label>
           <textarea id="reject-reason" class="dialog-textarea" rows="4" [ngModel]="rejectReason()" (ngModelChange)="rejectReason.set($event)" placeholder="Enter rejection reason..."></textarea>
           <div class="dialog-actions">
-            <button type="button" class="btn btn--secondary" (click)="closeRejectionDialog()">Cancel</button>
-            <button type="button" class="btn btn--danger" [disabled]="!rejectReason().trim() || actionPending()"> Confirm Reject </button>
+            <button type="button" class="btn btn--secondary" (click)="closeRejectDialog()">Cancel</button>
+            <button type="button" class="btn btn--danger" [disabled]="!rejectReason().trim() || actionPending()" (click)="onConfirmReject()"> Confirm Reject </button>
           </div>
         </div>
       }
@@ -269,11 +271,11 @@
    @if (toastMessage(); as toast) {
     <div class="toast" role="status">
       <span> {{ toast }} </span>
-      <button type="nutton" class="toast-dismiss" (click)="dismissToast()" aria-label="Dismiss">
+      <button type="button" class="toast-dismiss" (click)="dismissToast()" aria-label="Dismiss">
         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
       </button>
     </div>
    }
     
-
+</div>
 
