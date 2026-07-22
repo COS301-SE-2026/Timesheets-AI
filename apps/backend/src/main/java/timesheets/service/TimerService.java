@@ -62,6 +62,15 @@ public class TimerService {
 
     if (existingActiveTimer.isPresent()) {
       TimerSession activeTimer = existingActiveTimer.get();
+
+      //checks if the existing timer is paused
+      if (Boolean.TRUE.equals(activeTimer.getIsPaused())) {
+        throw new ConflictException(
+            "Timer is paused",
+            "You have a paused timer. Resume it or discard it before starting a new one.",
+            activeTimer.getId());
+      }
+
       throw new ConflictException(
           "Timer already active in another workspace",
           "You already have a running timer. Stop it before starting a new one.",
@@ -100,10 +109,36 @@ public class TimerService {
     timerSession.setTaskId(task != null ? task.getId() : null);
     timerSession.setStartedAt(LocalDateTime.now());
     timerSession.setIsRunning(true);
+    timerSession.setIsPaused(false);
     timerSession.setPausedDurationSeconds(0L);
+    timerSession.setPausedAt(null);
 
     return timerSessionRepository.save(
         timerSession); // so I am creating and getting a timer session
+  }
+
+  /*
+  -- this should pause the current running timer
+  - I added the timer pause and stuff such that the timer can be resumed later 
+   */
+  @Transactional
+  public TimerSession pauseTimer() {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    TimerSession activeTimer =
+        timerSessionRepository
+            .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId)
+            .orElseThrow(() -> new IllegalStateException("No active timer found"));
+
+    // check if the timer is already paused
+    if (Boolean.TRUE.equals(activeTimer.getIsPaused())) {
+      throw new IllegalStateException("Timer is already paused");
+    }
+
+    activeTimer.setIsPaused(true);
+    activeTimer.setPausedAt(LocalDateTime.now());
+
+    return timerSessionRepository.save(activeTimer);
   }
 
   // this should be if a timer is stopped and a draft timer entry is created
@@ -122,10 +157,24 @@ public class TimerService {
     LocalDateTime startedAt = activeTimer.getStartedAt();
     long durationSeconds = ChronoUnit.SECONDS.between(startedAt, now); // I am calculating how long
 
+    //sibtracts the total paused duration
     if (activeTimer.getPausedDurationSeconds() != null) {
-      durationSeconds -= (activeTimer.getPausedDurationSeconds() / 60);
-    } // so this should subtract the paused duration to see the actual time- I made the mistake of
-    // not cosidering this properlly
+      durationSeconds -= (activeTimer.getPausedDurationSeconds());
+    }
+
+    //if the timer is paused, only time that counts is when a timer is paused
+    if (Boolean.TRUE.equals(activeTimer.getIsPaused()) && activeTimer.getPausedAt() != null) {
+      long durationUntilPause = ChronoUnit.SECONDS.between(startedAt, activeTimer.getPausedAt());
+
+      durationSeconds = durationUntilPause;
+
+      if (activeTimer.getPausedDurationSeconds() != null) {
+        durationSeconds -= activeTimer.getPausedDurationSeconds();
+      }
+    }
+
+    //to make sure that duration is not negative
+    durationSeconds = Math.max(0, durationSeconds);
 
     activeTimer.setEndedAt(now);
     activeTimer.setIsRunning(false); // stopping the timer
@@ -153,6 +202,7 @@ public class TimerService {
     return timeEntryRepository.save(timeEntry);
   }
 
+  // ! helper function
   public TimerSession getActiveTimer() {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();

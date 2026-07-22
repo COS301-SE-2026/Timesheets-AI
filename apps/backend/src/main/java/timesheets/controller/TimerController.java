@@ -3,6 +3,7 @@ package timesheets.controller;
 import exception.ConflictException;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,16 @@ public class TimerController {
       return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
       // if a user tries to start another time while one exists already
     }
+  }
+
+  //pause the currently running timer
+  @PostMapping("/pause")
+  public ResponseEntity<ActiveTimerResponse> pauseTimer() {
+    TimerSession timer = timerService.pauseTimer();
+
+    ActiveTimerResponse response = convertToResponse(timer);
+
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/stop") // the endpoint will look like POST /api/timers/stop
@@ -103,17 +114,32 @@ public class TimerController {
     response.setId(timer.getId());
     response.setStartedAt(timer.getStartedAt());
     response.setActive(timer.getIsRunning());
+    response.setIsPaused(Boolean.TRUE.equals(timer.getIsPaused()));
+    response.setPausedAt(timer.getPausedAt());
 
     // this will find the time that passed since the timer started
     if (timer.getIsRunning() && timer.getStartedAt() != null) {
+      LocalDateTime now = LocalDateTime.now();
 
-      long minutes =
-          java.time.Duration.between(timer.getStartedAt(), java.time.LocalDateTime.now())
-              .toMinutes();
-      response.setElapsedMinutes((int) minutes);
+      // the total seconds from the start till now
+      long totalSeconds = java.time.Duration.between(timer.getStartedAt(), now).toSeconds();
+      if (timer.getPausedDurationSeconds() != null) {
+        totalSeconds -= timer.getPausedDurationSeconds();
+      }
 
+      // if paused get the time since last paused
+      if (Boolean.TRUE.equals(timer.getIsPaused()) && timer.getPausedAt() != null) {
+        long secondsSincePause = java.time.Duration.between(timer.getPausedAt(), now).toSeconds();
+        totalSeconds -= secondsSincePause;
+      }
+
+      totalSeconds = Math.max(0, totalSeconds);
+
+      response.setElapsedSeconds((int) totalSeconds);
+      response.setElapsedMinutes((int) (totalSeconds / 60));
     } else {
       response.setElapsedMinutes(0);
+      response.setElapsedSeconds(0);
     }
 
     String projectName = "Unknown Project";
@@ -128,8 +154,6 @@ public class TimerController {
         projectName = project.getName();
       }
     }
-    // previously I wanted to put something loading, but since I can have a stub, and because of JPA
-    // I have the basic functions now I can do this yayyy!!
 
     ActiveTimerResponse.SimpleProject simpleProject = new ActiveTimerResponse.SimpleProject();
 
