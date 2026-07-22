@@ -63,7 +63,7 @@ public class TimerService {
     if (existingActiveTimer.isPresent()) {
       TimerSession activeTimer = existingActiveTimer.get();
 
-      //checks if the existing timer is paused
+      // checks if the existing timer is paused
       if (Boolean.TRUE.equals(activeTimer.getIsPaused())) {
         throw new ConflictException(
             "Timer is paused",
@@ -119,7 +119,7 @@ public class TimerService {
 
   /*
   -- this should pause the current running timer
-  - I added the timer pause and stuff such that the timer can be resumed later 
+  - I added the timer pause and stuff such that the timer can be resumed later
    */
   @Transactional
   public TimerSession pauseTimer() {
@@ -141,39 +141,41 @@ public class TimerService {
     return timerSessionRepository.save(activeTimer);
   }
 
-  //resumes a timer
-  @Transactional 
-  public TimerSession resumeTimer(){
+  // resumes a timer
+  @Transactional
+  public TimerSession resumeTimer() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
-    TimerSession activeTimer = timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId).orElseThrow(()-> new IllegalStateException("No active timer found"));
+    TimerSession activeTimer =
+        timerSessionRepository
+            .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId)
+            .orElseThrow(() -> new IllegalStateException("No active timer found"));
 
-    //should see if there is an active timer for the user
-    if(!Boolean.TRUE.equals(activeTimer.getIsPaused())){
+    // should see if there is an active timer for the user
+    if (!Boolean.TRUE.equals(activeTimer.getIsPaused())) {
       throw new IllegalStateException("Timer is not paused");
     }
 
-    //calculates how long it is paused
-    if(activeTimer.getPausedAt() != null){
-      long pausedDurationSeconds = ChronoUnit.SECONDS.between(activeTimer.getPausedAt(), LocalDateTime.now());
+    // calculates how long it is paused
+    if (activeTimer.getPausedAt() != null) {
+      long pausedDurationSeconds =
+          ChronoUnit.SECONDS.between(activeTimer.getPausedAt(), LocalDateTime.now());
 
-      //add the total to paused duration
+      // add the total to paused duration
       Long currentPausedDuration = activeTimer.getPausedDurationSeconds();
 
-      if(currentPausedDuration == null){
+      if (currentPausedDuration == null) {
         currentPausedDuration = 0L;
       }
       activeTimer.setPausedDurationSeconds(currentPausedDuration + pausedDurationSeconds);
     }
 
-    //update timer states
+    // update timer states
     activeTimer.setIsPaused(false);
     activeTimer.setPausedAt(null);
 
     return timerSessionRepository.save(activeTimer);
   }
-
-
 
   // this should be if a timer is stopped and a draft timer entry is created
   @Transactional
@@ -191,12 +193,12 @@ public class TimerService {
     LocalDateTime startedAt = activeTimer.getStartedAt();
     long durationSeconds = ChronoUnit.SECONDS.between(startedAt, now); // I am calculating how long
 
-    //sibtracts the total paused duration
+    // sibtracts the total paused duration
     if (activeTimer.getPausedDurationSeconds() != null) {
       durationSeconds -= (activeTimer.getPausedDurationSeconds());
     }
 
-    //if the timer is paused, only time that counts is when a timer is paused
+    // if the timer is paused, only time that counts is when a timer is paused
     if (Boolean.TRUE.equals(activeTimer.getIsPaused()) && activeTimer.getPausedAt() != null) {
       long durationUntilPause = ChronoUnit.SECONDS.between(startedAt, activeTimer.getPausedAt());
 
@@ -207,7 +209,7 @@ public class TimerService {
       }
     }
 
-    //to make sure that duration is not negative
+    // to make sure that duration is not negative
     durationSeconds = Math.max(0, durationSeconds);
 
     activeTimer.setEndedAt(now);

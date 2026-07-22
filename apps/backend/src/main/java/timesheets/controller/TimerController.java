@@ -53,7 +53,7 @@ public class TimerController {
     }
   }
 
-  //pause the currently running timer
+  // pause the currently running timer
   @PostMapping("/pause")
   public ResponseEntity<ActiveTimerResponse> pauseTimer() {
     TimerSession timer = timerService.pauseTimer();
@@ -63,9 +63,9 @@ public class TimerController {
     return ResponseEntity.ok(response);
   }
 
-  //resumes a timer
+  // resumes a timer
   @PostMapping("/resume")
-  public ResponseEntity<ActiveTimerResponse> resumeTimer(){
+  public ResponseEntity<ActiveTimerResponse> resumeTimer() {
     TimerSession timer = timerService.resumeTimer();
 
     ActiveTimerResponse response = convertToResponse(timer);
