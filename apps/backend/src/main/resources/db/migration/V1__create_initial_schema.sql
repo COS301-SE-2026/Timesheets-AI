@@ -3,6 +3,7 @@
 -- Enable pgcrypto
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+
 -- Drop existing tables if they exist (CAREFUL: This deletes data!)
 -- DROP TABLE IF EXISTS audit_logs CASCADE;
 -- DROP TABLE IF EXISTS notifications CASCADE;
@@ -155,6 +156,8 @@ CREATE TABLE timer_sessions (
     started_at TIMESTAMP NOT NULL,
     ended_at TIMESTAMP,
     paused_duration_seconds BIGINT DEFAULT 0,
+    is_paused BOOLEAN DEFAULT FALSE,
+    paused_at TIMESTAMP,
     is_running BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT now()
 );

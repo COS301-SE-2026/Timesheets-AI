@@ -1,9 +1,27 @@
-
-
 -- Enable UUID generation if not already enabled
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- DROP TABLE IF EXISTS audit_logs CASCADE;
+-- DROP TABLE IF EXISTS notifications CASCADE;
+-- DROP TABLE IF EXISTS ai_insights CASCADE;
+-- DROP TABLE IF EXISTS git_commits CASCADE;
+-- DROP TABLE IF EXISTS calendar_events CASCADE;
+-- DROP TABLE IF EXISTS jira_tickets CASCADE;
+-- DROP TABLE IF EXISTS user_availability CASCADE;
+-- DROP TABLE IF EXISTS time_entries CASCADE;
+-- DROP TABLE IF EXISTS timer_sessions CASCADE;
+-- DROP TABLE IF EXISTS timesheets CASCADE;
+-- DROP TABLE IF EXISTS tasks CASCADE;
+-- DROP TABLE IF EXISTS project_members CASCADE;
+-- DROP TABLE IF EXISTS projects CASCADE;
+-- DROP TABLE IF EXISTS workspace_members CASCADE;
+-- DROP TABLE IF EXISTS workspaces CASCADE;
+-- DROP TABLE IF EXISTS users CASCADE;
+
 -- User 1: Thabang Siduke- he is MFA enabled so use User 2 if you need JWT token
+
+-- 1. USERS
+-- User 1: Thabang Siduke - MFA enabled
 INSERT INTO users (
     id,
     first_name,
@@ -19,7 +37,7 @@ INSERT INTO users (
     'Thabang',
     'Siduke',
     'thabang.siduke@momentum.co.za',
-    '$2a$12$l.I8BliSILNVE7tbTm937eT7OMBdU9mv5.pXpmzBm3JcJNA/5mA1i',  -- password: "momentlyPass300$"
+    '$2a$12$l.I8BliSILNVE7tbTm937eT7OMBdU9mv5.pXpmzBm3JcJNA/5mA1i',
     true,
     'ACTIVE',
     NOW(),
@@ -49,7 +67,7 @@ INSERT INTO users (
     NOW()
 );
 
--- User 3: Lethabo Maseko 
+-- User 3: Lethabo Maseko
 INSERT INTO users (
     id,
     first_name,
@@ -256,7 +274,7 @@ INSERT INTO users (
     NOW()
 );
 
--- 2. WORKSPACE MEMBERS (All users in Workspace 1)
+-- 2. WORKSPACES
 INSERT INTO workspaces (
     id,
     name,
@@ -266,11 +284,12 @@ INSERT INTO workspaces (
 ) VALUES (
     '00000000-0000-0000-0001-000000000010',
     'Momentum Engineering',
-    '00000000-0000-0000-0001-000000000001',  -- Thabang is owner
+    '00000000-0000-0000-0001-000000000001',
     NOW(),
     NOW()
 );
 
+-- 3. WORKSPACE MEMBERS
 INSERT INTO workspace_members (id, workspace_id, user_id, role, joined_at, created_at, updated_at) VALUES
 -- Thabang Siduke (DEVELOPER)
 ('00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0001-000000000010', '00000000-0000-0000-0001-000000000001', 'DEVELOPER', NOW(), NOW(), NOW()),
@@ -297,16 +316,16 @@ INSERT INTO workspace_members (id, workspace_id, user_id, role, joined_at, creat
 
 
 
--- 3. PROJECTS
-INSERT INTO projects (id, workspace_id, name, description, status, budget_hours, hourly_rate, created_by_workspace_member_id, created_at, updated_at) VALUES
-('00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0001-000000000010', 'Mobile App Development', 'Building the React Native mobile application', 'ACTIVE', 500.00, 75.00, '00000000-0000-0000-0003-000000000022', NOW(), NOW()),
-('00000000-0000-0000-0002-000000000041', '00000000-0000-0000-0001-000000000010', 'Backend API', 'Spring Boot REST API development', 'ACTIVE', 300.00, 90.00, '00000000-0000-0000-0002-000000000021', NOW(), NOW()),
-('00000000-0000-0000-0003-000000000042', '00000000-0000-0000-0001-000000000010', 'Design System', 'Building the company design system', 'ON_HOLD', 150.00, 65.00, '00000000-0000-0000-0001-000000000020', NOW(), NOW()),
-('00000000-0000-0000-0004-000000000043', '00000000-0000-0000-0001-000000000010', 'DevOps Pipeline', 'CI/CD pipeline setup and maintenance', 'ACTIVE', 200.00, 85.00, '00000000-0000-0000-0006-000000000025', NOW(), NOW());
+-- 4. PROJECTS
+INSERT INTO projects (id, workspace_id, name, description, status, budget_hours, hourly_rate, budget_cost, created_by_workspace_member_id, created_at, updated_at) VALUES
+('00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0001-000000000010', 'Mobile App Development', 'Building the React Native mobile application', 'ACTIVE', 500.00, 75.00, 37500.00, '00000000-0000-0000-0003-000000000022', NOW(), NOW()),
+('00000000-0000-0000-0002-000000000041', '00000000-0000-0000-0001-000000000010', 'Backend API', 'Spring Boot REST API development', 'ACTIVE', 300.00, 90.00, 27000.00, '00000000-0000-0000-0002-000000000021', NOW(), NOW()),
+('00000000-0000-0000-0003-000000000042', '00000000-0000-0000-0001-000000000010', 'Design System', 'Building the company design system', 'ON_HOLD', 150.00, 65.00, 9750.00, '00000000-0000-0000-0001-000000000020', NOW(), NOW()),
+('00000000-0000-0000-0004-000000000043', '00000000-0000-0000-0001-000000000010', 'DevOps Pipeline', 'CI/CD pipeline setup and maintenance', 'ACTIVE', 200.00, 85.00, 17000.00, '00000000-0000-0000-0006-000000000025', NOW(), NOW());
 
 
 
--- 4. PROJECT MEMBERS
+-- 5. PROJECT MEMBERS
 INSERT INTO project_members (id, project_id, workspace_member_id, is_project_manager, is_active, created_at, updated_at) VALUES
 -- Mobile App project members
 ('00000000-0000-0000-0001-000000000050', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0001-000000000020', false, true, NOW(), NOW()),
@@ -330,7 +349,7 @@ INSERT INTO project_members (id, project_id, workspace_member_id, is_project_man
 
 
 
--- 5. TASKS
+-- 6. TASKS
 INSERT INTO tasks (id, project_id, title, description, status, priority, estimated_hours, assigned_workspace_member_id, created_at, updated_at) VALUES
 -- Mobile App tasks
 ('00000000-0000-0000-0001-000000000070', '00000000-0000-0000-0001-000000000040', 'Implement Login Screen', 'Design and implement the login screen with Google SSO', 'IN_PROGRESS', 'HIGH', 8.0, '00000000-0000-0000-0001-000000000020', NOW(), NOW()),
@@ -351,8 +370,7 @@ INSERT INTO tasks (id, project_id, title, description, status, priority, estimat
 ('00000000-0000-0000-0010-000000000079', '00000000-0000-0000-0004-000000000043', 'AWS Infrastructure', 'Setup AWS resources', 'TODO', 'HIGH', 10.0, '00000000-0000-0000-0010-000000000029', NOW(), NOW());
 
 
-
--- 6. TIMESHEETS (Only for active devs)
+-- 7. TIMESHEETS
 -- Thabang Siduke's timesheets
 INSERT INTO timesheets (id, workspace_member_id, period_start, period_end, status, created_at, updated_at) VALUES
 ('00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '2026-07-13', '2026-07-19', 'DRAFT', NOW(), NOW()),
@@ -370,7 +388,7 @@ INSERT INTO timesheets (id, workspace_member_id, period_start, period_end, statu
 
 
 
--- 7. TIME ENTRIES
+-- 8. TIME ENTRIES
 INSERT INTO time_entries (id, timesheet_id, workspace_member_id, project_id, task_id, start_time, end_time, duration_seconds, entry_type, description, created_at, updated_at) VALUES
 -- Thabang's time entries
 ('00000000-0000-0000-0001-000000000090', '00000000-0000-0000-0001-000000000080', '00000000-0000-0000-0001-000000000020', '00000000-0000-0000-0001-000000000040', '00000000-0000-0000-0001-000000000070', '2026-07-13 09:00:00', '2026-07-13 12:00:00', 10800, 'MANUAL', 'Working on login screen UI', NOW(), NOW()),
@@ -388,7 +406,7 @@ INSERT INTO time_entries (id, timesheet_id, workspace_member_id, project_id, tas
 
 
 
--- 8. USER PREFERENCES
+-- 9. USER PREFERENCES
 INSERT INTO user_preferences (id, user_id, theme, email_notifications, jira_enabled, calendar_enabled, git_enabled, created_at, updated_at) VALUES
 ('00000000-0000-0000-0001-000000000100', '00000000-0000-0000-0001-000000000001', 'DARK', true, false, true, false, NOW(), NOW()),
 ('00000000-0000-0000-0002-000000000101', '00000000-0000-0000-0002-000000000002', 'LIGHT', true, true, false, true, NOW(), NOW()),
@@ -396,20 +414,18 @@ INSERT INTO user_preferences (id, user_id, theme, email_notifications, jira_enab
 ('00000000-0000-0000-0004-000000000103', '00000000-0000-0000-0005-000000000005', 'LIGHT', false, true, false, true, NOW(), NOW());
 
 
-
--- 9. USER MFA (For Thabang - enabled)
+-- 10. USER MFA (Thabang - enabled)
 INSERT INTO user_mfa (id, user_id, secret_key, is_enabled, created_at, updated_at) VALUES
 ('00000000-0000-0000-0001-000000000110', '00000000-0000-0000-0001-000000000001', 'JBSWY3DPEHPK3PXP', true, NOW(), NOW());
 
-
--- 10. EMAIL VERIFICATION TOKENS (All verified)
+-- 11. EMAIL VERIFICATION TOKENS
 INSERT INTO email_verification_tokens (id, user_id, token, expires_at, verified_at, created_at) VALUES
 ('00000000-0000-0000-0001-000000000120', '00000000-0000-0000-0001-000000000001', 'thabang-verify-token-001', NOW() + INTERVAL '24 hours', NOW(), NOW()),
 ('00000000-0000-0000-0002-000000000121', '00000000-0000-0000-0002-000000000002', 'enzokuhle-verify-token-002', NOW() + INTERVAL '24 hours', NOW(), NOW()),
 ('00000000-0000-0000-0003-000000000122', '00000000-0000-0000-0003-000000000003', 'lethabo-verify-token-003', NOW() + INTERVAL '24 hours', NOW(), NOW());
 
 
--- 11. USER IDENTITY PROVIDERS (Google SSO)
+--12. USER IDENTITY PROVIDERS (Google SSO)
 INSERT INTO user_identity_providers (id, user_id, provider, provider_user_id, email, created_at) VALUES
 ('00000000-0000-0000-0001-000000000130', '00000000-0000-0000-0001-000000000001', 'GOOGLE', 'thabang-google-id-001', 'thabang.siduke@gmail.com', NOW()),
 ('00000000-0000-0000-0002-000000000131', '00000000-0000-0000-0003-000000000003', 'GOOGLE', 'lethabo-google-id-002', 'lethabo.maseko@gmail.com', NOW());
