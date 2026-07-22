@@ -1,298 +1,40 @@
 @use '../../shared/styles/index' as tokens;
-// we are using the shared styles & its variable 
-.timesheet-outer-dashboard-frame {
-  padding: tokens.$space-6;
-  background-color: transparent;
-  min-height: calc(100vh - 80px);
+.timesheets-page {
+  display: flex;
+  flex-direction: column;
+  gap: tokens.$space-6;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
-// Metric Section
-.metrics-summary-overview-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: tokens.$space-4;
-  margin-bottom: tokens.$space-6;
-}
-
-.metric-card-widget {
-  background-color: tokens.$color-white;
-  border: 1px solid tokens.$color-border;
-  border-radius: tokens.$radius-card;
-  padding: 16px 20px;
-  box-shadow: tokens.$elevation-1;
+// Page-header 
+.page-header {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.metric-card-widget .widget-label {
-  color: tokens.$color-text-muted;
-  font-weight: tokens.$font-weight-medium;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.metric-card-widget .widget-value-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.metric-card-widget .widget-value-row h3 {
-  margin: 0;
-  font-size: 22px;
-  font-weight: tokens.$font-weight-bold;
-  color: tokens.$color-primary;
-}
-
-/* trending badge */
-.trending-badge {
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: tokens.$radius-pill;
-  font-weight: tokens.$font-weight-bold;
-}
-
-.trending-badge.upward {
-  background-color: tokens.$color-status-approved-bg;
-  color: tokens.$color-status-approved-text;
-}
-
-/* project indicator */
-.project-indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-/* status pill */
-.status-badge-pill.state-draft {
-  background-color: tokens.$color-status-pending-bg;
-  color: tokens.$color-status-pending-text;
-  padding: 4px 12px;
-  border-radius: tokens.$radius-pill;
-  font-size: 13px;
-  font-weight: tokens.$font-weight-medium;
-}
-
-// Timesheet table 
-.timesheet-data-table-grid-card {
-  width: 100%;
-  background-color: tokens.$color-white;
-  border: 1px solid tokens.$color-border;
-  border-radius: tokens.$radius-card;
-  overflow: hidden;
-  box-shadow: tokens.$elevation-2;
-  margin-bottom: tokens.$space-6;
-}
-
-.table-grid-row {
-  display: grid;
-  grid-template-columns: 360px repeat(7, 1fr);
-  align-items: center;
-  border-bottom: 1px solid tokens.$color-border;
-  transition: background-color 0.15s ease;
-}
-
-.table-grid-row:last-child {
-  border-bottom: none;
-}
-
-/* grid cells */
-.grid-cell {
-  padding: 16px 12px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-.grid-cell.alignment-left-column {
-  justify-content: flex-start;
-  text-align: left;
-  padding-left: tokens.$space-6;
-}
-
-/* header row */
-.structural-header-columns {
-  background-color: tokens.$color-primary;
-  border-bottom: 2px solid tokens.$color-border;
-  font-weight: tokens.$font-weight-medium;
-}
-
-.structural-header-columns .date-cell {
-  color: tokens.$color-text-body;
-  font-size: 13px;
-  letter-spacing: 0.3px;
-  font-weight: tokens.$font-weight-medium;
-}
-
-/* time cells */
-.segment-time-value {
-  border-left: 1px dashed rgba(191, 212, 244, 0.35);
-  color: tokens.$color-text-muted;
-  opacity: 0.45;
-}
-
-.segment-time-value[data-intensity="high"] {
-  background-color: tokens.$color-primary-surface;
-  color: tokens.$color-text-body;
-  opacity: 1;
-}
-
-/* time input box */
-.time-input-box {
-  width: 100%;
-  font-size: 15px;
-  font-family: monospace;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.time-input-box.filled-box {
-  font-weight: tokens.$font-weight-regular;
-}
-
-/* today highlight */
-.highlighted-today-column {
-  background-color: rgba(230, 241, 251, 0.5) !important;
-}
-
-/* summary row */
-.aggregate-summary-values-row {
-  background-color: tokens.$color-secondary;
-  border-top: 2px solid tokens.$color-dark-surface;
-  color: tokens.$color-text-inverse;
-  position: sticky;
-  bottom: 0;
-}
-
-.aggregate-summary-values-row .summary-title-accent {
-  color: tokens.$color-secondary;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  font-size: 13px;
-}
-
-.aggregate-summary-values-row .computed-sum-cell {
-  font-size: 15px;
-  font-weight: tokens.$font-weight-bold;
-  color: tokens.$color-text-inverse;
-}
-
-.aggregate-summary-values-row .highlighted-today-column {
-  background-color: rgba(255, 255, 255, 0.05) !important;
-}
-
-/* task rows */
-.tracking-data-entry-item-row {
-  background-color: tokens.$color-white;
-}
-
-.tracking-data-entry-item-row:hover {
-  background-color: rgba(230, 241, 251, 0.25);
-}
-
-/* task meta */
-.task-meta-identity-details {
-  display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
-  gap: 3px;
-}
-
-.task-meta-identity-details .item-primary-row {
-  display: flex;
-  align-items: center;
-  gap: tokens.$space-2;
-  color: tokens.$color-text-body;
-  font-size: 15px;
-  font-weight: tokens.$font-weight-bold;
-}
-
-.colored-badge-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: tokens.$radius-pill;
-  display: inline-block;
-}
-
-.task-meta-identity-details .item-sub-metadata-row {
-  color: tokens.$color-text-muted;
-  padding-left: 16px;
-  font-size: 12px;
-  font-weight: tokens.$font-weight-regular;
-}
-
-.task-meta-identity-details .separator-pipe {
-  color: tokens.$color-border;
-  margin: 0 6px;
-}
-
-// footer things CTA 
-.timesheet-action-footer-toolbar {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
+  gap: tokens.$space-4;
+  flex-wrap: wrap;
 }
 
-.left-action-cluster,
-.right-action-cluster {
+.page-header-title {
+  margin:0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  color: tokens.$color-text-body;
+  line-height: var(--line-height-tight);
+}
+
+.page-header-subtitles {
+  margin: tokens.$space-1 0 0;
+  font-size: var(--font-size-body);
+  color: tokens.$color-text-muted;
+}
+
+.page-header-actions {
   display: flex;
   align-items: center;
   gap: tokens.$space-3;
-}
-
-/* buttons */
-.btn {
-  padding: 10px 18px;
-  font-size: 14px;
-  font-weight: tokens.$font-weight-medium;
-  border-radius: tokens.$radius-tag;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  transition: background-color 0.15s ease,
-              border-color 0.15s ease,
-              box-shadow 0.15s ease;
-}
-
-.btn .btn-icon {
-  margin-right: 8px;
-  font-size: 13px;
-}
-
-/* secondary button */
-.btn.btn-secondary {
-  background-color: tokens.$color-white;
-  border: 1px solid tokens.$color-border;
-  color: tokens.$color-text-body;
-  box-shadow: tokens.$elevation-1;
-}
-
-.btn.btn-secondary:hover {
-  background-color: tokens.$color-primary-surface;
-  border-color: tokens.$color-primary-hover;
-  color: tokens.$color-primary-hover;
-}
-
-/* primary button */
-.btn.btn-primary {
-  background-color: tokens.$color-primary;
-  border: 1px solid tokens.$color-primary;
-  color: tokens.$color-text-inverse;
-  font-weight: tokens.$font-weight-bold;
-  box-shadow: tokens.$elevation-1;
-}
-
-.btn.btn-primary:hover {
-  background-color: tokens.$color-primary-hover;
-  border-color: tokens.$color-primary-hover;
+  flex-wrap: wrap;
 }
