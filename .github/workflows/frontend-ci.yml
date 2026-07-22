@@ -62,9 +62,9 @@ jobs:
 #===================== PLAN stage ================================
 
             # this checks for code quality and help to detect for potential bugs 
-            # - name: Run ESlint
-            #   working-directory: apps/frontend/client
-            #   run: yarn lint 
+            - name: Run ESlint
+              working-directory: apps/frontend/client
+              run: yarn lint 
 
 #===================== TEST stage ================================
 
