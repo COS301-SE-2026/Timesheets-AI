@@ -12,7 +12,7 @@ import { RouterLink } from '@angular/router';
 import { MOCK_TIMESHEETS, STATUS_FILTERS, TimesheetStatus, TimesheetSummary, TimesheetWeekView, TaskRow} from './timesheet.mock'
 
 type StatusFilter = 'ALL' | TimesheetStatus;
-type UiState = 'idle' | 'laoding' | 'error' | 'empty';
+type UiState = 'idle' | 'loading' | 'error' | 'empty';
 
 @Component({
   selector: 'app-timesheets',
@@ -67,7 +67,8 @@ readonly summary = computed<TimesheetSummary | null> (
 
 readonly tasks = computed<TaskRow[]>(() => this.selectedWeek()?.tasks ?? []);
 readonly days = computed(() => this.selectedWeek()?.days ?? []);
-readonly dailyTotals = computed(() => this.selectedWeek()?.grandTotal ?? '0h 00m');
+readonly dailyTotals = computed(() => this.selectedWeek()?.dailyTotals ?? '0h 00m');
+readonly grandTotal = computed<string>(() => this.selectedWeek()?.grandTotal ?? '0h 00m');
 readonly hasEntries = computed(() => this.tasks().length > 0);
 
 readonly weekPickerLabel = computed(() => {
@@ -85,7 +86,7 @@ readonly canSubmit = computed(() => {
 
 readonly canApproveOrReject = computed(() => {
   const s = this.summary();
-  return this.isManager() && !!s  && s.status === 'SUBMITTED' && !s.isLocked;
+  return (this.isManager() && !!s  && s.status === 'SUBMITTED');
 });
 
 readonly isReadOnly = computed(() => {
@@ -96,7 +97,7 @@ readonly isReadOnly = computed(() => {
   return s.isLocked || s.status === 'SUBMITTED' || s.status === 'APPROVED' ;
 });
 
-construct() {
+constructor() {
   // INTEGRATION: Call loadTimesheets() on init once timesheetService exist.
   this.loadTimesheets();
 }
@@ -243,7 +244,7 @@ closeRejectDialog(): void {
 
 // INTEGRATION POST /api/timesheets/{id} reject with body {reason}
 
-onConfrimReject(): void {
+onConfirmReject(): void {
   const s = this.summary();
   const reason = this.rejectReason().trim();
   if (!s || !reason) {
@@ -251,10 +252,40 @@ onConfrimReject(): void {
   }
   this.actionPending.set(true);
   // INTEGRATIOON: this.timesheetService.reject(s.id, reasons).subscribe({...})
-  this.patchLoacalStatus(s.id, 'REJECTED', { rejectedAt: new Date().toISOString(), rejectionReason: reason, isLocked: false});
+  this.patchLocalStatus(s.id, 'REJECTED', { rejectedAt: new Date().toISOString(), rejectionReason: reason, isLocked: false});
   this.actionPending.set(false);
   this.closeRejectDialog();
   this.showToast('Timesheet Rejected.');
 }
+
+dismissToast(): void {
+  this.toastMessage.set(null);
+}
+
+private showToast(message: string): void {
+  this.toastMessage.set(message);
+  window.setTimeout(() => {
+    if (this.toastMessage() === message) {
+      this.toastMessage.set(null);
+    }
+  }, 4000);
+}
+
+// Local mock mutation - remove when API responses update state
+
+private patchLocalStatus( id: string, status: TimesheetStatus, extras: Partial<TimesheetSummary>) : void {
+    this.allTimesheets.update((list) =>
+    list.map((week) => {
+      if (week.summary.id !== id) {
+        return week;
+      }
+      return {
+        ...week, summary: {
+          ...week.summary, status, ...extras, updatedAt: new Date().toISOString()
+        }
+      };
+    })
+    );
+  }
 
 }
