@@ -14,8 +14,8 @@ services:
     container_name: momently-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${DB_NAME:-momently_dev}
-      POSTGRES_USER: ${DB_USERNAME:-momently}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5433:5432"   # FIX: host uses 5433, container still uses 5432 (correct internal port)
@@ -79,8 +79,8 @@ services:
   frontend:
     image: momently-frontend 
     build:
-      context: ./apps/frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: apps/frontend/Dockerfile
       target: dev
     container_name: momently-frontend
     restart: unless-stopped
