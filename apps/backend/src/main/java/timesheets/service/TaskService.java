@@ -1,0 +1,209 @@
+package timesheets.service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import timesheets.domain.Project;
+import timesheets.domain.ProjectMember;
+import timesheets.domain.Task;
+import timesheets.domain.WorkspaceMember;
+import timesheets.dto.request.CreateTaskRequest;
+import timesheets.dto.response.TaskResponse;
+import timesheets.repository.ProjectMemberRepository;
+import timesheets.repository.ProjectRepository;
+import timesheets.repository.TaskRepository;
+import timesheets.repository.UserRepository;
+import timesheets.repository.WorkspaceMemberRepository;
+import timesheets.security.SecurityUtils;
+
+@Service
+@RequiredArgsConstructor
+public class TaskService {
+
+  private final SecurityUtils securityUtils;
+  private final TaskRepository taskRepository;
+  private final ProjectRepository projectRepository;
+  private final ProjectMemberRepository projectMemberRepository;
+  private final WorkspaceMemberRepository workspaceMemberRepository;
+  private final UserRepository userRepository;
+
+  // this gets all the active tasks of a project - only if the user has access to
+  // that project
+  @Transactional(readOnly = true)
+  public List<TaskResponse> getTasksForProject(UUID projectId, UUID workspaceMemberId) {
+
+    // checks if user has access to that project
+    if (!userHasAccessToProject(projectId, workspaceMemberId)) {
+      throw new RuntimeException("You don't have access to  this project");
+    }
+
+    List<Task> tasks = taskRepository.findByProjectIdAndIsDeletedFalse(projectId);
+
+    // gets the project name that can be used for display
+    String projectName =
+        projectRepository.findById(projectId).map(Project::getName).orElse("Unknown Project");
+
+    // each task converted to a response
+    return tasks.stream()
+        .map(
+            task -> {
+              String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
+              return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+            })
+        .collect(Collectors.toList());
+  }
+
+  // gets a task by it's id with the full details for display
+  @Transactional(readOnly = true)
+  public TaskResponse getTaskResponseById(UUID taskId, UUID workspaceMemberId) {
+    Task task = getTaskById(taskId);
+
+    // checks if the task has been deleted
+    if (Boolean.TRUE.equals(task.getIsDeleted())) {
+      throw new RuntimeException("Task has been deleted");
+    }
+
+    if (!userHasAccessToProject(task.getProjectId(), workspaceMemberId)) {
+      throw new RuntimeException("You do not have access to this task");
+    }
+
+    String projectName =
+        projectRepository.findById(task.getProjectId()).map(Project::getName).orElse("Unknown Pro");
+
+    String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
+
+    return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+  }
+
+  // this gets the task by the id - internal entity
+  @Transactional
+  public Task getTaskById(UUID taskId) {
+    return taskRepository
+        .findById(taskId)
+        .orElseThrow(() -> new RuntimeException("Task not found"));
+  }
+
+  @Transactional(readOnly = true)
+  public List<TaskResponse> getMyTasks(UUID workspaceMemberId) {
+    List<Task> tasks =
+        taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId);
+
+    return tasks.stream()
+        .map(
+            task -> {
+              String projectName =
+                  projectRepository
+                      .findById(task.getProjectId())
+                      .map(Project::getName)
+                      .orElse("Unknown Project");
+              String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
+              return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+            })
+        .collect(Collectors.toList());
+  }
+
+  // this creates a new task
+  @Transactional
+  public TaskResponse createTask(CreateTaskRequest request, UUID workspaceMemberId) {
+    UUID projectId = request.getProjectId();
+
+    // to verify that the user has access to create tasks on the project
+    if (!isProjectManager(projectId, workspaceMemberId)
+        && !securityUtils.isAdmin()
+        && !securityUtils.isManager()) {
+      throw new RuntimeException("You don't have permission to create tasks on this project");
+    }
+
+    // to verify that the project exists and is not archived
+    Project project =
+        projectRepository
+            .findById(projectId)
+            .orElseThrow(() -> new RuntimeException("Project not found"));
+
+    if ("ARCHIVED".equals(project.getStatus())) {
+      throw new RuntimeException("Cannot create tasks on an archived project");
+    }
+
+    // this checks if there is a valid parent task and if that parent task is part of the same
+    // project
+    if (request.getParentTaskId() != null) {
+      Task parentTask =
+          taskRepository
+              .findById(request.getParentTaskId())
+              .orElseThrow(() -> new RuntimeException("Parent task not found"));
+
+      if (!parentTask.getProjectId().equals(projectId)) {
+        throw new RuntimeException("Parent task does not belong to this project");
+      }
+    }
+
+    // builds the task
+    Task task = new Task();
+    task.setProjectId(projectId);
+    task.setTitle(request.getTitle());
+    task.setDescription(request.getDescription());
+    task.setJiraTicketKey(request.getJiraTicketId());
+    task.setParentTaskId(request.getParentTaskId());
+    task.setEstimatedHours(request.getEstimatedHours());
+    task.setAssignedWorkspaceMemberId(request.getAssignedWorkspaceMemberId());
+    task.setDueDate(request.getDueDate());
+    task.setPriority(request.getPriority() != null ? request.getPriority() : "MEDIUM");
+    task.setStatus(request.getStatus() != null ? request.getStatus() : "TODO");
+    task.setIsDeleted(false);
+
+    // if the task gets marked as done right away, then the timestamp is updated
+    if ("DONE".equals(task.getStatus())) {
+      task.setCompletedAt(LocalDateTime.now());
+    }
+
+    Task savedTask = taskRepository.save(task);
+
+    String projectName = project.getName();
+    String assignedToName = getAssignedToName(savedTask.getAssignedWorkspaceMemberId());
+
+    return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName);
+  }
+
+  // ! helper functions
+  // checks if the user has access to the project
+  private boolean userHasAccessToProject(UUID projectId, UUID workspaceMemeberId) {
+
+    boolean isAdmin = securityUtils.isAdmin();
+    boolean isManager = securityUtils.isManager();
+
+    // admins and managers have access to all the projects
+    if (isAdmin || isManager) {
+      return true;
+    }
+
+    // the dev must be a member of the project in order to see it
+    return projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+        projectId, workspaceMemeberId);
+  }
+
+  // gets the name of the user assigned to that task
+  private String getAssignedToName(UUID workspaceMemberId) {
+    if (workspaceMemberId == null) {
+      return "Unassigned";
+    }
+
+    return workspaceMemberRepository
+        .findById(workspaceMemberId)
+        .map(WorkspaceMember::getUserId)
+        .flatMap(userRepository::findById)
+        .map(user -> user.getFirstName() + " " + user.getLastName())
+        .orElse("Unknown user");
+  }
+
+  // checks if the user is a project manager for a particular project
+  private boolean isProjectManager(UUID projectId, UUID workspaceMemberId) {
+    return projectMemberRepository
+        .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
+        .map(ProjectMember::getIsProjectManager)
+        .orElse(false);
+  }
+}
