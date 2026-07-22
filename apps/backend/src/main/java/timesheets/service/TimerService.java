@@ -141,6 +141,40 @@ public class TimerService {
     return timerSessionRepository.save(activeTimer);
   }
 
+  //resumes a timer
+  @Transactional 
+  public TimerSession resumeTimer(){
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    TimerSession activeTimer = timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId).orElseThrow(()-> new IllegalStateException("No active timer found"));
+
+    //should see if there is an active timer for the user
+    if(!Boolean.TRUE.equals(activeTimer.getIsPaused())){
+      throw new IllegalStateException("Timer is not paused");
+    }
+
+    //calculates how long it is paused
+    if(activeTimer.getPausedAt() != null){
+      long pausedDurationSeconds = ChronoUnit.SECONDS.between(activeTimer.getPausedAt(), LocalDateTime.now());
+
+      //add the total to paused duration
+      Long currentPausedDuration = activeTimer.getPausedDurationSeconds();
+
+      if(currentPausedDuration == null){
+        currentPausedDuration = 0L;
+      }
+      activeTimer.setPausedDurationSeconds(currentPausedDuration + pausedDurationSeconds);
+    }
+
+    //update timer states
+    activeTimer.setIsPaused(false);
+    activeTimer.setPausedAt(null);
+
+    return timerSessionRepository.save(activeTimer);
+  }
+
+
+
   // this should be if a timer is stopped and a draft timer entry is created
   @Transactional
   public TimeEntry stopTimer() {

@@ -15,6 +15,7 @@ public class TimerStatusResponse {
   private Boolean hasActiveTimer;
   private Boolean isRunning;
   private Boolean isPaused;
+  private UUID projectId;
   private UUID timerId;
   private UUID taskId;
   private LocalDateTime startedAt;

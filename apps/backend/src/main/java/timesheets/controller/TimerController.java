@@ -63,6 +63,16 @@ public class TimerController {
     return ResponseEntity.ok(response);
   }
 
+  //resumes a timer
+  @PostMapping("/resume")
+  public ResponseEntity<ActiveTimerResponse> resumeTimer(){
+    TimerSession timer = timerService.resumeTimer();
+
+    ActiveTimerResponse response = convertToResponse(timer);
+
+    return ResponseEntity.ok(response);
+  }
+
   @PostMapping("/stop") // the endpoint will look like POST /api/timers/stop
   public ResponseEntity<StopTimerResponse> stopTimer() {
 
