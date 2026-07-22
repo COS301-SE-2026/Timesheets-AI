@@ -1,3 +1,10 @@
+/**
+ * Author: Cleopatra Kwenda
+ * Date: 2026-07-13
+ * Purpose: 404 not found page with navigation back functionality.
+ * Related Requirement: -
+ */
+
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Location, CommonModule } from '@angular/common';

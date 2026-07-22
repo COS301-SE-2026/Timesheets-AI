@@ -5,12 +5,10 @@ name: Frontend Pipeline
 on:
     push:
         branches: [main, dev]
-        # paths:
-        #     - 'apps/frontend/**' 
+
     pull_request:
         branches: [main, dev]
-        # paths: 
-        #     - 'apps/frontend/**'
+       
 
 jobs:
     # this is only for frontend check only and provide job access to the code in the repo 
@@ -23,27 +21,62 @@ jobs:
             
             # Logic Gate: This is used to determine if the files changed are in Backend
             # dorny repo is used in this logic gate - this is using SHA instead of versions for security suggested by SonarQube 
-            # The SHA is version 3 (v3.0.3)
+            # Updated to SHA (v4) to fix Node 20 deprecation warning 
             - name: Check for Frontend Changes
               id: filter
-              uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590
+              uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
+              continue-on-error: true # if this step fails, it will go to retry step 
               with:
                 filters: |
                     frontend:
                         - 'apps/frontend/**'
                         - '.github/workflows/frontend-ci.yml'
-            # Only runs if frontend filter is true 
+
+            # Added: automated retry  
+            - name: Retry 
+              if: steps.filter.outcome == 'failure'
+              id: retry
+              uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
+              with:
+                filters: |
+                    frontend:
+                        - 'apps/frontend/**'
+                        - '.github/workflows/frontend-ci.yml'
+
+#===================== BUILD stage ================================
+
+            # Only runs if frontend filter is true on the first run or retry step 
             - name: Set up Node.js
-              if: steps.filter.outputs.frontend == 'true'
+              if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
               uses: actions/setup-node@v4
               with:
                 node-version: '22' # current node.js version - recommeded 
                 # uses yarn NOT npm to store downloaded dependencies, dependency-path: means rebuild cache only if yarn.lock changes
                 cache: 'yarn'
-                cache-dependency-path: apps/frontend/client/yarn.lock 
-            - name: Install & Test (Yarn)
-              if: steps.filter.outputs.frontend == 'true'
-              run: |
-                cd apps/frontend/client
-                yarn install --frozen-lockfile 
-                yarn test --watch=false
+                cache-dependency-path: yarn.lock 
+
+            - name: Install Dependencies 
+              if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
+              run: yarn install --frozen-lockfile 
+
+#===================== PLAN stage ================================
+
+            # this checks for code quality and help to detect for potential bugs 
+            # - name: Run ESlint
+            #   working-directory: apps/frontend/client
+            #   run: yarn lint 
+
+#===================== TEST stage ================================
+
+            # runs frontend unit tests using Jest 
+            - name: Run Jest tests
+              if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
+              working-directory: apps/frontend/client
+              run: yarn test --watch=false
+
+#===================== RELEASE stage ================================
+
+            # ensure that the Angular builds successfully 
+            - name: Build Angular
+              if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
+              run: docker build -f apps/frontend/Dockerfile -t momently-frontend:${{ github.sha }} .

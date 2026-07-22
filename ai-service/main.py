@@ -36,7 +36,7 @@ def root():
     return {"message": "Momently AI Service, visit /docs for Swagger UI"}
 
 
-#Placeholder insight endpoint(Not needed for demo 1, but will be used in later milestones when we integrate ML models)
+# Placeholder insight endpoint(Not needed for demo 1, but will be used in later milestones when we integrate ML models)
 @app.post("/insights", tags=["Insights"])
 def get_insights(payload: dict):
     """

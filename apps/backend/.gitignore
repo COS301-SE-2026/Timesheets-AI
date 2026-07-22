@@ -1,7 +1,7 @@
 *.class
 
 *.log
-
+.env
 *.jar
 *.war
 *.nar
@@ -10,3 +10,4 @@
 *.rar
 
 target/
+

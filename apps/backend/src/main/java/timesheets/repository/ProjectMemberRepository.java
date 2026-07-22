@@ -1,14 +1,25 @@
 package timesheets.repository;
 
-import timesheets.domain.ProjectMember;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.UUID;
+import timesheets.domain.ProjectMember;
 
 @Repository
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, UUID> {
-    
-    //this will see if a certain member is already assigned to a specific project
-    boolean existsByProjectIdAndWorkspaceMemberId(UUID projectId, UUID workspaceMemberId);
+
+  // this will see if a certain member is already assigned to a specific project
+  boolean existsByProjectIdAndWorkspaceMemberId(UUID projectId, UUID workspaceMemberId);
+
+  // finds all the projects that a workspace member is assigned to
+  List<ProjectMember> findByWorkspaceMemberId(UUID workspaceMemberId);
+
+  // finds all the workspace members assigned to a specific project
+  List<ProjectMember> findByProjectId(UUID projectId);
+
+  // finds a specifc record or a member on a project
+  Optional<ProjectMember> findByProjectIdAndWorkspaceMemberId(
+      UUID projectId, UUID workspaceMemberId);
 }

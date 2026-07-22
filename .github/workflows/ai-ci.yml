@@ -1,0 +1,87 @@
+# workflow configuration where it runs tests and etc for the ai
+# [Stack: Python (FastAPI)]
+
+# the trigger: this will run when there is a pull request or push on the main or dev branches
+name: AI Pipeline
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request: 
+      branches: [main, dev]
+
+jobs:
+  ai-check:
+    runs-on: ubuntu-latest 
+    steps: 
+      - uses: actions/checkout@v4
+
+    # Logic Gate: this is used to determine where the changes occur and if it occurs in the ai service folder, therefore the ai-check should run otherwise passed quickly 
+      - name: Check for AI Service Changes
+        id: filter
+        uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
+        continue-on-error: true
+        with:
+          filters: |
+            ai:
+              - 'ai-service/**'
+              - '.github/workflows/ai-ci.yml'
+
+      - name: Retry 
+        if: steps.filter.outcome == 'failure'
+        id: retry
+        uses: dorny/paths-filter@9d7afb8d214ad99e78fbd4247752c4caed2b6e4c
+        with:
+          filters: |
+              ai:
+                  - 'ai-service/**'
+                  - '.github/workflows/ai-ci.yml'
+
+#===================== BUILD stage ================================
+
+    # Set up the required Python environment for this workflow 
+      - name: Set up Python 
+        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip' 
+          # the cache will be invalid and destroyed when the textfil e
+          cache-dependency-path: ai-service/requirements.txt
+
+      - name: Install Dependencies 
+        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
+        run: |
+          cd ai-service 
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt 
+
+#===================== PLAN stage ================================
+
+        # ruff is recommended for Python FastAPI (made by Astral) 
+        # it is fast and it ahndles linting, auto fix sytnax and formatting so no need for different kinds of tools 
+      - name: Run Ruff Lint 
+        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
+        run: |
+          cd ai-service
+          ruff format --check .
+          ruff check .
+
+#===================== TEST stage ================================
+
+      - name: Run Tests 
+        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
+        working-directory: ai-service
+        env:
+          PYTHONPATH: .
+        run: |
+          pytest
+
+#===================== RELEASE stage ================================
+      
+      # build docker image to deploy 
+      - name: Build Docker Image
+        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
+        working-directory: ai-service 
+        run:  |
+         docker build -t momently-ai:${{ github.sha}} .

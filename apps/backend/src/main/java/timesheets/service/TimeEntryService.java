@@ -1,133 +1,133 @@
 package timesheets.service;
 
-import timesheets.domain.TimeEntry;
-import timesheets.dto.request.TimeEntryRequest;
-import timesheets.enums.TimeEntryStatus;
-import timesheets.repository.TimeEntryRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import exception.TimeEntryAccessDeniedException;
 import exception.TimeEntryNotFoundException;
-
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import timesheets.domain.TimeEntry;
+import timesheets.domain.Timesheet;
+import timesheets.dto.request.TimeEntryRequest;
+import timesheets.dto.response.TimeEntryResponse;
+import timesheets.repository.TimeEntryRepository;
+import timesheets.security.SecurityUtils;
 
-//this is the file that has all my business logic, the control will call the service and the service will call repo
+// this is the file that has all my business logic, the control will call the service and the
+// service will call repo
 
 @Service
+@RequiredArgsConstructor
 public class TimeEntryService {
-    
-    private final TimeEntryRepository timeEntryRepository;
-    
-    public TimeEntryService(TimeEntryRepository timeEntryRepository) {
-        this.timeEntryRepository = timeEntryRepository;
-    }
-    
-    @Transactional //this will help that is anything fails then the database rollback happens automatically
-    public TimeEntry createTimeEntry(UUID workspaceMemberId, TimeEntryRequest request) {
 
-        TimeEntry entry = new TimeEntry();
+  private final TimeEntryRepository timeEntryRepository;
+  private final TimesheetService timesheetService;
+  private final SecurityUtils securityUtils;
 
-        entry.setWorkspaceMemberId(workspaceMemberId);
+  // this would be if they need to create a time entry manually
+  @Transactional
+  public TimeEntry createTimeEntry(TimeEntryRequest request) {
 
-        entry.setProjectId(request.getProjectId());
-        entry.setTaskId(request.getTaskId());
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
-        entry.setStartTime(request.getStartTime());
-        entry.setEndTime(request.getEndTime());
-        entry.setDurationMinutes(request.getDurationMinutes());
-        entry.setEntryType(request.getEntryType());
-        entry.setDescription(request.getDescription());
+    LocalDate entryDate = request.getStartTime().toLocalDate();
 
-        entry.setStatus(TimeEntryStatus.DRAFT);
-        
-        return timeEntryRepository.save(entry);
-    }
-    
-    public List<TimeEntry> getMyTimeEntries(UUID workspaceMemberId) {
-        return timeEntryRepository.findByWorkspaceMemberIdOrderByStartTimeDesc(workspaceMemberId);
-    } 
-    //all the entries should be gotten by this, also this will not need transactional because it's only reading data
-    
+    // calculate the weeks start and end
+    LocalDate weekStart = entryDate.with(DayOfWeek.MONDAY);
+    LocalDate weekEnd = entryDate.with(DayOfWeek.SUNDAY);
 
-    public List<TimeEntry> getMyTimeEntriesByStatus(UUID workspaceMemberId, TimeEntryStatus status) {
-        return timeEntryRepository.findByWorkspaceMemberIdAndStatus(workspaceMemberId, status);
-    }
-    //if we only want draft entries or only approved entries
-    
+    // to get or create timesheet for this period
+    Timesheet timesheet = timesheetService.getOrCreateTimesheet(weekStart, weekEnd);
 
-    public TimeEntry getTimeEntryById(UUID id) {
-        return timeEntryRepository.findById(id).orElseThrow(() -> new TimeEntryNotFoundException(id));
-    }
-    //this will be if only one specific entry is needed
+    TimeEntry entry = new TimeEntry();
 
-    @Transactional
-    public TimeEntry updateTimeEntry(UUID id, UUID workspaceMemberId, TimeEntryRequest request) {
-        TimeEntry entry = getTimeEntryById(id);
-        
-        //we only want draft entries to be editable, to maintain data integrity, we don't want users to go and edit entries that have already been added
-        if (entry.getStatus() != TimeEntryStatus.DRAFT) {
-            throw new RuntimeException("Cannot edit time entry that is already " + entry.getStatus().name());
-        }
-        
-        //we only want the owner of time entries to be able to edit them
-        if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
-            throw new RuntimeException("You can only edit your own time entries");
-        }
-        
-        entry.setProjectId(request.getProjectId());
-        entry.setTaskId(request.getTaskId());
+    entry.setWorkspaceMemberId(workspaceMemberId);
+    entry.setTimesheetId(
+        timesheet.getId()); // I want it to automatically be assigned to a Timesheet
+    entry.setProjectId(request.getProjectId());
+    entry.setTaskId(request.getTaskId());
+    entry.setStartTime(request.getStartTime());
+    entry.setEndTime(request.getEndTime());
+    entry.setDurationSeconds(request.getDurationSeconds());
+    entry.setEntryType(
+        request
+            .getEntryType()); // this will show if a time entry was manual or started with a timer
+    entry.setDescription(request.getDescription());
+    entry.setIsLocked(false);
 
-        entry.setStartTime(request.getStartTime());
-        entry.setEndTime(request.getEndTime());
+    return timeEntryRepository.save(entry);
+  }
 
-        entry.setDurationMinutes(request.getDurationMinutes());
-        entry.setEntryType(request.getEntryType());
-        entry.setDescription(request.getDescription());
-        entry.setEditedAt(LocalDateTime.now());
+  // to get all the time entries of a particular workspace member
+  public List<TimeEntry> getMyTimeEntries() {
 
-        entry.setEditedByWorkspaceMemberId(workspaceMemberId);
-        
-        return timeEntryRepository.save(entry);
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    return timeEntryRepository.findByWorkspaceMemberIdOrderByStartTimeDesc(workspaceMemberId);
+  }
+
+  // can get a time entry using the id
+  public TimeEntry getTimeEntryById(UUID id) {
+    return timeEntryRepository.findById(id).orElseThrow(() -> new TimeEntryNotFoundException(id));
+  }
+
+  @Transactional
+  public void deleteTimeEntry(UUID id) {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    TimeEntry entry = getTimeEntryById(id);
+
+    if (Boolean.TRUE.equals(entry.getIsLocked())) {
+      throw new RuntimeException("Cannot delete a locked time entry");
     }
 
-    
-    
-
-    @Transactional
-    public void deleteTimeEntry(UUID id, UUID workspaceMemberId) {
-
-        TimeEntry entry = getTimeEntryById(id);
-        
-        if (entry.getStatus() != TimeEntryStatus.DRAFT) {
-            throw new RuntimeException("Cannot delete time entry that is already " + entry.getStatus().name());
-        }
-        
-        if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
-            throw new TimeEntryAccessDeniedException("You can only delete your own time entries");
-        }
-        
-        timeEntryRepository.deleteById(id);
+    if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
+      throw new TimeEntryAccessDeniedException("You can only delete your own time entries");
     }
-    
-    //I am doing these things to maintain data integrity
-    @Transactional
-    public TimeEntry submitTimeEntry(UUID id, UUID workspaceMemberId) {
-        TimeEntry entry = getTimeEntryById(id);
-        
-        if (entry.getStatus() != TimeEntryStatus.DRAFT) {
-            throw new RuntimeException("Time entry has already been submitted");
-        }
-        
-        if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
-            throw new RuntimeException("You can only submit your own time entries");
-        }
-        
-        entry.setStatus(TimeEntryStatus.SUBMITTED);
-        entry.setSubmittedAt(LocalDateTime.now());
-        
-        return timeEntryRepository.save(entry);
+
+    // remember we are only doing soft deletes
+    entry.setIsDeleted(true);
+    entry.setDeletedAt(LocalDateTime.now());
+
+    timeEntryRepository.save(entry);
+  }
+
+  // this will allow a user to edit time entries as long as if they are not locked
+  @Transactional
+  public TimeEntry updateTimeEntry(UUID id, TimeEntryRequest request) {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    TimeEntry entry = getTimeEntryById(id);
+
+    if (Boolean.TRUE.equals(entry.getIsLocked())) {
+      throw new RuntimeException("Cannot edit a locked time entry");
     }
+
+    if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
+      throw new TimeEntryAccessDeniedException("You can only edit your own time entries");
+    }
+
+    entry.setProjectId(request.getProjectId());
+    entry.setTaskId(request.getTaskId());
+    entry.setStartTime(request.getStartTime());
+    entry.setEndTime(request.getEndTime());
+    entry.setDurationSeconds(request.getDurationSeconds());
+    entry.setEntryType(request.getEntryType());
+    entry.setDescription(request.getDescription());
+
+    return timeEntryRepository.save(entry);
+  }
+
+  // gets the time entries that all belong to a specific timesheet
+  public List<TimeEntryResponse> getEntriesByTimesheet(UUID timesheetId) {
+    List<TimeEntry> entries = timeEntryRepository.findByTimesheetId(timesheetId);
+
+    return entries.stream().map(TimeEntryResponse::from).collect(Collectors.toList());
+  }
 }

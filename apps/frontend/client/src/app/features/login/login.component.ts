@@ -1,30 +1,54 @@
-import { Component, inject } from '@angular/core';
+/**
+ * Author: Cleopatra Kwenda
+ * Date: 2026-05-15
+ * Purpose: Handles user authentication through login form with validation
+ * Related Requirement: -
+ */
+
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  inject,
+  ViewChild,
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { AuthService } from '../../core/services/auth.service';
+import { environment } from '../../../environments/environment';
+
+declare const google: any;
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
 })
-export class LoginComponent {
-
+export class LoginComponent implements AfterViewInit {
   // Form builder (same style as signup OR you can inject if you want full consistency)
   private readonly formBuilder = inject(FormBuilder);
 
   // Logo (fixes your NG error + allows reuse in template)
   protected readonly brandLogo = '/assets/momently.png';
 
+  private readonly route = inject(ActivatedRoute);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
   // UI state
   protected loading = false;
   protected errorMessage = '';
   protected showPassword = false;
   protected submitted = false;
-
-  /* Toast state */
   protected toastMessage = '';
   protected showToast = false;
 
@@ -32,36 +56,80 @@ export class LoginComponent {
   protected readonly loginForm: FormGroup = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
-    remember: [false]
+    remember: [false],
   });
+
+  // This shows a quick toast if they came from a succesful signup
+  constructor() {
+    if (this.route.snapshot.queryParams['registered'] === 'true') {
+      this.showDemoToast('Account created! Please login!');
+    }
+  }
 
   // Toggle password visibility
   protected togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
 
-  /* Show a temporary demo toast message */
   protected showDemoToast(message: string): void {
     this.toastMessage = message;
     this.showToast = true;
-    setTimeout(() => { this.showToast = false; }, 4000);
+    setTimeout(() => {
+      this.showToast = false;
+    }, 4000);
   }
 
-  /* Forgot password handler */
   protected onForgotPassword(event: Event): void {
     event.preventDefault();
-    this.showDemoToast(
-      'Password reset is not available in Demo 1. Use the test credentials shared with your team.'
-    );
+    this.showDemoToast('Password reset is not available yet.');
   }
 
-  /* Social login handler */
+  @ViewChild('googleBtn') googleBtn!: ElementRef;
+
+  ngAfterViewInit(): void {
+    google.accounts.id.initialize({
+      client_id: environment.googleClientId,
+      callback: (response: { credential: string }) =>
+        this.handleGoogleCredential(response.credential),
+    });
+
+    google.accounts.id.renderButton(this.googleBtn.nativeElement, {
+      theme: 'outline',
+      size: 'large',
+      width: 320,
+    });
+  }
+  protected triggerGoogleLogin(): void {
+    const hiddenGoogleButton =
+      this.googleBtn.nativeElement.querySelector('div[role="button"]');
+    hiddenGoogleButton?.click();
+  }
+
+  //TODO: Fix the MFA thing, after it shows up in the UI
+  private handleGoogleCredential(idToken: string): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.authService.googleAuth(idToken).subscribe({
+      next: (res) => {
+        this.loading = false;
+        if (res.requiresMfa) {
+          this.showDemoToast('MFA is not supported in the UI yet');
+          return;
+        }
+        this.router.navigate(['/log-time']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err.message;
+      },
+    });
+  }
   protected onSocialLogin(provider: string): void {
     this.showDemoToast(
-      `${provider} login is not available in Demo 1. Please use the email and password form.`
+      `${provider} login is not available yet, use email and password.`,
     );
   }
-  
 
   // Submit handler
   protected onSubmit(): void {
@@ -75,10 +143,23 @@ export class LoginComponent {
     this.loading = true;
     this.errorMessage = '';
 
-    setTimeout(() => {
-      this.loading = false;
-      this.errorMessage = 'Demo only — no backend connected yet.';
-    }, 1000);
+    const { email, password } = this.loginForm.value;
+
+    this.authService.login({ email, password }).subscribe({
+      next: (res) => {
+        this.loading = false;
+        if (res.requiresMfa) {
+          this.showDemoToast('MFA is not supported in the UI yet.');
+          return;
+        }
+        this.router.navigate(['/log-time']);
+      },
+
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err.message;
+      },
+    });
   }
 
   // Email error logic
@@ -102,7 +183,6 @@ export class LoginComponent {
     return (control.touched || this.submitted) && control.invalid;
   }
 
-  
   protected get passwordErrorMessage(): string {
     const control = this.loginForm.controls['password'];
 
