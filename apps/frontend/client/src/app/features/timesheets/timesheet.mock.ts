@@ -136,8 +136,8 @@ export const MOCK_TIMESHEET_WEEK_28: TimesheetWeekView = {
 
 export const MOCK_TIMESHEET_WEEK_29: TimesheetWeekView = {
   summary: {
-  id: 'ts-week-28',
-  weekNumber: 28,
+  id: 'ts-week-29',
+  weekNumber: 29,
   periodStart: '2026-07-13',
   periodEnd: '2026-07-19',
   periodLabel: 'JUL 13 - JUL 19, 2026',
