@@ -21,7 +21,7 @@ COPY apps/frontend/client/ apps/frontend/client
 RUN chown -R appuser:appgroup /app
 USER appuser
 
-WORKDIR /aap/apps/frontend/client 
+WORKDIR /app/apps/frontend/client 
 
 EXPOSE 4200
 CMD ["yarn", "start", "--host", "0.0.0.0"]
@@ -57,4 +57,4 @@ COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Nginx port 
 EXPOSE 8080
-CMD ["nginx", "-g", "daemo n off;"]                                                      
+CMD ["nginx", "-g", "daemon off;"]                                                      
