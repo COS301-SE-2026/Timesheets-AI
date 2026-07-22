@@ -79,7 +79,6 @@ describe('LoginComponet', () => {
     jest.useFakeTimers();
 
     const comp = component ;
-    const spy = jest.spyOn(console, 'info').mockImplementation();
 
     comp.loginForm.setValue({
       email: 'enzokuhle.khumalo@momentum.co.za',
