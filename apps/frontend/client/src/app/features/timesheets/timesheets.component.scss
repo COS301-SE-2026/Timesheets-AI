@@ -38,3 +38,48 @@
   gap: tokens.$space-3;
   flex-wrap: wrap;
 }
+
+// Week picker
+
+.week-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: centre;
+  gap: tokens.$space-2;
+  min-width: 280px;
+  padding: 10px 14px;
+  background: tokens.$color-white;
+  border: 1px solid tokens.$color-border;
+  border-radius: tokens.$radius-tag;
+  box-shadow: tokens.$elevation-1;
+  color: tokens.$color-text-body;
+  cursor: pointer;
+}
+
+.week-picker i:first-child {
+  color: tokens.$color-primary;
+  font-size: 14px;
+}
+
+.week-picker {
+  appearance: none;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: tokens.$font-weight-medium;
+  color: tokens.$color-text-body;
+  flex: 1;
+  min-width: 0;
+  padding-right: tokens.$space-4;
+  cursor: pointer;
+  outline: none;
+}
+
+.week-picker-chevron {
+  position: absolute;
+  right: 14px;
+  font-size: 11px;
+  color: tokens.$color-text-muted;
+  pointer-events: none;
+}
