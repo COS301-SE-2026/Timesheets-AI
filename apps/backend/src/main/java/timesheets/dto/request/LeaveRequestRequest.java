@@ -77,4 +77,31 @@ public class LeaveRequestRequest {
     // this is going to be a JSON string of attachements
     private String attachments;
   }
+
+  // request for approving a leave request
+  @Data
+  @Builder
+  public static class Approve {
+    // no approval fields
+  }
+
+  // request for rejecting a leave request
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Reject {
+    @NotBlank(message = "Rejection reason is required")
+    private String reason;
+  }
+
+  // request for cancelling a leave request
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Cancel {
+    @NotBlank(message = "Cancellation reason is required")
+    private String reason;
+  }
 }
