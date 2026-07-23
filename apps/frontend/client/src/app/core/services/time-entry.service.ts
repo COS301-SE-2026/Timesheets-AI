@@ -41,7 +41,7 @@ export interface TimeEntryRequest {
 
 @Injectable ({providedIn: 'root'})
 export class TimeEntryService {
-    provate readonly baseUrl = '/api/time-entries';
+    private readonly baseUrl = '/api/time-entries';
 
     constructor(private http: HttpClient){}
     //gets every entry thst belongs to the logged in user
@@ -60,21 +60,21 @@ export class TimeEntryService {
 
     //creates a manual time entry, entryType should be 'MANUAL' when called from this flow
     createEntry(entry: TimeEntryRequest): Observable<TimeEntryResponse>{
-        return this.http.get<TimeEntryResponse>(this.baseUrl, entry).pipe(
+        return this.http.post<TimeEntryResponse>(this.baseUrl, entry).pipe(
             catchError(this.handleError('createEntry'))
         );
     }
 
     //updates an existing entry, sends the full object since backend expects a full replace not patch
     updateEntry(id:string, entry: TimeEntryRequest): Observable<TimeEntryResponse>{
-        return this.http.get<TimeEntryResponse>(`${this.baseUrl}/${id}`, entry).pipe(
+        return this.http.put<TimeEntryResponse>(`${this.baseUrl}/${id}`, entry).pipe(
             catchError(this.handleError('updateEntry'))
         );
     }
-
+    
     //deletes an entry, backend will do a soft delete using the isDeleted flag, not a hard delete
     deleteEntry(id:string): Observable<void>{
-        return this.http.get<TimeEntryResponse>(`${this.baseUrl}/${id}`).pipe(
+        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
             catchError(this.handleError('deleteEntry'))
         );
     }
