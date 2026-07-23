@@ -93,6 +93,9 @@ describe('LoginComponet', () => {
     expect(comp.loading).toBe(true);
 
     const req = httpMock.expectOne('/api/auth/login');
+    const router = TestBed.inject(Router);
+    const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
+
     expect(req.request.method).toBe('POST');
 
     // Simulate a normal, non-MFA login response.
@@ -120,7 +123,7 @@ describe('LoginComponet', () => {
     //MFA isn't supported in the UI yet(tbh i think it isnt in backend too, it just has a db field), so when the backend says requiresMfa,
     //we expect a toast instead of a redirect, this guards against someone
     //wiring up navigation before MFA is actually built.
-    const comp = component as any;
+    const comp = component ;
     const router = TestBed.inject(Router);
     const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
@@ -179,7 +182,7 @@ describe('LoginComponet', () => {
 
   //The following has to do with form validators, are they responding as they should? stay tuned to find out lol
   it('should show email error for invalid email format', () => {
-    const comp = component as any;
+    const comp = component;
     comp.loginForm.controls['email'].setValue('wrong-email');
     comp.loginForm.controls['email'].markAsTouched(); // validators should only kick in once a field's been touched
     expect(comp.showEmailError).toBe(true);
@@ -221,25 +224,6 @@ describe('LoginComponet', () => {
     expect(comp.showPassword).toBe(true);
     comp.togglePassword();
     expect(comp.showPassword).toBe(false);
-  });
-
-  it('should submit form when valid', () => {
-    const comp = component;
-    const spy = jest.spyOn(console, 'info').mockImplementation();
-
-    comp.loginForm.setValue({
-      email: 'john@company.com',
-      password: 'Password1',
-      remember: false
-    });
-
-    comp.onSubmit();
-
-    expect(comp.loginForm.valid).toBe(true);
-    expect(comp.submitted).toBe(true);
-    expect(comp.loading).toBe(true);
-
-    spy.mockRestore();
   });
 
   it('should show validation errors when submitting invalid form', () => {
