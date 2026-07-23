@@ -1,3 +1,10 @@
+/**
+ * Author: Kgaugelo Matsena & Lerato Sibanda
+ * Date: 2026-05-15
+ * Purpose: Navigation sidebar component with route-based active state tracking.
+ * Related Requirement: -
+ */
+
 import { Component, signal } from '@angular/core'; // UI componenet and signal store state, uodate UI changes automatically 
 import { CommonModule } from '@angular/common'; //to be able use ngIf and ngFor 
 import { MatIconModule } from '@angular/material/icon';

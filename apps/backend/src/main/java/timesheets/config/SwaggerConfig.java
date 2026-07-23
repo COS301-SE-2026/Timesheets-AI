@@ -35,4 +35,7 @@ public class SwaggerConfig {
   }
 }
 
+/*the bearerAuth essentially tells Swagger, to send the authentication tokens to the API. I will
+place the JWT token and that will get added to every protected endpoint*/
+
 // check out the swagger docs at: http://localhost:8080/swagger-ui/index.html

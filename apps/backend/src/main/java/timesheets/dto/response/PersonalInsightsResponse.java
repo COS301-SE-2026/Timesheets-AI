@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InsightsSummaryResponse {
+public class PersonalInsightsResponse {
   // total hours logged in the date range
   private Double totalHoursLogged;
   private Double averageHoursPerDay;

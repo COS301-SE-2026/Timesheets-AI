@@ -3,28 +3,58 @@
 FROM node:22-alpine AS dev
 WORKDIR /app/client
 
+# Create a non-root user 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-COPY client/package.json client/yarn.lock ./
+# Copy the dependency files 
+COPY package.json yarn.lock ./
+
+# copy frontend package.json so Yarn is aware of the workspace we using 
+COPY apps/frontend/client/package.json apps/frontend/client/package.json
+
+# Install dependencies 
 RUN yarn install --frozen-lockfile
-COPY client/ .
+
+# Copy angular application 
+COPY apps/frontend/client/ apps/frontend/client
 
 RUN chown -R appuser:appgroup /app
 USER appuser
 
-EXPOSE 4200
-CMD ["yarn", "start", "--host", "0.0.0.0", "--disable-host-check"]
+WORKDIR /app/apps/frontend/client 
 
-#Build stage
+EXPOSE 4200
+CMD ["yarn", "start", "--host", "0.0.0.0"]
+
+# Build stagea
 FROM node:22-alpine AS build
-WORKDIR /app/client
-COPY client/package.json client/yarn.lock ./
+WORKDIR /app
+
+# Copy the dependency files 
+COPY package.json yarn.lock ./
+
+# copy frontend package.json so Yarn is aware of the workspace we using 
+COPY apps/frontend/client/package.json apps/frontend/client/package.json
+
+# Install dependencies 
 RUN yarn install --frozen-lockfile
-COPY client/ .
+
+# Copy angular application 
+COPY apps/frontend/client/ apps/frontend/client
+
+WORKDIR /app/apps/frontend/client 
+
+# Create a build 
 RUN yarn build --configuration production
 
-#Serve stage (nginx)
+# Serve stage (nginx)
 FROM nginxinc/nginx-unprivileged:alpine AS prod
-COPY --from=build /app/client/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 4200
+
+# Copy angular application 
+COPY --from=build /app/apps/frontend/client/dist/client/browser/ /usr/share/nginx/html/
+
+COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Nginx port 
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]                                                      
