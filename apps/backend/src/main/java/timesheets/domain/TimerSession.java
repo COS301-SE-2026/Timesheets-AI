@@ -45,11 +45,30 @@ public class TimerSession {
   @Column(name = "is_running", nullable = false)
   private Boolean isRunning;
 
+  @Column(name = "is_paused")
+  @Builder.Default
+  private Boolean isPaused = false;
+
+  @Column(name = "paused_at")
+  private LocalDateTime pausedAt;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
   @PrePersist
   protected void onCreate() {
     createdAt = LocalDateTime.now();
+
+    if (isRunning == null) {
+      isRunning = true;
+    }
+
+    if (isPaused == null) {
+      isPaused = false;
+    }
+
+    if (pausedDurationSeconds == null) {
+      pausedDurationSeconds = 0L;
+    }
   }
 }

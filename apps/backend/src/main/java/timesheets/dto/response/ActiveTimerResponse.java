@@ -19,7 +19,10 @@ public class ActiveTimerResponse {
   private SimpleTask task;
   private LocalDateTime startedAt;
   private Integer elapsedMinutes;
+  private Integer elapsedSeconds;
   private Boolean active;
+  private Boolean isPaused;
+  private LocalDateTime pausedAt;
 
   public static ActiveTimerResponse empty() {
 

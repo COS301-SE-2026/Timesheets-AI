@@ -70,6 +70,7 @@ jobs:
 
             # runs frontend unit tests using Jest 
             - name: Run Jest tests
+              if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
               working-directory: apps/frontend/client
               run: yarn test --watch=false
 
@@ -77,4 +78,5 @@ jobs:
 
             # ensure that the Angular builds successfully 
             - name: Build Angular
+              if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
               run: docker build -f apps/frontend/Dockerfile -t momently-frontend:${{ github.sha }} .
