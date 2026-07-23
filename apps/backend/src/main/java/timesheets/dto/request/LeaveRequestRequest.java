@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +41,7 @@ public class LeaveRequestRequest {
     private LocalDate endDate;
 
     @Positive(message = "Total days must be positive")
-    private Double totalDays;
+    private BigDecimal totalDays;
 
     private String reason;
 
@@ -70,7 +71,7 @@ public class LeaveRequestRequest {
     private LocalDate endDate;
 
     @Positive(message = "Total days must be positive")
-    private Double totalDays;
+    private BigDecimal totalDays;
 
     private String reason;
 

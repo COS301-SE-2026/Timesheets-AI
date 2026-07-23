@@ -1,5 +1,6 @@
 package timesheets.dto.response;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -20,7 +21,7 @@ public class LeaveRequestResponse {
   private String leaveType;
   private LocalDate startDate;
   private LocalDate endDate;
-  private Double totalDays;
+  private BigDecimal totalDays;
   private String reason;
   private String attachments;
   private String status;

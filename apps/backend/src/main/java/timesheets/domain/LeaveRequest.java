@@ -1,6 +1,7 @@
 package timesheets.domain;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,8 +36,8 @@ public class LeaveRequest {
   @Column(name = "end_date", nullable = false)
   private LocalDate endDate;
 
-  @Column(name = "total_days", nullable = false, precision = 4, scale = 1)
-  private Double totalDays;
+  @Column(name = "total_days", nullable = false)
+  private BigDecimal totalDays;
 
   @Column(name = "reason")
   private String reason;
