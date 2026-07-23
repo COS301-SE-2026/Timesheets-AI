@@ -187,7 +187,7 @@ CREATE TABLE user_availability (
     start_date DATE NOT NULL,
     end_date DATE,
     reason TEXT,
-    created_at TIMESTAMP DEFAULT now(),
+    created_at TIMESTAMP DEFAULT now()
 );
 
 CREATE TABLE leave_requests(
