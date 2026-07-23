@@ -190,6 +190,39 @@ CREATE TABLE user_availability (
     created_at TIMESTAMP DEFAULT now()
 );
 
+CREATE TABLE leave_requests(
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    workspace_member_id UUID NOT NULL REFERENCES workspace_members(id) ON DELETE CASCADE,
+    leave_type VARCHAR(30) NOT NULL CHECK(leave_type IN ('ANNUAL', 'SICK', 'MATERNITY', 'PATERNITY', 'FAMILY_RESPONSIBILITY', 'OTHER')),
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    total_days NUMERIC (4,1) NOT NULL,
+    reason TEXT,
+    attachments JSONB,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK(status IN ('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED')),
+    approved_by_workspace_member_id UUID REFERENCES workspace_members(id) ON DELETE SET NULL,
+    approved_at TIMESTAMP, 
+    rejection_reason TEXT, 
+    availability_id UUID REFERENCES user_availability(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT now(),
+    updated_at TIMESTAMP DEFAULT now()
+);
+
+COMMENT ON COLUMN leave_requests.attachments IS 'JSONB array of attachement objects:
+{
+    "files": [
+        {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "medical-certificate.pdf",
+        "type": "application/pdf",
+        "size": 102400,
+        "url": "https://storage.example.com/uploads/medical-certificate.pdf",
+        "uploadedAt": "2026-07-23T10:00:00"
+        }
+    ]
+}';
+
+
 CREATE TABLE jira_tickets (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     project_id UUID REFERENCES projects(id) ON DELETE RESTRICT,
