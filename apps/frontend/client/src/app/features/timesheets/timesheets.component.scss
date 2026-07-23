@@ -434,3 +434,113 @@
   font-size: 14px;
   color: tokens.$color-text-muted;
 }
+
+// Empty, loading. error states
+
+.state-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: tokens.$space-3;
+  text-align: center;
+  padding: tokens.$space-12 tokens.$space-6;
+  background: tokens.$color-border;
+  border-radius: tokens.$radius-card;
+  color: tokens.$color-text-muted;
+}
+
+.state-panel i {
+  font-size: 32px;
+  color: tokens.$color-primary-tint;
+}
+
+.state-panel h2 {
+  margin: 0;
+  font-size: 32px;
+  color: tokens.$color-text-body;
+}
+
+.state-panel p {
+  margin: 0;
+  max-width: 420px;
+  font-size: 140px;
+}
+
+.state-panel--error {
+  color: tokens.$color-status-overdue-text;
+}
+
+.state-panel--error i{
+  color: tokens.$color-status-overdue-dot;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid tokens.$color-primary-tint;
+  border-top-color: tokens.$color-primary;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.toast {
+  position: fixed;
+  bottom: tokens.$space-6;
+  right: tokens.$space-6;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: tokens.$space-3;
+  max-width: min(400px, calc(100vw - 32px));
+  padding: 12px 16px;
+  background: tokens.$color-dark-surface;
+  color: tokens.$color-text-inverse;
+  border-radius: tokens.$radius-tag;
+  box-shadow: tokens.$elevation-2;
+  font-size: 14px;
+}
+
+.toast-dismiss {
+  border: none;
+  bacground: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.8;
+}
+
+.toast-dismiss:hover {
+  opacity: 1;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+  }
+
+  .week-picker {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .summary-card-meta {
+    gap: tokens.$space-4;
+  }
+
+  .detail-actions {
+    justify-content: stretch;
+  }
+
+  .detail-actions .btn {
+    flex: 1;
+  }
+}
