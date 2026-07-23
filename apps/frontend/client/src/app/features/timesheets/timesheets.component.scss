@@ -360,3 +360,77 @@
   flex-wrap: wrap;
 }
 
+// Buttons
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: tokens.$radius-tag;
+  font-size: 14px;
+  font-weight: tokens.$font-weight-medium;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: no-allowed;
+}
+
+.btn--primary {
+  background: tokens.$color-primary;
+  border-color: tokens.$color-primary;
+  color: tokens.$color-text-inverse;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: tokens.$color-primary-hover;
+  border-color: tokens.$color-primary-hover ;
+}
+
+.btn--secondary {
+  background: tokens.$color-white;
+  border-color: tokens.$color-border;
+  color: tokens.$color-text-body;
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background: tokens.$color-primary-surface;
+  border-color: tokens.$color-primary-tint;
+}
+
+.btn--view {
+  padding: 6px 14px;
+  background: tokens.$color-primary;
+  border-color: tokens.$color-primary-tint;
+  color: tokens.$color-primary;
+  font-size: 13px;
+}
+
+.btn--view:hover:not(:disabled) {
+  background: tokens.$color-primary-tint;
+}
+
+.btn--danger {
+  background: tokens.$color-status-overdue-bg;
+  border-color: tokens.$color-status-overdue-bg;
+  color: tokens.$color-status-overdue-text;
+}
+
+.btn--danger:hover:not(:disabled) {
+  filter: brightness(0.96);
+}
+
+.awaiting-review, .read-only-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin:0;
+  font-size: 14px;
+  color: tokens.$color-text-muted;
+}
