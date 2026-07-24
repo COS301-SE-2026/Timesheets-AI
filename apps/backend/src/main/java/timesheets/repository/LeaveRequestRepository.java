@@ -15,6 +15,28 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, UUID
   // finds all the leave requests for a specific workspace member, the newest shows first
   List<LeaveRequest> findByWorkspaceMemberIdOrderByCreatedAtDesc(UUID workspaceMemberId);
 
+  /*
+  - finds all the leave requests for multiple workspace members
+  - I want to ge a user's requests across all workspaces
+  */
+  @Query(
+      "SELECT lr FROM LeaveRequest lr "
+          + "WHERE lr.workspaceMemberId IN :workspaceMemberIds "
+          + "ORDER BY lr.createdAt DESC")
+  List<LeaveRequest> findByWorkspaceMemberIdInOrderByCreatedAtDesc(List<UUID> workspaceMemberIds);
+
+  /*
+  - finds all the leave requests for multiple workspace members filtered by status
+  - I want to get a user's requests across all workspaces, with the status filetered
+  */
+  @Query(
+      "SELECT lr FROM LeaveRequest lr "
+          + "WHERE lr.workspaceMemberId IN :workspaceMemberIds "
+          + "AND lr.status = :status "
+          + "ORDER BY lr.createdAt DESC")
+  List<LeaveRequest> findByWorkspaceMemberIdInAndStatus(
+      @Param("workspaceMemberIds") List<UUID> workspaceMemberIds, @Param("status") String status);
+
   // finds leave requests by status
   List<LeaveRequest> findByStatus(String status);
 

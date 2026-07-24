@@ -39,7 +39,7 @@ public class LeaveRequestController {
     return ResponseEntity.ok(response);
   }
 
-  // this will get the leave requests for a specific user
+  // this will get the leave requests for a specific user, their own requests
   @GetMapping("/my-requests")
   public ResponseEntity<List<LeaveRequestResponse>> getMyLeaveRequests() {
     List<LeaveRequestResponse> responses = leaveRequestService.getMyLeaveRequests();
@@ -56,7 +56,13 @@ public class LeaveRequestController {
     return ResponseEntity.ok(response);
   }
 
-  // this gets the leave requests by status
+  /*
+  - this gets all the leave requests
+  - for dev it gets their own leave requests
+  - for a manager it gets all the leave requests in the workspace
+  - for and admin it gets the requests across the entire workspace
+  NOTE: the status is optional, so if there is a status then it returns by status hence it returns all of them
+   */
   @GetMapping
   public ResponseEntity<List<LeaveRequestResponse>> getRequestsByStatus(
       @RequestParam(required = false) String status) {
@@ -72,7 +78,7 @@ public class LeaveRequestController {
     return ResponseEntity.ok(responses);
   }
 
-  // this gets the leave requests in a certain range
+  // this gets the leave requests in a certain range of dates
   @GetMapping("/date-range")
   public ResponseEntity<List<LeaveRequestResponse>> getRequestsByDateRange(
       @RequestParam LocalDate from, @RequestParam LocalDate to) {

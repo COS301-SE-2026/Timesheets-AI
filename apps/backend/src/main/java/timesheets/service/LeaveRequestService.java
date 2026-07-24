@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.LeaveRequest;
+import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.LeaveRequestRequest;
 import timesheets.dto.response.LeaveRequestResponse;
 import timesheets.repository.LeaveRequestRepository;
@@ -120,10 +121,19 @@ public class LeaveRequestService {
   // this will get the users leave requests
   @Transactional(readOnly = true)
   public List<LeaveRequestResponse> getMyLeaveRequests() {
-    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    UUID userId = securityUtils.getCurrentUserId();
+
+    List<UUID> workspaceMemberIds =
+        workspaceMemberRepository.findByUserId(userId).stream()
+            .map(WorkspaceMember::getId)
+            .collect(Collectors.toList());
+
+    if (workspaceMemberIds.isEmpty()) {
+      return List.of();
+    }
 
     return leaveRequestRepository
-        .findByWorkspaceMemberIdOrderByCreatedAtDesc(workspaceMemberId)
+        .findByWorkspaceMemberIdInOrderByCreatedAtDesc(workspaceMemberIds)
         .stream()
         .map(this::buildLeaveRequestResponse)
         .collect(Collectors.toList());
@@ -217,7 +227,8 @@ public class LeaveRequestService {
       UUID workspaceId = securityUtils.getCurrentWorkspaceId();
 
       requests =
-          leaveRequestRepository.findByWorkspaceIdAndStartDateBetween(workspaceId, null, null);
+          leaveRequestRepository.findByWorkspaceIdAndStartDateBetween(
+              workspaceId, startDate, endDate);
     } else {
       requests = leaveRequestRepository.findByStartDateBetween(startDate, endDate);
     }
@@ -232,6 +243,8 @@ public class LeaveRequestService {
   */
   @Transactional
   public LeaveRequestResponse approveLeaveRequest(UUID requestId) {
+    
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
       throw new RuntimeException("Only Admins and Managers can approve leave requests");
@@ -244,6 +257,11 @@ public class LeaveRequestService {
 
     if (!"PENDING".equals(leaveRequest.getStatus())) {
       throw new RuntimeException("Leave request is not pending approval");
+    }
+        
+    //cannot approve their own requests
+    if (leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
+        throw new RuntimeException("You cannot approve your own leave request");
     }
 
     // for managers verify that the request is in their workspace
@@ -258,7 +276,6 @@ public class LeaveRequestService {
       }
     }
 
-    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
     leaveRequest.setStatus("APPROVED");
 
     leaveRequest.setApprovedByWorkspaceMemberId(currentMemberId);
@@ -272,6 +289,8 @@ public class LeaveRequestService {
   @Transactional
   public LeaveRequestResponse rejectLeaveRequest(UUID requestId, String reason) {
 
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
       throw new RuntimeException("Only Admins and Managers can reject leave requests");
     }
@@ -283,6 +302,11 @@ public class LeaveRequestService {
 
     if (!"PENDING".equals(leaveRequest.getStatus())) {
       throw new RuntimeException("Leave request is not pending approval");
+    }
+
+    //cannot approve their own requests
+    if (leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
+        throw new RuntimeException("You cannot reject your own leave request");
     }
 
     // for managers verify that the request is in their workspace
