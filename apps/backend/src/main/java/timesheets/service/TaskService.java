@@ -146,7 +146,7 @@ public class TaskService {
     task.setProjectId(projectId);
     task.setTitle(request.getTitle());
     task.setDescription(request.getDescription());
-    task.setJiraTicketKey(request.getJiraTicketId());
+    task.setJiraTicketKey(request.getJiraTicketKey());
     task.setParentTaskId(request.getParentTaskId());
     task.setEstimatedHours(request.getEstimatedHours());
     task.setAssignedWorkspaceMemberId(request.getAssignedWorkspaceMemberId());
