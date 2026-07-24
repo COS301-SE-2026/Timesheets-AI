@@ -170,7 +170,51 @@ export class MyTasksComponent {
     this.loadMockData();
   }
 
+  // apply all active filtes to the task list
 
+  public applyFilters(): void {
+    const currentTasks = this.tasks();
+    let filtered = [...currentTasks];
+
+    const selectedStatus = this.selectedStatus();
+    if(selectedStatus !== 'ALL') {
+      filtered = filtered.filter((task: Task) => task.status === selectedStatus);
+    }
+
+    if(!this.showCompleted()) {
+      filtered = filtered.filter((task: Task) => task.status !== 'DONE');
+    }
+
+    if(!this.showArchived()) {
+      filtered = filtered.filter((task: Task) => task.status !== 'ARCHIVED');
+    }
+
+    this.filteredTasks.set(filtered);
+  }
+
+  // Handles status filter dropdown change
+
+  public onStatusFilterChange(event: Event): void {
+    const selectedElement = event.target as HTMLSelectElement;
+    this.selectedStatus.set(selectedElement.value);
+    this.applyFilters(); 
+  }
+
+  // Handles show completed checkbox change
+
+  public onToogleCompleted(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    this.showCompleted.set(checkbox.checked);
+    this.applyFilters();
+  }
+
+  // Handles show archived checkbox changes
+
+  public onToggleArchived(event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    this.showArchived.set(checkbox.checked);
+    this.applyFilters();
+  }
 
 
 
