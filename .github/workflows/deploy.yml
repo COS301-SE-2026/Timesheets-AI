@@ -20,12 +20,7 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@d0834ad3a60a024346910e522a81b0002bd37fea
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}  
+
 
 
       # appleboy is plugin to SSH into a server e.g. ec2 instance
@@ -44,8 +39,10 @@ jobs:
         # Download the latest Docker images from ECR
         # Restart the containers using updated images 
         # Remove old Docker images 
+        # set -e wlll make script to end when an error occurs
         
           script: |
+            set -e
             cd ~/projects/Timesheets-AI 
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
             | docker login \
@@ -53,6 +50,6 @@ jobs:
               --password-stdin \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
-              docker compose -f docker-compose.prod.yml pull
-              docker compose -f docker-compose.prod.yml up -d
-              docker image prune -f
+            docker compose --env-file .env.production -f docker-compose.prod.yml pull
+            docker compose --env-file .env.production -f docker-compose.prod.yml up -d
+            docker image prune -f
