@@ -57,4 +57,25 @@ export class ProjectDetailsComponent {
         );
 
     });
+
+    protected readonly projectTitle= computed(
+        ()=> this.project().name,
+    );
+
+    protected readonly projectStatus= computed(
+        ()=> this.project().status,
+    );
+
+    protected readonly projectRole= computed(
+        ()=> this.project().role,
+    );
+
+    protected readonly projectTags= computed(
+        ()=> this.project().tags,
+    );
+
+    protected readonly projectMembers= computed(
+        ()=> this.project().teamMembers,
+    );
+    
 }
