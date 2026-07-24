@@ -7,7 +7,6 @@ Related Requirement: N/A
 
 import { Project } from "../../models/project.model";
 import { ProjectRole } from "../../enums/project-role.enum";
-// export { Project } from "../../models/project.model";
 
 export interface ProjectMember{
     id: string;
@@ -17,6 +16,7 @@ export interface ProjectMember{
     avatarColourClass: string;
 }
 export interface ProjectDetails extends Project{
-    deadline?: string;
-    members?: ProjectMember[];
+    deadline: string;
+    members: ProjectMember[];
+    completionPercentage?: number;
 }
