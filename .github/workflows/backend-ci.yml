@@ -80,10 +80,10 @@ jobs:
 
 #==================== Login to AWS ECR  ===========================================================
         - name: Login to AWS ECR
-          if: github.event.name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true')
+          if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true')
           id: login-to-ecr
           uses: aws-actions/amazon-ecr-login@v2
-          
+
 #===================== RELEASE stage ================================
 
         # ensure that the docker image is built successfully and that it can be containerized and deployed 
@@ -92,4 +92,17 @@ jobs:
           if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
           working-directory: apps/backend
           run: docker build -t momently-backend:${{ github.sha}} .
+
+        # docker has image locally
+        #  so example: momently-backend:544dr55645
+        # ecr DOES NOT have this image - only Github runner knows
+#====================== Tag Image ====================================
+
+        # docker tag is giving same image another name 
+        # latest - give us the newest version and aws ec2 instance will run this to get latest version 
+        - name: Tag Docker Image
+          if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true')
+          run: |
+            docker tag momently-backend:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/momently-backend:latest
+            docker tag momently-backend:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/momently-backend:${{ github.sha }}
 
