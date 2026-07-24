@@ -58,6 +58,62 @@ public class LeaveRequestService {
     return buildLeaveRequestResponse(saved);
   }
 
+  // this updates a leave request
+  @Transactional
+  public LeaveRequestResponse updateLeaveRequest(
+      UUID requestId, LeaveRequestRequest.Update request) {
+    LeaveRequest leaveRequest =
+        leaveRequestRepository
+            .findById(requestId)
+            .orElseThrow(() -> new RuntimeException("Leave request not found"));
+
+    // making sure that only pending requests can be updated
+    if (!"PENDING".equals(leaveRequest.getStatus())) {
+      throw new RuntimeException("Only pending leave requests can be updated");
+    }
+
+    // only the requester should be able to update the request
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    if (!leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
+      throw new RuntimeException("You can only update your own leave requests");
+    }
+
+    // check if both dates are provided
+    if (request.getStartDate() != null && request.getEndDate() != null) {
+      if (request.getEndDate().isBefore(request.getStartDate())) {
+        throw new RuntimeException("End date cannot be before start date");
+      }
+    }
+
+    // since this is an update not all the fields will be available
+    if (request.getLeaveType() != null) {
+      leaveRequest.setLeaveType(request.getLeaveType());
+    }
+
+    if (request.getStartDate() != null) {
+      leaveRequest.setStartDate(request.getStartDate());
+    }
+
+    if (request.getEndDate() != null) {
+      leaveRequest.setEndDate(request.getEndDate());
+    }
+
+    if (request.getTotalDays() != null) {
+      leaveRequest.setTotalDays(request.getTotalDays());
+    }
+
+    if (request.getReason() != null) {
+      leaveRequest.setReason(request.getReason());
+    }
+
+    if (request.getAttachments() != null) {
+      leaveRequest.setAttachments(request.getAttachments());
+    }
+
+    LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+    return buildLeaveRequestResponse(saved);
+  }
+
   // ! helper builder
   // this should build the response
   private LeaveRequestResponse buildLeaveRequestResponse(LeaveRequest leaveRequest) {

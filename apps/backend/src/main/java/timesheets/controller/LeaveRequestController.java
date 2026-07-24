@@ -1,6 +1,7 @@
 package timesheets.controller;
 
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +25,15 @@ public class LeaveRequestController {
     LeaveRequestResponse response = leaveRequestService.createLeaveRequest(request);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
+
+  // this updates a leave request
+  @PatchMapping("/{id}")
+  public ResponseEntity<LeaveRequestResponse> updateLeaveRequest(
+      @PathVariable UUID id, @Valid @RequestBody LeaveRequestRequest.Update request) {
+
+    LeaveRequestResponse response = leaveRequestService.updateLeaveRequest(id, request);
+
+    return ResponseEntity.ok(response);
   }
 }
