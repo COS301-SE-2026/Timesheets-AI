@@ -42,6 +42,10 @@ readonly toastMessage = signal<string | null>(null);
 
 readonly showRejectDialog = signal(false);
 readonly rejectReason = signal('');
+
+readonly showSubmitDialog = signal(false);
+readonly showSubmitSuccessDialog = signal(false);
+
 readonly actionPending = signal(false);
 
 readonly filteredTimesheets = computed(() =>{
@@ -190,24 +194,45 @@ onViewTask(task: TaskRow): void {
 
 // INTEGRATION: Conftim, then POST /api/timesheets/{id}/submit
 
-onSubmitTimesheet(): void {
-  const s = this.summary();
-  if (!s || !this.canSubmit()) {
-    return;
-  }
-  const confirmed = window.confirm(
-    'Submit this timesheet for approval? You will not be able to edit it while it is under review.'
-  );
-  if(!confirmed) {
+openSubmitDialog(): void {
+  if (!this.canSubmit() || this.actionPending()){
     return;
   }
 
-  this.actionPending.set(true);
-  // INTEGRATION: this.timesheetService.submit(s.id).subscribe({...})
-  this.patchLocalStatus(s.id, 'SUBMITTED', {submittedAt: new Date().toISOString(), isLocked: true });
-  this.actionPending.set(false);
-  this.showToast('Timesheet submitted successfully.');
+  this.showSubmitDialog.set(true);
 }
+
+closeSubmitDialog(): void {
+  if (this.actionPending()){
+    return;
+  }
+  this.showSubmitDialog.set(false);
+}
+
+confirmSubmitTimesheet(): void {
+  const s = this.summary();
+
+  if(!s || !this.canSubmit() || this.actionPending()) {
+    return;
+  }
+  this.actionPending.set(true);
+
+  // INTEGRATION replace this mock update with: this.timesheetsService.submit(s.id).subscribe({...})
+
+  this.patchLocalStatus(s.id, 'SUBMITTED', {
+    submittedAt: new Date().toISOString(),
+    isLocked: true
+  });
+
+  this.actionPending.set(false);
+  this.showSubmitDialog.set(false);
+  this.showSubmitSuccessDialog.set(true);
+}
+
+closeSubmissionSuccessDialog(): void {
+  this.showSubmitSuccessDialog.set(false);
+}
+
 
 // INTEGRATION: Confirm then POST /api/timesheets/{id}/approve
 
