@@ -45,4 +45,13 @@ public class LeaveRequestController {
 
     return ResponseEntity.ok(responses);
   }
+
+  // this will get the leave requests by ID- incase someone needs to see the details about the leave
+  // requests
+  @GetMapping("/{id}")
+  public ResponseEntity<LeaveRequestResponse> getLeaveRequestById(@PathVariable UUID id) {
+    LeaveRequestResponse response = leaveRequestService.getLeaveRequestById(id);
+
+    return ResponseEntity.ok(response);
+  }
 }

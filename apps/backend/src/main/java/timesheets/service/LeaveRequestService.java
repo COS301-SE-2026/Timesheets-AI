@@ -128,6 +128,26 @@ public class LeaveRequestService {
         .collect(Collectors.toList());
   }
 
+  // this gets the leave requests by the ID
+  @Transactional(readOnly = true)
+  public LeaveRequestResponse getLeaveRequestById(UUID requestId) {
+    LeaveRequest leaveRequest =
+        leaveRequestRepository
+            .findById(requestId)
+            .orElseThrow(() -> new RuntimeException("Leave request not found"));
+
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    //to check if the member has access
+    if (!leaveRequest.getWorkspaceMemberId().equals(currentMemberId)
+        && !securityUtils.isAdmin()
+        && !securityUtils.isManager()) {
+      throw new RuntimeException("You don't have access to this leave request");
+    }
+
+    return buildLeaveRequestResponse(leaveRequest);
+  }
+
   // ! helper builder
   // this should build the response
   private LeaveRequestResponse buildLeaveRequestResponse(LeaveRequest leaveRequest) {
