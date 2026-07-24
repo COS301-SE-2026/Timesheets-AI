@@ -304,6 +304,33 @@ public class LeaveRequestService {
     return buildLeaveRequestResponse(saved);
   }
 
+  /*
+  - this will only allow a requester to cancel their own request
+  - a manager or admin cannot cancel someone else's request, instead they can only reject it
+  */
+  @Transactional
+  public LeaveRequestResponse cancelLeaveRequest(UUID requestId, String reason) {
+    LeaveRequest leaveRequest =
+        leaveRequestRepository
+            .findById(requestId)
+            .orElseThrow(() -> new RuntimeException("Leave request not found"));
+
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    if (!leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
+      throw new RuntimeException("Only the requester can cancel their own leave request");
+    }
+
+    if (!"PENDING".equals(leaveRequest.getStatus())) {
+      throw new RuntimeException("Only pending leave requests can be cancelled");
+    }
+
+    leaveRequest.setStatus("CANCELLED");
+
+    LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+    return buildLeaveRequestResponse(saved);
+  }
+
   // ! helper builder
   // this should build the response
   private LeaveRequestResponse buildLeaveRequestResponse(LeaveRequest leaveRequest) {

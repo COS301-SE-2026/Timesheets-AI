@@ -102,4 +102,13 @@ public class LeaveRequestController {
     LeaveRequestResponse response = leaveRequestService.rejectLeaveRequest(id, request.getReason());
     return ResponseEntity.ok(response);
   }
+
+  // this cancels a pending request
+  @PostMapping("/{id}/cancel")
+  public ResponseEntity<LeaveRequestResponse> cancelLeaveRequest(
+      @PathVariable UUID id, @Valid @RequestBody LeaveRequestRequest.Cancel request) {
+
+    LeaveRequestResponse response = leaveRequestService.cancelLeaveRequest(id, request.getReason());
+    return ResponseEntity.ok(response);
+  }
 }
