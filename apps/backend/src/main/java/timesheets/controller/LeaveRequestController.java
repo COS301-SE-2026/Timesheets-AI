@@ -1,6 +1,7 @@
 package timesheets.controller;
 
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +69,15 @@ public class LeaveRequestController {
 
     // if the status is not there then all the responses should be returned
     List<LeaveRequestResponse> responses = leaveRequestService.getMyLeaveRequests();
+    return ResponseEntity.ok(responses);
+  }
+
+  // this gets the leave requests in a certain range
+  @GetMapping("/date-range")
+  public ResponseEntity<List<LeaveRequestResponse>> getRequestsByDateRange(
+      @RequestParam LocalDate from, @RequestParam LocalDate to) {
+    List<LeaveRequestResponse> responses = leaveRequestService.getRequestByDateRange(from, to);
+
     return ResponseEntity.ok(responses);
   }
 }

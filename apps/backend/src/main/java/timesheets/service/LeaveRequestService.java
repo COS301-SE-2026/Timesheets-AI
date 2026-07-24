@@ -1,5 +1,6 @@
 package timesheets.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -192,6 +193,36 @@ public class LeaveRequestService {
     return leaveRequestRepository.findByStatus(status).stream()
         .map(this::buildLeaveRequestResponse)
         .collect(Collectors.toList());
+  }
+
+  /*
+  - this gets the leave requests within a certain date range
+  - admins can view from the entire workspace
+  - managers can view from that specific workspace only
+  - devs can only view their own
+  */
+  @Transactional(readOnly = true)
+  public List<LeaveRequestResponse> getRequestByDateRange(LocalDate startDate, LocalDate endDate) {
+
+    List<LeaveRequest> requests;
+
+    // devs can only see their own requests
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      UUID memberId = securityUtils.getDefaultWorkspaceMemberId();
+
+      requests =
+          leaveRequestRepository.findByWorkspaceMemberIdAndStartDateBetween(
+              memberId, startDate, endDate);
+    } else if (securityUtils.isManager() && !securityUtils.isAdmin()) {
+      UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+
+      requests =
+          leaveRequestRepository.findByWorkspaceIdAndStartDateBetween(workspaceId, null, null);
+    } else {
+      requests = leaveRequestRepository.findByStartDateBetween(startDate, endDate);
+    }
+
+    return requests.stream().map(this::buildLeaveRequestResponse).collect(Collectors.toList());
   }
 
   // ! helper builder
