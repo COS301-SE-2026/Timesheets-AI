@@ -24,7 +24,7 @@ jobs:
 
         steps:
         # Note here: check if we use checkout@sha - that was in lecture slides not v4 (could be more secure)
-        - uses: actions/checkout@v4 
+        - uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
         # Logic Gate: This is used to determine if the files changed are in Backend
         # dorny repo is used in this logic gate - this is using SHA instead of versions for security suggested by SonarQube 
@@ -54,7 +54,7 @@ jobs:
         # Only runs if backend changes 
         - name: Set up JDK 17
           if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
-          uses: actions/setup-java@v4
+          uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9
           with:
             # these lines tell Github Actions which installer and distribution to install
             java-version: '17'
@@ -72,7 +72,7 @@ jobs:
 #==================== Login to AWS  ===========================================================
         - name: Configure AWS Credentials
           if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true')
-          uses: aws-actions/configure-aws-credentials@v4
+          uses: aws-actions/configure-aws-credentials@d0834ad3a60a024346910e522a81b0002bd37fea
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -81,7 +81,7 @@ jobs:
 #==================== Login to AWS ECR  ===========================================================
         - name: Login to AWS ECR
           if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true')
-          uses: aws-actions/amazon-ecr-login@v2
+          uses: aws-actions/amazon-ecr-login@33f92af657bba1882ab79d8621debd2f6769a0c9
 
 #===================== RELEASE stage ================================
 
