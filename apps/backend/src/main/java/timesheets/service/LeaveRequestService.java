@@ -268,6 +268,42 @@ public class LeaveRequestService {
     return buildLeaveRequestResponse(saved);
   }
 
+  // rejects a pending request, keeping same role access as approve endpoint
+  @Transactional
+  public LeaveRequestResponse rejectLeaveRequest(UUID requestId, String reason) {
+
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      throw new RuntimeException("Only Admins and Managers can reject leave requests");
+    }
+
+    LeaveRequest leaveRequest =
+        leaveRequestRepository
+            .findById(requestId)
+            .orElseThrow(() -> new RuntimeException("Leave request not found"));
+
+    if (!"PENDING".equals(leaveRequest.getStatus())) {
+      throw new RuntimeException("Leave request is not pending approval");
+    }
+
+    // for managers verify that the request is in their workspace
+    if (securityUtils.isManager() && !securityUtils.isAdmin()) {
+      UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+
+      boolean hasAccess =
+          leaveRequestRepository.findByWorkspaceId(workspaceId).stream()
+              .anyMatch(leaveReq -> leaveReq.getId().equals(requestId));
+      if (!hasAccess) {
+        throw new RuntimeException("You can only reject requests from your workspace");
+      }
+    }
+
+    leaveRequest.setStatus("REJECTED");
+    leaveRequest.setRejectionReason(reason);
+
+    LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+    return buildLeaveRequestResponse(saved);
+  }
+
   // ! helper builder
   // this should build the response
   private LeaveRequestResponse buildLeaveRequestResponse(LeaveRequest leaveRequest) {

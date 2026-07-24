@@ -93,4 +93,13 @@ public class LeaveRequestController {
 
     return ResponseEntity.ok(response);
   }
+
+  // rejects a pending leave request
+  @PostMapping("/{id}/reject")
+  public ResponseEntity<LeaveRequestResponse> rejectLeaveRequest(
+      @PathVariable UUID id, @Valid @RequestBody LeaveRequestRequest.Reject request) {
+
+    LeaveRequestResponse response = leaveRequestService.rejectLeaveRequest(id, request.getReason());
+    return ResponseEntity.ok(response);
+  }
 }
