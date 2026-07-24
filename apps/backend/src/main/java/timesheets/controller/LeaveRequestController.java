@@ -54,4 +54,20 @@ public class LeaveRequestController {
 
     return ResponseEntity.ok(response);
   }
+
+  // this gets the leave requests by status
+  @GetMapping
+  public ResponseEntity<List<LeaveRequestResponse>> getRequestsByStatus(
+      @RequestParam(required = false) String status) {
+
+    if (status != null) {
+      List<LeaveRequestResponse> responses = leaveRequestService.getRequestsByStatus(status);
+
+      return ResponseEntity.ok(responses);
+    }
+
+    // if the status is not there then all the responses should be returned
+    List<LeaveRequestResponse> responses = leaveRequestService.getMyLeaveRequests();
+    return ResponseEntity.ok(responses);
+  }
 }

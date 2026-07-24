@@ -138,14 +138,60 @@ public class LeaveRequestService {
 
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
-    //to check if the member has access
-    if (!leaveRequest.getWorkspaceMemberId().equals(currentMemberId)
-        && !securityUtils.isAdmin()
-        && !securityUtils.isManager()) {
-      throw new RuntimeException("You don't have access to this leave request");
+    // devs should only view their own leave request
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      if (!leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
+        throw new RuntimeException("You don't have access to this leave request");
+      }
+      return buildLeaveRequestResponse(leaveRequest);
     }
 
+    if (securityUtils.isManager() && !securityUtils.isAdmin()) {
+      UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+
+      boolean hasAccess =
+          leaveRequestRepository.findByWorkspaceId(workspaceId).stream()
+              .anyMatch(leaveReq -> leaveReq.getId().equals(requestId));
+
+      if (!hasAccess) {
+        throw new RuntimeException("You don't have access to this leave request");
+      }
+      return buildLeaveRequestResponse(leaveRequest);
+    }
     return buildLeaveRequestResponse(leaveRequest);
+  }
+
+  /*
+  - this gets the leave requests by status
+  - admins can view from the entire workspace
+  - managers can view from that specific workspace only
+  - devs can only view their own
+  */
+  @Transactional(readOnly = true)
+  public List<LeaveRequestResponse> getRequestsByStatus(String status) {
+
+    // developers can only view their own leave requests
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      UUID memberId = securityUtils.getDefaultWorkspaceMemberId();
+
+      return leaveRequestRepository.findByWorkspaceMemberIdAndStatus(memberId, status).stream()
+          .map(this::buildLeaveRequestResponse)
+          .collect(Collectors.toList());
+    }
+
+    // managers can only view all leave requests in their specific workspace
+    if (securityUtils.isManager() && !securityUtils.isAdmin()) {
+      UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+
+      return leaveRequestRepository.findByWorkspaceIdAndStatus(workspaceId, status).stream()
+          .map(this::buildLeaveRequestResponse)
+          .collect(Collectors.toList());
+    }
+
+    // admins can view leave requests across the entire workspace
+    return leaveRequestRepository.findByStatus(status).stream()
+        .map(this::buildLeaveRequestResponse)
+        .collect(Collectors.toList());
   }
 
   // ! helper builder
