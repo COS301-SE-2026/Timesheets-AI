@@ -1,6 +1,7 @@
 package timesheets.controller;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,5 +36,13 @@ public class LeaveRequestController {
     LeaveRequestResponse response = leaveRequestService.updateLeaveRequest(id, request);
 
     return ResponseEntity.ok(response);
+  }
+
+  // this will get the leave requests for a specific user
+  @GetMapping("/my-requests")
+  public ResponseEntity<List<LeaveRequestResponse>> getMyLeaveRequests() {
+    List<LeaveRequestResponse> responses = leaveRequestService.getMyLeaveRequests();
+
+    return ResponseEntity.ok(responses);
   }
 }

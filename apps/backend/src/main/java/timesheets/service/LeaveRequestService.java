@@ -1,6 +1,8 @@
 package timesheets.service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,6 +114,18 @@ public class LeaveRequestService {
 
     LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
     return buildLeaveRequestResponse(saved);
+  }
+
+  // this will get the users leave requests
+  @Transactional(readOnly = true)
+  public List<LeaveRequestResponse> getMyLeaveRequests() {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    return leaveRequestRepository
+        .findByWorkspaceMemberIdOrderByCreatedAtDesc(workspaceMemberId)
+        .stream()
+        .map(this::buildLeaveRequestResponse)
+        .collect(Collectors.toList());
   }
 
   // ! helper builder
