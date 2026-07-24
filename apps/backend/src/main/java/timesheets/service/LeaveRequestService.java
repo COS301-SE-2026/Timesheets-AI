@@ -243,7 +243,7 @@ public class LeaveRequestService {
   */
   @Transactional
   public LeaveRequestResponse approveLeaveRequest(UUID requestId) {
-    
+
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
@@ -258,10 +258,10 @@ public class LeaveRequestService {
     if (!"PENDING".equals(leaveRequest.getStatus())) {
       throw new RuntimeException("Leave request is not pending approval");
     }
-        
-    //cannot approve their own requests
+
+    // cannot approve their own requests
     if (leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
-        throw new RuntimeException("You cannot approve your own leave request");
+      throw new RuntimeException("You cannot approve your own leave request");
     }
 
     // for managers verify that the request is in their workspace
@@ -304,9 +304,9 @@ public class LeaveRequestService {
       throw new RuntimeException("Leave request is not pending approval");
     }
 
-    //cannot approve their own requests
+    // cannot approve their own requests
     if (leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
-        throw new RuntimeException("You cannot reject your own leave request");
+      throw new RuntimeException("You cannot reject your own leave request");
     }
 
     // for managers verify that the request is in their workspace
