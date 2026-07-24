@@ -6,12 +6,11 @@ with only mock that should be eaisly integrated.
 Related Requirement: N/A
 */
 
-import { Component, OnInit, signal, computed } from "@angular/core";
+import { Component, signal, computed } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { HeaderComponent } from "../../../shared/components/header/header.component";
 import { ProgressBarComponent } from "../../../shared/components/progress-bar/progress-bar.component";
 import { StatusChipComponent } from "../../../shared/components/status-chip/status-chip.component";
-import { ProjectMember } from "../project-details/models/project-details.model";
 import { Project } from "../models/project.model";
 import { PROJECTS } from "../mock/projects.mock";
 import { ActivatedRoute } from "@angular/router";
@@ -36,7 +35,7 @@ export class ProjectDetailsComponent {
     protected readonly projectId= computed(()=>
         Number(this.route.snapshot.paramMap.get('id')),
     )
-    
+
     protected readonly project= signal<Project>(PROJECTS[0]);
 
     protected readonly activeTab=signal<'overview' | 'tasks'>('overview');
@@ -86,5 +85,11 @@ export class ProjectDetailsComponent {
     protected readonly projectMembers= computed(
         ()=> this.project().teamMembers,
     );
+
+    protected readonly hoursSummary= computed(()=>{
+        const project= this.project();
+        
+        return `${project.hoursLogged}h / ${project.totalHours}h`;
+    });
     
 }
