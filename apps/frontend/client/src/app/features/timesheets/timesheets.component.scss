@@ -253,6 +253,9 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+.week-picker-name {
+  display: none;
+}
 
 .summary-card-meta dd {
   grid-column: 2;
@@ -332,7 +335,7 @@
   text-transform : uppercase;
   letter-spacing: 0.04em;
   color: tokens.$color-primary;
-  border-bottom: 2px solid tokens.$color-secondary;;
+  border-bottom: 2px solid tokens.$color-secondary;
 }
 
 .entry-table td:not(:first-child) {
@@ -562,11 +565,13 @@
   left: 50%;
   z-index: 101;
   transform: translate(-50%, -50%);
-
   width: min(390px, calc(100vw - 32px));
   box-sizing: border-box;
+  margin: 0;
+  border: none;
   padding: tokens.$space-6;
   background: tokens.$color-white;
+  border: 1px solid tokens.$color-border;
   border-radius: tokens.$radius-card;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
   text-align: center;

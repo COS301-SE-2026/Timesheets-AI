@@ -12,14 +12,15 @@
       <!-- INTEGRATION: Oprions come from GET /api/timesheets/me (or status filter), changing selection should load GET /api/timesheets/{id} + /entries -->
 
       <!-- Week picker -->
-       <label class="week-picker">
+       <label class="week-picker" for="week-picker">
+        <span class="week-picker-name">Week</span>
         <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
         <select 
+          id="week-picker"
           class="week-picker-select"
           [ngModel]="selectedTimesheetId()"
           (ngModelChange)="onWeekChange($event)"
-          [disabled]="uiState() === 'loading' || filteredTimesheets().length === 0"
-          aria-label="Select timesheet week">
+          [disabled]="uiState() === 'loading' || filteredTimesheets().length === 0">
           @for (week of filteredTimesheets(); track week.summary.id) {
             <option [value]="week.summary.id">
               Week {{ week.summary.weekNumber }} . {{ week.summary.periodLabel }}
@@ -27,6 +28,7 @@
           }
         </select>
         <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
+
        </label>
 
     </div>
@@ -47,10 +49,10 @@
     <!-- Loading -->
 
     @if (uiState() === 'loading') {
-      <div class="state-panel state-panel--loading" role="status">
+      <output class="state-panel state-panel--loading">
         <div class="spinner" aria-hidden="true"></div>
         <p>Loading timesheets...</p>
-      </div>
+      </output>
     }
 
    <!-- Error -->
@@ -148,7 +150,7 @@
 
       <!-- Entries table or empty entries -->
        @if(hasEntries()) {
-       <div class="entry-table-wrapper" role="region" aria-label="Weekly time entries">
+       <section class="entry-table-wrapper" aria-label="Weekly time entries">
         <table class="entry-table">
           <thead>
             <tr>
@@ -210,7 +212,7 @@
             </tr>
           </tfoot>
         </table>
-       </div>
+      </section>
 
        <!-- Role / status actions -->
         
@@ -256,9 +258,9 @@
 
     <!-- Submit confirmation modal -->
     @if (showSubmitDialog()){
-    <div class="modal-backdrop" (click)="closeSubmitDialog()"></div>
+    <div class="modal-backdrop" (click)="closeSubmitDialog()" (keydown.enter)="closeSubmitDialog()" (keydown.space)="closeSubmitDialog()" ></div>
 
-    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="submit-modal-title">
+    <dialog class="modal" aria-labelledby="submit-modal-title" open>
       <div class="modal-icon" aria-hidden="true">
         <i class="fa-regular fa-paper-plane"></i>
       </div>
@@ -270,7 +272,7 @@
         <button type="button" class="btn btn--secondary" [disabled]="actionPending()" (click)="closeSubmitDialog()"> Cancel</button>
         <button type="button" class="btn btn--secondary" [disabled]="actionPending()" (click)="confirmSubmitTimesheet()"> Submit </button>
       </div>
-    </section>
+    </dialog>
     }
 
     <!-- Submission sucees modal -->
@@ -278,7 +280,7 @@
     @if (showSubmitSuccessDialog()) {
       <div class="modal-backdrop"></div>
 
-      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="success-modal-title">
+      <dialog class="modal" aria-labelledby="success-modal-title" open>
         <div class="modal-icon modal-icon--success" aria-hidden="true">
           <i class="fa-solid fa-check"></i>
         </div>
@@ -289,13 +291,13 @@
         <div class="modal-actions modal-actions--center">
           <button type="button" class="btn btn--primary" (click)="closeSubmissionSuccessDialog()">Done</button>
         </div>
-      </section>
+      </dialog>
     }
       <!-- Rject Reason dialog -->
 
       @if (showRejectDialog()) {
-        <div class="dialog-backdrop" (click)="closeRejectDialog()" role="presentation"></div>
-        <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="reject-dialog-title">
+        <div class="dialog-backdrop" (click)="closeRejectDialog()" aria-hidden="true"></div>
+        <dialog class="dialog" aria-labelledby="reject-dialog-title" open>
           <h2 id="reject-dialog-title"> Reject Timesheet </h2>
           <p>Please provide a reason for rejection. The employee will see this on their timesheet.</p>
           <label class="dialog-label" for="reject-reason">Reason</label>
@@ -304,18 +306,18 @@
             <button type="button" class="btn btn--secondary" (click)="closeRejectDialog()">Cancel</button>
             <button type="button" class="btn btn--danger" [disabled]="!rejectReason().trim() || actionPending()" (click)="onConfirmReject()"> Confirm Reject </button>
           </div>
-        </div>
+        </dialog>
       }
 
    <!-- Success toast -->
 
    @if (toastMessage(); as toast) {
-    <div class="toast" role="status">
+    <output class="toast">
       <span> {{ toast }} </span>
       <button type="button" class="toast-dismiss" (click)="dismissToast()" aria-label="Dismiss">
         <i class="fa-solid fa-xmark" aria-hidden="true"></i>
       </button>
-    </div>
+    </output>
    }
     
 </div>
