@@ -35,23 +35,23 @@ services:
     container_name: momently-backend
     restart: unless-stopped
   
-    depends-on:
+    depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
 
-  environment:
-    SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
-    SPRING_DATASOURCE_URL: jdbc:posgresql://postgres:5432/${DB_NAME}
-    SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
-    SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
-    SPRING_REDIS_HOST: redis
-    SPRING_REDIS_PORT: 6379
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
 
-    JWT_SECRET: ${JWT_SECRET}
-    JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
 
     ports:
       - "8080:8080"
@@ -85,8 +85,8 @@ services:
     ports:
       - "8000:8000"
 
-  volumes:
+volumes:
     postgres_data:
       name: momently-postgres-data
 
-      
+
