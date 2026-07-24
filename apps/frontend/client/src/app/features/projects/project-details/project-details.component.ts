@@ -27,4 +27,6 @@ import { PROJECTS } from "../mock/projects.mock";
     styleUrls: ['./project-details.component.scss']
 })
 
-export class ProjectDetailsComponent {}
+export class ProjectDetailsComponent {
+    protected readonly project= signal<Project>(PROJECTS[0]);
+}
