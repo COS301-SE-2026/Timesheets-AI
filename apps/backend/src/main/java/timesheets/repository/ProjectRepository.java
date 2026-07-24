@@ -1,5 +1,6 @@
 package timesheets.repository;
 
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -8,6 +9,12 @@ import timesheets.domain.Project;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
-  // just having this as a stub for now, I won't add the custom functions yet, only basic CRUD will
-  // be available rn
+  // finds alll the project in a workspace that has not been soft deleted
+  List<Project> findByWorkspaceIdAndIsDeletedFalse(UUID workspaceId);
+
+  // finds all the projects for the workspace, this will also be the soft deleted ones
+  List<Project> findByWorkspaceId(UUID workspaceId);
+
+  // find all the projects (for an admin)
+  List<Project> findAllByIsDeletedFalse();
 }

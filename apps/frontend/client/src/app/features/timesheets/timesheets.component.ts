@@ -1,10 +1,11 @@
 /**
- * Author: Lerato Sibanda
- * DAte: 2026-06-20
- * Related Requirement: Timesheet
+ * Author: Kgaugelo Matsena & Lerato Sibanda
+ * Date: 2026-05-19
+ * Purpose: Display weekly timesheets overview with task breakdown and totals.
+ * Related Requirement: -
  */
 
-import { Component, computed, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
