@@ -15,6 +15,10 @@ jobs:
     # ubuntu latest - Github will uses linux machine - better and minimize build minutes
     frontend-check:
         runs-on: ubuntu-latest
+
+        permissions:
+          contents: read 
+
         steps:
             # Note here: check if we use checkout@sha - that was in lecture slides not v4 (could be more secure)
             - uses: actions/checkout@v4 
@@ -74,9 +78,41 @@ jobs:
               working-directory: apps/frontend/client
               run: yarn test --watch=false
 
+#==================== Login to AWS  ===========================================================
+            - name: Configure AWS Credentials
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: ${{ secrets.AWS_REGION }}
+
+#==================== Login to AWS ECR  ===========================================================
+            - name: Login to AWS ECR
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              uses: aws-actions/amazon-ecr-login@v2
+
 #===================== RELEASE stage ================================
 
             # ensure that the Angular builds successfully 
             - name: Build Angular
               if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
               run: docker build -f apps/frontend/Dockerfile -t momently-frontend:${{ github.sha }} .
+
+#====================== Tag Image ====================================
+
+        # docker tag is giving same image another name 
+        # latest - give us the newest version and aws ec2 instance will run this to get latest version 
+            - name: Tag Docker Image
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              run: |
+                docker tag momently-frontend:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/momently-frontend:latest
+                docker tag momently-frontend:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/momently-frontend:${{ github.sha }}
+
+#====================== Push to ECR ======================
+
+            - name: Push Docker Image
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              run: |
+                docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/momently-frontend:latest
+                docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/momently-frontend:${{ github.sha }}
