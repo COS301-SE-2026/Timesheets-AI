@@ -338,7 +338,6 @@ TEAM MEMBERS
 
 .team-members{
     display: flex;
-    // gap: 0.5rem;
     flex-wrap: wrap;
     margin-top: 0.75rem;
 }
@@ -362,31 +361,25 @@ TEAM MEMBERS
     height: 40px;
     border-radius: 50%;
     margin-left: -10px;
-    background: #5f62ff;
+    background: #4338CA;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: 700;
-}
-
-.team-member :first-child{
-    margin: left 0;
-}
-
-.team-member{
     &:nth-child(4n+1){background-color: #4f8ef7;}
     &:nth-child(4n+2){background-color: #f9a826;}
     &:nth-child(4n+3){background-color: #4caf50;}
     &:nth-child(4n+0){background-color: #9c27b0;}
 }
 
+.team-member :first-child{
+    margin: left 0;
+}
+
 .team-member-more{
     width: 40px;
     height: 40px;
-
-    // min-width: 34px;
-    // min-height: 34px;
 
     display: flex;
     justify-content: center;
