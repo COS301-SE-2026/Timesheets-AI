@@ -225,6 +225,49 @@ public class LeaveRequestService {
     return requests.stream().map(this::buildLeaveRequestResponse).collect(Collectors.toList());
   }
 
+  /*
+  - approves a pending request
+  - a manager only approves requests in their workspace
+  - admin can approve requests in any workspace
+  */
+  @Transactional
+  public LeaveRequestResponse approveLeaveRequest(UUID requestId) {
+
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      throw new RuntimeException("Only Admins and Managers can approve leave requests");
+    }
+
+    LeaveRequest leaveRequest =
+        leaveRequestRepository
+            .findById(requestId)
+            .orElseThrow(() -> new RuntimeException("Leave request not found"));
+
+    if (!"PENDING".equals(leaveRequest.getStatus())) {
+      throw new RuntimeException("Leave request is not pending approval");
+    }
+
+    // for managers verify that the request is in their workspace
+    if (securityUtils.isManager() && !securityUtils.isAdmin()) {
+      UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+
+      boolean hasAccess =
+          leaveRequestRepository.findByWorkspaceId(workspaceId).stream()
+              .anyMatch(leaveReq -> leaveReq.getId().equals(requestId));
+      if (!hasAccess) {
+        throw new RuntimeException("You can only approve requests from your workspace");
+      }
+    }
+
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    leaveRequest.setStatus("APPROVED");
+
+    leaveRequest.setApprovedByWorkspaceMemberId(currentMemberId);
+    leaveRequest.setApprovedAt(java.time.LocalDateTime.now());
+
+    LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+    return buildLeaveRequestResponse(saved);
+  }
+
   // ! helper builder
   // this should build the response
   private LeaveRequestResponse buildLeaveRequestResponse(LeaveRequest leaveRequest) {

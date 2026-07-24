@@ -80,4 +80,17 @@ public class LeaveRequestController {
 
     return ResponseEntity.ok(responses);
   }
+
+  /*
+  - this approves a leave request
+  - only pending leave requests can approved
+  */
+  @PostMapping("/{id}/approve")
+  public ResponseEntity<LeaveRequestResponse> approveLeaveRequest(
+      @PathVariable UUID id, @Valid @RequestBody LeaveRequestRequest.Approve request) {
+
+    LeaveRequestResponse response = leaveRequestService.approveLeaveRequest(id);
+
+    return ResponseEntity.ok(response);
+  }
 }
