@@ -29,4 +29,10 @@ import { PROJECTS } from "../mock/projects.mock";
 
 export class ProjectDetailsComponent {
     protected readonly project= signal<Project>(PROJECTS[0]);
+
+    protected readonly activeTab=signal<'overview' | 'tasks'>('overview');
+
+    protected setActiveTab( tab: 'overview' | 'tasks'):void{
+        this.activeTab.set(tab);
+    }
 }
