@@ -90,6 +90,7 @@ jobs:
 #==================== Login to AWS ECR  ===========================================================
             - name: Login to AWS ECR
               if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              id: login-to-ecr
               uses: aws-actions/amazon-ecr-login@33f92af657bba1882ab79d8621debd2f6769a0c9
 
 #===================== RELEASE stage ================================
@@ -106,13 +107,13 @@ jobs:
             - name: Tag Docker Image
               if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
               run: |
-                docker tag momently-frontend:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/momently-frontend:latest
-                docker tag momently-frontend:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/momently-frontend:${{ github.sha }}
+                docker tag momently-frontend:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:latest
+                docker tag momently-frontend:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:${{ github.sha }}
 
 #====================== Push to ECR ======================
 
             - name: Push Docker Image
               if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
               run: |
-                docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/momently-frontend:latest
-                docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/momently-frontend:${{ github.sha }}
+                docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:latest
+                docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:${{ github.sha }}
