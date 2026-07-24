@@ -35,4 +35,26 @@ export class ProjectDetailsComponent {
     protected setActiveTab( tab: 'overview' | 'tasks'):void{
         this.activeTab.set(tab);
     }
+
+    protected readonly completionPercentage= computed(()=>{
+        const project= this.project();
+
+        if(project.totalHours===0){
+            return 0;
+        }
+
+        return Math.round(
+            (project.hoursLogged / project.totalHours)*100,
+        );
+    });
+
+    protected readonly remainingHours= computed(()=>{
+        const project= this.project();
+
+        return Math.max(
+            0,
+            project.totalHours- project.hoursLogged,
+        );
+
+    });
 }
