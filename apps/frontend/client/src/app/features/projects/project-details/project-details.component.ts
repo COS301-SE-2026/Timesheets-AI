@@ -14,6 +14,7 @@ import { StatusChipComponent } from "../../../shared/components/status-chip/stat
 import { ProjectMember } from "../project-details/models/project-details.model";
 import { Project } from "../models/project.model";
 import { PROJECTS } from "../mock/projects.mock";
+import { ActivatedRoute } from "@angular/router";
 @Component({
     selector: 'app-project-details',
     standalone: true,
@@ -28,6 +29,14 @@ import { PROJECTS } from "../mock/projects.mock";
 })
 
 export class ProjectDetailsComponent {
+    constructor(
+        private readonly route: ActivatedRoute,
+    ){}
+
+    protected readonly projectId= computed(()=>
+        Number(this.route.snapshot.paramMap.get('id')),
+    )
+    
     protected readonly project= signal<Project>(PROJECTS[0]);
 
     protected readonly activeTab=signal<'overview' | 'tasks'>('overview');
