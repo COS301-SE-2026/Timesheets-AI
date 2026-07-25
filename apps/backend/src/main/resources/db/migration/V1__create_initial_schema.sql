@@ -208,7 +208,7 @@ CREATE TABLE leave_requests(
     updated_at TIMESTAMP DEFAULT now()
 );
 
-COMMENT ON COLUMN leave_requests.attachments IS E'JSONB array of attachement objects:
+COMMENT ON COLUMN leave_requests.attachments IS $$JSONB array of attachment objects:
 {
     "files": [
         {
@@ -220,7 +220,7 @@ COMMENT ON COLUMN leave_requests.attachments IS E'JSONB array of attachement obj
         "uploadedAt": "2026-07-23T10:00:00"
         }
     ]
-}';
+}$$;
 
 
 CREATE TABLE jira_tickets (
