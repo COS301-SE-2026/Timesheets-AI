@@ -9,6 +9,7 @@ import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
+import { BidiModule } from "@angular/cdk/bidi";
 
 /**
  * Represents a task assigned to a user
@@ -90,7 +91,7 @@ const PRIORITY_CLASSES: Record<TaskPriority, string> = {
 
 @Component({
   selector: 'app-my-tasks',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, BidiModule],
   templateUrl: './my-tasks.component.html',
   styleUrl: './my-tasks.component.scss',
   standalone: true
