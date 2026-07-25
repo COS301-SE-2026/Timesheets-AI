@@ -1,0 +1,192 @@
+/*
+Author: Cleopatra Kwenda
+Date: 2026-07-25
+Purpose: Styling the details page such 
+it follows our wireframes.
+Related Requirement: N/A
+*/
+
+/*
+COLOUR VARIABLES
+*/
+$background: #f8fafc;
+$card-background: #ffffff;
+$border-colour: #e2e8f0;
+$text-primary: #0f172a;
+$text-secondary: #64748b;
+$text-muted: #94a3b8;
+$primary: var(--color-primary);
+$primary-light: #eef2ff;
+
+/*
+PAGE LAYOUT
+*/
+:host{
+    display: block;
+    min-height: 100vh;
+}
+
+.project-details-container{
+    padding: 2rem 3rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/*
+BAXCK BUTTON
+*/
+.back-link-btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width:fit-content;
+    background: transparent;
+    border: none;
+    color: $text-secondary;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: 0.2;
+}
+
+.back-link-btn:hover{
+    color: $primary;
+    transform: translateX(-3px);
+}
+
+.back-link-btn i{
+    font-size: 0.9rem;
+}
+
+/*
+PAGE HEADER
+*/
+.project-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+}
+
+/*
+LEFT HEADER
+*/
+.project-header-left{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.project-avatar{
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: white;
+    background: #4f46e5;
+    flex-shrink: 0;
+}
+
+.project-heading{
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.project-title{
+    margin: 0;
+    color: $text-primary;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.project-description{
+    margin: 0;
+    color: $text-secondary;
+    line-height: 1.6;
+}
+
+/*
+RIGHT HEADER
+*/
+.project-header-right{
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.project-status-badge{
+    flex-shrink: 0;
+}
+
+.role-chip{
+    flex-shrink: 0;
+}
+
+/*
+META GRID
+*/
+.project-meta-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+/*
+META CARD
+*/
+
+.meta-card{
+    background: $card-background;
+    border: 1px solid $border-colour;
+    border-radius: 16px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    transition: 0.2s;
+}
+
+.meta-card:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+/*
+META CONTENT
+*/
+.meta-icon{
+    color: $primary;
+    font-size: 1.1rem;
+}
+
+.meta-title{
+    color: $text-muted;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04rem;
+}
+
+.meta-value{
+    color: $text-primary;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/*
+PROJECT TAGS
+*/
+.project-tag{
+    background: #f1f5f9;
+    color: $text-secondary;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
