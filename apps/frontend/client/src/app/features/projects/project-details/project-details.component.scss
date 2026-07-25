@@ -190,3 +190,310 @@ PROJECT TAGS
     font-size: 0.75rem;
     font-weight: 600;
 }
+
+/*
+NAVIGATION TABS
+*/
+.project-tabs{
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 1px solid $border-colour;
+}
+
+.tab-button{
+    background: transparent;
+    border: none;
+    padding: 0.9rem 1.25rem;
+    color: $text-secondary;
+    font-size: 0.95;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: 0.2s;
+}
+
+.tab-button:hover{
+    color: $primary;
+}
+
+.tab-button.active{
+    color: $primary;
+    border-bottom-color: $primary;
+}
+
+/*
+OVERVIEW GRID
+*/
+.overview-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+/*
+OVERVIEW CARD
+*/
+.overview-card{
+    background: $card-background;
+    border: 1px solid $border-colour;
+    border-radius: 18px;
+    padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    transition: 0.2s;
+}
+
+.overview-card:hover{
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.overview-card-title{
+    margin: 0 0 1.2rem;
+    color: $text-primary;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/*
+HOURS CARD
+*/
+.hours-stat{
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+}
+
+.hours-logged{
+    font-size: 2rem;
+    font-weight: 700;
+    color: $text-primary;
+}
+
+.hours-total{
+    color: $text-muted;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.remaining-hours{
+    margin-top: 0.75;
+    color: $text-secondary;
+    font-size: 0.85rem;
+}
+
+/*
+SIMPLE BAR CHART
+*/
+.hours-bars{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    height: 180px;
+    margin-top: 1.5rem;
+}
+
+.bar-column{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    width: 70px;
+    height: 100%;
+}
+
+.bar{
+    width: 100%;
+    border-radius: 8px 8px 0 0;
+    transition: 0.3s;
+}
+
+.bar.logged{
+    background: $primary;
+}
+
+.bar.estimated{
+    background: #cbd5e1;
+}
+
+.bar-value{
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.bar-label{
+    margin-top: 0.6rem;
+    color: $text-muted;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+/*
+PROGRESS CARD
+*/
+.progress-card{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.progress-circle{
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: conic-gradient(
+        $primary calc(var(--progress)* 1%),
+        #e2e8f0
+    );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem 0;
+    position: relative;
+}
+
+.progress-circle::before{
+    content: "";
+    position: absolute;
+    width: 95px;
+    height: 95px;
+    border-radius: 50%;
+    background: white;
+}
+
+.progress-inner{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+}
+
+.progress-percentage{
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: $text-primary;
+}
+
+.progress-label{
+    color: $text-muted;
+    font-size: 0.75rem;
+}
+
+/*
+TASK SUMMARY
+*/
+.task-summary{
+    width: 100%;
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.task-box{
+    flex: 1;
+    background: #f8fafc;
+    border-radius: 12px ;
+    padding: 0.85rem;
+    text-align: center;
+}
+
+.task-box-title{
+    display: block;
+    color: $text-muted;
+    font-family: 0.72rem;
+    margin-bottom: 0.35rem;
+}
+
+.task-box-value{
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/*
+TEAM CARD
+*/
+.team-list{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.team-member-row{
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.avatar-blue{
+    background: #3b82f6;
+}
+
+.avatar-purple{
+    background: #8b5cf6;
+}
+
+.avatar-green{
+    background: #10b981;
+}
+
+.avatar-orange{
+    background: #f97316;
+}
+
+.member-details{
+    flex: 1;
+}
+
+.member-name{
+    display: block;
+    color: $text-primary;
+    font-weight: 600;
+}
+
+.member-role{
+    color: $text-muted;
+    font-size: 0.8rem;
+}
+
+/*
+KPI SECTION STILL NEED TO DO
+*/
+.kpi-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+}
+
+.kpi-card{
+    background: white;
+    border: 1px solid $border-colour;
+    padding: 1.25rem;
+    transition: 0.2s;
+}
+
+.kpi-card:hover{
+    transform: translateY(-3px);
+}
+
+.kpi-title{
+    color: $text-muted;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.kpi-value{
+    margin-top: 0.5rem;
+    color: $text-primary;
+    font-size: 2rem;
+    font-weight: 700;
+}
