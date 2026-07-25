@@ -208,7 +208,7 @@ CREATE TABLE leave_requests(
     updated_at TIMESTAMP DEFAULT now()
 );
 
-COMMENT ON COLUMN leave_requests.attachments IS 'JSONB array of attachement objects:
+COMMENT ON COLUMN leave_requests.attachments IS E'JSONB array of attachement objects:
 {
     "files": [
         {
