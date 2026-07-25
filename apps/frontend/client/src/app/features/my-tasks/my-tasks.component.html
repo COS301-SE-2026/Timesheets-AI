@@ -41,7 +41,41 @@
             <div class="summary-card-value" aria-live="polite">
                 {{ archivedCount() }}
             </div>
-            <div class="summary-card-label text-caption"> Archived </div>
+            <div class="summary-card-label text-caption"> Archived</div>
          </div>
+      </section>
+
+      <!-- Filters Section -->
+
+      <section class="filters-section" aria-label="Task filters">
+        <!-- Status filter dropdown -->
+         <div class="filter-group">
+            <label class="text-label" for="satus-filter">Status</label>
+            <select id="'status-filter" class="filter-select" [ngModel] = "selectedStatus()" (ngModelChange)="selectedStatus.set($event); applyFilters()" aria-describedby="status-filter-description">
+                @for (option of statusFilterOptions; track option.value) {
+                    <option [value]="option.value"> {{ option.label }} </option>
+                }
+            </select>
+            <span id="status-filter-description" class="visually-hidden">
+                Filter bu tasks status
+            </span>
+         </div>
+
+         <!-- Filter checnkboxes -->
+          <div class="filter-group filter-checkboxes">
+
+            <!-- show copleted -->
+             <label class="checkbox-label">
+                <input type="checkbox" [ngModel]="showCompleted()" (ngModelChange)="showCompleted.set($event); applyFilters()" aria-label="Show completed tasks"/>
+                Show Completed
+             </label>
+
+             <!-- Show archived -->
+
+             <label class=checkbox-label>
+                <input type="checkbox" [ngModel]="showArchived()" (ngModelChange)="showArchived.set($event); applyFilters()" aria-label="Show archived tasks"/>
+                Show Archived
+             </label>
+          </div>
       </section>
 </div>
