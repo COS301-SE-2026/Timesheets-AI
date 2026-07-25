@@ -57,7 +57,7 @@
                 }
             </select>
             <span id="status-filter-description" class="visually-hidden">
-                Filter bu tasks status
+                Filter by tasks status
             </span>
          </div>
 
@@ -77,5 +77,71 @@
                 Show Archived
              </label>
           </div>
+      </section>
+
+      <!-- Task Table -->
+
+      <section class="task-table-container" aria-label="Task list">
+        @if (isLoading()) {
+
+            <!-- Loading state -->
+
+            <div class="laoding-state" role="status" aria-label="Loading tasks">
+                <p class="text-body text-muted"> Loading tasks...</p>
+            </div>
+        } @else {
+            <!-- Table -->
+             <table class="task-table" aria-labelledby="page-title">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-label">Task</th>
+                        <th scope="col" class="text-label">Project</th>
+                        <th scope="col" class="text-label">Jira Ticket</th>
+                        <th scope="col" class="text-label">Assigned To</th>
+                        <th scope="col" class="text-label">Status</th>
+                        <th scope="col" class="text-label">Priority</th>
+                        <th scope="col" class="text-label">Due Date</th>
+                        <th scope="col" class="text-label">Esimated</th>
+                        <th scope="col" class="text-label">Actual</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (task of filteredTasks(); track task.id) {
+                        <tr>
+                            <td class="tast-title text-body-strong">{{ task.title }}</td>
+                            <td class="text-body">{{ task.projectName }}</td>
+                            <td class="text-body">{{ task.jiraTicketKey || '-' }}</td>
+                            <td class="text-body">{{ task.assignedToName }}</td>
+                            <td>
+                                <select [class]="getStatusClass(task.status)" [ngModel]="task.status" (ngModelChange)="onStatusChange(task, $event)" class="status-dropdown" aria-label="Updated status for {{ task.title }}">
+                                    @for (option of statusDropdownOptions; track option.value ){
+                                        <option [value] = "option.value">> {{ option.label }}</option>
+                                    }
+                                </select>
+                            </td>
+
+                            <!-- Ptiority badge -->
+                             <td>
+                                <span [class]="getPriorityClass(task.priority)">
+                                    {{ priorityLabels[task.priority] }}
+                                </span>
+                             </td>
+
+                             <td class="text-body"> {{ formatDate(task.dueDate) }} </td>
+                             <td class="text-body text-right"> {{ task.estimatedHours }}h </td>
+                             <td class="text-body text-right"> {{ task.actualHours }}h </td>
+                        </tr>
+                    } @empty {
+                        <!-- Empty State -->
+                         <tr>
+                            <td colspan="9" class="text-center text-body text-muted">
+                                No tasks found
+                            </td> 
+                         </tr>
+                    }
+                </tbody>
+             </table>
+        }
       </section>
 </div>
