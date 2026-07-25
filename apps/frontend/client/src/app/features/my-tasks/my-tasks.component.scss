@@ -1,0 +1,65 @@
+@use '../../shared/styles/colors' as *;
+@use '../../shared/styles/spacing' as *;
+@use '../../shared/styles/typography' as *;
+@use '../../shared/styles/radius' as *;
+@use '../../shared/styles/elevation' as *;
+
+// Page layout
+
+.my-task-page {
+    padding: $space-6;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+// Page header
+
+.page-header {
+    margin-bottom: $space-6;
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
+
+// Summary cards
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: $space-4;
+    margin-bottom: $space-6;
+}
+
+.summary-card {
+    background: var(--color-white);
+    padding: $space-4;
+    border-radius: var(--radius-card);
+    box-shadow: var(--elevation-1);
+    text-align: center;
+    transition: box-shadow 0.2s ease;
+
+&:hover {
+    box-shadow: var(--elevation-2);
+}
+
+
+.summary-card-value {
+    font-family: var(--font-display);
+    font-size: var(--font-size-h1);
+    font-weight: var(--font-weight-primary);
+    color: var(--color-text-primary);
+    line-height: var(--line-height-tight);
+}
+
+.summary-card-label {
+    color: var(--color-text-muted);
+    margin-top: $space-1;
+}
+
+.summary-card-subtitle {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-caption);
+    margin-top: $space-1;
+}
+}
