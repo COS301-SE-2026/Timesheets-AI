@@ -118,10 +118,9 @@ HEADER
         @for (project of filteredProjects; track project.id){
             <article class="project-card">
                 <a class="project-card-link"
-                    [routerLink]="['projects', project.id]">
+                    [routerLink]="['/projects', project.id]">
 
                     <div class="project-card-header">
-
                         <div class="project-title-row">
                             <div class="project-avatar"> 
                                 {{project.initials}}

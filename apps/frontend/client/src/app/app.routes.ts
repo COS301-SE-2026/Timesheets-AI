@@ -64,6 +64,14 @@ export const routes: Routes = [
         .then(m => m.ProjectsComponent)
   },
 
+  /* Project Details Page */
+  {
+    path: 'projects/:id',
+    loadComponent: () =>
+      import('./features/projects/project-details/project-details.component')
+        .then(m => m.ProjectDetailsComponent)
+  },
+
   /* 404 fallback */
   {
     path: 'not-found',
