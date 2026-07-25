@@ -41,7 +41,7 @@ export interface TimeEntryRequest {
 
 @Injectable ({providedIn: 'root'})
 export class TimeEntryService {
-    private http = inject(HttpClient);
+    private readonly http = inject(HttpClient);
 
     private readonly baseUrl = '/api/time-entries';
     //gets every entry thst belongs to the logged in user

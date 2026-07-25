@@ -606,7 +606,7 @@ export class LogtimeComponent implements OnDestroy {
     Edge case: a timer that runs past midnight can't be safely checked by the same single-date overlap logic saveEntry() uses (that logic
     assumes one entry = one calendar day). Rather than silently produce a wrong overlap check (or worse, silently save a corrupt entry),
     block and ask the user to split it manually, This is rare but not impossible for a timer left running overnight
-    TODO: During anamoly detection this will flag unusual task hours
+    Known limitation: During anamoly detection this will flag unusual task hours
     */
     if (startDateStr !== endDateStr) {
       this.conflictMessage.set(

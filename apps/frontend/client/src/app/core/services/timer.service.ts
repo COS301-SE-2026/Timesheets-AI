@@ -9,9 +9,8 @@ Date: 23 July 2026
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 
 //so these mirror the schema on swagger exactly, so there's no silent mismatch later
 
@@ -72,7 +71,7 @@ export interface StartTimerRequest {
 
 @Injectable({ providedIn: 'root' })
 export class TimerService {
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
   /*the proxy.conf.json already routes /api to spring boot, so no need for
     full host here, its the same as the authservice

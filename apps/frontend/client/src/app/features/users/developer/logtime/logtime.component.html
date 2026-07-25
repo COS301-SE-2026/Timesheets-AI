@@ -444,6 +444,7 @@
         <!-- Project and date range filters -->
         <div class="entries-toolbar__filters" [formGroup]="filterForm">
           <select
+            id="entries-filter-project"
             [value]="selectedProjectId()"
             (change)="selectedProjectId.set($any($event.target).value)"
           >
