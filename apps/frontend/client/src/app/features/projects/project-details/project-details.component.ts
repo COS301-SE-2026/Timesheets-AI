@@ -15,6 +15,8 @@ import { PROJECT_DETAIL } from "../mock/project-details.mock";
 import { ActivatedRoute } from "@angular/router";
 import { ProjectDetails } from "./models/project-details.model";
 import { RouterModule } from "@angular/router";
+import { ProjectStatus } from "../enums/project-status.enum";
+import { ProjectRole } from "../enums/project-role.enum";
 @Component({
     selector: 'app-project-details',
     standalone: true,
@@ -30,6 +32,10 @@ import { RouterModule } from "@angular/router";
 })
 
 export class ProjectDetailsComponent {
+
+    protected readonly ProjectStatus= ProjectStatus;
+    protected readonly ProjectRole= ProjectRole;
+
     constructor(
         private readonly route: ActivatedRoute,
     ){}

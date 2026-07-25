@@ -16,19 +16,22 @@ import { Project } from './models/project.model';
 import { ProjectStatus } from './enums/project-status.enum';
 import { PROJECT_FILTERS } from './constants/project-filters.constant';
 import { PROJECTS } from './mock/projects.mock';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { StatsCardComponent } from '../../shared/components/stats-card/stats-card.component';
 import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-projects',
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     HeaderComponent,
     StatsCardComponent,
     ProgressBarComponent,
+    NgClass
   ],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss',

@@ -16,7 +16,7 @@ import { ProjectStatus } from '../enums/project-status.enum';
 
 export const PROJECTS: Project[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Project Alpha',
     client: 'TechCorp Inc.',
     description: 'Customer-facing web application rebuilding.',

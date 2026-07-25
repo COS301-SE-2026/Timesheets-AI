@@ -166,6 +166,12 @@ PROJECT CARDS
     transition: 0.2s;
 }
 
+.project-card-link{
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
 .project-card:hover{
     transform: translateY(-5px);
 }

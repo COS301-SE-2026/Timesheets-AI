@@ -117,110 +117,114 @@ HEADER
     <section class="projects-grid">
         @for (project of filteredProjects; track project.id){
             <article class="project-card">
-                <div class="project-card-header">
+                <a class="project-card-link"
+                    [routerLink]="['projects', project.id]">
 
-                    <div class="project-title-row">
-                        <div class="project-avatar"> 
-                            {{project.initials}}
+                    <div class="project-card-header">
+
+                        <div class="project-title-row">
+                            <div class="project-avatar"> 
+                                {{project.initials}}
+                            </div>
+
+                            <div class="project-title-content">
+                                <h2 class="project-name">
+                                    {{project.name}}
+                                </h2>
+
+                                <p class="project-client">
+                                    {{project.client}}
+                                </p>
+                            </div>
                         </div>
 
-                        <div class="project-title-content">
-                            <h2 class="project-name">
-                                {{project.name}}
-                            </h2>
-
-                            <p class="project-client">
-                                {{project.client}}
-                            </p>
-                        </div>
+                        <span class="project-status-badge">
+                            {{project.status}}
+                        </span>
                     </div>
 
-                    <span class="project-status-badge">
-                        {{project.status}}
-                    </span>
-                </div>
+                    <!--
+                    DESCRIPTIONS
+                    -->
+                    <p class="project-description">
+                        {{project.description}}
+                    </p>
 
-                <!--
-                DESCRIPTIONS
-                -->
-                <p class="project-description">
-                    {{project.description}}
-                </p>
-
-                <!--
-                TAGS
-                -->
-                <div class="project-tags">
-                    @for (tag of project.tags; track tag){
-                        <span class="project-tag">
-                            {{tag}}
-                        </span>
-                    }
-                </div>
-
-                <!--
-                PROGRESS OF PROJECTS??
-                -->
-                <div class="project-progress">
-                    <div class="progress-header">
-                        <span class="progress-title">
-                            Hours Logged
-                        </span>
-
-                        <span class="progress-value">
-                            {{project.hoursLogged }}h / {{project.totalHours}}
-                        </span>
-
-                    </div>
-                    
-                    <app-progress-bar
-                        [progress]="(project.hoursLogged / project.totalHours)*100">
-                    </app-progress-bar>
-                </div>
-                    
-
-                <!--
-                FOOTER OF CARD
-                -->
-                <div class="project-card-footer">
-
-
-                    <span 
-                        class="role-chip"
-                        [ngClass]="{
-                            'developer-chip': project.role ==='Developer',
-                            'manager-chip': project.role ==='Manager',
-                            'admin-chip': project.role ==='Admin'
-                        }">
-                        {{project.role}}
-                    </span> 
-                </div>
-
-                <!--
-                TEAM MEMEBERS
-                -->
-                <div class="project-team">
-
-                    <span class="team-count">
-                        <i class="fa-solid fa-user"></i>
-                        {{project.teamMembers.length}}
-                        members
-                    </span>
-
-                    <div class="team-members">
-                        @for (member of project.teamMembers.slice(0,4); track member){
-                            <span class="team-member">
-                                {{member}}
-                            </span>
-                        }
-
-                        @if(project.teamMembers.length >4){
-                            <span class="team-member-more">
-                                +{{project.teamMembers.length -4}}
+                    <!--
+                    TAGS
+                    -->
+                    <div class="project-tags">
+                        @for (tag of project.tags; track tag){
+                            <span class="project-tag">
+                                {{tag}}
                             </span>
                         }
                     </div>
-                </div>
+
+                    <!--
+                    PROGRESS OF PROJECTS??
+                    -->
+                    <div class="project-progress">
+                        <div class="progress-header">
+                            <span class="progress-title">
+                                Hours Logged
+                            </span>
+
+                            <span class="progress-value">
+                                {{project.hoursLogged }}h / {{project.totalHours}}
+                            </span>
+
+                        </div>
+                        
+                        <app-progress-bar
+                            [progress]="(project.hoursLogged / project.totalHours)*100">
+                        </app-progress-bar>
+                    </div>
+                        
+
+                    <!--
+                    FOOTER OF CARD
+                    -->
+                    <div class="project-card-footer">
+
+
+                        <span 
+                            class="role-chip"
+                            [ngClass]="{
+                                'developer-chip': project.role ==='Developer',
+                                'manager-chip': project.role ==='Manager',
+                                'admin-chip': project.role ==='Admin'
+                            }">
+                            {{project.role}}
+                        </span> 
+                    </div>
+
+                    <!--
+                    TEAM MEMEBERS
+                    -->
+                    <div class="project-team">
+
+                        <span class="team-count">
+                            <i class="fa-solid fa-user"></i>
+                            {{project.teamMembers.length}}
+                            members
+                        </span>
+
+                        <div class="team-members">
+                            @for (member of project.teamMembers.slice(0,4); track member){
+                                <span class="team-member">
+                                    {{member}}
+                                </span>
+                            }
+
+                            @if(project.teamMembers.length >4){
+                                <span class="team-member-more">
+                                    +{{project.teamMembers.length -4}}
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </a>
             </article>
         }
     </section>
