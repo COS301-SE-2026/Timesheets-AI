@@ -6,7 +6,7 @@
  */
 
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar.component';
 
@@ -15,7 +15,7 @@ import { DAYS, TASKS, DAILY_TOTALS, Day, Task, GRAND_TOTAL } from './timesheet.m
 @Component({
   selector: 'app-timesheets',
   standalone: true,
-  imports: [CommonModule, ProgressBarComponent, HeaderComponent],
+  imports: [ProgressBarComponent, HeaderComponent],
   templateUrl: './timesheets.component.html',
   styleUrl: './timesheets.component.scss'
 })
