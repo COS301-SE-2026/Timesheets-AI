@@ -16,6 +16,7 @@ export async function configureTestBed<T>(componentType: Type<T>): Promise<{ com
 export function createComponentTest<T>(componentType: Type<T>, componentName: string) {
   describe(componentName, () => {
     let component: T;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     let fixture: ComponentFixture<T>;
 
     beforeEach(async () => {
