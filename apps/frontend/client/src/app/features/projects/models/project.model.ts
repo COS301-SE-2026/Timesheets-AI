@@ -11,7 +11,7 @@ import { ProjectRole } from '../enums/project-role.enum';
 import { ProjectStatus } from '../enums/project-status.enum';
 
 export interface Project {
-  id: number;
+  id: string;
   name: string;
   client: string;
   description: string;
