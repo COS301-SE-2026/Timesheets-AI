@@ -24,11 +24,6 @@ public class TimesheetController {
   private final TimeEntryService timeEntryService;
   private final SecurityUtils securityUtils;
 
-  // TODO: Replace with actual reviewerId from JWT token after security is implemented
-  private UUID getCurrentReviewerId() {
-    return UUID.fromString("00000000-0000-0000-0000-000000000002");
-  }
-
   // getting all the timesheets for a logged in user
   @GetMapping("/me")
   public ResponseEntity<List<TimesheetResponse>> getMyTimesheets() {
@@ -78,10 +73,9 @@ public class TimesheetController {
   @PostMapping("/{id}/approve")
   public ResponseEntity<TimesheetResponse> approveTimesheet(@PathVariable UUID id) {
 
-    // TODO: need to replace it with an actual reviewer maybe from security context?
     UUID reviewerId = securityUtils.getCurrentUserId();
-
     Timesheet timesheet = timesheetService.approveTimesheet(id, reviewerId);
+
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
   }
 
@@ -89,8 +83,10 @@ public class TimesheetController {
   @PostMapping("/{id}/reject")
   public ResponseEntity<TimesheetResponse> rejectTimesheet(
       @PathVariable UUID id, @Valid @RequestBody RejectRequest request) {
-    UUID reviewerId = getCurrentReviewerId();
+
+    UUID reviewerId = securityUtils.getCurrentUserId();
     Timesheet timesheet = timesheetService.rejectTimesheet(id, reviewerId, request.getReason());
+
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
   }
 }
