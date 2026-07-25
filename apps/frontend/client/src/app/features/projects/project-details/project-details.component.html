@@ -1,0 +1,250 @@
+<!--
+Author: Cleopatra Kwenda
+Date: 2026-07-17
+Purpose: will display our desired wireframe of 
+all the project details page.
+Related Requirements: N/A
+-->
+
+<div class="project-details-container">
+    <!--
+    BACK BUTTON
+    -->
+
+    <button
+        class="back-link-btn"
+        type="button"
+        routerlink="/projects">
+    
+        <i class="fa-solid fa-arrow-left"></i>
+        Back to Projects
+
+    </button>
+
+    <!--
+    PAGE HEADER
+    -->
+    <header class="project-header">
+        <div class="project-header-left">
+            <div class="project-avatar">
+                {{ project().initials }}
+            </div>
+
+            <div class="project-heading">
+                <h1 class="project-title">
+                    {{ project().name }}
+                </h1>
+
+                <p class="project-description">
+                    {{ project().description }}
+                </p>
+            </div>
+        </div>
+
+        <div class="project-header-right">
+            <span
+                class="project-status-badge"
+                [ngClass]="{
+                    'status-active': project().status === ProjectStatus.ACTIVE,
+                    'status-completed': project().status === ProjectStatus.COMPLETED,
+                    'status-hold': project().status === ProjectStatus.ON_HOLD,
+                }">
+                {{ project().status }}
+
+            </span>
+
+            <span
+                class="role-chip"
+                [ngClass]="{
+                    'developer-chip': project().role === ProjectRole.DEVELOPER,
+                    'manager-chip': project().role === ProjectRole.MANAGER,
+                    'admin-chip': project().role === ProjectRole.ADMIN,
+                }">
+
+                {{ project().role }}
+
+            </span>
+
+        </div>
+    </header>
+
+    <section class="project-meta-grid">
+        <div class="meta-card">
+            <i class="fa-regular fa-building"></i>
+
+            <span class="meta-title">
+                Client
+            </span>
+
+            <strong>
+                {{ project().client }}
+            </strong>
+
+        </div>
+
+        <div class="meta-card">
+            <i class="fa-regular fa-calendar"></i>
+
+            <span class="meta-title">
+                Deadline
+            </span>
+
+            <strong>
+                {{ project().deadline }}
+            </strong>
+        </div>
+
+        <div class="meta-card">
+            <i class="fa-solid fa-users"></i>
+
+            <span class="meta-title">
+                Team Members
+            </span>
+
+            <strong>
+                {{ project().members.length }}
+            </strong>
+        </div>
+
+        <div class="meta-card">
+            <i class="fa-solid fa-tags"></i>
+
+            <span class="meta-title">
+                Tags
+            </span>
+
+            <div class="project-tags">
+                <span 
+                    class="project-tag"
+                    *ngFor="let tag of project().tags">
+
+                    {{ tag }}
+
+                </span>
+
+            </div>
+        </div>
+    </section>
+
+    <!--
+    NAVIGATION TABS
+    -->
+    <nav class="project-tabs">
+        <button
+            class="tab-button"
+            [class.active]="activeTab() === 'overview'"
+            (click)="setActiveTab('overview')">
+
+            Overview
+
+        </button>
+
+        <button
+            class="tab-button"
+            [class.active]="activeTab() === 'tasks'"
+            (click)="setActiveTab('tasks')">
+
+            Tasks
+
+        </button>
+    </nav>
+
+    <!--
+    OVERVIEW
+    -->
+    <section 
+        class="overview-grid"
+        *ngIf="activeTab()==='overview'">
+
+        <!--
+        Hours
+        -->
+        <article class="overview-card">
+            <h3>
+                Hours Logged
+            </h3>
+
+            <div class="hours-header">
+                <span>
+                    {{ project().hoursLogged }}h
+                </span>
+                <span>
+                    /
+                </span>
+                <span>
+                    {{ project().totalHours }}h
+                </span>
+            </div>
+
+            <app-progress-bar
+                [progress]="completionPercentage()">
+            </app-progress-bar>
+
+            <p class="remaining-hours">
+                {{ remainingHours() }} hours remaining
+            </p>
+        </article>
+
+        <!--
+        Progress
+        -->
+        <article class="overview-card">
+            <h3>
+                Project Progress
+            </h3>
+
+            <div class="progress-circle">
+                {{ completionPercentage() }}%
+            </div>
+            <p>
+                Based on hours logged
+            </p>
+        </article>
+
+        <!--
+        Team
+        -->
+        <article class="overview-card">
+            <h3>
+                Team Members
+            </h3>
+
+            <div class="team-list">
+                <div
+                    class="member-row"
+                    *ngFor="let member of project().members">
+
+                    <div
+                        class="team-member"
+                        [ngClass]="member.avatarColourClass">
+                        {{ member.initials }}
+                    </div>
+
+                    <div class="member-information">
+                        <strong>
+                            {{ member.name }}
+                        </strong>
+                        <p>
+                            {{ member.role }}
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+        </article>
+
+    </section>
+
+    <!--
+    TASKS TAB
+    -->
+    <section
+        class="tasks-section"
+        *ngIf="activeTab()=== 'tasks'">
+
+        <app-project-tasks
+            [projectId]="project().id">
+        </app-project-tasks>
+    </section>
+
+</div>

@@ -11,15 +11,17 @@ import { CommonModule } from "@angular/common";
 import { HeaderComponent } from "../../../shared/components/header/header.component";
 import { ProgressBarComponent } from "../../../shared/components/progress-bar/progress-bar.component";
 import { StatusChipComponent } from "../../../shared/components/status-chip/status-chip.component";
-import { Project } from "../models/project.model";
-import { PROJECTS } from "../mock/projects.mock";
+import { PROJECT_DETAIL } from "../mock/project-details.mock";
 import { ActivatedRoute } from "@angular/router";
+import { ProjectDetails } from "./models/project-details.model";
+import { RouterModule } from "@angular/router";
 @Component({
     selector: 'app-project-details',
     standalone: true,
     imports: [
         CommonModule,
         HeaderComponent,
+        RouterModule,
         ProgressBarComponent,
         StatusChipComponent,
     ],
@@ -36,7 +38,11 @@ export class ProjectDetailsComponent {
         Number(this.route.snapshot.paramMap.get('id')),
     )
 
-    protected readonly project= signal<Project>(PROJECTS[0]);
+    protected readonly project= signal<ProjectDetails>(
+        PROJECT_DETAIL,
+    )
+
+    // protected readonly project= signal<Project>(PROJECTS[0]);
 
     protected readonly activeTab=signal<'overview' | 'tasks'>('overview');
 
