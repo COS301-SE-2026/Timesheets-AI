@@ -14,7 +14,7 @@ jobs:
   ai-check:
     runs-on: ubuntu-latest 
     steps: 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
     # Logic Gate: this is used to determine where the changes occur and if it occurs in the ai service folder, therefore the ai-check should run otherwise passed quickly 
       - name: Check for AI Service Changes
@@ -42,7 +42,7 @@ jobs:
     # Set up the required Python environment for this workflow 
       - name: Set up Python 
         if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c
         with:
           python-version: '3.12'
           cache: 'pip' 
@@ -76,12 +76,46 @@ jobs:
           PYTHONPATH: .
         run: |
           pytest
+#==================== Login to AWS  ===========================================================
+      - name: Configure AWS Credentials
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true')
+        uses: aws-actions/configure-aws-credentials@d0834ad3a60a024346910e522a81b0002bd37fea
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+#==================== Login to AWS ECR  ===========================================================
+      - name: Login to AWS ECR
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true')
+        id: login-to-ecr
+        uses: aws-actions/amazon-ecr-login@33f92af657bba1882ab79d8621debd2f6769a0c9
 
 #===================== RELEASE stage ================================
-      
-      # build docker image to deploy 
+
+        # ensure that the docker image is built successfully and that it can be containerized and deployed 
+        # github sha - so every build image created, it will be associated with a hash (commit number) - which will helps us to know which commit created an image
       - name: Build Docker Image
-        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
-        working-directory: ai-service 
-        run:  |
-         docker build -t momently-ai:${{ github.sha}} .
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true')
+        working-directory: ai-service
+        run: |
+          docker build -t momently-ai:${{ github.sha}} .
+
+
+#====================== Tag Image ====================================
+
+        # docker tag is giving same image another name 
+        # latest - give us the newest version and aws ec2 instance will run this to get latest version 
+      - name: Tag Docker Image
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true')
+        run: |
+          docker tag momently-ai:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-ai:latest
+          docker tag momently-ai:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-ai:${{ github.sha }}
+
+#====================== Push to ECR ======================
+      
+      - name: Push Docker Image
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true')
+        run: |
+          docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-ai:latest
+          docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-ai:${{ github.sha }}

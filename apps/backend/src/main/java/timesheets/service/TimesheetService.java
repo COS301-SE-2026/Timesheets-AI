@@ -69,10 +69,16 @@ public class TimesheetService {
 
   @Transactional
   public Timesheet submitTimesheet(UUID timesheetId) {
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     Timesheet timesheet =
         timesheetRepository
             .findById(timesheetId)
             .orElseThrow(() -> new RuntimeException("Timesheet not found"));
+
+    if (!timesheet.getWorkspaceMemberId().equals(currentMemberId)) {
+      throw new RuntimeException("You can only submit your own timesheets");
+    }
 
     if (!"DRAFT".equals(timesheet.getStatus())) {
       throw new RuntimeException("Timesheet has already been submitted");
@@ -96,10 +102,21 @@ public class TimesheetService {
 
   @Transactional
   public Timesheet approveTimesheet(UUID timesheetId, UUID reviewerId) {
+
+    // the user should be an admin or a manager to approve
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      throw new RuntimeException("Only Admins and Managers can approve timesheets");
+    }
+
     Timesheet timesheet =
         timesheetRepository
             .findById(timesheetId)
             .orElseThrow(() -> new RuntimeException("Timesheet not found"));
+
+    // to prevent self-approval
+    if (timesheet.getWorkspaceMemberId().equals(reviewerId)) {
+      throw new RuntimeException("You cannot approve your own timesheet");
+    }
 
     if (!"SUBMITTED".equals(timesheet.getStatus())) {
       throw new RuntimeException("Only submitted timesheets can be approved");
@@ -118,10 +135,21 @@ public class TimesheetService {
 
   @Transactional
   public Timesheet rejectTimesheet(UUID timesheetId, UUID reviewerId, String reason) {
+
+    // the user must be admin or manager to reject
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      throw new RuntimeException("Only Admins and Managers can reject timesheets");
+    }
+
     Timesheet timesheet =
         timesheetRepository
             .findById(timesheetId)
             .orElseThrow(() -> new RuntimeException("Timesheet not found"));
+
+    // to prevent self-rejection
+    if (timesheet.getWorkspaceMemberId().equals(reviewerId)) {
+      throw new RuntimeException("You cannot reject your own timesheet");
+    }
 
     if (!"SUBMITTED".equals(timesheet.getStatus())) {
       throw new RuntimeException("Only submitted timesheets can be rejected");
