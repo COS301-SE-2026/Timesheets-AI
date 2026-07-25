@@ -8,8 +8,8 @@ Author: Zamokuhle Zwane
 Date: 23 July 2026
 */
 
-import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { Injectable, inject } from "@angular/core";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
 
@@ -41,9 +41,9 @@ export interface TimeEntryRequest {
 
 @Injectable ({providedIn: 'root'})
 export class TimeEntryService {
-    private readonly baseUrl = '/api/time-entries';
+    private http = inject(HttpClient);
 
-    constructor(private http: HttpClient){}
+    private readonly baseUrl = '/api/time-entries';
     //gets every entry thst belongs to the logged in user
     getMyEntries(): Observable<TimeEntryResponse[]>{
         return this.http.get<TimeEntryResponse[]>(`${this.baseUrl}/me`).pipe(
@@ -81,7 +81,7 @@ export class TimeEntryService {
 
     //same pattern as TimerService, logs the failed operation then rethrows for the caller
     private handleError(operation:string){
-        return(error: any) => {
+        return(error: HttpErrorResponse) => { //was : (error:any)
             console.error(`[TimeEntryService] ${operation} failed:`, {
                 status: error.status,
                 message: error.message,

@@ -7,8 +7,8 @@ Author: Zamokuhle Zwane
 Date: 23 July 2026
  */
 
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
@@ -72,12 +72,12 @@ export interface StartTimerRequest {
 
 @Injectable({ providedIn: 'root' })
 export class TimerService {
+  private http = inject(HttpClient);
+
   /*the proxy.conf.json already routes /api to spring boot, so no need for
     full host here, its the same as the authservice
     */
   private readonly baseUrl = '/api/timers';
-
-  constructor(private http: HttpClient) {}
   //starts a new timer for a given project + task, backend hardcodes entryType to a TIMER
   startTimer(request: StartTimerRequest): Observable<ActiveTimerResponse> {
     return this.http
@@ -120,7 +120,7 @@ export class TimerService {
     */
   }
   private handleError(operation: string) {
-    return (error: any) => {
+    return (error: HttpErrorResponse) => { //was: (error: any)
       console.error(`[TimerService] ${operation} failed:`, {
         status: error.status,
         message: error.message,
