@@ -1,1 +1,47 @@
-<p>my-tasks works!</p>
+<div class="my-task-page" role="main" aria-label="My Task">
+
+    <!-- Page header -->
+     <header class="page-header">
+        <div>
+            <h1 class="text-h1" id="page-title"> My Tasks</h1>
+            <p class="text-body text-muted" id="page-description"> All tasks assigned to you across projects.</p>
+        </div>
+     </header>
+
+     <!-- Summary Cards -->
+      <section class="summary-cards" aria-label="Task summary">
+        <div class="summary-card">
+            <div class="summary-card-value" aria-live="polite">
+                {{ totalCount() }}
+            </div>
+            <div class="summary-card-label text-caption"> Total Tasks</div>
+        </div>
+
+        <!-- Active Tasks -->
+
+        <div class="summary-card">
+            <div class="sumamry-card-value" aria-live="polite">
+                {{ activeCount() }}
+            </div>
+            <div class="summary-card-label text-caption"> Active </div>
+            <div class="summary-card-subtitle text-caption"> Includes To Do &amp; In progress</div>
+        </div>
+
+        <!-- Completed Tasks -->
+
+        <div class="summary-card">
+            <div class="sumary-card-value" aria-live="polite">
+                {{ completedCount() }}
+            </div>
+            <div class="summary-card-label text-caption"> Completed </div>
+        </div>
+
+        <!-- Archived Tasks -->
+         <div class="summary-card">
+            <div class="summary-card-value" aria-live="polite">
+                {{ archivedCount() }}
+            </div>
+            <div class="summary-card-label text-caption"> Archived </div>
+         </div>
+      </section>
+</div>
