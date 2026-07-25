@@ -25,7 +25,7 @@ export interface Task {
   priority: TaskPriority;
   estimatedHours: number;
   actualHours: number;
-  jiraTicketKet?: string;
+  jiraTicketKey?: string;
   assignedToName: string;
   assignedWorkspaceMemberId: string;
   dueDate?: string;
@@ -73,6 +73,13 @@ const PRIORITY_LABELS: Record<TaskPriority, string> = {
     LOW: 'Low',
     MEDIUM: 'Medium',
     HIGH: 'High'
+} as const;
+
+const STATUS_CLASSES: Record<TaskStatus, string> = {
+  TO_DO : 'status-to-do',
+  IN_PROGRESS: 'status-in-progress',
+  DONE: 'status-done',
+  ARCHIVED: 'status-archived'
 } as const;
 
 const PRIORITY_CLASSES: Record<TaskPriority, string> = {
@@ -216,7 +223,104 @@ export class MyTasksComponent {
     this.applyFilters();
   }
 
+// get css class for a task status badge
 
+public getStatusClass(status: TaskStatus) {
+  return `status-badge ${STATUS_CLASSES[status]}`
+}
 
+public getPriorityClass(priority: TaskPriority): string {
+  return `priority-badge ${PRIORITY_CLASSES[priority]}`;
+}
+
+public onStatusChange(task: Task, newStatus: string) : void {
+  const status = newStatus as TaskStatus;
+
+  // TODO: REPLACE WITH ACTUAL API WHEN INTEGRATING
+  // MOCK UPDATE FOR DEMMONSTRATION
+  this.updateTaskInList({...task, status});
+}
+
+// Format date string for display
+
+public formatDate(dateString?: string): string {
+  if(!dateString) {
+    return '-';
+  }
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-ZA', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+}
+
+// Track tasks by their id
+
+public trackByTaskId(index: number, task: Task): string {
+  return task.id;
+}
+
+// Update task in the task list after status change
+
+private updateTaskInTaskList(updatedTask: Task): void {
+  const currentTasks = this.tasks();
+  const index = currentTasks.findIndex((task: Task) => task.id === updateTask.id);
+  if (index !== -1){
+    const newTasks = [...currentTasks];
+    newTasks[index] = updatedTask;
+    this.tasks.set(newTasks);
+    this.applyFilters();
+  }
+}
+
+private loadMockData(): void {
+  const mockTasks: Task[] = [{
+    id: '1',
+    title: 'Design lodin flow',
+    description: 'Design the login flow for the application',
+    projectName: 'Project Alpha',
+    projectId: 'proj-1',
+    status: 'IN_PROGRESS',
+    priority: 'HIGH',
+    estimatedHours: 8,
+    actualHours: 6,
+    jiraTicketKey: 'ALPHA_101',
+    assignedToName: 'Thabang Siduke',
+    assignedWorkspaceMemberId: 'user-1',
+    dueDate: '2026-07-28',
+    createdAt: '2026-07-20T10:00:00Z',
+    updatedAt: '2026-07-22T14:30:00Z',
+    isDeleted: false,
+    completedAt: '',
+    parentTaskId: ''
+  },
+  {
+    id: '2',
+    title: 'Implement OAuth callback',
+    description: 'Implement OAuth callback handler',
+    projectName: 'Project Alpha',
+    projectId: 'proj-1',
+    status: 'TO_DO',
+    priority: 'MEDIUM',
+    estimatedHours: 5,
+    actualHours: 0,
+    jiraTicketKey: 'ALPHA_102',
+    assignedToName: 'Thabang Siduke',
+    assignedWorkspaceMemberId: 'user-1',
+    dueDate: '2026-07-26',
+    createdAt: '2026-07-20T10:00:00Z',
+    updatedAt: '2026-07-20T10:30:00Z',
+    isDeleted: false,
+    completedAt: '',
+    parentTaskId: ''
+  }
+
+];
+
+this.tasks.set(mockTasks);
+this.applyFilters();
+this.isLoading.set(false);
+}
 
 }
