@@ -90,7 +90,6 @@ jobs:
         # github sha - so every build image created, it will be associated with a hash (commit number) - which will helps us to know which commit created an image
         - name: Build Docker Image
           if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true')
-          if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
           working-directory: apps/backend
           run: docker build -t momently-backend:${{ github.sha}} .
 

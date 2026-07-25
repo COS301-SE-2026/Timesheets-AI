@@ -97,19 +97,9 @@ jobs:
         # github sha - so every build image created, it will be associated with a hash (commit number) - which will helps us to know which commit created an image
       - name: Build Docker Image
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true')
-        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
         working-directory: ai-service
         run: |
           docker build -t momently-ai:${{ github.sha}} .
-
-#===================== BUILD stage ================================
-      
-      # build docker image to deploy 
-      - name: Build Docker Image
-        if: steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true'
-        working-directory: ai-service 
-        run:  |
-         docker build -t momently-ai:${{ github.sha}} .
 
 
 #====================== Tag Image ====================================
@@ -119,13 +109,13 @@ jobs:
       - name: Tag Docker Image
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true')
         run: |
-          docker tag momently-backend:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-backend:latest
-          docker tag momently-backend:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-backend:${{ github.sha }}
+          docker tag momently-ai:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-ai:latest
+          docker tag momently-ai:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-ai:${{ github.sha }}
 
 #====================== Push to ECR ======================
       
       - name: Push Docker Image
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true')
         run: |
-          docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-backend:latest
-          docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-backend:${{ github.sha }}
+          docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-ai:latest
+          docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-ai:${{ github.sha }}

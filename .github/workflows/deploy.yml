@@ -20,9 +20,6 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
 
-
-
-
       # appleboy is plugin to SSH into a server e.g. ec2 instance
       # so no need to open terminal, ssh -i privatekey.pem ubuntu@IP
       # it runs all the steps specified in script 
