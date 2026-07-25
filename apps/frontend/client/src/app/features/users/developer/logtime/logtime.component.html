@@ -443,16 +443,19 @@
 
         <!-- Project and date range filters -->
         <div class="entries-toolbar__filters" [formGroup]="filterForm">
-          <select
-            id="entries-filter-project"
-            [value]="selectedProjectId()"
-            (change)="selectedProjectId.set($any($event.target).value)"
-          >
-            <option value="">All projects</option>
-            @for (project of projects(); track project.id) {
-              <option [value]="project.id">{{ project.name }}</option>
-            }
-          </select>
+          <label class="filter-date" for="entries-filter-project">
+            <span class="visually-hidden">Project</span>
+            <select
+              id="entries-filter-project"
+              [value]="selectedProjectId()"
+              (change)="selectedProjectId.set($any($event.target).value)"
+            >
+              <option value="">All projects</option>
+              @for (project of projects(); track project.id) {
+                <option [value]="project.id">{{ project.name }}</option>
+              }
+            </select>
+          </label>
           <label class="filter-date">
             <span>From</span>
             <input type="date" formControlName="from" />
