@@ -429,3 +429,17 @@ INSERT INTO email_verification_tokens (id, user_id, token, expires_at, verified_
 INSERT INTO user_identity_providers (id, user_id, provider, provider_user_id, email, created_at) VALUES
 ('00000000-0000-0000-0001-000000000130', '00000000-0000-0000-0001-000000000001', 'GOOGLE', 'thabang-google-id-001', 'thabang.siduke@gmail.com', NOW()),
 ('00000000-0000-0000-0002-000000000131', '00000000-0000-0000-0003-000000000003', 'GOOGLE', 'lethabo-google-id-002', 'lethabo.maseko@gmail.com', NOW());
+
+
+
+-- 13. LEAVE REQUESTS
+-- Enzokuhle Khumalo
+INSERT INTO leave_requests (id, workspace_member_id, leave_type, start_date, end_date, total_days, reason, status, attachments, created_at, updated_at) VALUES 
+('00000000-0000-0000-0001-000000000140', '00000000-0000-0000-0002-000000000021', 'ANNUAL', '2026-08-01', '2026-08-05', 5.0, 'Family vacation to Cape Town', 'PENDING', NULL, NOW(), NOW()),
+('00000000-0000-0000-0002-000000000141', '00000000-0000-0000-0002-000000000021', 'SICK', '2026-07-25', '2026-07-25', 1.0, 'Doctor appointment', 'APPROVED', NULL, NOW(), NOW()),
+('00000000-0000-0000-0003-000000000142', '00000000-0000-0000-0002-000000000021', 'ANNUAL', '2026-08-15', '2026-08-19', 5.0, 'Requested time off', 'REJECTED', NULL, NOW(), NOW());
+
+-- Faith Solomons
+INSERT INTO leave_requests (id, workspace_member_id, leave_type, start_date, end_date, total_days, reason, status, attachments, created_at, updated_at) VALUES 
+('00000000-0000-0000-0010-000000000149', '00000000-0000-0000-0009-000000000028', 'ANNUAL', '2026-08-25', '2026-08-29', 5.0, 'Visiting family', 'PENDING', NULL, NOW(), NOW()
+);
