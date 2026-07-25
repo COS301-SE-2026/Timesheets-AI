@@ -239,7 +239,7 @@ public onStatusChange(task: Task, newStatus: string) : void {
 
   // TODO: REPLACE WITH ACTUAL API WHEN INTEGRATING
   // MOCK UPDATE FOR DEMMONSTRATION
-  this.updateTaskInList({...task, status});
+  this.updateTaskInTaskList({...task, status});
 }
 
 // Format date string for display
@@ -266,7 +266,7 @@ public trackByTaskId(index: number, task: Task): string {
 
 private updateTaskInTaskList(updatedTask: Task): void {
   const currentTasks = this.tasks();
-  const index = currentTasks.findIndex((task: Task) => task.id === updateTask.id);
+  const index = currentTasks.findIndex((task: Task) => task.id === updatedTask.id);
   if (index !== -1){
     const newTasks = [...currentTasks];
     newTasks[index] = updatedTask;

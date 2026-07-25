@@ -50,8 +50,8 @@
       <section class="filters-section" aria-label="Task filters">
         <!-- Status filter dropdown -->
          <div class="filter-group">
-            <label class="text-label" for="satus-filter">Status</label>
-            <select id="'status-filter" class="filter-select" [ngModel] = "selectedStatus()" (ngModelChange)="selectedStatus.set($event); applyFilters()" aria-describedby="status-filter-description">
+            <label class="text-label" for="status-filter">Status</label>
+            <select id="status-filter" class="filter-select" [ngModel] = "selectedStatus()" (ngModelChange)="selectedStatus.set($event); applyFilters()" aria-describedby="status-filter-description">
                 @for (option of statusFilterOptions; track option.value) {
                     <option [value]="option.value"> {{ option.label }} </option>
                 }
@@ -72,7 +72,7 @@
 
              <!-- Show archived -->
 
-             <label class=checkbox-label>
+             <label class="checkbox-label">
                 <input type="checkbox" [ngModel]="showArchived()" (ngModelChange)="showArchived.set($event); applyFilters()" aria-label="Show archived tasks"/>
                 Show Archived
              </label>
@@ -86,12 +86,12 @@
 
             <!-- Loading state -->
 
-            <div class="laoding-state" role="status" aria-label="Loading tasks">
+            <div class="loading-state" role="status" aria-label="Loading tasks">
                 <p class="text-body text-muted"> Loading tasks...</p>
             </div>
         } @else {
             <!-- Table -->
-             <table class="task-table" aria-labelledby="page-title">
+             <table class="tasks-table" aria-labelledby="page-title">
                 <thead>
                     <tr>
                         <th scope="col" class="text-label">Task</th>
@@ -101,7 +101,7 @@
                         <th scope="col" class="text-label">Status</th>
                         <th scope="col" class="text-label">Priority</th>
                         <th scope="col" class="text-label">Due Date</th>
-                        <th scope="col" class="text-label">Esimated</th>
+                        <th scope="col" class="text-label">Estimated</th>
                         <th scope="col" class="text-label">Actual</th>
                     </tr>
                 </thead>
@@ -109,14 +109,14 @@
                 <tbody>
                     @for (task of filteredTasks(); track task.id) {
                         <tr>
-                            <td class="tast-title text-body-strong">{{ task.title }}</td>
+                            <td class="task-title text-body-strong">{{ task.title }}</td>
                             <td class="text-body">{{ task.projectName }}</td>
                             <td class="text-body">{{ task.jiraTicketKey || '-' }}</td>
                             <td class="text-body">{{ task.assignedToName }}</td>
                             <td>
-                                <select [class]="getStatusClass(task.status)" [ngModel]="task.status" (ngModelChange)="onStatusChange(task, $event)" class="status-dropdown" aria-label="Updated status for {{ task.title }}">
+                                <select [attr.aria-label]=" 'Update status for' + task.title" [ngModel]="task.status" (ngModelChange)="onStatusChange(task, $event)" class="status-dropdown" >
                                     @for (option of statusDropdownOptions; track option.value ){
-                                        <option [value] = "option.value">> {{ option.label }}</option>
+                                        <option [value] = "option.value"> {{ option.label }}</option>
                                     }
                                 </select>
                             </td>
