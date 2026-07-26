@@ -249,7 +249,7 @@
 
     <!-- Submit confirmation modal -->
     @if (showSubmitDialog()){
-    <div class="modal-backdrop" role = "button" tabindex="0" aria-label="Close dialog" (click)="closeSubmitDialog()" (keydown.enter)="closeSubmitDialog()" (keydown.space)="closeSubmitDialog()" ></div>
+    <button = "button" aria-label="Close dialog" (click)="closeSubmitDialog()" ></button>
 
     <dialog class="modal" aria-labelledby="submit-modal-title" open>
       <div class="modal-icon" aria-hidden="true">
