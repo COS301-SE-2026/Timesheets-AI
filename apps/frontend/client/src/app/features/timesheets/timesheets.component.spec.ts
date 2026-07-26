@@ -173,14 +173,14 @@ describe('TimesheetsComponent', () => {
 
     it('should load timesheets, projects, and tasks, and select the first timesheet by default', () => {
       expect(component.uiState()).toBe('idle');
-      expect(component.filteredTimesheets().length).toBe(2);
+      expect(component.filteredTimesheets()).toHaveLength(2);
       expect(component.selectedTimesheetId()).toBe(currentTimesheetId);
       expect(component.summary()?.status).toBe('DRAFT');
     });
 
     it('should group entries into task rows with seconds converted to minutes', () => {
       const rows = component.tasks();
-      expect(rows.length).toBe(1); //both entries share taskOneId
+      expect(rows).toHaveLength(1); //both entries share taskOneId
 
       const row = rows[0];
       expect(row.id).toBe(taskOneId);
@@ -238,7 +238,7 @@ describe('TimesheetsComponent', () => {
         .expectOne(`/api/timesheets/${pastTimesheetId}/entries`)
         .flush([]);
 
-      expect(component.filteredTimesheets().length).toBe(1);
+      expect(component.filteredTimesheets()).toHaveLength(1);
       expect(component.summary()?.status).toBe('APPROVED');
     });
     it('should switch weeks and load that weeks entries on onWeekChange', () => {
