@@ -58,6 +58,22 @@ export class AuthService {
   //refs: https://angular.dev/guide/signals
 
   readonly currentUser = signal<AuthUser | null>(this.loadStoredUser());
+  constructor() {
+    /*
+    if there's a token but no stored user, that's someone who logged in
+    before persistSession() existed, there's no /api/users/me endpoint to
+    backfill the name from, and the JWT itself only carries email/userId,
+    no name. rather than leave them stuck on "Guest" indefinitely, clear
+    the stale token so the route guard kicks them to /login for one clean
+    re-login, after which persistSession() takes over normally
+    */
+    if (this.getToken() && !this.currentUser()) {
+      console.warn(
+        '[AuthService] token found with no stored user, forcing re-login',
+      );
+      localStorage.removeItem(TOKEN_KEY);
+    }
+  }
 
   register(payload: RegisterRequest): Observable<RegisterResponse> {
     return this.http
@@ -67,7 +83,7 @@ export class AuthService {
 
   login(payload: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, payload).pipe(
-      tap((res) => localStorage.setItem(TOKEN_KEY, res.token)),
+      tap((res) => this.persistSession(res)),
       catchError(this.handleError),
     );
   }
@@ -75,7 +91,7 @@ export class AuthService {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/google`, { idToken })
       .pipe(
-        tap((res) => localStorage.setItem(TOKEN_KEY, res.token)),
+        tap((res) => this.persistSession(res)),
         catchError(this.handleError),
       );
   }
@@ -90,6 +106,8 @@ export class AuthService {
         .subscribe();
     }
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
 
