@@ -5,7 +5,7 @@
  * Related Requirement: FR-05 : Task management
  */
 
-import { Component, OnInit, OnDestroy, signal, computed} from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, HostListener} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -114,6 +114,10 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public readonly showCompleted = signal<boolean>(false);
   public readonly showArchived = signal<boolean>(false);
   public readonly searchQuery = signal<string>('');
+  public readonly selectedTask = signal<Task | null>(null);
+  public readonly isDetailOpen = signal<boolean>(false);
+  public readonly isDetailLoading = signal<boolean>(false);
+  public readonly detailError = signal<string | null>(null);
 
   //Computed signals
 
@@ -287,6 +291,20 @@ public formatDate(dateString?: string): string {
   });
 }
 
+public formatDateTime(value?: string): string {
+  if(!value){
+    return '-';
+  }
+  const date = new Date(value);
+  return date.toLocaleString('en-ZA', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
 // Track tasks by their id
 
 public trackByTaskId(index: number, task: Task): string {
@@ -315,6 +333,35 @@ private updateTaskInTaskList(updatedTask: Task): void {
     this.applyFilters();
   }
 }
+
+// INTEGRATION: replace the mock lookup with the actual api call
+//  opens th task detail form
+
+public onViewTask(task: Task) {
+  this.detailError.set(null);
+  this.isDetailOpen.set(true);
+  this.isDetailLoading.set(true);
+
+// MOCK stand in for GET /api/tasks/(taskId) response
+  const detail = this.tasks().find((t: Task) => t.id === task.id) ?? task;
+  this.selectedTask.set(detail);
+  this.isDetailLoading.set(false);
+}
+
+public closeTaskDetail(): void {
+  this.isDetailOpen.set(false);
+  this.selectedTask.set(null);
+  this.detailError.set(null);
+}
+
+// closes modal on escape
+@HostListener('document:keydown.escape')
+public onEscapeKey(): void {
+  if(this.isDetailOpen()){
+    this.closeTaskDetail();
+  }
+}
+
 
 private loadMockData(): void {
   const mockTasks: Task[] = [{
