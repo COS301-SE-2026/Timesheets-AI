@@ -84,7 +84,7 @@ function hashTaskId(id: string): number {
   let hash = 0;
   for (let i = 0; i < id.length; i++) {
     hash = (hash << 5) - hash + id.charCodeAt(i);
-    hash |= 0; // keep it a 32 bit int
+    hash = Math.trunc(hash); // keep it a 32 bit int
   }
   return Math.abs(hash);
 }
