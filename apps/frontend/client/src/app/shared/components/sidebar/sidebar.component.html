@@ -1,37 +1,37 @@
 <div class="sidebar">
-    <!-- branding --> 
-    <div class="logo-container">
-        <img class="logo-icon" src="/assets/momently.png" alt="" />
-        <div class="logo-text">
-            <h2><span>m</span>omently</h2>
-            <p>Every moment counts</p>
-        </div>
+  <!-- branding -->
+  <div class="logo-container">
+    <img class="logo-icon" src="/assets/momently.png" alt="" />
+    <div class="logo-text">
+      <h2><span>m</span>omently</h2>
+      <p>Every moment counts</p>
     </div>
+  </div>
 
-    <!-- navigation -->
-    <nav class="nav-links">
-        @for (item of navItems(); track item.label) {
-            <a 
-                class="nav-item"
-                tabindex ="0"
-                [class.active]="item.route === activeRoute()"
-                (click)="setActive(item.route)"
-                (keydown.enter)="setActive(item.route)"
-                (keydown.space)="setActive(item.route)">
+  <!-- navigation -->
+  <nav class="nav-links">
+    @for (item of navItems(); track item.label) {
+      <a
+        class="nav-item"
+        tabindex="0"
+        [class.active]="item.route === activeRoute()"
+        (click)="setActive(item.route)"
+        (keydown.enter)="setActive(item.route)"
+        (keydown.space)="setActive(item.route)"
+      >
+        <mat-icon class="nav-icon" aria-hidden="true">{{ item.icon }}</mat-icon>
+        <span class="nav-label">{{ item.label }}</span>
+      </a>
+    }
+  </nav>
 
-                <mat-icon class="nav-icon" aria-hidden="true">{{ item.icon }}</mat-icon>
-                <span class="nav-label">{{ item.label }}</span>
-            </a>
-        }
-    </nav>
-
-    <!-- user profile -->
-    <div class="user-profile">
-        <div class="avatar">JD</div>
-        <div class="user-info">
-            <span class="user-name">John Doe</span>
-            <span class="user-role">Software Developer</span>
-        </div>
-        <span class="dropdown-arrow">⌄</span>
+  <!-- user profile -->
+  <div class="user-profile">
+    <div class="avatar">{{ initials() }}</div>
+    <div class="user-info">
+      <span class="user-name">{{ displayName() }}</span>
+      <span class="user-role">{{ displayRole() }}</span>
     </div>
+    <span class="dropdown-arrow">⌄</span>
+  </div>
 </div>
