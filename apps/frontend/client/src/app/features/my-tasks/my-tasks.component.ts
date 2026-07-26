@@ -1,19 +1,19 @@
 /**
- * Autthor: Lerato Sibanda
+ * Author: Lerato Sibanda
  * Date: 2026-07-25
  * Purpose: Display and manage tasks assigned to the current user with filtering and status updates
  * Related Requirement: FR-05 : Task management
  */
 
-import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
-import { BidiModule } from "@angular/cdk/bidi";
+import { Subject } from 'rxjs';
+import { RouterLink } from '@angular/router';
 
 /**
  * Represents a task assigned to a user
- * Matches the ackend API response structure
+ * Matches the backend API response structure
  */
 
 export interface Task {
@@ -30,20 +30,20 @@ export interface Task {
   assignedToName: string;
   assignedWorkspaceMemberId: string;
   dueDate?: string;
-  completedAt: string;
+  completedAt?: string;
   createdAt: string;
   updatedAt: string;
-  parentTaskId: string;
+  parentTaskId?: string;
   isDeleted: boolean;
   deletedAt?: string;
 }
 
 // status and priority options as defined in backend
 
-export type TaskStatus = 'TO_DO' | 'IN_PROGRESS' | 'DONE' | 'ARCHIVED';
+export type TaskStatus = 'TO_DO' | 'IN_PROGRESS' | 'COMPLETED' | 'ARCHIVED';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
 
-// reuest payload for updating task status
+// request payload for updating task status
 
 export interface UpdateStatusRequest {
   status: TaskStatus;
@@ -59,12 +59,12 @@ interface StatusDropdownOption {
   label: string;
 }
 
-// Dispaly labels for task statuses
+// Display labels for task statuses
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
   TO_DO: 'To Do',
   IN_PROGRESS: 'In Progress',
-  DONE: 'Done',
+  COMPLETED: 'Completed',
   ARCHIVED: 'Archived'
 } as const;
 
@@ -79,7 +79,7 @@ const PRIORITY_LABELS: Record<TaskPriority, string> = {
 const STATUS_CLASSES: Record<TaskStatus, string> = {
   TO_DO : 'status-to-do',
   IN_PROGRESS: 'status-in-progress',
-  DONE: 'status-done',
+  COMPLETED: 'status-completed',
   ARCHIVED: 'status-archived'
 } as const;
 
@@ -87,17 +87,23 @@ const PRIORITY_CLASSES: Record<TaskPriority, string> = {
     LOW: 'priority-low',
     MEDIUM: 'priority-medium',
     HIGH: 'priority-high'
-} as const;
+};
+
+const PRIORITY_ICONS: Record<TaskPriority, string> = {
+  LOW: 'fa-arrow-down',
+  MEDIUM: 'fa-minus',
+  HIGH: 'fa-arrow-up'
+}as const;
 
 @Component({
   selector: 'app-my-tasks',
-  imports: [CommonModule, FormsModule, BidiModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './my-tasks.component.html',
   styleUrl: './my-tasks.component.scss',
   standalone: true
 })
 
-export class MyTasksComponent {
+export class MyTasksComponent implements OnInit, OnDestroy {
 
   // Component state signal
 
@@ -107,6 +113,7 @@ export class MyTasksComponent {
   public readonly selectedStatus = signal<string>('ALL');
   public readonly showCompleted = signal<boolean>(false);
   public readonly showArchived = signal<boolean>(false);
+  public readonly searchQuery= signal<string>('');
 
   //Computed signals
 
@@ -120,7 +127,7 @@ export class MyTasksComponent {
 
   // Total number of completed tasks
   public readonly completedCount = computed<number>(() => {
-    return this.tasks().filter((task: Task) => task.status === 'DONE').length;
+    return this.tasks().filter((task: Task) => task.status === 'COMPLETED').length;
   });
 
   // Total number of archived charts
@@ -141,7 +148,7 @@ export class MyTasksComponent {
     {value: 'ALL', label: 'All'},
     {value: 'TO_DO', label: 'To Do'},
     {value: 'IN_PROGRESS', label: 'In Progress'},
-    {value: 'DONE', label: 'Done'},
+    {value: 'COMPLETED', label: 'Completed'},
     {value: 'ARCHIVED', label: 'Archived'}
   ];
 
@@ -149,13 +156,16 @@ export class MyTasksComponent {
   public readonly statusDropdownOptions: StatusDropdownOption[] = [
     {value: 'TO_DO', label: 'To Do'},
     {value: 'IN_PROGRESS', label: 'In Progress'},
-    {value: 'DONE', label: 'Done'},
+    {value: 'COMPLETED', label: 'Completed'},
     {value: 'ARCHIVED', label: 'Archived'}
   ];
 
   public readonly statusLabels = STATUS_LABELS;
   public readonly priorityLabels = PRIORITY_LABELS;
+  public readonly priorityIcons = PRIORITY_ICONS;
   private readonly destroy$ = new Subject<void>();
+
+  // INTEGRATION: Inject tASKservices when integrating with backend
 
   // Initialize component and load tasks
 
@@ -165,7 +175,7 @@ export class MyTasksComponent {
 
   // cleanup subscription when the component is destroyed
 
-  public ngOnDestro(): void { 
+  public ngOnDestroy(): void { 
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -173,7 +183,7 @@ export class MyTasksComponent {
   public loadTasks(): void {
     this.isLoading.set(true);
 
-    // TODO: REPLACE WITH ACTUAL API CALL
+    // INTEGRATION: REPLACE WITH ACTUAL API CALL
     // ADDED MOCK DATA BELOW FOR DEMONSTRATION
     this.loadMockData();
   }
@@ -184,13 +194,20 @@ export class MyTasksComponent {
     const currentTasks = this.tasks();
     let filtered = [...currentTasks];
 
+    const searchQuery = this.searchQuery().toLowerCase().trim();
+      if (searchQuery) {
+        filtered = filtered.filter((task: Task) => {
+          return task.title.toLowerCase().includes(searchQuery) || task.projectName.toLowerCase().includes(searchQuery) || (task.jiraTicketKey && task.jiraTicketKey.toLowerCase().includes(searchQuery));
+        });
+      }
+
     const selectedStatus = this.selectedStatus();
     if(selectedStatus !== 'ALL') {
       filtered = filtered.filter((task: Task) => task.status === selectedStatus);
     }
 
     if(!this.showCompleted()) {
-      filtered = filtered.filter((task: Task) => task.status !== 'DONE');
+      filtered = filtered.filter((task: Task) => task.status !== 'COMPLETED');
     }
 
     if(!this.showArchived()) {
@@ -200,17 +217,25 @@ export class MyTasksComponent {
     this.filteredTasks.set(filtered);
   }
 
+  // Handles search input change
+
+  public onSearchChange(event: Event) : void {
+    const inputElement = event.target as HTMLInputElement;
+    this.searchQuery.set(inputElement.value);
+    this.applyFilters();
+  }
+
   // Handles status filter dropdown change
 
   public onStatusFilterChange(event: Event): void {
-    const selectedElement = event.target as HTMLSelectElement;
-    this.selectedStatus.set(selectedElement.value);
+    const selectElement = event.target as HTMLSelectElement;
+    this.selectedStatus.set(selectElement.value);
     this.applyFilters(); 
   }
 
   // Handles show completed checkbox change
 
-  public onToogleCompleted(event: Event): void {
+  public onToggleCompleted(event: Event): void {
     const checkbox = event.target as HTMLInputElement;
     this.showCompleted.set(checkbox.checked);
     this.applyFilters();
@@ -223,11 +248,10 @@ export class MyTasksComponent {
     this.showArchived.set(checkbox.checked);
     this.applyFilters();
   }
-
 // get css class for a task status badge
 
-public getStatusClass(status: TaskStatus) {
-  return `status-badge ${STATUS_CLASSES[status]}`
+public getStatusClass(status: TaskStatus):string {
+  return `status-badge ${STATUS_CLASSES[status]}`;
 }
 
 public getPriorityClass(priority: TaskPriority): string {
@@ -237,9 +261,16 @@ public getPriorityClass(priority: TaskPriority): string {
 public onStatusChange(task: Task, newStatus: string) : void {
   const status = newStatus as TaskStatus;
 
-  // TODO: REPLACE WITH ACTUAL API WHEN INTEGRATING
+  // INTEGRATION: REPLACE WITH ACTUAL API WHEN INTEGRATING
   // MOCK UPDATE FOR DEMMONSTRATION
   this.updateTaskInTaskList({...task, status});
+}
+
+// Navigate to project
+
+public navigateToProject(projectId: string) : void {
+  // INTEGRSTION: Implement navigation to project detail
+  console.log('Navigate to project:', projectId);
 }
 
 // Format date string for display
@@ -262,6 +293,16 @@ public trackByTaskId(index: number, task: Task): string {
   return task.id;
 }
 
+public getStatusIcon(status: TaskStatus): string {
+  const icons: Record<TaskStatus, string> = {
+    TO_DO: 'fa-regular fa-circle',
+    IN_PROGRESS:'fa-regular fa-circle-check',
+    COMPLETED:'fa-solid fa-check-circle',
+    ARCHIVED: 'fa-regular fa-file-zipper'
+  };
+  return icons[status];
+}
+
 // Update task in the task list after status change
 
 private updateTaskInTaskList(updatedTask: Task): void {
@@ -278,7 +319,7 @@ private updateTaskInTaskList(updatedTask: Task): void {
 private loadMockData(): void {
   const mockTasks: Task[] = [{
     id: '1',
-    title: 'Design lodin flow',
+    title: 'Design login flow',
     description: 'Design the login flow for the application',
     projectName: 'Project Alpha',
     projectId: 'proj-1',
@@ -286,7 +327,7 @@ private loadMockData(): void {
     priority: 'HIGH',
     estimatedHours: 8,
     actualHours: 6,
-    jiraTicketKey: 'ALPHA_101',
+    jiraTicketKey: 'ALPHA-101',
     assignedToName: 'Thabang Siduke',
     assignedWorkspaceMemberId: 'user-1',
     dueDate: '2026-07-28',
@@ -306,7 +347,7 @@ private loadMockData(): void {
     priority: 'MEDIUM',
     estimatedHours: 5,
     actualHours: 0,
-    jiraTicketKey: 'ALPHA_102',
+    jiraTicketKey: 'ALPHA-102',
     assignedToName: 'Thabang Siduke',
     assignedWorkspaceMemberId: 'user-1',
     dueDate: '2026-07-26',
