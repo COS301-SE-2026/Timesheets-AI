@@ -6,6 +6,9 @@ bad value at compile time intead of a 500 at runtime
 
 Author: Zamokuhle Zwane
 Date: 23 July 2026
+
+Patched: Zamokuhle Zwane, 25 July 2026
+fixed a typo, was entryTime and not entryType.
 */
 
 import { Injectable, inject } from "@angular/core";
@@ -22,7 +25,7 @@ export interface TimeEntryResponse {
     startTime: string;
     endTime: string;
     durationMinutes: number;
-    entryTime: 'MANUAL' | 'TIMER'; //matches the CHECK constraint
+    entryType: 'MANUAL' | 'TIMER'; //matches the CHECK constraint, was entryTime
     description: string;
     isDeleted: boolean;
     createdAt: string;
