@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-import {TimesheetsComponent } from './timesheets.component'
+import { TimesheetsComponent } from './timesheets.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('TimesheetsComponent', () => {
   let fixture: ComponentFixture<TimesheetsComponent>;
@@ -9,7 +10,7 @@ describe('TimesheetsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TimesheetsComponent],
-      providers: [provideRouter([])]
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TimesheetsComponent);
@@ -21,5 +22,4 @@ describe('TimesheetsComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
 });
