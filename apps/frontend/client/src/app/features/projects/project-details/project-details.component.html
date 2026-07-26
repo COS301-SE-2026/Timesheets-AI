@@ -160,45 +160,132 @@ Related Requirements: N/A
         Hours
         -->
         <article class="overview-card">
-            <h3>
-                Hours Logged
-            </h3>
 
             <div class="hours-header">
+                <div>
+                    <h3 class="overview-card-title">
+                        Hours Logged vs Estimated
+                    </h3>
+
+                    <p class="overview-card-subtitle">
+                        Current project hours
+                    </p>
+                </div>
+
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-dot logged"></span>
+                        Logged
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot estimated"></span>
+                        Estimated
+                    </div>
+                </div>
+            </div>
+
+            <div class="hours-summary">
                 <span>
                     {{ project().hoursLogged }}h
                 </span>
+
                 <span>
-                    /
-                </span>
-                <span>
-                    {{ project().totalHours }}h
+                    of {{ project().totalHours }}h
                 </span>
             </div>
-
-            <app-progress-bar
-                [progress]="completionPercentage()">
-            </app-progress-bar>
 
             <p class="remaining-hours">
                 {{ remainingHours() }} hours remaining
             </p>
+            
+            <div class="hours-chart">
+                <div class="chart-column">
+                    <div
+                        class="chart-bar logged"
+                        [style.height.%]="completionPercentage()">
+
+                        <span class="bar-value">
+                            {{ project().hoursLogged }}h
+                        </span>
+
+                    </div>
+
+                    <span class="bar-title">
+                        Logged
+                    </span>
+                </div>
+
+                <div class="chart-column">
+                    <div
+                        class="chart-bar estimated"
+                        style="height:100%;">
+
+                        <span class="bar-value">
+                            {{ project().totalHours }}h
+                        </span>
+
+                    </div>
+
+                    <span class="bar-title">
+                        Estimated
+                    </span>
+                </div>
+            </div>
+            
         </article>
 
         <!--
         Progress
         -->
-        <article class="overview-card">
-            <h3>
+        <article class="overview-card progress-card">
+            <h3 class="overview-card-title">
                 Project Progress
             </h3>
 
-            <div class="progress-circle">
-                {{ completionPercentage() }}%
-            </div>
-            <p>
-                Based on hours logged
+            <p class="overview-card-subtitle">
+                Based on logged hours
             </p>
+
+            <div 
+                class="progress-circle"
+                [style.--progress]="completionPercentage()">
+
+                <div class="progress-inner">
+                    <span class="progress-percentage">
+                        {{ completionPercentage() }}%
+                    </span>
+
+                    <span class="progress-label">
+                        Complete
+                    </span>
+
+                </div>
+            </div>
+
+            <div class="progress-summary">
+                <div class="summary-box">
+
+                    <span class="summary-title">
+                        Logged
+                    </span>
+
+                    <span class="summary-value">
+                        {{ project().hoursLogged }}h
+                    </span>
+                </div>
+
+                <div class="summary-box">
+                    <span class="summary-title">
+                        Remaining
+                    </span>
+
+                    <span class="summary-value">
+                        {{ remainingHours() }}h
+                    </span>
+                </div>
+            </div>
+            
         </article>
 
         <!--

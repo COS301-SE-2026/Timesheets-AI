@@ -300,17 +300,23 @@ OVERVIEW GRID
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
+    align-items: start;
 }
 
 /*
 OVERVIEW CARD
 */
 .overview-card{
-    border-radius: 18px;
-    padding: 1.4rem;
+    background: $surface;
+    border: 1px solid $border;
+    border-radius: 20px;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    transition: 0.2s;
+    box-shadow: 
+        0 1px 2px rgba(15, 23, 42, 0.04),
+        0 8px 24px rgba(15, 23, 42, 0.05);
+    min-height: 420px;
 }
 
 .overview-card:hover{
@@ -319,10 +325,16 @@ OVERVIEW CARD
 }
 
 .overview-card-title{
-    margin: 0 0 1.2rem;
+    margin: 0;
     color: $text-primary;
-    font-size: 1rem;
+    font-size: 1.55rem;
     font-weight: 700;
+}
+
+.overview-card-subtitle{
+    margin-top: 0.35;
+    color: $text-secondary;
+    font-size: 0.9rem;
 }
 
 /*
@@ -330,8 +342,9 @@ HOURS CARD
 */
 .hours-header{
     display: flex;
-    align-items: baseline;
-    gap: 0.35rem;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
 .hours-logged{
@@ -352,9 +365,72 @@ HOURS CARD
     font-size: 0.85rem;
 }
 
+.hours-summary{
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 1.25rem;
+}
+
+.hours-value{
+    font-size: 2rem;
+    font-weight: 700;
+    gap: 0.35rem;
+    margin-bottom: 1.25rem;
+}
+
+.hours-subtitle{
+    color: $text-secondary;
+    font-size: 0.9rem;
+}
+
+.hours.chart{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    height: 220px;
+    margin-top: auto;
+}
+
+.chart-column{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    width: 70px;
+}
 /*
 SIMPLE BAR CHART
 */
+.chart-legend{
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    font-size: 0.82rem;
+    color: $text-secondary;
+}
+
+.legend-item{
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.legend-dot{
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-dot.logged{
+    background: #2563eb;
+}
+
+.legend-dot.estimated{
+    background: #cbd5e1;
+}
+
 .hours-bars{
     display: flex;
     justify-content: space-evenly;
@@ -372,23 +448,39 @@ SIMPLE BAR CHART
     height: 100%;
 }
 
-.bar{
+.chart-bar{
     width: 100%;
-    border-radius: 8px 8px 0 0;
-    transition: 0.3s;
+    border-radius: 10px 10px 0 0;
+    position: relative;
 }
 
-.bar.logged{
-    background: $primary;
+.chart-bar.logged{
+    background: linear-gradient(
+        to top,
+        #2563eb,
+        #8ea7ff
+    );
 }
 
-.bar.estimated{
-    background: #cbd5e1;
+.chart-bar.estimated{
+    background: #e2e8f0;
 }
 
 .bar-value{
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
     margin-bottom: 0.5rem;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: $text-primary;
+}
+
+.bar-title{
+    margin-top: 0.8rem;
+    font-size: 0.78rem;
+    color: $text-secondary;
     font-weight: 700;
 }
 
@@ -403,9 +495,8 @@ SIMPLE BAR CHART
 PROGRESS CARD
 */
 .progress-card{
-    display: flex;
-    flex-direction: column;
     align-items: center;
+    text-align: center;
 }
 
 .progress-circle{
@@ -450,6 +541,38 @@ PROGRESS CARD
     color: $text-muted;
     font-size: 0.75rem;
 }
+
+.progress-description{
+    margin-top: 0.35rem;
+    color: $text-secondary;
+    font-size: 0.9rem;
+}
+
+.progress-summary{
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.summary-box{
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 1rem;
+}
+
+.summary-title{
+    color: $text-secondary;
+    font-size: 0.85rem;
+}
+
+.summary-value{
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 1.7rem;
+    font-weight: 700;
+}
+
 
 /*
 TASK SUMMARY
@@ -701,5 +824,4 @@ RESPOSIVENESS
         height: 36px;
         font-size: 0.75rem;
     }
-
 }
