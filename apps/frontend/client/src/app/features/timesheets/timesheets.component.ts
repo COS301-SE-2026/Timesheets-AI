@@ -25,7 +25,7 @@ import {
 import { TaskService, TaskResponse } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
-import {RouterLink} from '@angular/router'
+import { RouterLink } from '@angular/router';
 
 type StatusFilter = 'ALL' | TimesheetStatus;
 type UiState = 'idle' | 'loading' | 'error' | 'empty';
@@ -83,7 +83,7 @@ const TASK_STYLE_PALETTE: { iconClass: string; colorCode: string }[] = [
 function hashTaskId(id: string): number {
   let hash = 0;
   for (let i = 0; i < id.length; i++) {
-    hash = (hash << 5) - hash + id.charCodeAt(i);
+    hash = (hash << 5) - hash + id.codePointAt(i)!;
     hash = Math.trunc(hash); // keep it a 32 bit int
   }
   return Math.abs(hash);
@@ -116,7 +116,13 @@ export class TimesheetsComponent {
 
   private readonly allTimesheets = signal<TimesheetWeekView[]>([]);
 
-  readonly statusFilters: StatusFilter[] = ['ALL', 'DRAFT', 'SUBMITTED', 'APPROVED', 'REJECTED'];
+  readonly statusFilters: StatusFilter[] = [
+    'ALL',
+    'DRAFT',
+    'SUBMITTED',
+    'APPROVED',
+    'REJECTED',
+  ];
   readonly selectedFilter = signal<StatusFilter>('ALL');
   readonly selectedTimesheetId = signal<string>('');
   readonly uiState = signal<UiState>('idle');
