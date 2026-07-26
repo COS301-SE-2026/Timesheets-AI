@@ -132,6 +132,7 @@
                         <th scope="col" class="text-label">Due Date</th>
                         <th scope="col" class="text-label">Estimated</th>
                         <th scope="col" class="text-label">Actual</th>
+                        <th scope="col" class="text-label">Actions</th>
                     </tr>
                 </thead>
 
@@ -176,11 +177,16 @@
                              <td class="text-body"> {{ formatDate(task.dueDate) }} </td>
                              <td class="text-body text-right"> {{ task.estimatedHours }}h </td>
                              <td class="text-body text-right"> {{ task.actualHours }}h </td>
+                             <td class="text-center">
+                                <button type="button" class="view-button" (click)="onViewTask(task)" [attr.aria-label]="'View details for' + task.title">
+                                <i class="fa-regular fa-eye"></i> 
+                                View </button>
+                             </td>
                         </tr>
                     } @empty {
                         <!-- Empty State -->
                          <tr>
-                            <td colspan="9" class="text-center text-body text-muted">
+                            <td colspan="10" class="text-center text-body text-muted">
                                 No tasks found
                             </td> 
                          </tr>
@@ -189,4 +195,105 @@
              </table>
         }
       </section>
+
+      @if(isDetailOpen()) {
+        <div class="modal-overlay" (click)="closeTaskDetail()">
+            <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="task-detail-title" (click)="$event.stopPropagation()">
+                <header class="modal-header">
+                    <h2 id="task-detail-title" class="modal-title"> Task Detail </h2>
+                    <button type="button" class="modal-class" (click)="closeTaskDetail()" aria-label="Close task detail">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </header>
+
+                @if (isDetailLoading()) {
+                    <p class="modal-message">Loading task...</p>
+                } @else if (detailError()) {
+                    <p class="modal-message modal-error"> {{ detailError() }} </p>
+                } @else {
+                    @if (selectedTask(); as task) {
+                    <form class="task-detail-form" (ngSubmit)="closeTaskDetail()">
+
+                        <div class="form-row">
+                            <label class="form-label" for="detail-title">Title</label>
+                            <input id="detail-title" class="form-control" type="text" [value]="task.title" readonly />
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label" for="detail-description">Description</label>
+                            <textarea id="detail-description" class="form-control form-textarea" rows="5" readonly>
+                                {{ task.description || 'No description provided.' }}
+                            </textarea>
+                        </div>
+
+                        <div class="form-grid">
+
+                            <div class="form-row">
+                                <label class="form-label" for="detail-project">Project</label>
+                                <input id="detail-project" class="form-control" type="text" [value]="task.projectName" readonly/>
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label" for="detail-jira">Jira Ticket</label>
+                                 <input id="detail-jira" class="form-control" type="text" [value]="task.jiraTicketKey || '-'" readonly />
+                            </div>  
+
+                            <div class="form-row">
+                                <label class="form-label" for="detail-priority">Priority</label>
+                                <input id="detail-priority" class="form-control" type="text" [value]="task.assignedToName" readonly />
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label" for="detail-assignee">Assigned To</label>
+                                <input id="detail-assignee" class="form-control" type="text" [value]="task.assignedToName" readonly />
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label" for="detail-due"> Due Date</label>
+                                <input id="detail-due" class="form-control" type="text"  [value]="formatDate(task.dueDate)" readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-estimated"> Estimated hours</label>
+                                <input id="detail-estimated" class="form-control" type="text"  [value]="task.estimatedHours + 'h'" readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-actual"> Actual Hours</label>
+                                <input id="detail-actual" class="form-control" type="text"  [value]="task.actualHours + 'h'" readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-parent"> Parent Task</label>
+                                <input id="detail-parent" class="form-control" type="text"  [value]="task.parentTaskId || '-'" readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-completed"> Completed At</label>
+                                <input id="detail-completed" class="form-control" type="text"  [value]="formatDateTime(task.completedAt) || '-' " readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-created"> Created At</label>
+                                <input id="detail-created" class="form-control" type="text"  [value]="formatDateTime(task.createdAt)" readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-updated"> Last Updated </label>
+                                <input id="detail-updated" class="form-control" type="text"  [value]="formatDateTime(task.updatedAt)" readonly />
+                            </div>
+
+                        </div>
+
+                        <footer class="modal-footer">
+                            <button type="submit" class="modal-button">Close</button>
+                        </footer>
+
+                    </form>
+                } @else {
+                    <p class="modal=message"> Task details are unavailable </p>
+                } }
+            </div>
+        </div>
+      }
 </main>
