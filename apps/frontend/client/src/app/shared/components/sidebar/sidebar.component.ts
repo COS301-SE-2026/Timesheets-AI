@@ -3,12 +3,16 @@
  * Date: 2026-05-15
  * Purpose: Navigation sidebar component with route-based active state tracking.
  * Related Requirement: -
+ * 
+ * patched: Zamokuhle Zwane, 26 July 2026
+ * user-profile is hardcoded to JD, John Doe / software developer
  */
 
-import { Component, signal, inject } from '@angular/core'; // UI componenet and signal store state, uodate UI changes automatically 
+import { Component, signal, inject, computed} from '@angular/core'; // UI componenet and signal store state, uodate UI changes automatically 
  //to be able use ngIf and ngFor 
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface NavItem {
   label: string, //text shown in sidebar
@@ -26,7 +30,7 @@ interface NavItem {
 
 export class SidebarComponent {
   private readonly router = inject(Router);
-
+  private readonly authService = inject(AuthService);
 
   // create reactive state variable so it stores state, update UI automatically when changed 
   navItems = signal<NavItem[]>([
@@ -49,6 +53,29 @@ export class SidebarComponent {
   // setActive(label: string){
   //   this.activeRoute.set(label);
   // }
+
+  readonly currentUser = this.authService.currentUser;
+  readonly displayName = computed(() => {
+    const user = this.currentUser();
+    if(!user) return 'Guest';
+    return `${user.firstName} ${user.lastName}`.trim();
+  });
+
+  readonly displayRole = computed(() =>{
+    const role = this.currentUser()?.roles?.[0];
+    if(!role) return ''
+    const withoutPrefix = role.startsWith('ROLE_') ? role.slice(5):role;
+    return withoutPrefix.charAt(0) +withoutPrefix.slice(1).toLowerCase();
+  })
+
+  //first letter of first+last name
+  readonly initials = computed(() =>{
+    const user = this.currentUser();
+    if(!user) return "?";
+    const first = user.firstName?.charAt(0)??'';
+    const last = user.lastName?.charAt(0)??'';
+    return (first+last).toUpperCase() || '?';
+  });
 
   //Update to use Angular Router to replace the manual state tracking
   //This function changes the page route when a user clicks a sidebar item.
