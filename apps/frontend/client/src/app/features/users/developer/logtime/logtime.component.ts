@@ -431,14 +431,15 @@ export class LogtimeComponent implements OnDestroy {
       this.conflictMessage.set('End time must be after start time.');
       return;
     }
-
-    if (this.newTaskFormContext() === 'manual' && !this.newTaskTitle().trim()) {
+    //when the user picks new task but never typed a title, block the save entirely.
+    if(this.isCreatingNewManualTask()&& !this.newTaskTitle().trim()){
       this.newTaskTitleError.set(true);
       return;
     }
-
-    const entry = this.buildEntryFromForm();
-
+    //Backlog: this generates the new task client side 
+    const request = this.buildTimeEntryRequestFromForm();
+    const entry = this.buildEntryFromForm(request);
+  
     // Collision checking evaluation logic
     const hasConflict = this.entries().some(
       (existingEntry) =>
@@ -494,7 +495,6 @@ export class LogtimeComponent implements OnDestroy {
       this.closePanel();
     };
 
-    const request = this.buildTimeEntryRequestFromForm();
     const response = this.isEditMode()
       ? this.http.put<TimeEntry>(
           `${this.apiBaseUrl}/time-entries/${entry.id}`,
@@ -519,11 +519,6 @@ export class LogtimeComponent implements OnDestroy {
   //Instantiates the async timer interval loops, updating counters progressively
 
   startTimer(): void {
-    if (this.newTaskFormContext() === 'timer' && !this.newTaskTitle().trim()) {
-      this.newTaskTitleError.set(true);
-      return;
-    }
-
     const timer: ActiveTimer = {
       projectId: this.timerForm.controls.projectId.value,
       taskId: this.resolveTaskId('timer') || null,
@@ -654,9 +649,10 @@ export class LogtimeComponent implements OnDestroy {
     Refresh from the backend first so the overlap check isn't relying on potentially stale client-side state (e.g. an entry created in another tab/session while this timer was running).
     */
     this.http
-      .get<
-        TimeEntry[]
-      >(`${this.apiBaseUrl}/time-entries/me`, this.requestOptions())
+      .get<TimeEntry[]>(
+        `${this.apiBaseUrl}/time-entries/me`,
+        this.requestOptions(),
+      )
       .subscribe({
         next: (fetchedEntries) => {
           this.entries.set(
@@ -891,32 +887,7 @@ export class LogtimeComponent implements OnDestroy {
 
   private resolveTaskId(context: 'manual' | 'timer'): string {
     const form = context === 'manual' ? this.entryForm : this.timerForm;
-
-    if (this.newTaskFormContext() !== context) {
-      return form.controls.taskId.value;
-    }
-
-    const title = this.newTaskTitle().trim();
-    if (!title) {
-      return '';
-    }
-
-    const projectId = form.controls.projectId.value;
-    const newTask: Task = {
-      id: this.createTaskId(),
-      projectId,
-      title,
-    };
-
-    this.tasks.update((tasks) => [...tasks, newTask]);
-    form.controls.taskId.setValue(newTask.id);
-    this.resetNewTaskState();
-
-    return newTask.id;
-  }
-
-  private createTaskId(): string {
-    return `task-${Date.now()}-${crypto.randomUUID()}`;
+    return form.controls.taskId.value;
   }
 
   private updateDuration(): void {
@@ -932,13 +903,12 @@ export class LogtimeComponent implements OnDestroy {
     });
   }
 
-  private buildEntryFromForm(): TimeEntry {
+  private buildEntryFromForm(request: TimeEntryRequest): TimeEntry {
     /*
     note: buildTimeEntryRequestFromForm() now returns durationSeconds not durationMinutes (matches the real request schema), but the local
     TimeEntry model still tracks durationMinutes for display purposes reading straight off the form control here instead of the request
     object, since spreading 'request' would leave durationMinutes missing
     */
-    const request = this.buildTimeEntryRequestFromForm();
     const now = new Date().toISOString().slice(0, 19);
 
     return {
@@ -1042,9 +1012,10 @@ export class LogtimeComponent implements OnDestroy {
 
   private loadEntries(): void {
     this.http
-      .get<
-        TimeEntry[]
-      >(`${this.apiBaseUrl}/time-entries/me`, this.requestOptions())
+      .get<TimeEntry[]>(
+        `${this.apiBaseUrl}/time-entries/me`,
+        this.requestOptions(),
+      )
       .subscribe({
         next: (entries) =>
           this.entries.set(
@@ -1067,9 +1038,10 @@ export class LogtimeComponent implements OnDestroy {
   */
   private loadProjects(): void {
     this.http
-      .get<
-        ProjectApiResponse[]
-      >(`${this.apiBaseUrl}/projects`, this.requestOptions())
+      .get<ProjectApiResponse[]>(
+        `${this.apiBaseUrl}/projects`,
+        this.requestOptions(),
+      )
       .subscribe({
         next: (projects) => {
           this.projects.set(projects.map((p) => ({ id: p.id, name: p.name })));
@@ -1094,9 +1066,10 @@ export class LogtimeComponent implements OnDestroy {
   */
   private loadTasks(): void {
     this.http
-      .get<
-        TaskApiResponse[]
-      >(`${this.apiBaseUrl}/tasks/my-tasks`, this.requestOptions())
+      .get<TaskApiResponse[]>(
+        `${this.apiBaseUrl}/tasks/my-tasks`,
+        this.requestOptions(),
+      )
       .subscribe({
         next: (tasks) => {
           this.tasks.set([
@@ -1123,9 +1096,10 @@ export class LogtimeComponent implements OnDestroy {
   */
   private loadCurrentTimesheet(): void {
     this.http
-      .get<
-        Timesheet[]
-      >(`${this.apiBaseUrl}/timesheets/me`, this.requestOptions())
+      .get<Timesheet[]>(
+        `${this.apiBaseUrl}/timesheets/me`,
+        this.requestOptions(),
+      )
       .subscribe({
         next: (timesheets) => {
           const from = this.filterForm.controls.from.value;
