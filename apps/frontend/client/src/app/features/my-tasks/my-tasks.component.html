@@ -1,4 +1,4 @@
-<div class="my-task-page" role="main" aria-label="My Task">
+<main class="my-task-page">
 
     <!-- Page header -->
      <header class="page-header">
@@ -11,38 +11,58 @@
      <!-- Summary Cards -->
       <section class="summary-cards" aria-label="Task summary">
         <div class="summary-card">
+            <div class="summary-card-icon">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div class="summary-card-content">
             <div class="summary-card-value" aria-live="polite">
                 {{ totalCount() }}
             </div>
             <div class="summary-card-label text-caption"> Total Tasks</div>
+            </div>
         </div>
 
         <!-- Active Tasks -->
 
         <div class="summary-card">
-            <div class="sumamry-card-value" aria-live="polite">
+            <div class="summary-card-icon active">
+                <i class="fa-regular fa-clock"></i>
+            </div>
+            <div class="summary-card-content">
+            <div class="summary-card-value" aria-live="polite">
                 {{ activeCount() }}
             </div>
             <div class="summary-card-label text-caption"> Active </div>
             <div class="summary-card-subtitle text-caption"> Includes To Do &amp; In progress</div>
+             </div>
         </div>
 
         <!-- Completed Tasks -->
 
         <div class="summary-card">
-            <div class="sumary-card-value" aria-live="polite">
+            <div summary-card-icon completed>
+                <i class="fa-regular fa-circle-check"></i>
+            </div>
+            <div class="summary-card-content">
+            <div class="summary-card-value" aria-live="polite">
                 {{ completedCount() }}
             </div>
             <div class="summary-card-label text-caption"> Completed </div>
         </div>
+        </div>
 
         <!-- Archived Tasks -->
          <div class="summary-card">
+            <div class="summary-card-icon archived">
+                <i class="fa-regular fa-file-zipper"></i>
+            </div>   
+            <div class="summary-card-content">
             <div class="summary-card-value" aria-live="polite">
                 {{ archivedCount() }}
             </div>
             <div class="summary-card-label text-caption"> Archived</div>
          </div>
+        </div>
       </section>
 
       <!-- Filters Section -->
@@ -61,10 +81,19 @@
             </span>
          </div>
 
-         <!-- Filter checnkboxes -->
+         <!-- Search bar -->
+
+         <div class="filter-group search group">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass searh-icon"></i>
+                <input type="text" id="search-input" placeholder="Search tasks, projects or jira tickets" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event); applyFilters()" aria-label="Search tasks"/>
+            </div>
+         </div>
+
+         <!-- Filter checkboxes -->
           <div class="filter-group filter-checkboxes">
 
-            <!-- show copleted -->
+            <!-- show completed -->
              <label class="checkbox-label">
                 <input type="checkbox" [ngModel]="showCompleted()" (ngModelChange)="showCompleted.set($event); applyFilters()" aria-label="Show completed tasks"/>
                 Show Completed
@@ -86,9 +115,9 @@
 
             <!-- Loading state -->
 
-            <div class="loading-state" role="status" aria-label="Loading tasks">
+            <output class="loading-state" aria-label="Loading tasks">
                 <p class="text-body text-muted"> Loading tasks...</p>
-            </div>
+            </output>
         } @else {
             <!-- Table -->
              <table class="tasks-table" aria-labelledby="page-title">
@@ -114,7 +143,7 @@
                             <td class="text-body">{{ task.jiraTicketKey || '-' }}</td>
                             <td class="text-body">{{ task.assignedToName }}</td>
                             <td>
-                                <select [attr.aria-label]=" 'Update status for' + task.title" [ngModel]="task.status" (ngModelChange)="onStatusChange(task, $event)" class="status-dropdown" >
+                                <select [attr.aria-label]=" 'Update status for ' + task.title" [ngModel]="task.status" (ngModelChange)="onStatusChange(task, $event)" class="status-dropdown" >
                                     @for (option of statusDropdownOptions; track option.value ){
                                         <option [value] = "option.value"> {{ option.label }}</option>
                                     }
@@ -144,4 +173,4 @@
              </table>
         }
       </section>
-</div>
+</main>
