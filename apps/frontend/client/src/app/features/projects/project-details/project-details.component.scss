@@ -228,19 +228,20 @@ META CARD
 META CONTENT
 */
 .meta-icon{
-    color: $primary;
-    font-size: 1.1rem;
+    color: #94a3b8;
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
 }
 
 .meta-title{
-    color: $text-secondary;
-    font-size: 0.95rem;
+    color: #64748b;
+    font-size: 0.82rem;
     font-weight: 500;
 }
 
 .meta-value{
-    color: $text-primary;
-    font-size: 1.55rem;
+    color: #0f172a;
+    font-size: 1.25rem;
     font-weight: 700;
 }
 
