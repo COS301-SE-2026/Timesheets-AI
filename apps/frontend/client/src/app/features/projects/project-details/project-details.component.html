@@ -159,19 +159,13 @@ Related Requirements: N/A
         <!--
         Hours
         -->
-        <article class="overview-card">
+        <article class="overview-card hours-card">
 
-            <div class="hours-header">
-                <div>
+            <div class="card-header">
                     <h3 class="overview-card-title">
                         Hours Logged vs Estimated
                     </h3>
-
-                    <p class="overview-card-subtitle">
-                        Current project hours
-                    </p>
-                </div>
-
+            
                 <div class="chart-legend">
                     <div class="legend-item">
                         <span class="legend-dot logged"></span>
@@ -186,50 +180,57 @@ Related Requirements: N/A
             </div>
 
             <div class="hours-summary">
-                <span>
+                <h2>
                     {{ project().hoursLogged }}h
-                </span>
+                    <span>of {{ project().totalHours}}h</span>
+                </h2>
 
-                <span>
-                    of {{ project().totalHours }}h
-                </span>
+                <p class="remaining-hours">
+                    {{ remainingHours() | number:'1.1-1' }} hours remaining
+                </p>
+
             </div>
-
-            <p class="remaining-hours">
-                {{ remainingHours() }} hours remaining
-            </p>
             
             <div class="hours-chart">
-                <div class="chart-column">
-                    <div
-                        class="chart-bar logged"
-                        [style.height.%]="completionPercentage()">
-
-                        <span class="bar-value">
-                            {{ project().hoursLogged }}h
-                        </span>
-
-                    </div>
-
-                    <span class="bar-title">
-                        Logged
-                    </span>
+                <div class="chart-grid">
+                    <span>60h</span>
+                    <span>40h</span>
+                    <span>20h</span>
+                    <span>0h</span>
                 </div>
 
-                <div class="chart-column">
-                    <div
-                        class="chart-bar estimated"
-                        style="height:100%;">
+                <div class="bars">
+                    <div class="bar column">
+                        <div
+                            class="bar logged"
+                            [style.height.%]="completionPercentage()">
 
-                        <span class="bar-value">
-                            {{ project().totalHours }}h
+                            <span class="bar-value">
+                                {{ project().hoursLogged }}h
+                            </span>
+
+                        </div>
+
+                        <span class="bar-title">
+                            Logged
+                        </span>
+                    </div>
+                    
+                    <div class="bar-column">
+                        <div class="bar estimated">
+
+                            <span class="bar-value">
+                                {{ project().totalHours }}h
+                            </span>
+
+                        </div>
+
+                        <span class="bar-title">
+                            Estimated
                         </span>
 
                     </div>
-
-                    <span class="bar-title">
-                        Estimated
-                    </span>
+                        
                 </div>
             </div>
             
@@ -292,13 +293,17 @@ Related Requirements: N/A
         Team
         -->
         <article class="overview-card">
-            <h3>
+            <h3 class="overview-card-title">
                 Team Members
             </h3>
 
+            <p class="overview-card-subtitle">
+                Assigned project members
+            </p>
+
             <div class="team-list">
                 <div
-                    class="member-row"
+                    class="team-member-row"
                     *ngFor="let member of project().members">
 
                     <div
@@ -307,13 +312,14 @@ Related Requirements: N/A
                         {{ member.initials }}
                     </div>
 
-                    <div class="member-information">
-                        <strong>
+                    <div class="member-details">
+                        <span class="member-name">
                             {{ member.name }}
-                        </strong>
-                        <p>
+                        </span>
+
+                        <span class="member-role">
                             {{ member.role }}
-                        </p>
+                        </span>
 
                     </div>
                 </div>
