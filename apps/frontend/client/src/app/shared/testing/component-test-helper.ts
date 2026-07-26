@@ -33,11 +33,9 @@ export function createComponentTest<T>(
 ) {
   describe(componentName, () => {
     let component: T;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let fixture: ComponentFixture<T>;
 
     beforeEach(async () => {
-      ({ component, fixture } = await configureTestBed(
+      ({ component} = await configureTestBed(
         componentType,
         extraProviders,
       ));
