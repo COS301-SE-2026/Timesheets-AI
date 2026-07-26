@@ -154,9 +154,6 @@
                 @for (task of selectableTasks(); track task.id) {
                   <option [value]="task.id">{{ task.title }}</option>
                 }
-                <option [value]="createNewTaskValue">
-                  + Create new task...
-                </option>
               </select>
             </label>
           </div>
@@ -294,9 +291,6 @@
                 @for (task of selectableTimerTasks(); track task.id) {
                   <option [value]="task.id">{{ task.title }}</option>
                 }
-                <option [value]="createNewTaskValue">
-                  + Create new task...
-                </option>
               </select>
             </label>
 
