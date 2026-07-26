@@ -40,7 +40,7 @@ export interface Task {
 
 // status and priority options as defined in backend
 
-export type TaskStatus = 'TO_DO' | 'IN_PROGRESS' | 'COMPLETED' | 'ARCHIVED';
+export type TaskStatus = 'TO_DO' | 'IN_PROGRESS' | 'DONE' | 'ARCHIVED';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
 
 // request payload for updating task status
@@ -64,7 +64,7 @@ interface StatusDropdownOption {
 const STATUS_LABELS: Record<TaskStatus, string> = {
   TO_DO: 'To Do',
   IN_PROGRESS: 'In Progress',
-  COMPLETED: 'Completed',
+  DONE: 'Done',
   ARCHIVED: 'Archived'
 } as const;
 
@@ -79,7 +79,7 @@ const PRIORITY_LABELS: Record<TaskPriority, string> = {
 const STATUS_CLASSES: Record<TaskStatus, string> = {
   TO_DO : 'status-to-do',
   IN_PROGRESS: 'status-in-progress',
-  COMPLETED: 'status-completed',
+  DONE: 'status-done',
   ARCHIVED: 'status-archived'
 } as const;
 
@@ -97,7 +97,7 @@ const PRIORITY_ICONS: Record<TaskPriority, string> = {
 
 @Component({
   selector: 'app-my-tasks',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './my-tasks.component.html',
   styleUrl: './my-tasks.component.scss',
   standalone: true
@@ -109,11 +109,11 @@ export class MyTasksComponent implements OnInit, OnDestroy {
 
   public readonly tasks = signal<Task[]>([]);
   public readonly filteredTasks = signal<Task[]>([]);
-  public readonly  isLoading = signal<boolean>(false);
+  public readonly isLoading = signal<boolean>(false);
   public readonly selectedStatus = signal<string>('ALL');
   public readonly showCompleted = signal<boolean>(false);
   public readonly showArchived = signal<boolean>(false);
-  public readonly searchQuery= signal<string>('');
+  public readonly searchQuery = signal<string>('');
 
   //Computed signals
 
@@ -127,7 +127,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
 
   // Total number of completed tasks
   public readonly completedCount = computed<number>(() => {
-    return this.tasks().filter((task: Task) => task.status === 'COMPLETED').length;
+    return this.tasks().filter((task: Task) => task.status === 'DONE').length;
   });
 
   // Total number of archived charts
@@ -148,7 +148,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     {value: 'ALL', label: 'All'},
     {value: 'TO_DO', label: 'To Do'},
     {value: 'IN_PROGRESS', label: 'In Progress'},
-    {value: 'COMPLETED', label: 'Completed'},
+    {value: 'DONE', label: 'Done'},
     {value: 'ARCHIVED', label: 'Archived'}
   ];
 
@@ -156,7 +156,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public readonly statusDropdownOptions: StatusDropdownOption[] = [
     {value: 'TO_DO', label: 'To Do'},
     {value: 'IN_PROGRESS', label: 'In Progress'},
-    {value: 'COMPLETED', label: 'Completed'},
+    {value: 'DONE', label: 'Done'},
     {value: 'ARCHIVED', label: 'Archived'}
   ];
 
@@ -207,7 +207,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     }
 
     if(!this.showCompleted()) {
-      filtered = filtered.filter((task: Task) => task.status !== 'COMPLETED');
+      filtered = filtered.filter((task: Task) => task.status !== 'DONE');
     }
 
     if(!this.showArchived()) {
@@ -297,7 +297,7 @@ public getStatusIcon(status: TaskStatus): string {
   const icons: Record<TaskStatus, string> = {
     TO_DO: 'fa-regular fa-circle',
     IN_PROGRESS:'fa-regular fa-circle-check',
-    COMPLETED:'fa-solid fa-check-circle',
+    DONE:'fa-solid fa-check-circle',
     ARCHIVED: 'fa-regular fa-file-zipper'
   };
   return icons[status];
@@ -324,7 +324,7 @@ private loadMockData(): void {
     projectName: 'Project Alpha',
     projectId: 'proj-1',
     status: 'IN_PROGRESS',
-    priority: 'HIGH',
+    priority: 'LOW',
     estimatedHours: 8,
     actualHours: 6,
     jiraTicketKey: 'ALPHA-101',
@@ -341,7 +341,7 @@ private loadMockData(): void {
     id: '2',
     title: 'Implement OAuth callback',
     description: 'Implement OAuth callback handler',
-    projectName: 'Project Alpha',
+    projectName: 'Project Beta',
     projectId: 'proj-1',
     status: 'TO_DO',
     priority: 'MEDIUM',

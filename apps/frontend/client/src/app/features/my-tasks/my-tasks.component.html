@@ -40,21 +40,21 @@
         <!-- Completed Tasks -->
 
         <div class="summary-card">
-            <div summary-card-icon completed>
+            <div class="summary-card-icon completed">
                 <i class="fa-regular fa-circle-check"></i>
             </div>
             <div class="summary-card-content">
             <div class="summary-card-value" aria-live="polite">
                 {{ completedCount() }}
             </div>
-            <div class="summary-card-label text-caption"> Completed </div>
+            <div class="summary-card-label text-caption"> Done </div>
         </div>
         </div>
 
         <!-- Archived Tasks -->
          <div class="summary-card">
             <div class="summary-card-icon archived">
-                <i class="fa-regular fa-file-zipper"></i>
+                <i class="fa-solid fa-box-archive"></i>
             </div>   
             <div class="summary-card-content">
             <div class="summary-card-value" aria-live="polite">
@@ -83,10 +83,10 @@
 
          <!-- Search bar -->
 
-         <div class="filter-group search group">
+         <div class="filter-group search-group">
             <div class="search-wrapper">
-                <i class="fa-solid fa-magnifying-glass searh-icon"></i>
-                <input type="text" id="search-input" placeholder="Search tasks, projects or jira tickets" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event); applyFilters()" aria-label="Search tasks"/>
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" class="search-input" id="search-input" placeholder="Search tasks, projects or jira tickets" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event); applyFilters()" aria-label="Search tasks"/>
             </div>
          </div>
 
@@ -138,12 +138,27 @@
                 <tbody>
                     @for (task of filteredTasks(); track task.id) {
                         <tr>
-                            <td class="task-title text-body-strong">{{ task.title }}</td>
-                            <td class="text-body">{{ task.projectName }}</td>
-                            <td class="text-body">{{ task.jiraTicketKey || '-' }}</td>
+                            <td class="task-title">
+                                <span class="task-title-text">{{ task.title }} </span>
+                            </td>
+
+                            <td class="project-link">
+                                <a (click)="navigateToProject(task.projectId)" class="project-name-link text-body" [attr.aria-label]="'View project ' + task.projectName">{{ task.projectName }}</a>
+                            </td>
+
+
+                            <td class="text-body">
+                                @if (task.jiraTicketKey) {
+                                    <span class="jira-ticket"> {{ task.jiraTicketKey || '-' }} </span>
+                                } @else {
+                                    <span class="text-muted">-</span>
+                                }                           
+                            </td>
+
                             <td class="text-body">{{ task.assignedToName }}</td>
+
                             <td>
-                                <select [attr.aria-label]=" 'Update status for ' + task.title" [ngModel]="task.status" (ngModelChange)="onStatusChange(task, $event)" class="status-dropdown" >
+                                <select [class]="'status-dropdown ' + getStatusClass(task.status)" [attr.aria-label]=" 'Update status for ' + task.title" [ngModel]="task.status" (ngModelChange)="onStatusChange(task, $event)" >
                                     @for (option of statusDropdownOptions; track option.value ){
                                         <option [value] = "option.value"> {{ option.label }}</option>
                                     }
@@ -153,6 +168,7 @@
                             <!-- Ptiority badge -->
                              <td>
                                 <span [class]="getPriorityClass(task.priority)">
+                                    <i [class]="'fa-solid ' + priorityIcons[task.priority]"></i>
                                     {{ priorityLabels[task.priority] }}
                                 </span>
                              </td>
