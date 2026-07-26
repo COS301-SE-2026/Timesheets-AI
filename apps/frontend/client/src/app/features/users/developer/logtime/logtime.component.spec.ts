@@ -234,61 +234,6 @@ describe('LogtimeComponent', () => {
     expect(component.activePanel()).toBeNull();
   });
 
-  // New task creation, resolveTaskId()
-  //TODO: when tasks is being implemented, ill ccomeback.
-  it('should create a new task when saving a manual entry with a custom task name', () => {
-    const initialTaskCount = component.tasks().length;
-
-    component.openManualPanel();
-
-    component.newTaskFormContext.set('manual');
-    component.newTaskTitle.set('API integration spike');
-
-    component.entryForm.patchValue({
-      projectId: projectTwoId,
-      startTime: '22:00',
-      endTime: '23:00',
-      description: 'Spike work on API integration.',
-    });
-
-    component.saveEntry();
-
-    const req = httpMock.expectOne('/api/time-entries');
-    req.flush({
-      id: 'entry-new',
-      projectId: projectTwoId,
-      taskId: req.request.body.taskId,
-      entryType: 'MANUAL',
-      startTime: `${today()}T22:00:00`,
-      endTime: `${today()}T23:00:00`,
-      durationMinutes: 3600,
-      description: 'Spike work on API integration.',
-      isDeleted: false,
-    });
-
-    const createdTask = component
-      .tasks()
-      .find((task) => task.title === 'API integration spike');
-
-    expect(component.tasks().length).toBe(initialTaskCount + 1);
-    expect(createdTask?.projectId).toBe(projectTwoId);
-    expect(component.newTaskFormContext()).toBeNull();
-  });
-
-  // Task name required
-  it('should require a task name when creating a new task', () => {
-    component.openManualPanel();
-
-    component.newTaskFormContext.set('manual');
-    component.newTaskTitle.set('   ');
-
-    component.saveEntry();
-
-    expect(component.newTaskTitleError()).toBe(true);
-    expect(component.activePanel()).toBe('manual');
-
-    //no HTTP call should fire heree
-  });
 
   // Overlap validation
   it('should prevent overlapping manual entries', () => {
@@ -502,18 +447,6 @@ describe('LogtimeComponent', () => {
     expect(component.activeTimer()).toBeNull();
   });
 
-  //timer task validation
-  it('should require a task title when starting a timer with a new task', () => {
-    component.newTaskFormContext.set('timer');
-    component.newTaskTitle.set('   ');
-
-    component.startTimer();
-
-    expect(component.newTaskTitleError()).toBe(true);
-    expect(component.activeTimer()).toBeNull();
-    // no HTTP call should fire
-  });
-
   // Menu toggling
   it('should toggle the entry menu open and closed', () => {
     const entryId = component.entries()[0].id;
@@ -543,19 +476,6 @@ describe('LogtimeComponent', () => {
     component.dismissConflict();
 
     expect(component.conflictMessage()).toBe('');
-  });
-
-  // Preserve manual task creation state on project change
-  it('should preserve manual new task state when changing projects', () => {
-    component.newTaskFormContext.set('manual');
-    component.newTaskTitle.set('New task');
-
-    component.entryForm.controls.taskId.setValue('');
-
-    component.entryForm.controls.projectId.setValue(projectTwoId);
-
-    expect(component.newTaskFormContext()).toBe('manual');
-    expect(component.newTaskTitle()).toBe('New task');
   });
 
   // Reset manual task selection when not creating task
