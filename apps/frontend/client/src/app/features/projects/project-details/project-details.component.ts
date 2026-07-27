@@ -17,6 +17,9 @@ import { ProjectDetails } from "./models/project-details.model";
 import { RouterModule } from "@angular/router";
 import { ProjectStatus } from "../enums/project-status.enum";
 import { ProjectRole } from "../enums/project-role.enum";
+import { ChartConfiguration, ChartOptions } from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
+import { from } from "node:stream/iter";
 @Component({
     selector: 'app-project-details',
     standalone: true,
@@ -26,6 +29,7 @@ import { ProjectRole } from "../enums/project-role.enum";
         RouterModule,
         ProgressBarComponent,
         StatusChipComponent,
+        BaseChartDirective,
     ],
     templateUrl: './project-details.component.html',
     styleUrls: ['./project-details.component.scss']
@@ -103,5 +107,43 @@ export class ProjectDetailsComponent {
         
         return `${project.hoursLogged}h / ${project.totalHours}h`;
     });
+
+    hoursChartData: ChartConfiguration<'bar'>['data']= {
+        labels: ['Logged', 'Estimated'],
+        datasets: [
+            {
+                label: 'Hours',
+                data:[
+                    this.project().hoursLogged,
+                    this.project().totalHours
+                ]
+            }
+        ]
+    };
+
+    hoursChartOptions: ChartOptions<'bar'>={
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins:{
+            legend:{
+                display: false
+            }
+        },
+
+        scales:{
+            x:{
+                grid:{
+                    display:false
+                }
+            },
+
+            y:{
+                beginAtZero:true,
+                ticks:{
+                    stepSize:10
+                }
+            }
+        }
+    };
     
 }
