@@ -3,7 +3,7 @@
     <!-- Page header -->
      <header class="page-header">
         <div>
-            <h1 class="text-h1" id="page-title"> My Tasks</h1>
+            <h1 class="text-h1" class="page-title"> My Tasks</h1>
             <p class="text-body text-muted" id="page-description"> All tasks assigned to you across projects.</p>
         </div>
      </header>
@@ -40,7 +40,7 @@
         <!-- Completed Tasks -->
 
         <div class="summary-card">
-            <div class="summary-card-icon completed">
+            <div class="summary-card-icon done">
                 <i class="fa-regular fa-circle-check"></i>
             </div>
             <div class="summary-card-content">
@@ -159,11 +159,14 @@
                             <td class="text-body">{{ task.assignedToName }}</td>
 
                             <td>
+                                <div class="status-dropdown-wrapper">
                                 <select [class]="'status-dropdown ' + getStatusClass(task.status)" [attr.aria-label]=" 'Update status for ' + task.title" [ngModel]="task.status" (ngModelChange)="onStatusChange(task, $event)" >
                                     @for (option of statusDropdownOptions; track option.value ){
                                         <option [value] = "option.value"> {{ option.label }}</option>
                                     }
                                 </select>
+                                <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                                </div>
                             </td>
 
                             <!-- Ptiority badge -->
@@ -175,10 +178,10 @@
                              </td>
 
                              <td class="text-body"> {{ formatDate(task.dueDate) }} </td>
-                             <td class="text-body text-right"> {{ task.estimatedHours }}h </td>
-                             <td class="text-body text-right"> {{ task.actualHours }}h </td>
+                             <td class="text-body text-right font-mono" > {{ task.estimatedHours }}h </td>
+                             <td class="text-body text-right font-mono"> {{ task.actualHours }}h </td>
                              <td class="text-center">
-                                <button type="button" class="view-button" (click)="onViewTask(task)" [attr.aria-label]="'View details for' + task.title">
+                                <button type="button"  (keydown)="onOverlayKeydown($event)" class="view-button"  (click)="onViewTask(task)" [attr.aria-label]="'View details for ' + task.title">
                                 <i class="fa-regular fa-eye"></i> 
                                 View </button>
                              </td>
@@ -197,11 +200,11 @@
       </section>
 
       @if(isDetailOpen()) {
-        <div class="modal-overlay" (click)="closeTaskDetail()">
-            <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="task-detail-title" (click)="$event.stopPropagation()">
+        <div class="modal-overlay"  (keydown)="onOverlayKeydown($event)" (click)="closeTaskDetail()">
+            <div class="modal-panel" aria-modal="true" aria-labelledby="task-detail-title"  (keydown)="onOverlayKeydown($event)" (click)="$event.stopPropagation()">
                 <header class="modal-header">
                     <h2 id="task-detail-title" class="modal-title"> Task Detail </h2>
-                    <button type="button" class="modal-class" (click)="closeTaskDetail()" aria-label="Close task detail">
+                    <button type="button" class="modal-close" (click)="closeTaskDetail()" aria-label="Close task detail">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </header>
@@ -240,7 +243,7 @@
 
                             <div class="form-row">
                                 <label class="form-label" for="detail-priority">Priority</label>
-                                <input id="detail-priority" class="form-control" type="text" [value]="task.assignedToName" readonly />
+                                <input id="detail-priority" class="form-control" type="text" [value]="task.priority" readonly />
                             </div>
 
                             <div class="form-row">
@@ -291,7 +294,7 @@
 
                     </form>
                 } @else {
-                    <p class="modal=message"> Task details are unavailable </p>
+                    <p class="modal-message"> Task details are unavailable </p>
                 } }
             </div>
         </div>
