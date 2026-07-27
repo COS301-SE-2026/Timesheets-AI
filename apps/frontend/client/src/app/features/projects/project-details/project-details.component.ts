@@ -19,6 +19,7 @@ import { ProjectStatus } from "../enums/project-status.enum";
 import { ProjectRole } from "../enums/project-role.enum";
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+
 @Component({
     selector: 'app-project-details',
     standalone: true,
@@ -111,11 +112,19 @@ export class ProjectDetailsComponent {
         labels: ['Logged', 'Estimated'],
         datasets: [
             {
-                label: 'Hours',
                 data:[
                     this.project().hoursLogged,
                     this.project().totalHours
-                ]
+                ],
+
+                backgroundColor:[
+                    '#2563eb',
+                    '#d1d5db'
+                ],
+                
+                borderRadius:10,
+                borderSkipped: false,
+                barThickness:70
             }
         ]
     };
@@ -126,6 +135,10 @@ export class ProjectDetailsComponent {
         plugins:{
             legend:{
                 display: false
+            },
+
+            tooltip:{
+                enabled:false
             }
         },
 
@@ -133,13 +146,20 @@ export class ProjectDetailsComponent {
             x:{
                 grid:{
                     display:false
+                },
+                border:{
+                    display: false
                 }
             },
 
             y:{
                 beginAtZero:true,
+                max: this.project().totalHours,
                 ticks:{
                     stepSize:10
+                },
+                border:{
+                    display: false
                 }
             }
         }
