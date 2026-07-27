@@ -1,0 +1,227 @@
+<!--
+Author: Cleopatra Kwenda
+Date: 2026-07-17
+Purpose: will display our desired wireframe of 
+all the project that specific user is on.
+Related Requirements: N/A
+-->
+
+<!--
+HEADER
+-->
+<app-header [title] ="'Projects'">
+    <div class="header-search">
+        <label for="project-search" class="visually-hid">
+            Search projects
+        </label>
+        
+        <input
+            id="project-search"
+            class="project-search-input"
+            type="search"
+            placeholder="Search projects..."
+            [value]="searchTerm"
+            (input)="searchProjects($any($event.target).value)"
+        >
+
+    </div>
+</app-header>
+
+<div class="projects-page-container">
+    <!--
+    PAGE HEADING
+    -->
+
+
+    <!--
+    STATS CARDS
+    -->
+    <section class="projects-statistics-grid">
+        <app-stats-card
+            label="Projects"
+            [value]="totalProjects.toString()"
+            description="Total assigned projects"
+            [progress]="100"
+            icon="fa-regular fa-folder-open"
+            iconClass="blue">
+        </app-stats-card>
+
+        <app-stats-card
+            label="Active"
+            [value]="activeProjects.toString()"
+            description="Currently active"
+            [progress]="75"
+            icon="fa-solid fa-check"
+            iconClass="green">
+        </app-stats-card>
+
+        <app-stats-card
+            label="Completed"
+            [value]="completedProjects.toString()"
+            description="Completed projects"
+            [progress]="100"
+            icon="fa-solid fa-flag-checkered"
+            iconClass="orange">
+        </app-stats-card>
+
+        <app-stats-card
+            label="Total Hours"
+            [value]="totalHours +'h'"
+            description="Across all projects"
+            [progress]="100"
+            icon="fa-regular fa-clock"
+            iconClass="purple">
+        </app-stats-card>
+    </section>
+
+    <!--
+    FILTER BUTTONS SECTION
+    -->
+    <section class="project-filter-row">
+        @for (filter of filters; track filter){
+            <button 
+                class="project-filter-button"
+                [class.selected-filter]="selectedFilter===filter"
+                (click)="filterProjects(filter)">
+                {{filter}}
+            </button>
+        }
+    </section>
+
+    <div class="project-tags-filter">
+        <div class="tags-heading">
+            <i class="fa-solid fa-tags"></i>
+            <span class="tags-title">
+                Tags:
+            </span>
+        </div>
+        
+        @for(tag of avaiableTags; track tag){
+            <button
+                type="button"
+                class="filter-tag"
+                [class.selected-tag]="selectedTags.includes(tag)"
+                (click)="filterByTag(tag)">
+
+                {{tag}}
+            
+            </button>
+        }
+
+        
+    </div>
+
+    <!--
+    PROJECTS :)
+    -->
+    <section class="projects-grid">
+        @for (project of filteredProjects; track project.id){
+            <article class="project-card">
+                <div class="project-card-header">
+
+                    <div class="project-title-row">
+                        <div class="project-avatar"> 
+                            {{project.initials}}
+                        </div>
+
+                        <div class="project-title-content">
+                            <h2 class="project-name">
+                                {{project.name}}
+                            </h2>
+
+                            <p class="project-client">
+                                {{project.client}}
+                            </p>
+                        </div>
+                    </div>
+
+                    <span class="project-status-badge">
+                        {{project.status}}
+                    </span>
+                </div>
+
+                <!--
+                DESCRIPTIONS
+                -->
+                <p class="project-description">
+                    {{project.description}}
+                </p>
+
+                <!--
+                TAGS
+                -->
+                <div class="project-tags">
+                    @for (tag of project.tags; track tag){
+                        <span class="project-tag">
+                            {{tag}}
+                        </span>
+                    }
+                </div>
+
+                <!--
+                PROGRESS OF PROJECTS??
+                -->
+                <div class="project-progress">
+                    <div class="progress-header">
+                        <span class="progress-title">
+                            Hours Logged
+                        </span>
+
+                        <span class="progress-value">
+                            {{project.hoursLogged }}h / {{project.totalHours}}
+                        </span>
+
+                    </div>
+                    
+                    <app-progress-bar
+                        [progress]="(project.hoursLogged / project.totalHours)*100">
+                    </app-progress-bar>
+                </div>
+                    
+
+                <!--
+                FOOTER OF CARD
+                -->
+                <div class="project-card-footer">
+
+
+                    <span 
+                        class="role-chip"
+                        [ngClass]="{
+                            'developer-chip': project.role ==='Developer',
+                            'manager-chip': project.role ==='Manager',
+                            'admin-chip': project.role ==='Admin'
+                        }">
+                        {{project.role}}
+                    </span> 
+                </div>
+
+                <!--
+                TEAM MEMEBERS
+                -->
+                <div class="project-team">
+
+                    <span class="team-count">
+                        <i class="fa-solid fa-user"></i>
+                        {{project.teamMembers.length}}
+                        members
+                    </span>
+
+                    <div class="team-members">
+                        @for (member of project.teamMembers.slice(0,4); track member){
+                            <span class="team-member">
+                                {{member}}
+                            </span>
+                        }
+
+                        @if(project.teamMembers.length >4){
+                            <span class="team-member-more">
+                                +{{project.teamMembers.length -4}}
+                            </span>
+                        }
+                    </div>
+                </div>
+            </article>
+        }
+    </section>
+</div>

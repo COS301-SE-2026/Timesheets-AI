@@ -52,6 +52,14 @@ export const routes: Routes = [
         (m) => m.TimesheetsComponent,
       ),
   },
+  
+  /* Projects page */
+  {
+    path: 'projects',
+    loadComponent: () =>
+      import('./features/projects/projects.component')
+        .then(m => m.ProjectsComponent)
+  },
 
   /* 404 fallback */
   {
