@@ -280,22 +280,35 @@ Related Requirements: N/A
                     class="team-member-row"
                     *ngFor="let member of project().members">
 
-                    <div
-                        class="team-member"
-                        [ngClass]="member.avatarColourClass">
-                        {{ member.initials }}
+                    <div class="member-left">
+
+                        <div
+                            class="team-member"
+                            [ngClass]="member.avatarColourClass">
+                            {{ member.initials }}
+                        </div>
+
+                        <div class="member-details">
+                            <span class="member-name">
+                                {{ member.name }}
+                            </span>
+
+                            <!-- <span class="member-role">
+                                {{ member.role }}
+                            </span> -->
+
+                        </div>
                     </div>
 
-                    <div class="member-details">
-                        <span class="member-name">
-                            {{ member.name }}
-                        </span>
-
-                        <span class="member-role">
-                            {{ member.role }}
-                        </span>
-
-                    </div>
+                    <span
+                        class="member-role-chip"
+                        [ngClass]="{
+                            'developer-chip': member.role === ProjectRole.DEVELOPER,
+                            'manager-chip': member.role === ProjectRole.MANAGER,
+                            'admin-chip': member.role === ProjectRole.ADMIN,
+                        }">
+                        {{ member.role }}
+                    </span>
                 </div>
             </div>
         </article>

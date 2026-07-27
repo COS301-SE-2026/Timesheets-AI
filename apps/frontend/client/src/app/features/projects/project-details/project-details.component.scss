@@ -515,7 +515,7 @@ TEAM CARD
 .team-list{
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.4rem;
 }
 
 .team-member{
@@ -552,14 +552,40 @@ TEAM CARD
 }
 
 .member-name{
-    display: block;
     color: $text-primary;
     font-weight: 600;
+    font-size: 1rem;
 }
 
 .member-role{
     color: $text-muted;
     font-size: 0.8rem;
+}
+
+.team-member-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.member-left{
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.member-details{
+    display: flex;
+    flex-direction: column;
+}
+
+.member-role-chip{
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05rem;
+    text-transform: uppercase;
 }
 
 /*
