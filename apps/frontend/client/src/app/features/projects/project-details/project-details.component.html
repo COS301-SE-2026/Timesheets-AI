@@ -190,49 +190,13 @@ Related Requirements: N/A
                 </p>
 
             </div>
-            
-            <div class="hours-chart">
-                <div class="chart-grid">
-                    <span>60h</span>
-                    <span>40h</span>
-                    <span>20h</span>
-                    <span>0h</span>
-                </div>
 
-                <div class="bars">
-                    <div class="bar column">
-                        <div
-                            class="bar logged"
-                            [style.height.%]="completionPercentage()">
-
-                            <span class="bar-value">
-                                {{ project().hoursLogged }}h
-                            </span>
-
-                        </div>
-
-                        <span class="bar-title">
-                            Logged
-                        </span>
-                    </div>
-                    
-                    <div class="bar-column">
-                        <div class="bar estimated">
-
-                            <span class="bar-value">
-                                {{ project().totalHours }}h
-                            </span>
-
-                        </div>
-
-                        <span class="bar-title">
-                            Estimated
-                        </span>
-
-                    </div>
-                        
-                </div>
-            </div>
+            <canvas 
+                baseChart
+                [data]="hoursChartData"
+                [options]="hoursChartOptions"
+                [type]="'bar'">
+            </canvas>
             
         </article>
 
@@ -282,7 +246,7 @@ Related Requirements: N/A
                     </span>
 
                     <span class="summary-value">
-                        {{ remainingHours() }}h
+                        {{ remainingHours() | number:'1.1-1' }}h
                     </span>
                 </div>
             </div>
