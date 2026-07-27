@@ -16,6 +16,20 @@
 
 .page-header {
     margin-bottom: $space-6;
+    font-family: $font-display;
+
+}
+
+.page-title {
+    font-size: 35px;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.font-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .text-muted {
@@ -232,13 +246,12 @@
 
 // Tasks Table
 
-.tasks-table-container {
+.task-table-container {
     background: var(--color-white);
     border-radius: var(--radius-container);
     box-shadow: var(--elevation-1);
     overflow: hidden;
     overflow-x: auto;
-    border-left: 4px
 }
 
 .tasks-table {
@@ -346,36 +359,29 @@ tbody {
 
 // Status dropdown
 
-.status-dropdown {
-    padding: $space-1 $space-3;
-    border: none;
-    border-radius: var(--radius-tag);
-    font-family: var(--font-body);
-    font-size: var(--font-size-body);
-    font-weight:var(--font-weight-medium);
-    cursor: pointer;
+
+.status-dropdown-wrapper {
+    position: relative;
+    display: inline-block;
     width: 100%;
-    min-width: 110px;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill ='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    padding-right: 28px;
-    transition: box-shadow 0.15s ease;
-
-    &:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(15, 76, 145, 0.3);
-    }
-
-    &:hover {
-        opacity: 0.85;
-    }
-
-    option {
-        font-weight: var(--font-weight-regular);
-    }
 }
+    
+    .status-dropdown {
+        width: 100%;
+        appearance: none;
+        padding-right: 40px;
+        border: none;
+    }
+
+    .dropdown-icon {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: #1F2937;
+        font-size: 12px;
+    }
 
 // Status badge
 
@@ -411,7 +417,7 @@ tbody {
 .priority-badge {
     padding: $space-1 $space-3;
     border-radius: var(--radius-tag);
-    font-size: var(--font-weight-medium);
+    font-size: var(--font-size-body);
     font-weight: var(--font-weight-medium);
     display: inline-flex;
     align-items: center;
@@ -436,6 +442,163 @@ tbody {
     background: var(--color-semantic-green);
     color: var(--color-semantic-green-text);
 }
+
+.priority-critical {
+    background: #FCA5A5;
+    color: #7D1D1D;
+}
+
+
+
+.view-button {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-1;
+    padding: $space-1 $space-3;
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-button);
+    background: var(--color-white);
+    color: var(--color-primary);
+    font-family: var(--font-body);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+        background: var(--color-primary);
+        color: var(--color-white);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $space-4;
+    z-index: 1000;
+}
+
+.modal-panel {
+    background: var(--color-white);
+    border-radius: var(--radius-container);
+    box-shadow: var(--elevation-2);
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: $space-6;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $space-4;
+}
+
+.modal-title {
+    font-family: var(--font-display);
+    font-size: var(--font-size-h2);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.modal-close {
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 18px;
+    cursor: pointer;
+    padding: $space-1 $space-2;
+    border-radius: var(--radius-button);
+
+    &:hover { background: var(--color-gray-light); }
+}
+
+.modal-message {
+    padding: $space-6 0;
+    text-align: center;
+    color: var(--color-text-muted);
+
+    &.modal-error { color: var(--color-semantic-red-text); }
+}
+
+
+.task-detail-form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-4;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+}
+
+.form-label {
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wider);
+}
+
+.form-control {
+    padding: $space-2 $space-3;
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-button);
+    font-family: var(--font-body);
+    font-size: var(--font-size-body);
+    color: var(--color-text-body);
+    background: #FAFBFD;
+    width: 100%;
+
+    &[readonly] { cursor: default; }
+}
+
+.form-textarea {
+    resize: vertical;
+    line-height: var(--line-height-normal);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-3;
+    margin-top: $space-2;
+}
+
+.modal-button {
+    padding: $space-2 $space-6;
+    border: none;
+    border-radius: var(--radius-button);
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+
+    &:hover { background: var(--color-primary-hover); }
+}
+
+
 
 // Accessibility
 .visually-hidden {
@@ -471,6 +634,9 @@ tbody {
 }
 
 @media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
     .filters-section {
         flex-direction: column;
         align-items:stretch;
@@ -491,14 +657,14 @@ tbody {
         padding: $space-3;
     }
 
-    .tasks-table-container {
+    .task-table-container {
         border-radius: var(--radius-card);
     }
 }
 
 @media (max-width: 280px) {
     .summary-cards {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: $space-2;
     }
 
