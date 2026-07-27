@@ -5,11 +5,11 @@
  * Related Requirement: FR-05 : Task management
  */
 
-import { Component, OnInit, OnDestroy, signal, computed, HostListener} from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, inject, HostListener} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { RouterLink } from '@angular/router';
+import { Router} from '@angular/router';
 
 /**
  * Represents a task assigned to a user
@@ -41,7 +41,7 @@ export interface Task {
 // status and priority options as defined in backend
 
 export type TaskStatus = 'TO_DO' | 'IN_PROGRESS' | 'DONE' | 'ARCHIVED';
-export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
+export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 // request payload for updating task status
 
@@ -73,7 +73,8 @@ const STATUS_LABELS: Record<TaskStatus, string> = {
 const PRIORITY_LABELS: Record<TaskPriority, string> = {
     LOW: 'Low',
     MEDIUM: 'Medium',
-    HIGH: 'High'
+    HIGH: 'High',
+    CRITICAL: 'Critical'
 } as const;
 
 const STATUS_CLASSES: Record<TaskStatus, string> = {
@@ -86,13 +87,15 @@ const STATUS_CLASSES: Record<TaskStatus, string> = {
 const PRIORITY_CLASSES: Record<TaskPriority, string> = {
     LOW: 'priority-low',
     MEDIUM: 'priority-medium',
-    HIGH: 'priority-high'
+    HIGH: 'priority-high',
+    CRITICAL: 'priority-critical'
 };
 
 const PRIORITY_ICONS: Record<TaskPriority, string> = {
   LOW: 'fa-arrow-down',
   MEDIUM: 'fa-minus',
-  HIGH: 'fa-arrow-up'
+  HIGH: 'fa-arrow-up',
+  CRITICAL: 'fa-triangle-exclamation'
 }as const;
 
 @Component({
@@ -118,6 +121,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public readonly isDetailOpen = signal<boolean>(false);
   public readonly isDetailLoading = signal<boolean>(false);
   public readonly detailError = signal<string | null>(null);
+  private readonly router = inject(Router);
 
   //Computed signals
 
@@ -125,24 +129,24 @@ export class MyTasksComponent implements OnInit, OnDestroy {
 
   public readonly activeCount = computed<number>(() => {
     return this.tasks().filter((task: Task) => {
-      return task.status === 'TO_DO' || task.status === 'IN_PROGRESS';
+      return !task.isDeleted && (task.status === 'TO_DO' || task.status === 'IN_PROGRESS');
     }).length;
   });
 
   // Total number of completed tasks
   public readonly completedCount = computed<number>(() => {
-    return this.tasks().filter((task: Task) => task.status === 'DONE').length;
+    return this.tasks().filter((task: Task) => !task.isDeleted && task.status === 'DONE').length;
   });
 
   // Total number of archived charts
   public readonly archivedCount = computed<number>(() => {
-    return this.tasks().filter((task: Task) => task.status === 'ARCHIVED').length;
+    return this.tasks().filter((task: Task) => !task.isDeleted && task.status === 'ARCHIVED').length;
   });
 
   // Total number of archived tasks
 
   public readonly totalCount = computed<number>(() => {
-    return this.tasks().length;
+    return this.tasks().filter((task: Task) => !task.isDeleted).length;
   });
 
   // public constants
@@ -198,17 +202,20 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     const currentTasks = this.tasks();
     let filtered = [...currentTasks];
 
+    // exclude deleted filters from list
+    filtered = filtered.filter((task: Task) => !task.isDeleted);
+
     const searchQuery = this.searchQuery().toLowerCase().trim();
       if (searchQuery) {
         filtered = filtered.filter((task: Task) => {
-          return task.title.toLowerCase().includes(searchQuery) || task.projectName.toLowerCase().includes(searchQuery) || (task.jiraTicketKey && task.jiraTicketKey.toLowerCase().includes(searchQuery));
+          return task.title.toLowerCase().includes(searchQuery) || task.projectName.toLowerCase().includes(searchQuery) || task.jiraTicketKey?.toLowerCase().includes(searchQuery);
         });
       }
 
     const selectedStatus = this.selectedStatus();
     if(selectedStatus !== 'ALL') {
       filtered = filtered.filter((task: Task) => task.status === selectedStatus);
-    }
+    } else {
 
     if(!this.showCompleted()) {
       filtered = filtered.filter((task: Task) => task.status !== 'DONE');
@@ -217,7 +224,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     if(!this.showArchived()) {
       filtered = filtered.filter((task: Task) => task.status !== 'ARCHIVED');
     }
-
+  }
     this.filteredTasks.set(filtered);
   }
 
@@ -273,8 +280,15 @@ public onStatusChange(task: Task, newStatus: string) : void {
 // Navigate to project
 
 public navigateToProject(projectId: string) : void {
-  // INTEGRSTION: Implement navigation to project detail
-  console.log('Navigate to project:', projectId);
+  // INTEGRATION: Implement navigation to project detail
+  void this.router.navigate(['/projects', projectId])
+}
+
+public onOverlayKeydown (event: KeyboardEvent) : void {
+  if(event.key === 'Enter' || event.key === '') {
+    event.preventDefault();
+    this.closeTaskDetail();
+    }
 }
 
 // Format date string for display
@@ -284,6 +298,10 @@ public formatDate(dateString?: string): string {
     return '-';
   }
   const date = new Date(dateString);
+
+  if (Number.isNaN(date.getTime())){
+    return '-';
+  }
   return date.toLocaleDateString('en-ZA', {
     day: '2-digit',
     month: 'short',
@@ -371,7 +389,7 @@ private loadMockData(): void {
     projectName: 'Project Alpha',
     projectId: 'proj-1',
     status: 'IN_PROGRESS',
-    priority: 'LOW',
+    priority: 'HIGH',
     estimatedHours: 8,
     actualHours: 6,
     jiraTicketKey: 'ALPHA-101',
@@ -391,7 +409,7 @@ private loadMockData(): void {
     projectName: 'Project Beta',
     projectId: 'proj-1',
     status: 'TO_DO',
-    priority: 'MEDIUM',
+    priority: 'LOW',
     estimatedHours: 5,
     actualHours: 0,
     jiraTicketKey: 'ALPHA-102',
