@@ -191,12 +191,16 @@ Related Requirements: N/A
 
             </div>
 
-            <canvas 
-                baseChart
-                [data]="hoursChartData"
-                [options]="hoursChartOptions"
-                [type]="'bar'">
-            </canvas>
+            <div class="chart-container">
+                <!-- <canvas 
+                    baseChart
+                    [data]="hoursChartData"
+                    [options]="hoursChartOptions"
+                    [type]="'bar'">
+                </canvas> -->
+                <canvas #hoursChart></canvas>
+            </div>
+            
             
         </article>
 

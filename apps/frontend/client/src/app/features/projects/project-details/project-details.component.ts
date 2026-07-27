@@ -19,7 +19,6 @@ import { ProjectStatus } from "../enums/project-status.enum";
 import { ProjectRole } from "../enums/project-role.enum";
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { from } from "node:stream/iter";
 @Component({
     selector: 'app-project-details',
     standalone: true,
