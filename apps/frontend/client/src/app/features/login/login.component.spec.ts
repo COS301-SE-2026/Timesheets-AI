@@ -21,6 +21,34 @@ import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
+import { FormGroup } from '@angular/forms';
+
+//related to any linting errors
+interface GoogleIdentityServicesStub {
+  accounts: {
+    id: {
+      initialize: jest.Mock;
+      renderButton: jest.Mock;
+      prompt: jest.Mock;
+    };
+  };
+}
+//specific casting but not 'any' because iy caused linting errors
+interface LoginComponentInternals {
+  loginForm: FormGroup;
+  submitted: boolean;
+  loading: boolean;
+  showToast: boolean;
+  toastMessage: string;
+  errorMessage: string;
+  showPassword: boolean;
+  showEmailError: boolean;
+  emailErrorMessage: string;
+  showPasswordError: boolean;
+  passwordErrorMessage: string;
+  onSubmit(): void;
+  togglePassword(): void;
+}
 
 describe('LoginComponet', () => {
   let component: LoginComponent;
@@ -31,7 +59,7 @@ describe('LoginComponet', () => {
     //LoginComponent calls into window.google on init (Google Identity Services
     //button), so we stub it out here, otherwise every test in this file blows
     //up before it even gets to the assertions.
-    (window as any).google = {
+    (window as unknown as {google:GoogleIdentityServicesStub}).google = {
       accounts: {
         id: {
           initialize: jest.fn(),
@@ -58,7 +86,7 @@ describe('LoginComponet', () => {
 
   afterEach(() => {
     //just cleaning up the google stub so it doesnt leak into other test files and make sure w e didnt leave an unflushed HTTP requests hanging
-    delete (window as any).google;
+    delete (window as unknown as {google?: GoogleIdentityServicesStub}).google;
     httpMock.verify();
   });
   it('should create login component', () => {
@@ -76,7 +104,7 @@ describe('LoginComponet', () => {
   });
 
   it('should submit form when valid and navigate on success', () => {
-    const comp = component as any; //casting to any to reach into private form state
+    const comp = component as  unknown as LoginComponentInternals; //casting to any to reach into private form state
     const router = TestBed.inject(Router);
     const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
@@ -120,7 +148,7 @@ describe('LoginComponet', () => {
     //MFA isn't supported in the UI yet(tbh i think it isnt in backend too, it just has a db field), so when the backend says requiresMfa,
     //we expect a toast instead of a redirect, this guards against someone
     //wiring up navigation before MFA is actually built.
-    const comp = component as any;
+    const comp = component as  unknown as LoginComponentInternals;
     const router = TestBed.inject(Router);
     const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
@@ -156,7 +184,7 @@ describe('LoginComponet', () => {
   });
 
   it('should show error message when login fails', () => {
-    const comp = component as any;
+    const comp = component as  unknown as LoginComponentInternals;
 
     comp.loginForm.setValue({
       email: 'john@company.com',
@@ -179,7 +207,7 @@ describe('LoginComponet', () => {
 
   //The following has to do with form validators, are they responding as they should? stay tuned to find out lol
   it('should show email error for invalid email format', () => {
-    const comp = component as any;
+    const comp = component as  unknown as LoginComponentInternals;
     comp.loginForm.controls['email'].setValue('wrong-email');
     comp.loginForm.controls['email'].markAsTouched(); // validators should only kick in once a field's been touched
     expect(comp.showEmailError).toBe(true);
@@ -187,7 +215,7 @@ describe('LoginComponet', () => {
   });
 
   it('should clear email error when email becomes valid', () => {
-    const comp = component as any;
+    const comp = component as  unknown as LoginComponentInternals;
     comp.loginForm.controls['email'].setValue('john@company.com');
     comp.loginForm.controls['email'].markAsTouched();
     expect(comp.showEmailError).toBe(false);
@@ -195,7 +223,7 @@ describe('LoginComponet', () => {
   });
 
   it('should show password required error', () => {
-    const comp = component as any;
+    const comp = component as  unknown as LoginComponentInternals;
     comp.loginForm.controls['password'].setValue('');
     comp.loginForm.controls['password'].markAsTouched();
     expect(comp.showPasswordError).toBe(true);
@@ -203,7 +231,7 @@ describe('LoginComponet', () => {
   });
 
   it('should clear password error when valid password is entered', () => {
-    const comp = component as any;
+    const comp = component as  unknown as LoginComponentInternals;
     comp.loginForm.controls['password'].setValue('Password1');
     comp.loginForm.controls['password'].markAsTouched();
     expect(comp.showPasswordError).toBe(false);
@@ -211,7 +239,7 @@ describe('LoginComponet', () => {
   });
 
   it('should toggle password visibility', () => {
-    const comp = component as any;
+    const comp = component as  unknown as LoginComponentInternals;
     expect(comp.showPassword).toBe(false);
     comp.togglePassword();
     expect(comp.showPassword).toBe(true);
@@ -221,14 +249,14 @@ describe('LoginComponet', () => {
 
   it('should show validation errors when submitting invalid form', () => {
     //submitting a completely empty form should trip both field validators at once.
-    const comp = component as any;
+    const comp = component as  unknown as LoginComponentInternals;
     comp.onSubmit();
     expect(comp.showEmailError).toBe(true);
     expect(comp.showPasswordError).toBe(true);
   });
 
   it('should trigger validation when submit is clicked', () => {
-    const comp = component as any;
+    const comp = component as  unknown as LoginComponentInternals;
     comp.onSubmit();
     expect(comp.submitted).toBe(true);
     expect(comp.loginForm.invalid).toBe(true);
