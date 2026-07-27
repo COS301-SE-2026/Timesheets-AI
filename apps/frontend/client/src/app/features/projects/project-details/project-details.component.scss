@@ -298,9 +298,8 @@ OVERVIEW GRID
 */
 .overview-grid{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(3,minmax(0, 1fr));
     gap: 2rem;
-    align-items: stretch;
 }
 
 /*
@@ -316,7 +315,9 @@ OVERVIEW CARD
     box-shadow: 
         0 1px 3px rgba(16, 24, 40, 0.06),
         0 8px 24px rgba(15, 23, 40, 0.04);
-    min-height: 470px;
+    min-height: 520px;
+    width: 100%;
+    min-width: 0;
 }
 
 .overview-card:hover{
@@ -325,16 +326,25 @@ OVERVIEW CARD
 }
 
 .overview-card-title{
+    width: 100%;
     margin: 0;
     color: $text-primary;
-    font-size: 1.55rem;
+    font-size: 1.5rem;
     font-weight: 700;
+    line-height: 1.2;
 }
 
 .overview-card-subtitle{
     margin-top: 0.35;
     color: $text-secondary;
     font-size: 0.9rem;
+}
+
+.card-header{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
 }
 
 /*
@@ -349,6 +359,41 @@ SIMPLE BAR CHART
     flex: 1;
     display: flex;
     align-items: flex-end;
+}
+
+.chart-legend{
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-shrink: 0;
+}
+
+.legend-item{
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #667085;
+}
+
+.legend-dot{
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legend-logged{
+    background: #356ae6;
+}
+
+.legend-estimated{
+    background: #d9dee8;
+}
+
+.legend-text{
+    line-height: 1;
 }
 
 /*
