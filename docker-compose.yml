@@ -55,6 +55,8 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: dev
 
+      SERVER_PORT: 8080
+
       # FIX: correct Docker networking (NEVER localhost inside containers)
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-momently_dev}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-momently}
