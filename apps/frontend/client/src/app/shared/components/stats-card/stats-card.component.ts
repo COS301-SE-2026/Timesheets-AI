@@ -13,4 +13,6 @@ export class StatsCardComponent {
   @Input() value = '';
   @Input() description = '';
   @Input() progress = 0;
+  @Input() icon = '';
+  @Input() iconClass ='';
 } 

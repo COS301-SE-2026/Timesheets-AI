@@ -55,6 +55,14 @@ export const routes: Routes = [
       import('./features/timesheets/timesheets.component')
         .then(m => m.TimesheetsComponent)
   },
+  
+  /* Projects page */
+  {
+    path: 'projects',
+    loadComponent: () =>
+      import('./features/projects/projects.component')
+        .then(m => m.ProjectsComponent)
+  },
 
   /* 404 fallback */
   {
