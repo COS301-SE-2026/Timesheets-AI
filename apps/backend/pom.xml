@@ -236,6 +236,29 @@ it must end with:
                     </environmentVariables>
                 </configuration>
             </plugin>
+
+            <!-- JaCoco to see the coverage-->
+            <!-- code from: https://medium.com/@truongbui95/jacoco-code-coverage-with-spring-boot-835af8debc68 -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             
             <!-- Spring Boot Maven Plugin - packages the app into a runnable JAR and provides
                 the spring-boot:run command. Lombok is excluded from the final JAR because
