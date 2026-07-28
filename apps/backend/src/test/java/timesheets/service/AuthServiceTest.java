@@ -1,6 +1,7 @@
 package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -125,6 +126,7 @@ class AuthServiceTest {
     @DisplayName("the verification email should be resent for unverified email")
     void resendEmailVerification() {
 
+      // ARRANGE
       RegisterRequest request = createValidRegisterRequest();
       User existingUser = createTestUser();
       existingUser.setEmailVerified(false);
@@ -143,8 +145,27 @@ class AuthServiceTest {
       // checking that the new verification email was sent to the user
       verify(emailVerificationTokenRepository).deleteByUserId(existingUser.getId());
       verify(emailService).sendVerificationEmail(eq(testEmail), eq(testFirstName), anyString());
-      verify(userRepository, never())
-          .save(any(User.class)); // check that the user was not saved again in the DB
+
+      // check that the user was not saved again in the DB
+      verify(userRepository, never()).save(any(User.class));
     }
+  }
+
+  @Test
+  @DisplayName("reject registration for verified user")
+  void shouldRejectRegistrationForAlreadyVerifiedUser() {
+
+    // ARRANGE: set the user
+    RegisterRequest request = createValidRegisterRequest();
+    User existingUser = createTestUser();
+
+    existingUser.setEmailVerified(true);
+
+    when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(existingUser));
+
+    // ACT and ASSERT: an exception should be thrown
+    assertThatThrownBy(() -> authService.register(request))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("email already exists");
   }
 }
