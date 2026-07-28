@@ -11,7 +11,7 @@
  * - StartTimerRequest no longer sends 'notes', matches real StartTimerRequest schema (projectId, taskId only), response shape still unconfirmed with backend
  * - requestOptions() no longer sets Authorization manually, that's handled by the shared JWT interceptor in core/services/auth.service.ts
  * - submit moved from per-entry to per-timesheet, status/submittedAt/ pprovedAt/isLocked all live on the timesheets table, not time_entries, see submitTimesheet() and loadCurrentTimesheet() for details
- * 
+ *
  * Patched: Zamokuhle Zwane, 2026-07-28
  * SO that the timer doesnt persist, so when i go to the next page, it goes away and thats a problem because that means the timer would never stop and its a silent error
  */
@@ -19,7 +19,10 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { TimerService, ActiveTimerResponse } from '../../../../core/services/timer.service';
+import {
+  TimerService,
+  ActiveTimerResponse,
+} from '../../../../core/services/timer.service';
 
 //type definitions and interface
 
@@ -171,7 +174,7 @@ export class LogtimeComponent implements OnDestroy {
   readonly pausedElapsedSeconds = signal(0);
   readonly filterFrom = signal(this.today());
   readonly filterTo = signal(this.today());
-  
+
   /*
   tracks the current period's timesheet, submit now happens at this level not per entry, since status/submittedAt/approvedAt/isLocked all live on
   the timesheets table per backend schema, not on time_entries
@@ -341,12 +344,12 @@ export class LogtimeComponent implements OnDestroy {
     lingering in the list and causing 404s/500s when deleted or edited, since those ids were never inserted into the real time_entries table
     */
     this.loadEntries();
-    
+
     /*
     so this will restore the inprogress timer on load back to this page, without
     this navigating away makes it seem like its lost because the forntend doesnt know it exists  
     */
-   this.loadActiveTimer();
+    this.loadActiveTimer();
 
     /*
     will fetch real projects/tasks too, these were previously hardcoded mock arrays mixed with one real seed row each, which
@@ -1064,13 +1067,13 @@ export class LogtimeComponent implements OnDestroy {
   because "assigned to me" just means you're the accountable owner, not that youre the only one allowed to touch it
   so now tasks i fetched per project with the api/tasks/project GET
   */
-  private lastLoadedTaskProjectId: string | null = null
+  private lastLoadedTaskProjectId: string | null = null;
   private loadTasksForProject(projectId: string): void {
     if (!projectId) {
       this.tasks.set([{ id: '', projectId: '', title: 'No task selected' }]);
       return;
     }
-    if(projectId === this.lastLoadedTaskProjectId){
+    if (projectId === this.lastLoadedTaskProjectId) {
       return;
     }
     this.lastLoadedTaskProjectId = projectId;
@@ -1097,47 +1100,47 @@ export class LogtimeComponent implements OnDestroy {
       });
   }
 
-  private loadActiveTimer(): void{
+  private loadActiveTimer(): void {
     this.timerService.getActiveTimer().subscribe({
       next: (response) => this.restoreActiveTimer(response),
-      error: (error)=> {
-        if(error.status !== 204 && error.status !== 200){
+      error: (error) => {
+        if (error.status !== 204 && error.status !== 200) {
           console.error('[LogtimeComponent] loadActiveTimer failed:', error);
         }
       },
     });
   }
-  private restoreActiveTimer(response: ActiveTimerResponse | null): void{
-    if(!response || !response.active){
+  private restoreActiveTimer(response: ActiveTimerResponse | null): void {
+    if (!response?.active) {
       return; //if nothing is runninh, there's nothing to restore here
     }
 
     const timer: ActiveTimer = {
       id: response.id,
       projectId: response.project.id,
-      taskId: response.task?.id?? null,
-      notes: '', 
+      taskId: response.task?.id ?? null,
+      notes: '',
       startedAt: new Date(response.startedAt),
     };
 
     this.activeTimer.set(timer);
-    this.isTimerPaused.set(response.isPaused?? false);
+    this.isTimerPaused.set(response.isPaused ?? false);
     this.timerForm.patchValue(
-      {projectId: timer.projectId, taskId: timer.taskId?? ''},
-      {emitEvent: false},
+      { projectId: timer.projectId, taskId: timer.taskId ?? '' },
+      { emitEvent: false },
     );
 
-    this.timerForm.disable({emitEvent: false});
+    this.timerForm.disable({ emitEvent: false });
     this.clearTimerInterval();
 
-    if(response.isPaused){
-      this.pausedElapsedSeconds.set(response.elapsedSeconds?? 0);
-      this.elapsedSeconds.set(response.elapsedSeconds?? 0);
-    }else{
-      this.elapsedSeconds.set(response.elapsedSeconds??0);
+    if (response.isPaused) {
+      this.pausedElapsedSeconds.set(response.elapsedSeconds ?? 0);
+      this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
+    } else {
+      this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
       this.timerIntervalId = setInterval(() => {
         this.elapsedSeconds.set(
-          Math.floor((Date.now() - timer.startedAt.getTime())/1000),
+          Math.floor((Date.now() - timer.startedAt.getTime()) / 1000),
         );
       }, 1000);
     }
