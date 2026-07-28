@@ -8,13 +8,9 @@ Related Requirement: N/A
 
 import { Component, signal, computed } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { HeaderComponent } from "../../../shared/components/header/header.component";
-import { ProgressBarComponent } from "../../../shared/components/progress-bar/progress-bar.component";
-import { StatusChipComponent } from "../../../shared/components/status-chip/status-chip.component";
 import { PROJECT_DETAIL } from "../mock/project-details.mock";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, RouterModule } from "@angular/router";
 import { ProjectDetails, ProjectMember } from "./models/project-details.model";
-import { RouterModule } from "@angular/router";
 import { ProjectStatus } from "../enums/project-status.enum";
 import { ProjectRole } from "../enums/project-role.enum";
 import { ChartConfiguration, ChartOptions } from 'chart.js';
@@ -25,10 +21,7 @@ import { BaseChartDirective } from 'ng2-charts';
     standalone: true,
     imports: [
         CommonModule,
-        HeaderComponent,
         RouterModule,
-        ProgressBarComponent,
-        StatusChipComponent,
         BaseChartDirective,
     ],
     templateUrl: './project-details.component.html',
@@ -170,6 +163,16 @@ export class ProjectDetailsComponent {
 
     protected getInitials(member: ProjectMember): string{
         return `${member.firstName[0]}${member.lastName[0]}`
+    }
+
+    protected getProjectInitials():string{
+        return this.project()
+            .name
+            .split(' ')
+            .map(word=> word[0])
+            .join('')
+            .substring(0, 2)
+            .toUpperCase();
     }
 
     protected getAvatarColour(member: ProjectMember):string{

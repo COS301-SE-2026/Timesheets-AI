@@ -27,7 +27,7 @@ Related Requirements: N/A
     <header class="project-header">
         <div class="project-header-left">
             <div class="project-avatar">
-                {{ project().initials }}
+                {{ getProjectInitials(project.name) }}
             </div>
 
             <div class="project-heading">
@@ -56,12 +56,12 @@ Related Requirements: N/A
             <span
                 class="role-chip"
                 [ngClass]="{
-                    'developer-chip': project().role === ProjectRole.DEVELOPER,
-                    'manager-chip': project().role === ProjectRole.MANAGER,
-                    'admin-chip': project().role === ProjectRole.ADMIN,
+                    'developer-chip': project().myRole === ProjectRole.DEVELOPER,
+                    'manager-chip': project().myRole === ProjectRole.MANAGER,
+                    'admin-chip': project().myRole === ProjectRole.ADMIN,
                 }">
 
-                {{ project().role }}
+                {{ project().myRole }}
 
             </span>
 
@@ -70,14 +70,54 @@ Related Requirements: N/A
 
     <section class="project-meta-grid">
         <div class="meta-card">
-            <i class="fa-regular fa-building"></i>
+            <i class="fa-regular fa-clock"></i>
+            <span class="meta-title">
+                Budget Hours
+            </span>
 
+            <strong>
+                {{ project().budgetHours }}h
+            </strong>
+
+        </div>
+
+        <div class="meta-card">
+            <i class="fa-solid fa-coins"></i>
+            <span class="meta-title">
+                Hourly Rate
+            </span>
+
+            <strong>
+                {{ project().hourlyRate | currency }}
+            </strong>
+
+        </div>
+
+        <div class="meta-card">
+            <i class="fa-solid fa-wallet"></i>
+
+            <span class="meta-title">
+                Budget Cost
+            </span>
+
+            <strong>
+                {{ project().budgetCost | currency }}
+            </strong>
         </div>
 
         <div class="meta-card">
             <i class="fa-regular fa-calendar"></i>
 
+            <span class="meta-title">
+                End Date
+            </span>
+
+            <strong>
+                {{ project().endDate | date }}
+            </strong>
+
         </div>
+        
 
         <div class="meta-card">
             <i class="fa-solid fa-users"></i>
@@ -87,28 +127,11 @@ Related Requirements: N/A
             </span>
 
             <strong>
-                {{ project().members.length }}
+                {{ project().members.length || 0 }}
             </strong>
+
         </div>
-
-        <div class="meta-card">
-            <i class="fa-solid fa-tags"></i>
-
-            <span class="meta-title">
-                Tags
-            </span>
-
-            <div class="project-tags">
-                <span 
-                    class="project-tag"
-                    *ngFor="let tag of project().tags">
-
-                    {{ tag }}
-
-                </span>
-
-            </div>
-        </div>
+        
     </section>
 
     <!--
@@ -148,7 +171,7 @@ Related Requirements: N/A
 
             <div class="card-header">
                     <h3 class="overview-card-title">
-                        Hours Logged vs Estimated
+                        Hours Logged vs Budget
                     </h3>
             
                 <div class="chart-legend">
@@ -164,7 +187,7 @@ Related Requirements: N/A
                         <span class="legend-dot legend-estimated"></span>
                         
                         <span class="legend-text">
-                            Estimated
+                            Budget
                         </span>
                     </div>
                 </div>
@@ -263,19 +286,19 @@ Related Requirements: N/A
             <div class="team-list">
                 <div
                     class="team-member-row"
-                    *ngFor="let member of project().members">
+                    *ngFor="let member of project()?.members">
 
                     <div class="member-left">
 
                         <div
                             class="team-member"
-                            [ngClass]="member.avatarColourClass">
-                            {{ member.initials }}
+                            [ngClass]="getAvatarColour(member)">
+                            {{ getInitials(member) }}
                         </div>
 
                         <div class="member-details">
                             <span class="member-name">
-                                {{ member.name }}
+                                {{ getMemberName(member) }}
                             </span>
 
                             <!-- <span class="member-role">
@@ -285,15 +308,22 @@ Related Requirements: N/A
                         </div>
                     </div>
 
-                    <span
-                        class="member-role-chip"
-                        [ngClass]="{
-                            'developer-chip': member.role === ProjectRole.DEVELOPER,
-                            'manager-chip': member.role === ProjectRole.MANAGER,
-                            'admin-chip': member.role === ProjectRole.ADMIN,
-                        }">
-                        {{ member.role }}
-                    </span>
+                    <div class="member-right">
+                        <span
+                            class="member-role-chip"
+                            [ngClass]="{
+                                'developer-chip': member.role === ProjectRole.DEVELOPER,
+                                'manager-chip': member.role === ProjectRole.MANAGER,
+                                'admin-chip': member.role === ProjectRole.ADMIN,
+                            }">
+                            {{ member.role }}
+                        </span>
+
+                        <span class="member-hours">
+                            {{ member.hoursLogged }}h
+                        </span>
+                    </div>
+                    
                 </div>
             </div>
         </article>

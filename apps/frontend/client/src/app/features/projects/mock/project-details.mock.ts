@@ -29,21 +29,18 @@ export const PROJECT_DETAIL: ProjectDetails= {
     progressPercentage: 76,
     createdAt: '2026-07-01T08:00:00Z',
     updatedAt:'2026-07-28T14:30:00Z',
-    // role: ProjectRole.DEVELOPER,
-    // teamMembers: ['John Doe', 'Sara Kim', 'Miguel Ruiz', 'Cleopatra Kwenda', 'Lerato Sibanda', 'Kgaugelo Matsena'],
-    // tags: ['web', 'angular'],
-    // initials: 'PA',
-    // deadline:'2026-05-31',
+    myRole: ProjectRole.DEVELOPER,
+    startDate: '2026-06-01T08:00:00Z',
+    endDate: '2026-12-31T23:59:59Z',
     members:[
         {
             workspaceMemberId:'1',
             firstName: 'John',
             lastName: 'Doe',
             email: 'john.doe@example.com',
-            // initials: 'JD',
-            // role: ProjectRole.DEVELOPER,
+            role: ProjectRole.DEVELOPER,
             hoursLogged: 18.5,
-            avatarColourClass: 'avatar-blue',
+            // avatarColourClass: 'avatar-blue',
             joinedAt: '2026-06-15T09:00:00Z'
         },
         {
@@ -51,10 +48,9 @@ export const PROJECT_DETAIL: ProjectDetails= {
             firstName: 'Sara', 
             lastName:'Kim',
             email: 'sarakim@example.com',
-            // initials: 'SK',
-            // role: ProjectRole.MANAGER,
+            role: ProjectRole.MANAGER,
             hoursLogged: 26.1,
-            avatarColourClass: 'avatar-purple',
+            // avatarColourClass: 'avatar-purple',
             joinedAt: '2026-06-15T09:00:00Z'
             
         },
@@ -63,10 +59,9 @@ export const PROJECT_DETAIL: ProjectDetails= {
             firstName: 'Miguel', 
             lastName:'Ruiz',
             email: 'miguelr@example.com',
-            // initials: 'MR',
-            // role: ProjectRole.MANAGER,
+            role: ProjectRole.MANAGER,
             hoursLogged: 36.1,
-            avatarColourClass: 'avatar-purple',
+            // avatarColourClass: 'avatar-purple',
             joinedAt: '2026-06-15T09:00:00Z'
         },
     ]
