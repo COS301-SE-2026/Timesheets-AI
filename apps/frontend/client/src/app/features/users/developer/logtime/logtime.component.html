@@ -24,12 +24,39 @@
           <rect x="4" y="5" width="16" height="15" rx="2"></rect>
           <path d="M8 3v4M16 3v4M4 10h16"></path>
         </svg>
-        <select [value]="selectedView()" (change)="selectedView.set($any($event.target).value)">
+        <select
+          [value]="selectedView()"
+          (change)="selectedView.set($any($event.target).value)"
+        >
           @for (view of viewOptions; track view) {
             <option [value]="view">{{ view }}</option>
           }
         </select>
       </label>
+
+      <!--
+        timesheet-level submit action, replaces the old per-entry submit
+        buttons further down. status/submittedAt/isLocked all live on the
+        timesheet, not the entry, so this is the single action that moves
+        the whole period forward. disabled when there's no timesheet loaded
+        yet, when it's already locked, or when it's already been submitted
+      -->
+      @if (currentTimesheet(); as timesheet) {
+        <div class="header-pill header-pill--timesheet-status">
+          <span class="type-pill">{{ timesheet.status }}</span>
+        </div>
+        <button
+          class="btn btn--primary"
+          type="button"
+          [disabled]="timesheet.isLocked || timesheet.status !== 'DRAFT'"
+          (click)="submitTimesheet()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6"></path>
+          </svg>
+          Submit Timesheet
+        </button>
+      }
     </div>
   </header>
 
@@ -37,7 +64,9 @@
   @if (conflictMessage()) {
     <section class="banner banner--danger" role="alert">
       {{ conflictMessage() }}
-      <button type="button" class="banner__dismiss" (click)="dismissConflict()">Dismiss</button>
+      <button type="button" class="banner__dismiss" (click)="dismissConflict()">
+        Dismiss
+      </button>
     </section>
   }
 
@@ -45,15 +74,22 @@
   @if (toastMessage()) {
     <output class="banner banner--success">
       {{ toastMessage() }}
-      <button type="button" class="banner__dismiss" (click)="dismissToast()">Dismiss</button>
+      <button type="button" class="banner__dismiss" (click)="dismissToast()">
+        Dismiss
+      </button>
     </output>
   }
 
   <!-- Persistent timer banner, shown when timer is running but panel is closed -->
-  @if (activeTimer() && activePanel() !== 'timer') {
+  @if (activeTimer() && activePanel() !== "timer") {
     <section class="banner banner--info">
-      <span class="timer-status"><span class="timer-status__dot"></span> Timer running — {{ formatElapsed(elapsedSeconds()) }}</span>
-      <button type="button" class="link-btn" (click)="openTimerPanel()">View timer</button>
+      <span class="timer-status"
+        ><span class="timer-status__dot"></span> Timer running —
+        {{ formatElapsed(elapsedSeconds()) }}</span
+      >
+      <button type="button" class="link-btn" (click)="openTimerPanel()">
+        View timer
+      </button>
     </section>
   }
 
@@ -63,26 +99,39 @@
       + Add Manual Time Entry
     </button>
     <button class="btn btn--primary" type="button" (click)="openTimerPanel()">
-       Start Automatic Time Entry
+      Start Automatic Time Entry
     </button>
   </section>
 
   <!-- Manual entry panel, also used for editing existing entries -->
-  @if (activePanel() === 'manual') {
+  @if (activePanel() === "manual") {
     <section class="entry-panel" aria-labelledby="manual-panel-title">
       <article class="card entry-panel__card">
         <header class="card__header">
           <div>
             <!-- Title changes between 'Edit Entry' and 'Manual Time Entry' based on edit mode -->
-            <h2 id="manual-panel-title">{{ isEditMode() ? 'Edit Entry' : 'Manual Time Entry' }}</h2>
+            <h2 id="manual-panel-title">
+              {{ isEditMode() ? "Edit Entry" : "Manual Time Entry" }}
+            </h2>
             <p>Fill in the details below to log time manually.</p>
           </div>
-          <button type="button" class="icon-btn" aria-label="Close" (click)="closePanel()">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+          <button
+            type="button"
+            class="icon-btn"
+            aria-label="Close"
+            (click)="closePanel()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18"></path>
+            </svg>
           </button>
         </header>
 
-        <form class="manual-form" [formGroup]="entryForm" (ngSubmit)="saveEntry()">
+        <form
+          class="manual-form"
+          [formGroup]="entryForm"
+          (ngSubmit)="saveEntry()"
+        >
           <!-- Project and task selectors -->
           <div class="manual-form__row manual-form__row--2">
             <label class="field">
@@ -97,12 +146,14 @@
             <!-- Tasks are filtered based on the selected project -->
             <label class="field">
               <span class="field__label">Task (Optional)</span>
-              <select formControlName="taskId" (change)="onTaskSelectionChange($event, 'manual')">
+              <select
+                formControlName="taskId"
+                (change)="onTaskSelectionChange($event, 'manual')"
+              >
                 <option value="">No task selected</option>
                 @for (task of selectableTasks(); track task.id) {
                   <option [value]="task.id">{{ task.title }}</option>
                 }
-                <option [value]="createNewTaskValue">+ Create new task...</option>
               </select>
             </label>
           </div>
@@ -122,11 +173,11 @@
             </label>
           }
 
-       <!-- The api records the source of this entry -->
-       <label class="field">
-        <span class="field__label"> Entry Type </span>
-        <input type="text" value="Manual" readonly />
-       </label>
+          <!-- The api records the source of this entry -->
+          <label class="field">
+            <span class="field__label"> Entry Type </span>
+            <input type="text" value="Manual" readonly />
+          </label>
 
           <!-- Start time, end time, and auto calculated duration -->
           <div class="manual-form__row manual-form__row--3">
@@ -152,7 +203,9 @@
               </span>
               <!-- Validation error shown when end time is before start time -->
               @if (endTimeInvalid) {
-                <span class="field__error">End time must be after start time.</span>
+                <span class="field__error"
+                  >End time must be after start time.</span
+                >
               }
             </label>
 
@@ -162,7 +215,9 @@
               <input
                 type="text"
                 readonly
-                [value]="formatDuration(entryForm.controls.durationMinutes.value)"
+                [value]="
+                  formatDuration(entryForm.controls.durationMinutes.value)
+                "
               />
             </label>
           </div>
@@ -179,10 +234,12 @@
 
           <!-- Form actions: cancel or save/update -->
           <div class="manual-form__actions">
-            <button class="btn btn--ghost" type="button" (click)="closePanel()">Cancel</button>
+            <button class="btn btn--ghost" type="button" (click)="closePanel()">
+              Cancel
+            </button>
             <!-- Button label changes based on whether we're creating or editing -->
             <button class="btn btn--primary" type="submit">
-              {{ isEditMode() ? 'Update Entry' : 'Save Entry' }}
+              {{ isEditMode() ? "Update Entry" : "Save Entry" }}
             </button>
           </div>
         </form>
@@ -191,16 +248,23 @@
   }
 
   <!-- Timer panel for automatic time tracking -->
-  @if (activePanel() === 'timer') {
-     <section class="entry-panel" aria-labelledby="manual-panel-title">
+  @if (activePanel() === "timer") {
+    <section class="entry-panel" aria-labelledby="manual-panel-title">
       <article class="card entry-panel__card">
         <header class="card__header">
           <div>
             <h2 id="timer-panel-title">Automatic Time Entry</h2>
             <p>Set your project details, then start the timer.</p>
           </div>
-          <button type="button" class="icon-btn" aria-label="Close" (click)="closePanel()">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+          <button
+            type="button"
+            class="icon-btn"
+            aria-label="Close"
+            (click)="closePanel()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18"></path>
+            </svg>
           </button>
         </header>
 
@@ -209,7 +273,7 @@
           <form class="timer-form" [formGroup]="timerForm">
             <label class="field">
               <span class="field__label">Project</span>
-              <select formControlName="projectId" [disabled]="!!activeTimer()">
+              <select formControlName="projectId">
                 @for (project of projects(); track project.id) {
                   <option [value]="project.id">{{ project.name }}</option>
                 }
@@ -221,14 +285,12 @@
               <span class="field__label">Task (Optional)</span>
               <select
                 formControlName="taskId"
-                [disabled]="!!activeTimer()"
                 (change)="onTaskSelectionChange($event, 'timer')"
               >
                 <option value="">No task selected</option>
                 @for (task of selectableTimerTasks(); track task.id) {
                   <option [value]="task.id">{{ task.title }}</option>
                 }
-                <option [value]="createNewTaskValue">+ Create new task...</option>
               </select>
             </label>
 
@@ -240,7 +302,6 @@
                   [value]="newTaskTitle()"
                   (input)="newTaskTitle.set($any($event.target).value)"
                   placeholder="Enter a name for the new task"
-                  [disabled]="!!activeTimer()"
                 />
                 @if (newTaskTitleError()) {
                   <span class="field__error">Task name is required.</span>
@@ -254,7 +315,6 @@
                 type="text"
                 formControlName="description"
                 placeholder="What are you working on?"
-                [disabled]="!!activeTimer()"
               />
             </label>
           </form>
@@ -263,10 +323,14 @@
           <div class="timer-display">
             <!-- Running indicator, only visible when timer is active -->
             @if (activeTimer()) {
-              <p class="timer-status"><span class="timer-status__dot"></span> TIMER RUNNING</p>
+              <p class="timer-status">
+                <span class="timer-status__dot"></span> TIMER RUNNING
+              </p>
             }
             <p class="timer-display__label">Elapsed Time</p>
-            <strong class="timer-display__value">{{ formatElapsed(elapsedSeconds()) }}</strong>
+            <strong class="timer-display__value">{{
+              formatElapsed(elapsedSeconds())
+            }}</strong>
             <!-- Shows when the timer was started -->
             @if (activeTimer()) {
               <p class="timer-display__started">{{ timerStartedLabel() }}</p>
@@ -274,32 +338,68 @@
             <div class="timer-display__actions">
               <!-- Start button shown when no timer is active -->
               @if (!activeTimer()) {
-                <button class="btn btn--primary" type="button" (click)="startTimer()">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12l10-6-10-6Z"></path></svg>
+                <button
+                  class="btn btn--primary"
+                  type="button"
+                  (click)="startTimer()"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 6v12l10-6-10-6Z"></path>
+                  </svg>
                   Start Timer
                 </button>
               } @else if (!isTimerPaused()) {
                 <!-- Pause and stop controls shown when timer is running -->
-                <button class="btn btn--outline" type="button" (click)="pauseTimer()">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12M16 6v12"></path></svg>
+                <button
+                  class="btn btn--outline"
+                  type="button"
+                  (click)="pauseTimer()"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 6v12M16 6v12"></path>
+                  </svg>
                   Pause
                 </button>
-                <button class="btn btn--danger" type="button" (click)="stopTimer()">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>
+                <button
+                  class="btn btn--danger"
+                  type="button"
+                  (click)="stopTimer()"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="7" y="7" width="10" height="10" rx="1"></rect>
+                  </svg>
                   Stop &amp; Save
                 </button>
               } @else {
                 <!-- Resume and stop controls shown when timer is paused -->
-                <button class="btn btn--primary" type="button" (click)="resumeTimer()">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12l10-6-10-6Z"></path></svg>
+                <button
+                  class="btn btn--primary"
+                  type="button"
+                  (click)="resumeTimer()"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 6v12l10-6-10-6Z"></path>
+                  </svg>
                   Resume
                 </button>
-                <button class="btn btn--danger" type="button" (click)="stopTimer()">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1"></rect></svg>
+                <button
+                  class="btn btn--danger"
+                  type="button"
+                  (click)="stopTimer()"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="7" y="7" width="10" height="10" rx="1"></rect>
+                  </svg>
                   Stop &amp; Save
                 </button>
               }
-              <button class="btn btn--ghost" type="button" (click)="closePanel()">Cancel</button>
+              <button
+                class="btn btn--ghost"
+                type="button"
+                (click)="closePanel()"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
@@ -312,9 +412,11 @@
     <article class="card entries-card">
       <header class="entries-card__header">
         <div class="entries-card__title">
-          <h2>Today's Entries</h2>
+          <h2>{{ entriesCardTitle() }}</h2>
           <!-- Total duration badge across all filtered entries -->
-          <span class="total-badge">Total: {{ formatDuration(totalMinutes()) }}</span>
+          <span class="total-badge"
+            >Total: {{ formatDuration(totalMinutes()) }}</span
+          >
         </div>
       </header>
 
@@ -335,12 +437,19 @@
 
         <!-- Project and date range filters -->
         <div class="entries-toolbar__filters" [formGroup]="filterForm">
-          <select [value]="selectedProjectId()" (change)="selectedProjectId.set($any($event.target).value)">
-            <option value="">All projects</option>
-            @for (project of projects(); track project.id) {
-              <option [value]="project.id">{{ project.name }}</option>
-            }
-          </select>
+          <label class="filter-date" for="entries-filter-project">
+            <span class="visually-hidden">Project</span>
+            <select
+              id="entries-filter-project"
+              [value]="selectedProjectId()"
+              (change)="selectedProjectId.set($any($event.target).value)"
+            >
+              <option value="">All projects</option>
+              @for (project of projects(); track project.id) {
+                <option [value]="project.id">{{ project.name }}</option>
+              }
+            </select>
+          </label>
           <label class="filter-date">
             <span>From</span>
             <input type="date" formControlName="from" />
@@ -386,14 +495,14 @@
                 <td class="col-description">
                   <span>{{ entry.description }}</span>
                   <!-- Status notes shown below description -->
-                  @if (entry.status === 'SUBMITTED') {
+                  @if (entry.status === "SUBMITTED") {
                     <em class="status-note">Awaiting review</em>
                   }
-                  @if (entry.status === 'APPROVED') {
+                  @if (entry.status === "APPROVED") {
                     <em class="status-note status-note--approved">Approved</em>
                   }
                   <!-- Rejection reason shown for rejected entries -->
-                  @if (entry.status === 'REJECTED') {
+                  @if (entry.status === "REJECTED") {
                     <em class="status-note status-note--rejected">
                       {{ entry.rejectionReason }}
                     </em>
@@ -401,7 +510,9 @@
                 </td>
                 <td class="col-actions">
                   <!-- Edit button shown for draft and rejected entries -->
-                  @if (entry.status === 'DRAFT' || entry.status === 'REJECTED') {
+                  @if (
+                    entry.status === "DRAFT" || entry.status === "REJECTED"
+                  ) {
                     <button
                       type="button"
                       class="icon-btn"
@@ -409,12 +520,18 @@
                       (click)="editEntry(entry)"
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"></path>
+                        <path
+                          d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"
+                        ></path>
                       </svg>
                     </button>
                   }
-                  <!-- Overflow menu for draft entries: submit or delete -->
-                  @if (entry.status === 'DRAFT') {
+                  <!--
+                    overflow menu for draft entries: only delete now.
+                    submit moved to the timesheet level (see header), so
+                    a per-entry submit no longer applies here
+                  -->
+                  @if (entry.status === "DRAFT") {
                     <div class="action-menu">
                       <button
                         type="button"
@@ -431,22 +548,26 @@
                       <!-- Dropdown shown when this entry's menu is open -->
                       @if (openMenuEntryId() === entry.id) {
                         <div class="action-menu__dropdown">
-                          <button type="button" (click)="resubmitEntry(entry)">Submit</button>
-                          <button type="button" (click)="deleteEntry(entry)">Delete</button>
+                          <button type="button" (click)="deleteEntry(entry)">
+                            Delete
+                          </button>
                         </div>
                       }
                     </div>
                   }
-                  <!-- Resubmit button shown for rejected entries -->
-                  @if (entry.status === 'REJECTED') {
-                    <button type="button" class="link-btn" (click)="submitTimeEntry(entry)">Resubmit</button>
-                  }
+                  <!--
+                    rejected entries: edit and re-save as draft, then wait
+                    for the next timesheet submit. no per-entry resubmit
+                    anymore, that's a timesheet-level action now
+                  -->
                 </td>
               </tr>
             } @empty {
               <!-- Empty state when no entries match the current filters -->
               <tr>
-                <td colspan="6" class="empty-state">No entries match the selected filters.</td>
+                <td colspan="6" class="empty-state">
+                  No entries match the selected filters.
+                </td>
               </tr>
             }
           </tbody>
@@ -454,7 +575,11 @@
       </div>
 
       <!-- Shortcut to add another entry without scrolling back up -->
-      <button class="btn btn--outline btn--full" type="button" (click)="openManualPanel()">
+      <button
+        class="btn btn--outline btn--full"
+        type="button"
+        (click)="openManualPanel()"
+      >
         + Add Another Entry
       </button>
     </article>
