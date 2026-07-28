@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +25,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import timesheets.domain.EmailVerificationToken;
 import timesheets.domain.User;
+import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.RegisterRequest;
+import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.enums.UserStatus;
 import timesheets.repository.EmailVerificationTokenRepository;
+import timesheets.repository.UserMfaRepository;
 import timesheets.repository.UserRepository;
+import timesheets.repository.WorkspaceMemberRepository;
 
 /*
 -following the principle from the coding handbook of Arrange, Act, Assert
@@ -42,12 +47,12 @@ class AuthServiceTest {
 
   // mocking all the the dependancies
   @Mock private UserRepository userRepository;
-
   @Mock private PasswordEncoder passwordEncoder;
-
   @Mock private EmailVerificationTokenRepository emailVerificationTokenRepository;
-
   @Mock private EmailService emailService;
+  @Mock private WorkspaceMemberRepository workspaceMemberRepository;
+  @Mock private UserMfaRepository userMfaRepository;
+  @Mock private JwtService jwtService;
 
   @InjectMocks private AuthService authService;
 
@@ -85,6 +90,14 @@ class AuthServiceTest {
     request.setPassword(testPassword);
     request.setFirstName(testFirstName);
     request.setLastName(testLastName);
+    return request;
+  }
+
+  // creating an authorisation request with the test data
+  private AuthRequest createValidAuthRequest() {
+    AuthRequest request = new AuthRequest();
+    request.setEmail(testEmail);
+    request.setPassword(testPassword);
     return request;
   }
 
@@ -167,5 +180,43 @@ class AuthServiceTest {
     assertThatThrownBy(() -> authService.register(request))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("email already exists");
+  }
+
+  @Nested
+  @DisplayName("Login Tests")
+  class LoginTests {
+
+    @Test
+    @DisplayName("logs in properly with correct credentials")
+    void loginWithValidDetails() {
+      // ARRANGE: setting up user
+      AuthRequest request = createValidAuthRequest();
+      User user = createTestUser();
+
+      when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(user));
+
+      // the passwords should match
+      when(passwordEncoder.matches(testPassword, user.getPasswordHash())).thenReturn(true);
+      when(workspaceMemberRepository.findByUserId(testUserId))
+          .thenReturn(List.of()); // no workspaces yet
+      when(userMfaRepository.findByUserId(testUserId)).thenReturn(Optional.empty()); // no mfa yet
+
+      // mock token generated
+      when(jwtService.generateToken(any(User.class), eq(1))).thenReturn("jwt-token");
+
+      // ACT: test login function
+      AuthResponse response = authService.login(request);
+
+      // ASSERT: checks that the data I expect is what I am getting
+      assertThat(response).isNotNull();
+      assertThat(response.getToken()).isEqualTo("jwt-token");
+      assertThat(response.getUser()).isNotNull();
+      assertThat(response.getUser().getEmail()).isEqualTo(testEmail);
+      assertThat(response.getRequiresMfa()).isFalse();
+
+      verify(userRepository).save(user);
+      assertThat(user.getFailedLoginAttempts()).isEqualTo(0);
+      assertThat(user.getLockedUntil()).isNull();
+    }
   }
 }
