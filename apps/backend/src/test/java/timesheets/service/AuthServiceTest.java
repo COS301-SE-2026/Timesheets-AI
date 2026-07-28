@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -118,6 +119,32 @@ class AuthServiceTest {
       verify(userRepository).save(any(User.class)); // did a user get saved?
       // making sure verification email was sent
       verify(emailService).sendVerificationEmail(eq(testEmail), eq(testFirstName), anyString());
+    }
+
+    @Test
+    @DisplayName("the verification email should be resent for unverified email")
+    void resendEmailVerification() {
+
+      RegisterRequest request = createValidRegisterRequest();
+      User existingUser = createTestUser();
+      existingUser.setEmailVerified(false);
+
+      // the user already exists in DB but is unverified
+      when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(existingUser));
+      when(emailVerificationTokenRepository.save(any(EmailVerificationToken.class)))
+          .thenReturn(EmailVerificationToken.builder().build());
+
+      // ACT: test the register method
+      RegisterResponse response = authService.register(request);
+
+      // ASSERT
+      assertThat(response.getMessage()).contains("Verification email sent");
+
+      // checking that the new verification email was sent to the user
+      verify(emailVerificationTokenRepository).deleteByUserId(existingUser.getId());
+      verify(emailService).sendVerificationEmail(eq(testEmail), eq(testFirstName), anyString());
+      verify(userRepository, never())
+          .save(any(User.class)); // check that the user was not saved again in the DB
     }
   }
 }
