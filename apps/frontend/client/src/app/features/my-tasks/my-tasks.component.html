@@ -1,0 +1,302 @@
+<main class="my-task-page">
+
+    <!-- Page header -->
+     <header class="page-header">
+        <div>
+            <h1 class="text-h1" class="page-title"> My Tasks</h1>
+            <p class="text-body text-muted" id="page-description"> All tasks assigned to you across projects.</p>
+        </div>
+     </header>
+
+     <!-- Summary Cards -->
+      <section class="summary-cards" aria-label="Task summary">
+        <div class="summary-card">
+            <div class="summary-card-icon">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div class="summary-card-content">
+            <div class="summary-card-value" aria-live="polite">
+                {{ totalCount() }}
+            </div>
+            <div class="summary-card-label text-caption"> Total Tasks</div>
+            </div>
+        </div>
+
+        <!-- Active Tasks -->
+
+        <div class="summary-card">
+            <div class="summary-card-icon active">
+                <i class="fa-regular fa-clock"></i>
+            </div>
+            <div class="summary-card-content">
+            <div class="summary-card-value" aria-live="polite">
+                {{ activeCount() }}
+            </div>
+            <div class="summary-card-label text-caption"> Active </div>
+            <div class="summary-card-subtitle text-caption"> Includes To Do &amp; In progress</div>
+             </div>
+        </div>
+
+        <!-- Completed Tasks -->
+
+        <div class="summary-card">
+            <div class="summary-card-icon done">
+                <i class="fa-regular fa-circle-check"></i>
+            </div>
+            <div class="summary-card-content">
+            <div class="summary-card-value" aria-live="polite">
+                {{ completedCount() }}
+            </div>
+            <div class="summary-card-label text-caption"> Done </div>
+        </div>
+        </div>
+
+        <!-- Archived Tasks -->
+         <div class="summary-card">
+            <div class="summary-card-icon archived">
+                <i class="fa-solid fa-box-archive"></i>
+            </div>   
+            <div class="summary-card-content">
+            <div class="summary-card-value" aria-live="polite">
+                {{ archivedCount() }}
+            </div>
+            <div class="summary-card-label text-caption"> Archived</div>
+         </div>
+        </div>
+      </section>
+
+      <!-- Filters Section -->
+
+      <section class="filters-section" aria-label="Task filters">
+        <!-- Status filter dropdown -->
+         <div class="filter-group">
+            <label class="text-label" for="status-filter">Status</label>
+            <select id="status-filter" class="filter-select" [ngModel] = "selectedStatus()" (ngModelChange)="selectedStatus.set($event); applyFilters()" aria-describedby="status-filter-description">
+                @for (option of statusFilterOptions; track option.value) {
+                    <option [value]="option.value"> {{ option.label }} </option>
+                }
+            </select>
+            <span id="status-filter-description" class="visually-hidden">
+                Filter by tasks status
+            </span>
+         </div>
+
+         <!-- Search bar -->
+
+         <div class="filter-group search-group">
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" class="search-input" id="search-input" placeholder="Search tasks, projects or jira tickets" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event); applyFilters()" aria-label="Search tasks"/>
+            </div>
+         </div>
+
+         <!-- Filter checkboxes -->
+          <div class="filter-group filter-checkboxes">
+
+            <!-- show completed -->
+             <label class="checkbox-label">
+                <input type="checkbox" [ngModel]="showCompleted()" (ngModelChange)="showCompleted.set($event); applyFilters()" aria-label="Show completed tasks"/>
+                Show Completed
+             </label>
+
+             <!-- Show archived -->
+
+             <label class="checkbox-label">
+                <input type="checkbox" [ngModel]="showArchived()" (ngModelChange)="showArchived.set($event); applyFilters()" aria-label="Show archived tasks"/>
+                Show Archived
+             </label>
+          </div>
+      </section>
+
+      <!-- Task Table -->
+
+      <section class="task-table-container" aria-label="Task list">
+        @if (isLoading()) {
+
+            <!-- Loading state -->
+
+            <output class="loading-state" aria-label="Loading tasks">
+                <p class="text-body text-muted"> Loading tasks...</p>
+            </output>
+        } @else {
+            <!-- Table -->
+             <table class="tasks-table" aria-labelledby="page-title">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-label">Task</th>
+                        <th scope="col" class="text-label">Project</th>
+                        <th scope="col" class="text-label">Jira Ticket</th>
+                        <th scope="col" class="text-label">Assigned To</th>
+                        <th scope="col" class="text-label">Status</th>
+                        <th scope="col" class="text-label">Priority</th>
+                        <th scope="col" class="text-label">Due Date</th>
+                        <th scope="col" class="text-label">Estimated</th>
+                        <th scope="col" class="text-label">Actual</th>
+                        <th scope="col" class="text-label">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (task of filteredTasks(); track task.id) {
+                        <tr>
+                            <td class="task-title">
+                                <span class="task-title-text">{{ task.title }} </span>
+                            </td>
+
+                            <td class="project-link">
+                                <a (click)="navigateToProject(task.projectId)" class="project-name-link text-body" [attr.aria-label]="'View project ' + task.projectName">{{ task.projectName }}</a>
+                            </td>
+
+
+                            <td class="text-body">
+                                @if (task.jiraTicketKey) {
+                                    <span class="jira-ticket"> {{ task.jiraTicketKey || '-' }} </span>
+                                } @else {
+                                    <span class="text-muted">-</span>
+                                }                           
+                            </td>
+
+                            <td class="text-body">{{ task.assignedToName }}</td>
+
+                            <td>
+                                <div class="status-dropdown-wrapper">
+                                <select [class]="'status-dropdown ' + getStatusClass(task.status)" [attr.aria-label]=" 'Update status for ' + task.title" [ngModel]="task.status" (ngModelChange)="onStatusChange(task, $event)" >
+                                    @for (option of statusDropdownOptions; track option.value ){
+                                        <option [value] = "option.value"> {{ option.label }}</option>
+                                    }
+                                </select>
+                                <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+                                </div>
+                            </td>
+
+                            <!-- Ptiority badge -->
+                             <td>
+                                <span [class]="getPriorityClass(task.priority)">
+                                    <i [class]="'fa-solid ' + priorityIcons[task.priority]"></i>
+                                    {{ priorityLabels[task.priority] }}
+                                </span>
+                             </td>
+
+                             <td class="text-body"> {{ formatDate(task.dueDate) }} </td>
+                             <td class="text-body text-right font-mono" > {{ task.estimatedHours }}h </td>
+                             <td class="text-body text-right font-mono"> {{ task.actualHours }}h </td>
+                             <td class="text-center">
+                                <button type="button"  (keydown)="onOverlayKeydown($event)" class="view-button"  (click)="onViewTask(task)" [attr.aria-label]="'View details for ' + task.title">
+                                <i class="fa-regular fa-eye"></i> 
+                                View </button>
+                             </td>
+                        </tr>
+                    } @empty {
+                        <!-- Empty State -->
+                         <tr>
+                            <td colspan="10" class="text-center text-body text-muted">
+                                No tasks found
+                            </td> 
+                         </tr>
+                    }
+                </tbody>
+             </table>
+        }
+      </section>
+
+      @if(isDetailOpen()) {
+        <div class="modal-overlay"  (keydown)="onOverlayKeydown($event)" (click)="closeTaskDetail()">
+            <div class="modal-panel" aria-modal="true" aria-labelledby="task-detail-title"  (keydown)="onOverlayKeydown($event)" (click)="$event.stopPropagation()">
+                <header class="modal-header">
+                    <h2 id="task-detail-title" class="modal-title"> Task Detail </h2>
+                    <button type="button" class="modal-close" (click)="closeTaskDetail()" aria-label="Close task detail">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </header>
+
+                @if (isDetailLoading()) {
+                    <p class="modal-message">Loading task...</p>
+                } @else if (detailError()) {
+                    <p class="modal-message modal-error"> {{ detailError() }} </p>
+                } @else {
+                    @if (selectedTask(); as task) {
+                    <form class="task-detail-form" (ngSubmit)="closeTaskDetail()">
+
+                        <div class="form-row">
+                            <label class="form-label" for="detail-title">Title</label>
+                            <input id="detail-title" class="form-control" type="text" [value]="task.title" readonly />
+                        </div>
+
+                        <div class="form-row">
+                            <label class="form-label" for="detail-description">Description</label>
+                            <textarea id="detail-description" class="form-control form-textarea" rows="5" readonly>
+                                {{ task.description || 'No description provided.' }}
+                            </textarea>
+                        </div>
+
+                        <div class="form-grid">
+
+                            <div class="form-row">
+                                <label class="form-label" for="detail-project">Project</label>
+                                <input id="detail-project" class="form-control" type="text" [value]="task.projectName" readonly/>
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label" for="detail-jira">Jira Ticket</label>
+                                 <input id="detail-jira" class="form-control" type="text" [value]="task.jiraTicketKey || '-'" readonly />
+                            </div>  
+
+                            <div class="form-row">
+                                <label class="form-label" for="detail-priority">Priority</label>
+                                <input id="detail-priority" class="form-control" type="text" [value]="task.priority" readonly />
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label" for="detail-assignee">Assigned To</label>
+                                <input id="detail-assignee" class="form-control" type="text" [value]="task.assignedToName" readonly />
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label" for="detail-due"> Due Date</label>
+                                <input id="detail-due" class="form-control" type="text"  [value]="formatDate(task.dueDate)" readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-estimated"> Estimated hours</label>
+                                <input id="detail-estimated" class="form-control" type="text"  [value]="task.estimatedHours + 'h'" readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-actual"> Actual Hours</label>
+                                <input id="detail-actual" class="form-control" type="text"  [value]="task.actualHours + 'h'" readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-parent"> Parent Task</label>
+                                <input id="detail-parent" class="form-control" type="text"  [value]="task.parentTaskId || '-'" readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-completed"> Completed At</label>
+                                <input id="detail-completed" class="form-control" type="text"  [value]="formatDateTime(task.completedAt) || '-' " readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-created"> Created At</label>
+                                <input id="detail-created" class="form-control" type="text"  [value]="formatDateTime(task.createdAt)" readonly />
+                            </div>
+
+                             <div class="form-row">
+                                <label class="form-label" for="detail-updated"> Last Updated </label>
+                                <input id="detail-updated" class="form-control" type="text"  [value]="formatDateTime(task.updatedAt)" readonly />
+                            </div>
+
+                        </div>
+
+                        <footer class="modal-footer">
+                            <button type="submit" class="modal-button">Close</button>
+                        </footer>
+
+                    </form>
+                } @else {
+                    <p class="modal-message"> Task details are unavailable </p>
+                } }
+            </div>
+        </div>
+      }
+</main>

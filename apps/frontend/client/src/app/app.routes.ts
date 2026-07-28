@@ -61,6 +61,15 @@ export const routes: Routes = [
         .then(m => m.ProjectsComponent)
   },
 
+  // Tasks page
+
+  {
+    path: 'my-tasks',
+    loadComponent: () =>
+      import('./features/my-tasks/my-tasks.component')
+        .then(m => m.MyTasksComponent)
+  },
+
   /* 404 fallback */
   {
     path: 'not-found',
