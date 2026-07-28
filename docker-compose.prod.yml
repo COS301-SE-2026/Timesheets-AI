@@ -50,6 +50,8 @@ services:
 
   backend:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-backend:latest
+    env_file:
+      - .env.production
     container_name: momently-backend
     restart: unless-stopped
   
@@ -73,7 +75,7 @@ services:
 
       SERVER_PORT: ${SERVER_PORT}
 
-      GOOGELE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
 
@@ -87,6 +89,8 @@ services:
 
   frontend:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-frontend:latest
+    env_file:
+      - .env.production
     container_name: momently-frontend
     restart: unless-stopped
 
@@ -99,6 +103,8 @@ services:
 
   ai-service:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-ai:latest
+    env_file:
+      - .env.production
     container_name: momently-ai
     restart: unless-stopped
 
