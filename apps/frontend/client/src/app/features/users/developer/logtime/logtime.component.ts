@@ -11,11 +11,18 @@
  * - StartTimerRequest no longer sends 'notes', matches real StartTimerRequest schema (projectId, taskId only), response shape still unconfirmed with backend
  * - requestOptions() no longer sets Authorization manually, that's handled by the shared JWT interceptor in core/services/auth.service.ts
  * - submit moved from per-entry to per-timesheet, status/submittedAt/ pprovedAt/isLocked all live on the timesheets table, not time_entries, see submitTimesheet() and loadCurrentTimesheet() for details
+ *
+ * Patched: Zamokuhle Zwane, 2026-07-28
+ * SO that the timer doesnt persist, so when i go to the next page, it goes away and thats a problem because that means the timer would never stop and its a silent error
  */
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  TimerService,
+  ActiveTimerResponse,
+} from '../../../../core/services/timer.service';
 
 //type definitions and interface
 
@@ -130,6 +137,7 @@ export class LogtimeComponent implements OnDestroy {
   */
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = '/api';
+  private readonly timerService = inject(TimerService);
 
   //I used Enzokuhle Khumalo's workspace_members.id (real seed data), because it didnt need mfa
   private readonly workspaceMemberId =
@@ -220,25 +228,14 @@ export class LogtimeComponent implements OnDestroy {
   //Computed signals (Reactive  derived state)
 
   //Cascades tasks depending on the active project selected inside the manual logging form
-  readonly filteredTasks = computed(() =>
-    this.tasks().filter(
-      (task) =>
-        !task.id || task.projectId === this.entryForm.controls.projectId.value,
-    ),
-  );
+  readonly filteredTasks = computed(() => this.tasks());
 
   readonly selectableTasks = computed(() =>
-    this.tasks().filter(
-      (task) =>
-        task.id && task.projectId === this.entryForm.controls.projectId.value,
-    ),
+    this.tasks().filter((task) => task.id),
   );
 
   readonly selectableTimerTasks = computed(() =>
-    this.tasks().filter(
-      (task) =>
-        task.id && task.projectId === this.timerForm.controls.projectId.value,
-    ),
+    this.tasks().filter((task) => task.id),
   );
 
   readonly isCreatingNewManualTask = computed(
@@ -312,15 +309,13 @@ export class LogtimeComponent implements OnDestroy {
     Cascade resets: clear task selection when project changes, but preserve
     an in-progress "create new task" entry so the user doesn't lose their typing.
     */
-    this.entryForm.controls.projectId.valueChanges.subscribe(() => {
-      if (this.newTaskFormContext() !== 'manual') {
-        this.entryForm.controls.taskId.setValue('');
-      }
+    this.entryForm.controls.projectId.valueChanges.subscribe((projectId) => {
+      this.entryForm.controls.taskId.setValue('');
+      this.loadTasksForProject(projectId);
     });
-    this.timerForm.controls.projectId.valueChanges.subscribe(() => {
-      if (this.newTaskFormContext() !== 'timer') {
-        this.timerForm.controls.taskId.setValue('');
-      }
+    this.timerForm.controls.projectId.valueChanges.subscribe((projectId) => {
+      this.timerForm.controls.taskId.setValue('');
+      this.loadTasksForProject(projectId);
     });
 
     //Dynamic calculation: Synchronize real-time total duration when inputs change
@@ -351,11 +346,16 @@ export class LogtimeComponent implements OnDestroy {
     this.loadEntries();
 
     /*
+    so this will restore the inprogress timer on load back to this page, without
+    this navigating away makes it seem like its lost because the forntend doesnt know it exists  
+    */
+    this.loadActiveTimer();
+
+    /*
     will fetch real projects/tasks too, these were previously hardcoded mock arrays mixed with one real seed row each, which
     meant most of the project/task dropdown was picking IDs the backend had never heard of. Loading real data removes that trap entirely
     */
     this.loadProjects();
-    this.loadTasks();
   }
   private onDateRangeChange(): void {
     this.loadCurrentTimesheet();
@@ -431,13 +431,14 @@ export class LogtimeComponent implements OnDestroy {
       this.conflictMessage.set('End time must be after start time.');
       return;
     }
-
-    if (this.newTaskFormContext() === 'manual' && !this.newTaskTitle().trim()) {
+    //when the user picks new task but never typed a title, block the save entirely.
+    if (this.isCreatingNewManualTask() && !this.newTaskTitle().trim()) {
       this.newTaskTitleError.set(true);
       return;
     }
-
-    const entry = this.buildEntryFromForm();
+    //Backlog: this generates the new task client side
+    const request = this.buildTimeEntryRequestFromForm();
+    const entry = this.buildEntryFromForm(request);
 
     // Collision checking evaluation logic
     const hasConflict = this.entries().some(
@@ -494,7 +495,6 @@ export class LogtimeComponent implements OnDestroy {
       this.closePanel();
     };
 
-    const request = this.buildTimeEntryRequestFromForm();
     const response = this.isEditMode()
       ? this.http.put<TimeEntry>(
           `${this.apiBaseUrl}/time-entries/${entry.id}`,
@@ -519,11 +519,6 @@ export class LogtimeComponent implements OnDestroy {
   //Instantiates the async timer interval loops, updating counters progressively
 
   startTimer(): void {
-    if (this.newTaskFormContext() === 'timer' && !this.newTaskTitle().trim()) {
-      this.newTaskTitleError.set(true);
-      return;
-    }
-
     const timer: ActiveTimer = {
       projectId: this.timerForm.controls.projectId.value,
       taskId: this.resolveTaskId('timer') || null,
@@ -654,9 +649,10 @@ export class LogtimeComponent implements OnDestroy {
     Refresh from the backend first so the overlap check isn't relying on potentially stale client-side state (e.g. an entry created in another tab/session while this timer was running).
     */
     this.http
-      .get<
-        TimeEntry[]
-      >(`${this.apiBaseUrl}/time-entries/me`, this.requestOptions())
+      .get<TimeEntry[]>(
+        `${this.apiBaseUrl}/time-entries/me`,
+        this.requestOptions(),
+      )
       .subscribe({
         next: (fetchedEntries) => {
           this.entries.set(
@@ -891,32 +887,7 @@ export class LogtimeComponent implements OnDestroy {
 
   private resolveTaskId(context: 'manual' | 'timer'): string {
     const form = context === 'manual' ? this.entryForm : this.timerForm;
-
-    if (this.newTaskFormContext() !== context) {
-      return form.controls.taskId.value;
-    }
-
-    const title = this.newTaskTitle().trim();
-    if (!title) {
-      return '';
-    }
-
-    const projectId = form.controls.projectId.value;
-    const newTask: Task = {
-      id: this.createTaskId(),
-      projectId,
-      title,
-    };
-
-    this.tasks.update((tasks) => [...tasks, newTask]);
-    form.controls.taskId.setValue(newTask.id);
-    this.resetNewTaskState();
-
-    return newTask.id;
-  }
-
-  private createTaskId(): string {
-    return `task-${Date.now()}-${crypto.randomUUID()}`;
+    return form.controls.taskId.value;
   }
 
   private updateDuration(): void {
@@ -932,13 +903,12 @@ export class LogtimeComponent implements OnDestroy {
     });
   }
 
-  private buildEntryFromForm(): TimeEntry {
+  private buildEntryFromForm(request: TimeEntryRequest): TimeEntry {
     /*
     note: buildTimeEntryRequestFromForm() now returns durationSeconds not durationMinutes (matches the real request schema), but the local
     TimeEntry model still tracks durationMinutes for display purposes reading straight off the form control here instead of the request
     object, since spreading 'request' would leave durationMinutes missing
     */
-    const request = this.buildTimeEntryRequestFromForm();
     const now = new Date().toISOString().slice(0, 19);
 
     return {
@@ -1042,9 +1012,10 @@ export class LogtimeComponent implements OnDestroy {
 
   private loadEntries(): void {
     this.http
-      .get<
-        TimeEntry[]
-      >(`${this.apiBaseUrl}/time-entries/me`, this.requestOptions())
+      .get<TimeEntry[]>(
+        `${this.apiBaseUrl}/time-entries/me`,
+        this.requestOptions(),
+      )
       .subscribe({
         next: (entries) =>
           this.entries.set(
@@ -1067,9 +1038,10 @@ export class LogtimeComponent implements OnDestroy {
   */
   private loadProjects(): void {
     this.http
-      .get<
-        ProjectApiResponse[]
-      >(`${this.apiBaseUrl}/projects`, this.requestOptions())
+      .get<ProjectApiResponse[]>(
+        `${this.apiBaseUrl}/projects`,
+        this.requestOptions(),
+      )
       .subscribe({
         next: (projects) => {
           this.projects.set(projects.map((p) => ({ id: p.id, name: p.name })));
@@ -1080,6 +1052,7 @@ export class LogtimeComponent implements OnDestroy {
           if (!this.timerForm.controls.projectId.value) {
             this.timerForm.controls.projectId.setValue(firstProjectId);
           }
+          this.loadTasksForProject(firstProjectId); //populate tasks for whichever project
         },
         error: (error) =>
           this.conflictMessage.set(
@@ -1089,14 +1062,26 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   /*
-  Fetches real tasks from GET /api/tasks/my-tasks (replaces the old hardcoded mock array), keeps the "No task selected" placeholder row
-  at index 0 since filteredTasks()/selectableTasks() depend on it
+  I decided to deviate from the previous use of the api/tasks/my-tasks GET
+  because i think the system to should load every task on the project
+  because "assigned to me" just means you're the accountable owner, not that youre the only one allowed to touch it
+  so now tasks i fetched per project with the api/tasks/project GET
   */
-  private loadTasks(): void {
+  private lastLoadedTaskProjectId: string | null = null;
+  private loadTasksForProject(projectId: string): void {
+    if (!projectId) {
+      this.tasks.set([{ id: '', projectId: '', title: 'No task selected' }]);
+      return;
+    }
+    if (projectId === this.lastLoadedTaskProjectId) {
+      return;
+    }
+    this.lastLoadedTaskProjectId = projectId;
     this.http
-      .get<
-        TaskApiResponse[]
-      >(`${this.apiBaseUrl}/tasks/my-tasks`, this.requestOptions())
+      .get<TaskApiResponse[]>(
+        `${this.apiBaseUrl}/tasks/project/${projectId}`,
+        this.requestOptions(),
+      )
       .subscribe({
         next: (tasks) => {
           this.tasks.set([
@@ -1115,6 +1100,51 @@ export class LogtimeComponent implements OnDestroy {
       });
   }
 
+  private loadActiveTimer(): void {
+    this.timerService.getActiveTimer().subscribe({
+      next: (response) => this.restoreActiveTimer(response),
+      error: (error) => {
+        if (error.status !== 204 && error.status !== 200) {
+          console.error('[LogtimeComponent] loadActiveTimer failed:', error);
+        }
+      },
+    });
+  }
+  private restoreActiveTimer(response: ActiveTimerResponse | null): void {
+    if (!response?.active) {
+      return; //if nothing is runninh, there's nothing to restore here
+    }
+
+    const timer: ActiveTimer = {
+      id: response.id,
+      projectId: response.project.id,
+      taskId: response.task?.id ?? null,
+      notes: '',
+      startedAt: new Date(response.startedAt),
+    };
+
+    this.activeTimer.set(timer);
+    this.isTimerPaused.set(response.isPaused ?? false);
+    this.timerForm.patchValue(
+      { projectId: timer.projectId, taskId: timer.taskId ?? '' },
+      { emitEvent: false },
+    );
+
+    this.timerForm.disable({ emitEvent: false });
+    this.clearTimerInterval();
+
+    if (response.isPaused) {
+      this.pausedElapsedSeconds.set(response.elapsedSeconds ?? 0);
+      this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
+    } else {
+      this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
+      this.timerIntervalId = setInterval(() => {
+        this.elapsedSeconds.set(
+          Math.floor((Date.now() - timer.startedAt.getTime()) / 1000),
+        );
+      }, 1000);
+    }
+  }
   /*
   fetches the current period's timesheet so the submit button has something to act on. Uses GET /api/timesheets/me, which returns an
   array, taking the entry matching the current filter period since there's no single "current timesheet" endpoint documented in swagger
@@ -1123,9 +1153,10 @@ export class LogtimeComponent implements OnDestroy {
   */
   private loadCurrentTimesheet(): void {
     this.http
-      .get<
-        Timesheet[]
-      >(`${this.apiBaseUrl}/timesheets/me`, this.requestOptions())
+      .get<Timesheet[]>(
+        `${this.apiBaseUrl}/timesheets/me`,
+        this.requestOptions(),
+      )
       .subscribe({
         next: (timesheets) => {
           const from = this.filterForm.controls.from.value;
