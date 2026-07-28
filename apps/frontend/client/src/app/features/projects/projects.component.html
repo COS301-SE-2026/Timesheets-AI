@@ -123,7 +123,7 @@ HEADER
                     <div class="project-card-header">
                         <div class="project-title-row">
                             <div class="project-avatar"> 
-                                {{project.initials}}
+                                {{ getProjectInitials(project.name )}}
                             </div>
 
                             <div class="project-title-content">
@@ -131,9 +131,9 @@ HEADER
                                     {{project.name}}
                                 </h2>
 
-                                <p class="project-client">
+                                <!-- <p class="project-client">
                                     {{project.client}}
-                                </p>
+                                </p> -->
                             </div>
                         </div>
 
@@ -170,13 +170,13 @@ HEADER
                             </span>
 
                             <span class="progress-value">
-                                {{project.hoursLogged }}h / {{project.totalHours}}
+                                {{project.hoursLogged }}h / {{project.budgetHours}}
                             </span>
 
                         </div>
                         
                         <app-progress-bar
-                            [progress]="(project.hoursLogged / project.totalHours)*100">
+                            [progress]="project.progressPercentage">
                         </app-progress-bar>
                     </div>
                         
@@ -190,11 +190,11 @@ HEADER
                         <span 
                             class="role-chip"
                             [ngClass]="{
-                                'developer-chip': project.role ==='Developer',
-                                'manager-chip': project.role ==='Manager',
-                                'admin-chip': project.role ==='Admin'
+                                'developer-chip': project.myRole ==='Developer',
+                                'manager-chip': project.myRole ==='Manager',
+                                'admin-chip': project.myRole ==='Admin'
                             }">
-                            {{project.role}}
+                            {{project.myRole}}
                         </span> 
                     </div>
 
@@ -205,12 +205,12 @@ HEADER
 
                         <span class="team-count">
                             <i class="fa-solid fa-user"></i>
-                            {{project.teamMembers.length}}
+                            {{project.members.length}}
                             members
                         </span>
 
                         <div class="team-members">
-                            @for (member of project.teamMembers.slice(0,4); track member){
+                            @for (member of project.teamMembers.slice(0,4); track member.workspaaceMemberId){
                                 <span class="team-member">
                                     {{member}}
                                 </span>
@@ -218,7 +218,7 @@ HEADER
 
                             @if(project.teamMembers.length >4){
                                 <span class="team-member-more">
-                                    +{{project.teamMembers.length -4}}
+                                    +{{project.members.length -4}}
                                 </span>
                             }
                         </div>
