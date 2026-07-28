@@ -229,7 +229,7 @@ export class TimesheetsComponent {
         //build lightweight summaries only, no entries yet, it keeps this to a 3
         //request total instead of n+1 per timesheet
 
-        const summaries = timesheets.map((ts) => this.toSummary(ts));
+        const summaries = timesheets.map((ts) => this.toSummary(ts)).sort((a,b) => a.periodStart.localeCompare(b.periodStart));
         this.allTimesheets.set(
           summaries.map((summary) => ({
             summary,
@@ -245,11 +245,16 @@ export class TimesheetsComponent {
           return;
         }
 
+        const todayStr = this.toIsoDate(new Date());
+        const currentWeek = summaries.find(
+          (s) => s.periodStart <= todayStr && s.periodEnd >= todayStr,
+        );
+
         const targetId = summaries.some(
           (s) => s.id === this.selectedTimesheetId(),
         )
           ? this.selectedTimesheetId()
-          : summaries[0].id;
+          : (currentWeek ?? summaries[0]).id;
 
         this.selectedTimesheetId.set(targetId);
         this.loadEntriesForWeek(targetId); //this will fetch just the selected weeks entries
@@ -361,12 +366,13 @@ export class TimesheetsComponent {
   }
 
   private buildWeekDays(periodStart: string): Day[] {
-    const start = new Date(periodStart);
-    const todayStr = new Date().toISOString().slice(0, 10);
+    //Noticed a bug in the weekdays that means entries logged on Log time werent showing up on the matching day column here
+    //i think they date values were off by one
+    const [year, month, day] = periodStart.split('-').map(Number);
+    const todayStr = this.toIsoDate(new Date());
     return Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(start);
-      date.setDate(start.getDate() + i);
-      const dateStr = date.toISOString().slice(0, 10);
+      const date = new Date(year, month - 1, day + i); //local time throughout, instead of UTC
+      const dateStr = this.toIsoDate(date);
       return {
         label: date.toLocaleDateString([], {
           weekday: 'short',
@@ -377,6 +383,13 @@ export class TimesheetsComponent {
         isToday: dateStr === todayStr,
       };
     });
+  }
+  //helper function to format a date to be a YYYY-MM-DD without the toISOString()'s UTC
+  private toIsoDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private formatDuration(minutes: number): string {
