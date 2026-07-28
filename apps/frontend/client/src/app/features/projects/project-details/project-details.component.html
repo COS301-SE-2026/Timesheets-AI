@@ -72,26 +72,11 @@ Related Requirements: N/A
         <div class="meta-card">
             <i class="fa-regular fa-building"></i>
 
-            <span class="meta-title">
-                Client
-            </span>
-
-            <strong>
-                {{ project().client }}
-            </strong>
-
         </div>
 
         <div class="meta-card">
             <i class="fa-regular fa-calendar"></i>
 
-            <span class="meta-title">
-                Deadline
-            </span>
-
-            <strong>
-                {{ project().deadline }}
-            </strong>
         </div>
 
         <div class="meta-card">
@@ -188,7 +173,7 @@ Related Requirements: N/A
             <div class="hours-summary">
                 <h2>
                     {{ project().hoursLogged }}h
-                    <span>of {{ project().totalHours}}h</span>
+                    <span>of {{ project().budgetHours}}h</span>
                 </h2>
 
                 <p class="remaining-hours">

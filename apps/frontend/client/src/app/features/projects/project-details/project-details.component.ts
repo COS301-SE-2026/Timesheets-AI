@@ -13,7 +13,7 @@ import { ProgressBarComponent } from "../../../shared/components/progress-bar/pr
 import { StatusChipComponent } from "../../../shared/components/status-chip/status-chip.component";
 import { PROJECT_DETAIL } from "../mock/project-details.mock";
 import { ActivatedRoute } from "@angular/router";
-import { ProjectDetails } from "./models/project-details.model";
+import { ProjectDetails, ProjectMember } from "./models/project-details.model";
 import { RouterModule } from "@angular/router";
 import { ProjectStatus } from "../enums/project-status.enum";
 import { ProjectRole } from "../enums/project-role.enum";
@@ -63,13 +63,11 @@ export class ProjectDetailsComponent {
     protected readonly completionPercentage= computed(()=>{
         const project= this.project();
 
-        if(project.totalHours===0){
+        if(project.budgetHours===0){
             return 0;
         }
 
-        return Math.round(
-            (project.hoursLogged / project.totalHours)*100,
-        );
+        return project.progressPercentage;
     });
 
     protected readonly remainingHours= computed(()=>{
@@ -77,35 +75,35 @@ export class ProjectDetailsComponent {
 
         return Math.max(
             0,
-            project.totalHours- project.hoursLogged,
+            project.budgetHours- project.hoursLogged,
         );
 
     });
 
-    protected readonly projectTitle= computed(
-        ()=> this.project().name,
-    );
+    // protected readonly projectTitle= computed(
+    //     ()=> this.project().name,
+    // );
 
-    protected readonly projectStatus= computed(
-        ()=> this.project().status,
-    );
+    // protected readonly projectStatus= computed(
+    //     ()=> this.project().status,
+    // );
 
-    protected readonly projectRole= computed(
-        ()=> this.project().role,
-    );
+    // protected readonly projectRole= computed(
+    //     ()=> this.project().role,
+    // );
 
-    protected readonly projectTags= computed(
-        ()=> this.project().tags,
-    );
+    // protected readonly projectTags= computed(
+    //     ()=> this.project().tags,
+    // );
 
-    protected readonly projectMembers= computed(
-        ()=> this.project().teamMembers,
-    );
+    // protected readonly projectMembers= computed(
+    //     ()=> this.project().teamMembers,
+    // );
 
     protected readonly hoursSummary= computed(()=>{
         const project= this.project();
         
-        return `${project.hoursLogged}h / ${project.totalHours}h`;
+        return `${project.hoursLogged}h / ${project.budgetHours}h`;
     });
 
     hoursChartData: ChartConfiguration<'bar'>['data']= {
@@ -114,7 +112,7 @@ export class ProjectDetailsComponent {
             {
                 data:[
                     this.project().hoursLogged,
-                    this.project().totalHours
+                    this.project().budgetHours
                 ],
 
                 backgroundColor:[
@@ -154,7 +152,7 @@ export class ProjectDetailsComponent {
 
             y:{
                 beginAtZero:true,
-                max: this.project().totalHours,
+                max: this.project().budgetHours,
                 ticks:{
                     stepSize:10
                 },
@@ -164,5 +162,27 @@ export class ProjectDetailsComponent {
             }
         }
     };
+
+    //helpers to replace what i removed
+    protected getMemberName(member: ProjectMember): string{
+        return `${member.firstName} ${member.lastName}`
+    }
+
+    protected getInitials(member: ProjectMember): string{
+        return `${member.firstName[0]}${member.lastName[0]}`
+    }
+
+    protected getAvatarColour(member: ProjectMember):string{
+        const colours=[
+            'avatar-blue',
+            'avatar-purple',
+            'avatar-green',
+            'avatar-orange'
+        ];
+
+        return colours[
+            member.firstName.length%colours.length
+        ];
+    }
     
 }

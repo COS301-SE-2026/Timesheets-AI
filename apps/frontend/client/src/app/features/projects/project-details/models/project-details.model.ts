@@ -9,14 +9,18 @@ import { Project } from "../../models/project.model";
 import { ProjectRole } from "../../enums/project-role.enum";
 
 export interface ProjectMember{
-    id: string;
-    name: string;
-    initials: string;
+    workspaceMemberId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    hoursLogged: number;
     role: ProjectRole;
-    avatarColourClass: string;
+    joinedAt: string;
 }
 export interface ProjectDetails extends Project{
-    deadline: string;
+    totalCost: number;
+    hoursLogged: number
     members: ProjectMember[];
-    completionPercentage?: number;
+    progressPercentage: number;
 }
+
