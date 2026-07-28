@@ -13,7 +13,7 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   FormBuilder,
@@ -24,12 +24,28 @@ import {
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
 
-declare const google: any;
+//while doing lint fixes, i had to change the type from any
+interface GoogleIdentityServices {
+  accounts: {
+    id: {
+      initialize(config: {
+        client_id: string;
+        callback: (response: { credential: string }) => void;
+      }): void;
+      renderButton(
+        parent: HTMLElement,
+        options: { theme: string; size: string; width: number },
+      ): void;
+      prompt(): void;
+    };
+  };
+}
+declare const google: GoogleIdentityServices;
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
