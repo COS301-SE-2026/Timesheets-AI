@@ -36,6 +36,7 @@ import { RouterModule } from '@angular/router';
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss',
 })
+
 export class ProjectsComponent {
   protected readonly projects: Project[] = PROJECTS;
   protected filteredProjects: Project[] = [...PROJECTS];
@@ -68,7 +69,7 @@ export class ProjectsComponent {
 
   protected get totalHours(): number {
     return this.projects.reduce(
-      (totalHours, project) => totalHours + project.hoursLogged,
+      (totalHours, project) => totalHours + project.budgetHours,
       0,
     );
   }
@@ -93,33 +94,44 @@ export class ProjectsComponent {
     );
   }
 
-  protected filterByTag(tag:string): void{
-    const tagIndex=this.selectedTags.indexOf(tag);
+  // protected filterByTag(tag:string): void{
+  //   const tagIndex=this.selectedTags.indexOf(tag);
 
-    //removing tag if it was already selected
-    if(tagIndex> -1){
-      this.selectedTags.splice(tagIndex,1);
-    }else{
-      this.selectedTags.push(tag)
+  //   //removing tag if it was already selected
+  //   if(tagIndex> -1){
+  //     this.selectedTags.splice(tagIndex,1);
+  //   }else{
+  //     this.selectedTags.push(tag)
+  //   }
+
+  //   //no tags are selected= show everything
+  //   if(this.selectedTags.length===0){
+  //     this.filteredProjects=[...this.projects];
+  //     return;
+  //   }
+
+  //   this.filteredProjects=this.projects.filter(
+  //     project=>
+  //       this.selectedTags.every(
+  //         tag=>project.tags.includes(tag),
+  //       ),
+  //   );
+  // }
+
+  // protected get avaiableTags(): string[]{
+  //   return[... new Set(
+  //     this.projects.flatMap(project=> project.tags),
+  //   )];
+  // }
+
+  protected getProjectInitials(name:string):string{
+    if(!name) return '';
+    return name
+        .split(' ')
+        .map(word=> word[0])
+        .join('')
+        .substring(0, 2)
+        .toUpperCase();
     }
 
-    //no tags are selected= show everything
-    if(this.selectedTags.length===0){
-      this.filteredProjects=[...this.projects];
-      return;
-    }
-
-    this.filteredProjects=this.projects.filter(
-      project=>
-        this.selectedTags.every(
-          tag=>project.tags.includes(tag),
-        ),
-    );
-  }
-
-  protected get avaiableTags(): string[]{
-    return[... new Set(
-      this.projects.flatMap(project=> project.tags),
-    )];
-  }
 }

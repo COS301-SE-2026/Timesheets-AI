@@ -88,28 +88,7 @@ HEADER
         }
     </section>
 
-    <div class="project-tags-filter">
-        <div class="tags-heading">
-            <i class="fa-solid fa-tags"></i>
-            <span class="tags-title">
-                Tags:
-            </span>
-        </div>
-        
-        @for(tag of avaiableTags; track tag){
-            <button
-                type="button"
-                class="filter-tag"
-                [class.selected-tag]="selectedTags.includes(tag)"
-                (click)="filterByTag(tag)">
 
-                {{tag}}
-            
-            </button>
-        }
-
-        
-    </div>
 
     <!--
     PROJECTS :)
@@ -131,9 +110,7 @@ HEADER
                                     {{project.name}}
                                 </h2>
 
-                                <!-- <p class="project-client">
-                                    {{project.client}}
-                                </p> -->
+                                
                             </div>
                         </div>
 
@@ -152,13 +129,7 @@ HEADER
                     <!--
                     TAGS
                     -->
-                    <div class="project-tags">
-                        @for (tag of project.tags; track tag){
-                            <span class="project-tag">
-                                {{tag}}
-                            </span>
-                        }
-                    </div>
+                    
 
                     <!--
                     PROGRESS OF PROJECTS??
@@ -170,14 +141,12 @@ HEADER
                             </span>
 
                             <span class="progress-value">
-                                {{project.hoursLogged }}h / {{project.budgetHours}}
+                                {{project.budgetHours }}h / {{project.budgetHours}}
                             </span>
 
                         </div>
                         
-                        <app-progress-bar
-                            [progress]="project.progressPercentage">
-                        </app-progress-bar>
+                        
                     </div>
                         
 
@@ -203,25 +172,7 @@ HEADER
                     -->
                     <div class="project-team">
 
-                        <span class="team-count">
-                            <i class="fa-solid fa-user"></i>
-                            {{project.members.length}}
-                            members
-                        </span>
-
-                        <div class="team-members">
-                            @for (member of project.teamMembers.slice(0,4); track member.workspaaceMemberId){
-                                <span class="team-member">
-                                    {{member}}
-                                </span>
-                            }
-
-                            @if(project.teamMembers.length >4){
-                                <span class="team-member-more">
-                                    +{{project.members.length -4}}
-                                </span>
-                            }
-                        </div>
+                        
                     </div>
                 </a>
             </article>

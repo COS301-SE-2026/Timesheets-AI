@@ -16,16 +16,18 @@ import { ProjectStatus } from '../enums/project-status.enum';
 
 export const PROJECTS: Project[] = [
   {
-    id: '1',
+    id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
     name: 'Project Alpha',
-    client: 'TechCorp Inc.',
     description: 'Customer-facing web application rebuilding.',
     status: ProjectStatus.ACTIVE,
-    hoursLogged: 45.3,
-    totalHours: 60,
-    role: ProjectRole.DEVELOPER,
-    teamMembers: ['JD', 'SK', 'MR', 'CK', 'LS', 'KM'],
-    tags: ['web', 'angular'],
-    initials: 'PA'
+    budgetHours: 60,
+    hourlyRate: 85,
+    budgetCost: 5100,
+    // totalHours: 60,
+    createdAt: '2026-07-01T08:00:00Z',
+    updatedAt:'2026-07-28T14:30:00Z',
+    myRole: ProjectRole.DEVELOPER,
+    startDate: '2026-06-01T08:00:00Z',
+    endDate: '2026-12-31T23:59:59Z',
   },
 ];
