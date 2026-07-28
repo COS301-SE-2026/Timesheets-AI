@@ -239,6 +239,7 @@ it must end with:
 
             <!-- JaCoco to see the coverage-->
             <!-- code from: https://medium.com/@truongbui95/jacoco-code-coverage-with-spring-boot-835af8debc68 -->
+            <!-- added it to verify instead of test phase because it was slowing down testing-->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -252,7 +253,7 @@ it must end with:
                     </execution>
                     <execution>
                         <id>report</id>
-                        <phase>test</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>report</goal>
                         </goals>
