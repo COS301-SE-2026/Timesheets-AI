@@ -78,7 +78,12 @@ describe('LogtimeComponent', () => {
     httpMock.expectOne('/api/timesheets/me').flush([mockTimesheet]);
     httpMock.expectOne('/api/time-entries/me').flush(mockEntries);
     httpMock.expectOne('/api/projects').flush(mockProjects);
-    httpMock.expectOne('/api/tasks/my-tasks').flush(mockTasks);
+   
+    //no active timer running at start of normal test, 204 No Content
+    httpMock.expectOne('/api/timers/active').flush(null, {status: 204, statusText: 'No Content'})
+
+    httpMock.expectOne(`/api/tasks/project/${projectOneId}`).flush(
+      mockTasks.filter((t)=> t.projectId === projectOneId),);
   }
 
   beforeEach(async () => {
@@ -128,7 +133,8 @@ describe('LogtimeComponent', () => {
 
     //tasks signal keeps the "No task selected" placeholder at index 0
     expect(component.tasks()[0].title).toBe('No task selected');
-    expect(component.tasks()).toHaveLength(mockTasks.length + 1);
+    const projectOneTasks = mockTasks.filter((t) => t.projectId === projectOneId);
+    expect(component.tasks()).toHaveLength(projectOneTasks.length + 1);
   });
 
   it('should load the current timesheet and expose its status', () => {
@@ -203,6 +209,10 @@ describe('LogtimeComponent', () => {
       endTime: '23:00',
       description: 'Designed the log time page.',
     });
+
+    httpMock.expectOne(`/api/tasks/project/${projectTwoId}`).flush(
+      mockTasks.filter((t) => t.projectId === projectTwoId),
+    );
 
     component.saveEntry();
 
@@ -342,7 +352,8 @@ describe('LogtimeComponent', () => {
 
   //Timer functionality
   it('should start and stop a timer entry', () => {
-    jest.useFakeTimers();
+     jest.useFakeTimers();
+     jest.setSystemTime(new Date(`${today()}T03:00:00`)); // fixed, off-hours — avoids the 09:00-11:00 mock entry
 
     const initialCount = component.entries().length;
 
@@ -351,6 +362,10 @@ describe('LogtimeComponent', () => {
       taskId: taskTwoId,
       description: 'Timer tracked work.',
     });
+
+    httpMock.expectOne(`/api/tasks/project/${projectTwoId}`).flush(
+      mockTasks.filter((t) => t.projectId === projectTwoId),
+    );
 
     component.startTimer();
 
@@ -366,6 +381,7 @@ describe('LogtimeComponent', () => {
     expect(component.activeTimer()).toBeTruthy();
     expect(component.elapsedSeconds()).toBe(61);
 
+    
     component.stopTimer();
 
     //stopTimer() refreshes entries first to check for conflicts
@@ -393,6 +409,10 @@ describe('LogtimeComponent', () => {
         isDeleted: false,
       },
     ]);
+
+    httpMock.expectOne(`/api/tasks/project/${projectOneId}`).flush(
+      mockTasks.filter((t) => t.projectId === projectOneId),
+    );
 
     expect(component.entries().length).toBe(initialCount + 1);
     expect(component.activeTimer()).toBeNull();
@@ -484,23 +504,33 @@ describe('LogtimeComponent', () => {
 
     component.entryForm.controls.projectId.setValue(projectTwoId);
 
+    httpMock.expectOne(`/api/tasks/project/${projectTwoId}`).flush(
+      mockTasks.filter((t) => t.projectId === projectTwoId),
+    );
+
     expect(component.entryForm.controls.taskId.value).toBe('');
   });
 
   // Selectable task filtering
   it('should compute selectable tasks correctly', () => {
-    component.entryForm.controls.projectId.setValue(projectOneId);
+    component.entryForm.controls.projectId.setValue(projectTwoId);
+
+    httpMock.expectOne(`/api/tasks/project/${projectTwoId}`)
+    .flush(mockTasks.filter((t) => t.projectId === projectTwoId));
 
     const tasks = component.selectableTasks();
 
     expect(tasks.length).toBeGreaterThan(0);
 
-    expect(tasks.every((task) => task.projectId === projectOneId)).toBe(true);
+    expect(tasks.every((task) => task.projectId === projectTwoId)).toBe(true);
   });
 
   // Timer selectable tasks filtering
   it('should compute selectable timer tasks correctly', () => {
     component.timerForm.controls.projectId.setValue(projectTwoId);
+
+    httpMock.expectOne(`/api/tasks/project/${projectTwoId}`)
+    .flush(mockTasks.filter((t) => t.projectId === projectTwoId));
 
     const tasks = component.selectableTimerTasks();
 
