@@ -124,12 +124,6 @@
                 <dd class="summary-card-locked"> {{ s.isLocked ? 'Yes' : 'No' }}  
                 </dd>
               </div>
-             
-              <div class="summary-meta-card">
-                <i class="fa-regular fa-clock summary-meta-icon" aria-hidden="true"></i>
-               <dt> Created At </dt>
-               <dd>{{ formatDateTime(s.createdAt) }}</dd>
-              </div>
 
               <div class="summary-meta-card">
                 <i class="fa-regular fa-clock summary-meta-icon" aria-hidden="true"></i>
@@ -155,10 +149,9 @@
           <thead>
             <tr>
               <th class="col-task">Task</th>
-              @for (day of days(); track day.isoDate) {
-                <th class="col-day">
-                  <span class="col-day-name"> {{ day.label }} </span>
-                  <span class="col-day-date"> {{ day.dateLabel }} </span>
+              @for (day of days(); track day.dateStr) {
+                <th class="col-day" [class.highlighted-today-column]="day.isToday">
+                  {{ day.label }}
                 </th>
               }
               <th class="col-total">Total</th>
@@ -166,7 +159,7 @@
           </thead>
 
           <tbody>
-            @for (task of tasks(); track task.taskId) {
+            @for (task of tasks(); track task.id) {
               <tr>
                 <td class="col-task">
                   <div class="task-cell">
@@ -175,15 +168,13 @@
                       <strong class="task-cell-title"> {{ task.title }} </strong>
                       <span class="task-cell-meta">
                         {{ task.project }}
-                        <span class="task-cell-pipe"> | </span>
-                        {{ task.category }}
                       </span>
                     </div>
                   </div>
                 </td>
 
-                @for (hours of task.dailyHours; track $index) {
-                  <td class="col-day" [class.is-empty]="!hours">
+                @for (hours of task.loggedHours; track $index) {
+                  <td class="col-day" [class.is-empty]="hours === '-'" [class.highlighted-today-column]="days()[$index].isToday">
                     {{ displayHours(hours) }}
                   </td>
                 }
@@ -258,7 +249,7 @@
 
     <!-- Submit confirmation modal -->
     @if (showSubmitDialog()){
-    <div class="modal-backdrop" (click)="closeSubmitDialog()" (keydown.enter)="closeSubmitDialog()" (keydown.space)="closeSubmitDialog()" ></div>
+    <button = "button" aria-label="Close dialog" (click)="closeSubmitDialog()" ></button>
 
     <dialog class="modal" aria-labelledby="submit-modal-title" open>
       <div class="modal-icon" aria-hidden="true">
@@ -321,4 +312,3 @@
    }
     
 </div>
-
