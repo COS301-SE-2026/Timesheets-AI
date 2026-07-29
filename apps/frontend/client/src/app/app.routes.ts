@@ -80,6 +80,15 @@ export const routes: Routes = [
       ),
   },
 
+  // DEMO 2
+  {
+    path: 'verify-email',
+    loadComponent: () =>
+      import('./features/verify-email/verify-email.component').then(
+        m => m.VerifyEmailComponent
+      ),
+  },
+
   /* Catch-all wildcard (redirects to 404) */
   {
     path: '**',

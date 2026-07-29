@@ -18,6 +18,8 @@ export interface RegisterResponse {
   lastName: string;
   createdAt: string;
   message: string;
+  //DEMO 2
+  verificationToken: string;
 }
 
 export interface LoginRequest {

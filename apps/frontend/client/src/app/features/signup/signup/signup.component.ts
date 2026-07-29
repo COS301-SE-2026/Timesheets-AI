@@ -9,6 +9,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink, Router} from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { first } from 'rxjs';
 @Component({
   selector: 'app-signup',
   imports: [ReactiveFormsModule, RouterLink],
@@ -56,8 +57,7 @@ export class SignupComponent {
         // Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d).+$/)
         // REGEX need to match backend exactly
         Validators.pattern(
-            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\S+$).{8,20}$/
-
+          /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\S+$).{8,20}$/
         )
       ]
     ],
@@ -84,13 +84,25 @@ export class SignupComponent {
     const {name, surname, email, password } = this.signupForm.getRawValue();
     this.authService
     .register({firstName:name, lastName: surname, email, password})
-    .subscribe({
-      next: () => {
-        this.loading = false;
-        //no token comes back here, they still need to verify email then log in
+    // .subscribe({
+    //   next: () => {
+    //     this.loading = false;
+    //     //no token comes back here, they still need to verify email then log in
 
-        this.router.navigate(['/login'], {
-          queryParams: {registered: 'true'}
+    //     this.router.navigate(['/login'], {
+    //       queryParams: {registered: 'true'}
+    //     });
+    //   },
+    .subscribe({
+      next: (response) => {
+        this.loading = false;
+
+        this.router.navigate(['/verify-email'], {
+          state: {
+              token: response.verificationToken,
+              email: response.email,
+              firstName: response.firstName
+          }
         });
       },
       error: err => {
