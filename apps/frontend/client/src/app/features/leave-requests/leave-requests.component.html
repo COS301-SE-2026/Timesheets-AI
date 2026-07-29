@@ -28,7 +28,7 @@
                 </div>
             }
 
-            <section class="summary-grid" aria-lable="Leave request summary">
+            <section class="summary-grid" aria-label="Leave request summary">
                 @for (card of summaryCards(); track card.label){
                     <article class="summary-card">
                         <span class="summary-card-icon" [ngClass]=" 'summary-card-icon-' + card.type">
@@ -55,7 +55,7 @@
                     <p>{{ errorMessage() ?? 'Please try again later.' }}</p>
                 </section>
             } @else if (leaveRequests().length > 0){
-                <section class="content-card request-card" aria-labbeledby="request-table-title">
+                <section class="content-card request-card" aria-labelledby="request-table-title">
                     <h2 id="request-table-title" class="section-heading"> Your leave requests </h2>
                     <div class="table-wrapper">
                         <table class="request-table">
@@ -83,7 +83,7 @@
 
                                         <td data-label="Start Date"> {{ formatDate(request.startDate) }}</td>
                                         <td data-label="End Date"> {{ formatDate(request.endDate) }}</td>
-                                        <td data-label="Total days"> 
+                                        <td data-label="Total Days"> 
                                             <span class="number"> {{request.totalDays | number: '1.1-1' }}</span>
                                         </td>
                                         <td data-label="Status">
@@ -98,7 +98,7 @@
 
                                                 @if (canEdit(request)){
                                                     <button type="button" class="icon-button" [attr.aria-label]="'Edit '+ leaveTypeLabel(request.leaveType) + ' request'" title="Edit Request" (click)="editRequest(request)">
-                                                        <i class="fa-sloid fa-pen" aria-hidden="true"></i>
+                                                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
                                                     </button>
 
                                                     <button type="button" class="icon-button icon-button-danger" [attr.aria-label]="'Cancel ' + leaveTypeLabel(request.leaveType) + ' request'" title="Cancel request" (click)="cancelRequest(request)">
@@ -148,7 +148,7 @@
                     <h2 id="request-details-title" class="form-section-title"> Request Details </h2>
 
                     <div class="form-grid">
-                        <div class="form-filed" >
+                        <div class="form-field" >
                             <label class="form-label" for="leave-type">
                                  Leave Type
                                 <span class="required" aria-hidden="true"> * </span>
@@ -156,7 +156,7 @@
 
                             <div class="control-wrapper">
                                 <select id="leave-type" class="form-control" formControlName="leave_type" [class.form-control-invalid]="isInvalid('leave_type')" aria-describedby="leave-type-error">
-                                    <option value="" disables>
+                                    <option value="" disabled>
                                         Select leave type
                                     </option>
 
@@ -175,13 +175,13 @@
                             }
                         </div>
 
-                        <div class="form-field form-fieldd-reason">
+                        <div class="form-field form-field-reason">
                             <label class="form-label" for="leave-reason">
                                 Reason
                                 <span class="required" aria-hidden="true">*</span>
                             </label>
 
-                            <textarea id="leave-request" class="form-control form-control-textarea" rows="5" maxlength="500" formControlName="reason" placeholder="Please proved a reason for your leave request" [class.form-control-invalid]="isInvalid('reason')" aria-describedby="reason--error reason-counter">
+                            <textarea id="leave-reason" class="form-control form-control-textarea" rows="5" maxlength="500" formControlName="reason" placeholder="Please provide a reason for your leave request" [class.form-control-invalid]="isInvalid('reason')" aria-describedby="reason-error reason-counter">
 
                             </textarea>
 
@@ -192,7 +192,7 @@
                             @if (isInvalid('reason')){
                                 <p  id="reason-error" class="form-error">
                                     @if (leaveRequestForm.controls.reason.hasError('required')){
-                                        Please proved a reason
+                                        Please provide a reason
                                     } @else {The reason cannot exceed 500 characters. }
                                 </p>
                             }
@@ -201,12 +201,12 @@
                         <div class="form-field">
                             <label class="form-label" for="start-date"> 
                                 Start Date
-                                <span class="required" aria-hiiden="true">*</span>
+                                <span class="required" aria-hidden="true">*</span>
                             </label>
 
-                            <div class="controlWrapper">
-                                <input id="start-date" type="date" class="form-control form-control-date" formControlName="start-date" [class.form-control-invalid]="isInvalid('start_date')" aria-describedby="start-date-error"/>
-                                <i class="fa-regualr fa-calendar control-wrapper-icon" aria-hidden="true"></i>
+                            <div class="control-wrapper">
+                                <input id="start-date" type="date" class="form-control form-control-date" formControlName="start_date" [class.form-control-invalid]="isInvalid('start_date')" aria-describedby="start-date-error"/>
+                                <i class="fa-regular fa-calendar control-wrapper-icon" aria-hidden="true"></i>
                             </div>
 
                             @if(isInvalid('start_date')){
@@ -219,11 +219,11 @@
                         <div class="form-field">
                             <label class="form-label" for="end-date">
                                 End date
-                                <span class="required" aria-hideen="true">*</span>
+                                <span class="required" aria-hidden="true">*</span>
                             </label>
 
                             <div class="control-wrapper">
-                                <input id="end-date" type="date" class="form-cntrol form-control-date" formControlName="end_date" [class.form-control-invalid]="isInvalid('end_date') || leaveRequestForm.hasError('invalidDateRange')" aria-describedby="end-date-error"/>
+                                <input id="end-date" type="date" class="form-control form-control-date" formControlName="end_date" [class.form-control-invalid]="isInvalid('end_date') || leaveRequestForm.hasError('invalidDateRange')" aria-describedby="end-date-error"/>
                                 <i class=" fa-regular fa-calendar control-wrapper-icon" aria-hidden="true"></i>
                             </div>
 
@@ -238,9 +238,10 @@
                             }
                         </div>
 
-                        <div class="form-filed form-field-full-width">
+                 
+                        <div class="form-field form-field-full-width">
                             <label class="form-label" for="total-days">
-                                Total days 
+                                Total Days 
                                 <span class="required" aria-hidden="true">*</span>
                             </label>
 
@@ -256,19 +257,19 @@
                     </div>
                 </section>
 
-                <section class="from-section" aria-labelledby="additional-information-title">
+                <section class="form-section" aria-labelledby="additional-information-title">
                     <h2 id="additional-information-title" class="form-section-title">
                         Additional information
                     </h2>
 
-                    <div class="form-filed">
-                        <span class="form-labl">
+                    <div class="form-field">
+                        <span class="form-label">
                             Attachment (Optional)
                         </span>
 
                         <div class="attachment-placeholder">
                             <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
-                            <strong> Attachment are not available yet</strong>
+                            <strong> Attachments are not available yet</strong>
                             <span> The attachment value will remain empty for now</span>
                         </div>
 
@@ -288,8 +289,8 @@
                   
                         <p>
                             <strong>Note:</strong>
-                            Your resquest will be submitted for approval.
-                            Ypu will be notified once a decision had been made.
+                            Your request will be submitted for approval.
+                            You will be notified once a decision has been made.
                         </p>
                     </div>
                 </section>
@@ -313,8 +314,8 @@
 
                 <ul class="leave-guide-list">
                     @for (type of leaveTypeOptions; track type.value){
-                        <li class="leave-gude-item">
-                            <i [class]="type.icon + '' + iconClass(type.value)" aria-hidden="true"></i>
+                        <li class="leave-guide-item">
+                            <i [class]="type.icon + ' ' + iconClass(type.value)" aria-hidden="true"></i>
                             <strong> {{type.label}}</strong>
                             <span>{{ type.description }}</span>
                         </li>
