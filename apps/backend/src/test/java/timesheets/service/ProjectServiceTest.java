@@ -19,10 +19,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import timesheets.domain.Project;
 import timesheets.domain.ProjectMember;
+import timesheets.domain.TimeEntry;
+import timesheets.domain.User;
+import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateProjectRequest;
+import timesheets.dto.response.ProjectDetailResponse;
 import timesheets.dto.response.ProjectResponse;
+import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
+import timesheets.repository.TimeEntryRepository;
+import timesheets.repository.UserRepository;
+import timesheets.repository.WorkspaceMemberRepository;
 import timesheets.security.SecurityUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +41,11 @@ public class ProjectServiceTest {
   @Mock private ProjectRepository projectRepository;
   @Mock private ProjectMemberRepository projectMemberRepository;
   @Mock private ProjectService projectService;
+  @Mock private WorkspaceMemberRepository workspaceMemberRepository;
+  @Mock private UserRepository userRepository;
+  @Mock private TimeEntryRepository timeEntryRepository;
 
+  private final UUID testUserId = UUID.randomUUID();
   private final UUID testProjectId = UUID.randomUUID();
   private final UUID testWorkspaceId = UUID.randomUUID();
   private final String testProjectName = "Test Project";
@@ -83,6 +95,34 @@ public class ProjectServiceTest {
     request.setEndDate(LocalDate.now().plusMonths(1));
     request.setManagerIds(List.of());
     return request;
+  }
+
+  private User createTestUser() {
+    User user = new User();
+    user.setId(testUserId);
+    user.setEmail("test@momentum.co.za");
+    user.setFirstName("Test");
+    user.setLastName("User");
+    return user;
+  }
+
+  private WorkspaceMember createTestWorkspaceMember() {
+    WorkspaceMember member = new WorkspaceMember();
+    member.setId(testWorkspaceMemberId);
+    member.setUserId(testUserId);
+    member.setWorkspaceId(testWorkspaceId);
+    member.setRole(WorkspaceRole.DEVELOPER);
+    member.setCreatedAt(LocalDateTime.now());
+    return member;
+  }
+
+  private TimeEntry createTestTimeEntry() {
+    TimeEntry entry = new TimeEntry();
+    entry.setId(UUID.randomUUID());
+    entry.setProjectId(testProjectId);
+    entry.setWorkspaceMemberId(testWorkspaceMemberId);
+    entry.setDurationSeconds(3600);
+    return entry;
   }
 
   @Nested
@@ -157,6 +197,58 @@ public class ProjectServiceTest {
       assertThat(response.getBudgetCost()).isEqualTo(testBudgetCost);
 
       verify(projectRepository).save(any(Project.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Get Project Detail Tests")
+  class GetProjectDetailTests {
+
+    @Test
+    @DisplayName("returns project details")
+    void returnProjectDetail() {
+
+      // ARRANGE: setting up the project and the members
+      Project project = createTestProject();
+      WorkspaceMember workspaceMember = createTestWorkspaceMember();
+      ProjectMember projectMember = createTestProjectMember();
+
+      User user = createTestUser();
+      TimeEntry timeEntry = createTestTimeEntry();
+
+      // I want for the project to be returned when searched by ID
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectMemberRepository.findByProjectId(testProjectId))
+          .thenReturn(List.of(projectMember));
+      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+      when(userRepository.findById(testUserId)).thenReturn(Optional.of(user));
+
+      // this should be used to calculate the hours logged on the project
+      when(timeEntryRepository.findByProjectId(testProjectId)).thenReturn(List.of(timeEntry));
+
+      when(timeEntryRepository.findByWorkspaceMemberIdAndProjectId(
+              testWorkspaceMemberId, testProjectId))
+          .thenReturn(List.of(timeEntry));
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(projectMember));
+
+      // ACT: get the project details
+      ProjectDetailResponse response =
+          projectService.getProjectDetail(testProjectId, testWorkspaceMemberId);
+
+      // ASSERT: checking all the project details that are returned
+      assertThat(response).isNotNull();
+      assertThat(response.getId()).isEqualTo(testProjectId);
+      assertThat(response.getName()).isEqualTo(testProjectName);
+      assertThat(response.getMembers()).isNotNull();
+      assertThat(response.getMembers()).hasSize(1);
+      assertThat(response.getHoursLogged()).isEqualTo(BigDecimal.valueOf(60.0));
+      assertThat(response.getProgressPercentage()).isEqualTo(BigDecimal.valueOf(60.00));
+
+      verify(projectRepository).findById(testProjectId);
     }
   }
 }
