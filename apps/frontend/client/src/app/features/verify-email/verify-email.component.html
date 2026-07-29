@@ -39,6 +39,9 @@ If it fails, it saves the error string in error Message and display that
                 <button type="button" class="copy-button">
                     <mat-icon>content_copy</mat-icon>
                 </button>
+
+                <!-- when user clicks the clipboard icon, copied! will appear -->
+                <span clas="copied-text" *ngIf="copied"> Copied!</span>
             </div>
 
             <small class="token-help-message">
@@ -51,6 +54,28 @@ If it fails, it saves the error string in error Message and display that
             <span>{{ successMessage }}</span>
         </div>
 
-    
+        <div class="error" *ngIf="errorMessage">
+            <mat-icon>error</mat-icon>
+            <span>{{ errorMessage }}</span>
+        </div>
+
+        <!--might check another one because this is not that nice -->
+        <button class="verify-button" (click)="verifyEmail()">
+            <mat-icon>verified</mat-icon>
+
+            <span> Verify Email </span>
+
+            <span> Verifying </span>
+
+        </button>
+
+        <p class="login-text">
+            Aleady verified?
+        </p>
+
+        <a routerLink="/login" class="login-link">
+            Go To Login 
+        </a>
+
     </div>
 </div>
