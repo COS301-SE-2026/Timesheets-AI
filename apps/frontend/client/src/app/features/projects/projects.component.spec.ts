@@ -6,13 +6,19 @@ Author: Zamokuhle Zwane
 Date: 29 July 2026
 */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import {signal} from '@angular/core';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { signal } from '@angular/core';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { ProjectsComponent } from './projects.component';
 import { ProjectStatus } from './enums/project-status.enum';
 import { AuthService, AuthUser } from '../../core/services/auth.service';
-import { ProjectResponse, ProjectDetailResponse } from '../../core/services/project.service';
+import {
+  ProjectResponse,
+  ProjectDetailResponse,
+} from '../../core/services/project.service';
 import { Project } from './models/project.model';
 
 //specifically typed instead of as any
@@ -31,7 +37,7 @@ interface ProjectsComponentInternal {
   searchProjects(term: string): void;
 }
 
-function internal(component: ProjectsComponent): ProjectsComponentInternal{
+function internal(component: ProjectsComponent): ProjectsComponentInternal {
   return component as unknown as ProjectsComponentInternal;
 }
 
@@ -63,14 +69,13 @@ const KEITUMETSE_HOURS_LOGGED = 34 / 60; // -> "0h 34m", tests sub-hour case isn
 const PROJ1_TEAM_TOTAL_HOURS = 780.0666666666667;
 const PROJ1_PROGRESS_OVER_BUDGET = 174.62; // deliberately over 100, tests clamping
 
-
 describe('ProjectsComponent', () => {
   let component: ProjectsComponent;
   let fixture: ComponentFixture<ProjectsComponent>;
   let httpMock: HttpTestingController;
   let authServiceMock: Pick<AuthService, 'currentUser'>;
 
-  const currentUser: AuthUser ={
+  const currentUser: AuthUser = {
     id: 'user-1',
     email: USER_EMAIL,
     firstName: 'Enzokuhle',
@@ -82,7 +87,7 @@ describe('ProjectsComponent', () => {
   };
 
   ///matches GET /api/projects, no role flitering happens client side
-  const mockProjectList: ProjectResponse[] =[
+  const mockProjectList: ProjectResponse[] = [
     {
       id: 'proj-1',
       name: 'Mobile App Development',
@@ -126,7 +131,7 @@ describe('ProjectsComponent', () => {
       updatedAt: FIXTURE_TIMESTAMP,
     },
   ];
-function mockDetailFor(id: string): ProjectDetailResponse {
+  function mockDetailFor(id: string): ProjectDetailResponse {
     const detailsById: Record<string, ProjectDetailResponse> = {
       'proj-1': {
         id: 'proj-1',
@@ -215,16 +220,16 @@ function mockDetailFor(id: string): ProjectDetailResponse {
     };
     return detailsById[id];
   }
-  async function setup(){
+  async function setup() {
     authServiceMock = {
-      currentUser: signal<AuthUser | null> (currentUser),
+      currentUser: signal<AuthUser | null>(currentUser),
     };
     await TestBed.configureTestingModule({
       imports: [ProjectsComponent],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        {provide: AuthService, useValue: authServiceMock},
+        { provide: AuthService, useValue: authServiceMock },
       ],
     }).compileComponents();
 
@@ -232,181 +237,198 @@ function mockDetailFor(id: string): ProjectDetailResponse {
     fixture = TestBed.createComponent(ProjectsComponent);
     component = fixture.componentInstance;
   }
-    //flushes the list endpoint and drains the detail calls it triggers, any test that flushes the list has to flush httpClientTestingModule's
-    function flushProjectListAndDetails(
-      detailIds: string[] = ALL_PROJECT_IDS,
-    ): void{
+  //flushes the list endpoint and drains the detail calls it triggers, any test that flushes the list has to flush httpClientTestingModule's
+  function flushProjectListAndDetails(
+    detailIds: string[] = ALL_PROJECT_IDS,
+  ): void {
+    httpMock.expectOne(PROJECTS_ENDPOINT).flush(mockProjectList);
+    detailIds.forEach((id) => {
+      httpMock.expectOne(projectDetailEndpoint(id)).flush(mockDetailFor(id));
+    });
+  }
+
+  afterEach(() => {
+    httpMock.verify(); //catches any request that went unasserted
+  });
+
+  describe('initial load(ngOnInit', () => {
+    beforeEach(async () => {
+      await setup();
+      fixture.detectChanges(); //triggers ngOnInit
+    });
+
+    it('should create', () => {
+      flushProjectListAndDetails();
+      expect(component).toBeTruthy();
+    });
+
+    it('should be loading before the list resolves, and stop loading once it does', () => {
+      //checked before AND after the same flush, since loading only toggles off the list response not detail
+      expect(internal(component).loading).toBe(true);
+      flushProjectListAndDetails();
+      expect(internal(component).loading).toBe(false);
+    });
+
+    it('should render all projects returned by the list endpoint, no client side role filtering', () => {
+      flushProjectListAndDetails();
+      expect(internal(component).projects).toHaveLength(3);
+      expect(internal(component).filteredProjects).toHaveLength(3);
+    });
+
+    it('should set error true and loading false if the list calls fails', () => {
+      httpMock
+        .expectOne(PROJECTS_ENDPOINT)
+        .flush('server error', { status: 500, statusText: 'Server Error' });
+
+      expect(internal(component).error).toBe(true);
+      expect(internal(component).loading).toBe(false);
+    });
+
+    it('should issue a detail call for every project in the list, not a subset', () => {
+      flushProjectListAndDetails();
+      expect(internal(component).projects.every((p) => p.detailLoaded)).toBe(
+        true,
+      );
+      httpMock.verify();
+    });
+  });
+
+  describe('detail resolution, per card fields', () => {
+    beforeEach(async () => {
+      await setup();
+      fixture.detectChanges();
+    });
+
+    it('should format hoursLoggedLabel as "Xh Ym", not a raw decimal', () => {
+      flushProjectListAndDetails();
+      const card = internal(component).projects.find((p) => p.id === 'proj-1')!;
+      expect(card.hoursLoggedLabel).toBe('780h 4m');
+    });
+
+    it('should clamp progressPercentageClamped to 100 while keeping the raw value uncapped', () => {
+      flushProjectListAndDetails();
+      const card = internal(component).projects.find((p) => p.id === 'proj-1')!;
+      expect(card.progressPercentage).toBe(PROJ1_PROGRESS_OVER_BUDGET);
+      expect(card.progressPercentageClamped).toBe(100);
+    });
+
+    it('should populate teamMembersInitials from firstName/lastName', () => {
+      flushProjectListAndDetails();
+      const card = internal(component).projects.find((p) => p.id === 'proj-1')!;
+      expect(card.teamMemberInitials).toEqual(['TS', 'EK']); //array, toEqual not toBe(sign SonarQube!)
+    });
+
+    it('should show the 34-min case correctly rather than rounding it away', () => {
+      flushProjectListAndDetails();
+      const card = internal(component).projects.find((p) => p.id === 'proj-3')!;
+      expect(card.hoursLoggedLabel).toBe('0h 34m');
+    });
+
+    it('should mard the card as detailError and default to 0 hrs if a single detail call fails without sinking all the other cards', () => {
       httpMock.expectOne(PROJECTS_ENDPOINT).flush(mockProjectList);
-      detailIds.forEach((id) => {
-        httpMock.expectOne(projectDetailEndpoint(id)).flush(mockDetailFor(id));
-      });
-    }
-  
-    afterEach(() => {
-      httpMock.verify(); //catches any request that went unasserted
+      httpMock
+        .expectOne(projectDetailEndpoint('proj-1'))
+        .flush('server error', { status: 500, statusText: 'Server Error' });
+      httpMock
+        .expectOne(projectDetailEndpoint('proj-2'))
+        .flush(mockDetailFor('proj-2'));
+      httpMock
+        .expectOne(projectDetailEndpoint('proj-3'))
+        .flush(mockDetailFor('proj-3'));
+
+      const failedCard = internal(component).projects.find(
+        (p) => p.id === 'proj-1',
+      )!;
+      expect(failedCard.detailError).toBe(true);
+      expect(failedCard.detailLoaded).toBe(true);
+
+      const okCard = internal(component).projects.find(
+        (p) => p.id === 'proj-2',
+      )!;
+      expect(okCard.detailError).toBe(false);
+      expect(okCard.detailLoaded).toBe(true);
+    });
+  });
+  describe('myTotalHoursLabel', () => {
+    beforeEach(async () => {
+      await setup();
+      fixture.detectChanges();
     });
 
-    describe('initial load(ngOnInit', () => {
-      beforeEach(async () => {
-        await setup();
-        fixture.detectChanges(); //triggers ngOnInit
-      });
-
-      it('should create', () => {
-        flushProjectListAndDetails();
-        expect(component).toBeTruthy();
-      });
-
-      it('should be loading before the list resolves, and stop loading once it does', () => {
-        //checked before AND after the same flush, since loading only toggles off the list response not detail
-        expect(internal(component).loading).toBe(true);
-        flushProjectListAndDetails();
-        expect(internal(component).loading).toBe(false);
-      });
-
-      it('should render all projects returned by the list endpoint, no client side role filtering', () => {
-        flushProjectListAndDetails();
-        expect(internal(component).projects.length).toBe(3);
-        expect(internal(component).filteredProjects.length).toBe(3);
-      });
-
-      it('should set error true and loading false if the list calls fails', ()=> {
-        httpMock
-          .expectOne(PROJECTS_ENDPOINT)
-          .flush('server error', { status: 500, statusText: 'Server Error' });
-
-        expect(internal(component).error).toBe(true);
-        expect(internal(component).loading).toBe(false);
-      });
-
-      it('should issue a detail call for every project in the list, not a subset', () => {
-        flushProjectListAndDetails();
-        httpMock.verify();
-      });
+    it('should sum only the logged in users own hours across projects matched by email', () => {
+      flushProjectListAndDetails();
+      //USER_EMAIL only appears as member on proj 1
+      expect(internal(component).myTotalHoursLabel).toBe('540h 4m');
+      expect(internal(component).myTotalHoursLoading).toBe(false);
     });
 
-    describe('detail resolution, per card fields', () => {
-      beforeEach(async() => {
-        await setup();
-        fixture.detectChanges();
-      });
-
-      it('should format hoursLoggedLabel as "Xh Ym", not a raw decimal', ()=> {
-        flushProjectListAndDetails();
-        const card = internal(component).projects.find((p) => p.id === 'proj-1')!;
-        expect(card.hoursLoggedLabel).toBe('780h 4m');
-      });
-
-      it('should clamp progressPercentageClamped to 100 while keeping the raw value uncapped', () => {
-        flushProjectListAndDetails();
-        const card = internal(component).projects.find((p) => p.id === 'proj-1')!;
-        expect(card.progressPercentage).toBe(PROJ1_PROGRESS_OVER_BUDGET);
-        expect(card.progressPercentageClamped).toBe(100);
-      });
-
-      it('should populate teamMembersInitials from firstName/lastName', ()=> {
-        flushProjectListAndDetails();
-        const card = internal(component).projects.find((p) => p.id === 'proj-1')!;
-        expect(card.teamMemberInitials).toEqual(['TS', 'EK']); //array, toEqual not toBe(sign SonarQube!)
-      });
-
-      it('should show the 34-min case correctly rather than rounding it away', ()=> {
-        flushProjectListAndDetails();
-        const card = internal(component).projects.find((p) => p.id === 'proj-3')!;
-        expect(card.hoursLoggedLabel).toBe('0h 34m');
-      });
-
-      it('should mard the card as detailError and default to 0 hrs if a single detail call fails without sinking all the other cards', () => {
-        httpMock.expectOne(PROJECTS_ENDPOINT).flush(mockProjectList);
-        httpMock
-          .expectOne(projectDetailEndpoint('proj-1'))
-          .flush('server error', { status: 500, statusText: 'Server Error' });
-        httpMock.expectOne(projectDetailEndpoint('proj-2')).flush(mockDetailFor('proj-2'));
-        httpMock.expectOne(projectDetailEndpoint('proj-3')).flush(mockDetailFor('proj-3'));
-
-        const failedCard = internal(component).projects.find((p) => p.id === 'proj-1')!;
-        expect(failedCard.detailError).toBe(true);
-        expect(failedCard.detailLoaded).toBe(true);
-
-        const okCard = internal(component).projects.find((p) => p.id === 'proj-2')!;
-        expect(okCard.detailError).toBe(false);
-        expect(okCard.detailLoaded).toBe(true);
-      });
+    it('should still resolve myTotalHoursLabel even when on call fails', () => {
+      httpMock.expectOne(PROJECTS_ENDPOINT).flush(mockProjectList);
+      httpMock
+        .expectOne(projectDetailEndpoint('proj-1'))
+        .flush('server error', { status: 500, statusText: 'Server Error' });
+      httpMock
+        .expectOne(projectDetailEndpoint('proj-2'))
+        .flush(mockDetailFor('proj-2'));
+      httpMock
+        .expectOne(projectDetailEndpoint('proj-3'))
+        .flush(mockDetailFor('proj-3'));
+      //proj-1 fails
+      expect(internal(component).myTotalHoursLabel).toBe('0h 0m');
+      expect(internal(component).myTotalHoursLoading).toBe(false);
     });
-    describe('myTotalHoursLabel', () => {
-      beforeEach(async () => {
-        await setup();
-        fixture.detectChanges();
-      });
+  });
 
-      it('should sum only the logged in users own hours across projects matched by email', ()=> {
-        flushProjectListAndDetails();
-        //USER_EMAIL only appears as member on proj 1
-        expect(internal(component).myTotalHoursLabel).toBe('540h 4m');
-        expect(internal(component).myTotalHoursLoading).toBe(false);
-      });
+  describe('empty project list', () => {
+    it('should not issue any detail calls and should report 0h 0m if the list is empty', async () => {
+      await setup();
+      fixture.detectChanges();
 
-      it('should still resolve myTotalHoursLabel even when on call fails', () => {
-        httpMock.expectOne(PROJECTS_ENDPOINT).flush(mockProjectList);
-        httpMock.expectOne(projectDetailEndpoint('proj-1')).flush('server error', { status: 500, statusText: 'Server Error' });
-        httpMock.expectOne(projectDetailEndpoint('proj-2')).flush(mockDetailFor('proj-2'));
-        httpMock.expectOne(projectDetailEndpoint('proj-3')).flush(mockDetailFor('proj-3'));
-        //proj-1 fails 
-        expect(internal(component).myTotalHoursLabel).toBe('0h 0m');
-        expect(internal(component).myTotalHoursLoading).toBe(false);
-      });
+      httpMock.expectOne(PROJECTS_ENDPOINT).flush([]);
+
+      expect(internal(component).projects).toHaveLength(0);
+      expect(internal(component).myTotalHoursLabel).toBe('0h 0m');
+      expect(internal(component).myTotalHoursLoading).toBe(false);
+      httpMock.verify(); //confirms no stray calls fired
+    });
+  });
+
+  describe('stats getter', () => {
+    beforeEach(async () => {
+      await setup();
+      fixture.detectChanges();
+    });
+    it('should count total, active, on hold, and completed correctly', () => {
+      flushProjectListAndDetails();
+      //proj-1: ACTIVE, proj 2: ACTIVE, project: ON_HOLD, none COMPLETED
+      expect(internal(component).totalProjects).toBe(3);
+      expect(internal(component).activeProjects).toBe(2);
+      expect(internal(component).onHoldProjects).toBe(1);
+      expect(internal(component).completedProjects).toBe(0);
+    });
+  });
+
+  describe('filterProjects', () => {
+    beforeEach(async () => {
+      await setup();
+      fixture.detectChanges();
     });
 
-    describe('empty project list', () => {
-      it('should not issue any detail calls and should report 0h 0m if the list is empty', async()=> {
-        await setup();
-        fixture.detectChanges();
-
-        httpMock.expectOne(PROJECTS_ENDPOINT).flush([]);
-
-        expect(internal(component).projects.length).toBe(0);
-        expect(internal(component).myTotalHoursLabel).toBe('0h 0m');
-        expect(internal(component).myTotalHoursLoading).toBe(false);
-        httpMock.verify(); //confirms no stray calls fired
-      });
-    });
-
-    describe('stats getter', ()=> {
-      beforeEach(async () => {
-        await setup();
-        fixture.detectChanges();
-      });
-      it('should count total, active, on hold, and completed correctly', () => {
-        flushProjectListAndDetails();
-        //proj-1: ACTIVE, proj 2: ACTIVE, project: ON_HOLD, none COMPLETED
-        expect(internal(component).totalProjects).toBe(3);
-        expect(internal(component).activeProjects).toBe(2);
-        expect(internal(component).onHoldProjects).toBe(1);
-        expect(internal(component).completedProjects).toBe(0);
-      });
-    });
-    
-    describe('filterProjects', () => {
-      beforeEach(async () => {
-        await setup();
-        fixture.detectChanges();
-      });
-
-      it('should filter to only active-status projects when filtered by ProjectStatus.ACTIVE', () => {
+    it('should filter to only active-status projects when filtered by ProjectStatus.ACTIVE', () => {
       //so we filter by the real enum here rather than a guessed string
       flushProjectListAndDetails();
       internal(component).filterProjects(ProjectStatus.ACTIVE);
-      expect(internal(component).filteredProjects.length).toBe(2); //proj-1, proj-2
+      expect(internal(component).filteredProjects).toHaveLength(2); //proj-1, proj-2
     });
 
     it('should restore all projects when filtered by "All"', () => {
       flushProjectListAndDetails();
       internal(component).filterProjects(ProjectStatus.ON_HOLD);
       internal(component).filterProjects('All');
-      expect(internal(component).filteredProjects.length).toBe(3);
+      expect(internal(component).filteredProjects).toHaveLength(3);
     });
   });
-     describe('searchProjects', () => {
+  describe('searchProjects', () => {
     beforeEach(async () => {
       await setup();
       fixture.detectChanges();
@@ -415,14 +437,14 @@ function mockDetailFor(id: string): ProjectDetailResponse {
     it('should search by project name, case-insensitively', () => {
       flushProjectListAndDetails();
       internal(component).searchProjects('backend');
-      expect(internal(component).filteredProjects.length).toBe(1);
+      expect(internal(component).filteredProjects).toHaveLength(1);
       expect(internal(component).filteredProjects[0].name).toBe('Backend API');
     });
 
     it('should return an empty list for a search term matching nothing', () => {
       flushProjectListAndDetails();
       internal(component).searchProjects('nonexistent project xyz');
-      expect(internal(component).filteredProjects.length).toBe(0);
+      expect(internal(component).filteredProjects).toHaveLength(0);
     });
   });
 });
