@@ -275,5 +275,44 @@ class AuthServiceTest {
       assertThat(response.getToken()).isEqualTo("jwt-token"); // simulating a returned jwt token
       assertThat(response.getUser().getEmail()).isEqualTo(testEmail);
     }
+
+    @Test
+    @DisplayName("create new user from Google OAuth")
+    void createNewUserGoogleAuth() {
+
+      // ARRANGE: simulating a new user signing up
+      GoogleAuthRequest request = new GoogleAuthRequest();
+      request.setIdToken("swagger-test");
+
+      // it's empty to simulate the user never having used googl before
+      when(userIdentityProviderRepository.findByProviderAndProviderUserId(
+              "GOOGLE", "google-test-user-123"))
+          .thenReturn(Optional.empty());
+      when(userRepository.findByEmail("thabang.siduke@momentum.co.za"))
+          .thenReturn(Optional.empty());
+      when(userRepository.save(any(User.class)))
+          .thenAnswer(
+              invocation -> {
+                User user = invocation.getArgument(0);
+                user.setId(testUserId);
+                return user;
+              });
+
+      // saving the user to future google logins
+      when(userIdentityProviderRepository.save(any(UserIdentityProvider.class)))
+          .thenReturn(UserIdentityProvider.builder().build());
+
+      when(workspaceMemberRepository.findByUserId(any(UUID.class))).thenReturn(List.of());
+      when(userMfaRepository.findByUserId(any(UUID.class))).thenReturn(Optional.empty());
+      when(jwtService.generateToken(any(User.class), eq(1))).thenReturn("jwt-token");
+
+      // ACT: testing the function
+      AuthResponse response = authService.googleAuth(request);
+
+      // ASSERT: checking that the response gives me the data I expect
+      assertThat(response).isNotNull();
+      assertThat(response.getToken()).isEqualTo("jwt-token");
+      verify(userRepository).save(any(User.class)); // was the user saved to the DB?
+    }
   }
 }
