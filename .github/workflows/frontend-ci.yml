@@ -2,12 +2,27 @@ name: Frontend Pipeline
 
 # the trigger - when pull request and push is created on those branches only 
 # the workflow only runs if the files inside
-on:
-    push:
-        branches: [main, dev]
+# on:
+#     push:
+#         branches: [main, dev]
 
-    pull_request:
-        branches: [main, dev]
+#     pull_request:
+#         branches: [main, dev]
+
+# adding my branch for testing and to get the frontend image 
+
+on:
+  push:
+    branches:
+      - main
+      - dev 
+      - feature/nginx-reverse-proxy 
+
+  pull_request:
+    branches:
+      - main
+      - dev 
+      - feature/nginx-reverse-proxy 
        
 
 jobs:
