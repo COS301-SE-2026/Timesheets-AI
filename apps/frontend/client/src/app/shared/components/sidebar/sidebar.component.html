@@ -26,12 +26,21 @@
   </nav>
 
   <!-- user profile -->
-  <div class="user-profile">
+  <div class="user-profile" tabindex="0" (click)="toggleMenu()" (keydown.enter)="toggleMenu()">
     <div class="avatar">{{ initials() }}</div>
     <div class="user-info">
       <span class="user-name">{{ displayName() }}</span>
       <span class="user-role">{{ displayRole() }}</span>
     </div>
-    <span class="dropdown-arrow">⌄</span>
+    <span class="dropdown-arrow" [class.open]="isMenuOpen()">⌄</span>
+
+    @if(isMenuOpen()){
+      <div class="user-menu" (Click)="$event.stopPropagation()">
+        <button type="button" class = "user-menu-item" (click) = "onLogout()">
+          <i class="fa-solid fa-right-from-bracket"> </i>
+          <span> Log out</span>
+        </button>
+      </div>
+    }
   </div>
 </div>
