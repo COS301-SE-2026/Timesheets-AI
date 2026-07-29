@@ -1,1 +1,18 @@
-<p>leave-requests works!</p>
+
+<main class="leave-page">
+    @if (currentView() === 'LIST'){
+        <section class="page-container" aria-labelledby="leave-request-title" >
+            <header class="page-header">
+                <div class="page-header-content">
+                    <h1 id="leave-request-title" class="page-title"> Leave Request</h1>
+                    <p class="page-subtitle">Everything you've requested and where it stands.</p>
+                </div>
+
+                <button type="button" class="button button-primary" (click)="showView('CREATE')">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                    <span>Apply for leave</span>
+                </button>
+            </header>
+        </section>
+    }
+</main>
