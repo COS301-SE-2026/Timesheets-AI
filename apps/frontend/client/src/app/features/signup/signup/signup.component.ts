@@ -84,15 +84,6 @@ export class SignupComponent {
     const {name, surname, email, password } = this.signupForm.getRawValue();
     this.authService
     .register({firstName:name, lastName: surname, email, password})
-    // .subscribe({
-    //   next: () => {
-    //     this.loading = false;
-    //     //no token comes back here, they still need to verify email then log in
-
-    //     this.router.navigate(['/login'], {
-    //       queryParams: {registered: 'true'}
-    //     });
-    //   },
 
     .subscribe({
       next: (response) => {
@@ -106,9 +97,7 @@ export class SignupComponent {
               email: response.email,
               firstName: response.firstName
           }
-        }).then(result => {
-        console.log('Navigation result:', result);
-      });
+        });
       },
       error: err => {
         this.loading = false;

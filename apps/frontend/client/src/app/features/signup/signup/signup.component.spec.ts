@@ -1,5 +1,5 @@
 /*
-Covers the sign up request, verifies payload sent to /api/auth/register, the shape of the response on success
+Covers the sign up request, verifies payload sent to /auth/register, the shape of the response on success
 and that a token gets store, it doesnt return one, the user still has to verify(although we dont actually have a verification system) their email and login separately.
 also covers errors, both when the backend sends a message and when it doesnt.
 
@@ -78,12 +78,12 @@ describe('AuthService - register', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should POST the signup payload to /api/auth/register', () => {
+  it('should POST the signup payload to /auth/register', () => {
     service.register(validPayload).subscribe();
 
     /* matching on url.endsWith rather than a hardcoded full path so this
     doesn't break if environment.apiUrl changes between env */
-    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
 
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(validPayload);
@@ -105,7 +105,7 @@ describe('AuthService - register', () => {
 
     service.register(validPayload).subscribe((res) => (result = res));
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
     req.flush({
       id: '00000000-0000-0000-0003-000000000001',
       email: validPayload.email,
@@ -126,7 +126,7 @@ describe('AuthService - register', () => {
     //so unlike login(), there should be nothing written to localStorage here
     service.register(validPayload).subscribe();
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
     req.flush({
       id: '00000000-0000-0000-0003-000000000001',
       email: validPayload.email,
@@ -148,7 +148,7 @@ describe('AuthService - register', () => {
       error: (err) => (error = err),
     });
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
     req.flush(
       { message: 'An account with this email already exists.' },
       { status: 409, statusText: 'Conflict' },
@@ -165,7 +165,7 @@ describe('AuthService - register', () => {
       error: (err) => (error = err),
     });
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
     req.flush(null, { status: 500, statusText: 'Internal Server Error' });
 
     expect(error?.message).toBe('Something went wrong, try again in a bit.');
@@ -381,7 +381,7 @@ describe('SignupComponent', () => {
     expect(componentInstance.submitted).toBe(true);
     expect(componentInstance.loading).toBe(true);
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
     expect(req.request.method).toBe('POST');
     // firstName/lastName here, not name/surname createAccount() renames them before sending
     expect(req.request.body).toEqual({
@@ -410,7 +410,7 @@ describe('SignupComponent', () => {
     componentInstance.signupForm.setValue(validFormValue);
     componentInstance.createAccount();
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
     req.flush({
       id: '00000000-0000-0000-0003-000000000002',
       email: 'john@company.com',
@@ -442,7 +442,7 @@ describe('SignupComponent', () => {
     componentInstance.signupForm.setValue(validFormValue);
     componentInstance.createAccount();
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
     req.flush(
       { message: 'An account with this email already exists.' },
       { status: 409, statusText: 'Conflict' },

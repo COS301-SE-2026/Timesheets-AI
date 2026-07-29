@@ -3,6 +3,7 @@ import { VerifyEmailComponent } from './verify-email.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { of } from 'rxjs';
 
 describe('VerifyEmailComponent', () => {
   let component: VerifyEmailComponent;
@@ -12,14 +13,15 @@ describe('VerifyEmailComponent', () => {
     await TestBed.configureTestingModule({
       imports: [VerifyEmailComponent],
       providers: [
-        provideHttpClient(),
         provideRouter([]), 
         {
-          provide: AuthService
+          provide: AuthService,
+          useValue: {
+            verifyEmail: jest.fn().mockReturnValue(of({message:'Verified', redirectUrl:''}))
         }
-      ]
-    })
-    .compileComponents();
+      }
+    ]
+  }).compileComponents();
 
     fixture = TestBed.createComponent(VerifyEmailComponent);
     component = fixture.componentInstance;
