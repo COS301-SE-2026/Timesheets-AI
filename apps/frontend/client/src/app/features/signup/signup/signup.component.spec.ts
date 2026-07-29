@@ -404,7 +404,7 @@ describe('SignupComponent', () => {
   });
 
   // Test that a successful signup stops loading and redirects to /login?registered=true
-  it('should navigate to login with registered=true on successful signup', () => {
+  it('should navigate to verify email', () => {
     const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
     componentInstance.signupForm.setValue(validFormValue);
@@ -417,8 +417,7 @@ describe('SignupComponent', () => {
       firstName: 'John',
       lastName: 'Doe',
       createdAt: '2026-07-21T09:00:00.000Z',
-      message:
-        'Registered successfully, please check your email to verify your account.',
+      message:'Registered successfully, please check your email to verify your account.',
       verificationToken: '12345',
     } satisfies RegisterResponse);
 
@@ -432,7 +431,7 @@ describe('SignupComponent', () => {
             firstName: 'John'
         }
       }
-    )
+    );
   });
 
   // Test that a failed signup surfaces the backend's error message instead of navigating

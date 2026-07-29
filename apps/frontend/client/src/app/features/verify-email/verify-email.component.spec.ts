@@ -14,12 +14,13 @@ describe('VerifyEmailComponent', () => {
       imports: [VerifyEmailComponent],
       providers: [
         provideRouter([]), 
+        provideHttpClient(),
         {
           provide: AuthService,
           useValue: {
             verifyEmail: jest.fn().mockReturnValue(of({message:'Verified', redirectUrl:''}))
+          }
         }
-      }
     ]
   }).compileComponents();
 
