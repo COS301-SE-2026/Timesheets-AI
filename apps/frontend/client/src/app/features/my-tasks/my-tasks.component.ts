@@ -3,13 +3,25 @@
  * Date: 2026-07-25
  * Purpose: Display and manage tasks assigned to the current user with filtering and status updates
  * Related Requirement: FR-05 : Task management
+ *
+ * Patched: Zamokuhle Zwane 29 July 2026
+ * Integrated the tasks page with backend and ensured everything matches.
  */
 
-import { Component, OnInit, OnDestroy, signal, computed, inject, HostListener} from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  signal,
+  computed,
+  inject,
+  HostListener,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { Router} from '@angular/router';
+import { Router } from '@angular/router';
+import { TaskService, TaskResponse } from '../../core/services/task.service';
 
 /**
  * Represents a task assigned to a user
@@ -28,7 +40,7 @@ export interface Task {
   actualHours: number;
   jiraTicketKey?: string;
   assignedToName: string;
-  assignedWorkspaceMemberId: string;
+  assignedWorkspaceMemberId?: string;
   dueDate?: string;
   completedAt?: string;
   createdAt: string;
@@ -38,9 +50,8 @@ export interface Task {
   deletedAt?: string;
 }
 
-// status and priority options as defined in backend
-
-export type TaskStatus = 'TO_DO' | 'IN_PROGRESS' | 'DONE' | 'ARCHIVED';
+// status and priority options, matches tasks.status and tasks.priority CHECK constraints
+export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE' | 'BLOCKED';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
 // request payload for updating task status
@@ -59,60 +70,57 @@ interface StatusDropdownOption {
   label: string;
 }
 
-// Display labels for task statuses
-
+//display labels for task statuses
 const STATUS_LABELS: Record<TaskStatus, string> = {
-  TO_DO: 'To Do',
+  TODO: 'To Do',
   IN_PROGRESS: 'In Progress',
   DONE: 'Done',
-  ARCHIVED: 'Archived'
+  BLOCKED: 'Blocked',
 } as const;
 
-//Display labels for task priorities 
-
+//display label for task priorities
 const PRIORITY_LABELS: Record<TaskPriority, string> = {
-    LOW: 'Low',
-    MEDIUM: 'Medium',
-    HIGH: 'High',
-    CRITICAL: 'Critical'
+  LOW: 'Low',
+  MEDIUM: 'Medium',
+  HIGH: 'High',
+  CRITICAL: 'Critical',
 } as const;
 
 const STATUS_CLASSES: Record<TaskStatus, string> = {
-  TO_DO : 'status-to-do',
+  TODO: 'status-to-do',
   IN_PROGRESS: 'status-in-progress',
   DONE: 'status-done',
-  ARCHIVED: 'status-archived'
+  BLOCKED: 'status-archived',
 } as const;
 
 const PRIORITY_CLASSES: Record<TaskPriority, string> = {
-    LOW: 'priority-low',
-    MEDIUM: 'priority-medium',
-    HIGH: 'priority-high',
-    CRITICAL: 'priority-critical'
+  LOW: 'priority-low',
+  MEDIUM: 'priority-medium',
+  HIGH: 'priority-high',
+  CRITICAL: 'priority-critical',
 };
 
+// font awesome icons, using the free solid/regular sets already loaded for the app
 const PRIORITY_ICONS: Record<TaskPriority, string> = {
   LOW: 'fa-arrow-down',
   MEDIUM: 'fa-minus',
   HIGH: 'fa-arrow-up',
-  CRITICAL: 'fa-triangle-exclamation'
-}as const;
+  CRITICAL: 'fa-triangle-exclamation',
+} as const;
 
 @Component({
   selector: 'app-my-tasks',
   imports: [CommonModule, FormsModule],
   templateUrl: './my-tasks.component.html',
   styleUrl: './my-tasks.component.scss',
-  standalone: true
+  standalone: true,
 })
-
 export class MyTasksComponent implements OnInit, OnDestroy {
-
-  // Component state signal
-
+  //Component state signal
   public readonly tasks = signal<Task[]>([]);
   public readonly filteredTasks = signal<Task[]>([]);
   public readonly isLoading = signal<boolean>(false);
+  public readonly loadError = signal<boolean>(false);
   public readonly selectedStatus = signal<string>('ALL');
   public readonly showCompleted = signal<boolean>(false);
   public readonly showArchived = signal<boolean>(false);
@@ -122,6 +130,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public readonly isDetailLoading = signal<boolean>(false);
   public readonly detailError = signal<string | null>(null);
   private readonly router = inject(Router);
+  private readonly taskService = inject(TaskService);
 
   //Computed signals
 
@@ -129,43 +138,49 @@ export class MyTasksComponent implements OnInit, OnDestroy {
 
   public readonly activeCount = computed<number>(() => {
     return this.tasks().filter((task: Task) => {
-      return !task.isDeleted && (task.status === 'TO_DO' || task.status === 'IN_PROGRESS');
+      return (
+        !task.isDeleted &&
+        (task.status === 'TODO' || task.status === 'IN_PROGRESS')
+      );
     }).length;
   });
 
   // Total number of completed tasks
   public readonly completedCount = computed<number>(() => {
-    return this.tasks().filter((task: Task) => !task.isDeleted && task.status === 'DONE').length;
+    return this.tasks().filter(
+      (task: Task) => !task.isDeleted && task.status === 'DONE',
+    ).length;
   });
 
-  // Total number of archived charts
+  //total number of blocked tasks (was "archived" in the mock, schema only has BLOCKED)
   public readonly archivedCount = computed<number>(() => {
-    return this.tasks().filter((task: Task) => !task.isDeleted && task.status === 'ARCHIVED').length;
+    return this.tasks().filter(
+      (task: Task) => !task.isDeleted && task.status === 'BLOCKED',
+    ).length;
   });
 
-  // Total number of archived tasks
+  //total number of tasks
 
   public readonly totalCount = computed<number>(() => {
     return this.tasks().filter((task: Task) => !task.isDeleted).length;
   });
 
-  // public constants
-  // Status filter options for the filter down
+  //public constants tsatus filter options for the filter down
 
   public readonly statusFilterOptions: StatusFilterOption[] = [
-    {value: 'ALL', label: 'All'},
-    {value: 'TO_DO', label: 'To Do'},
-    {value: 'IN_PROGRESS', label: 'In Progress'},
-    {value: 'DONE', label: 'Done'},
-    {value: 'ARCHIVED', label: 'Archived'}
+    { value: 'ALL', label: 'All' },
+    { value: 'TODO', label: 'To Do' },
+    { value: 'IN_PROGRESS', label: 'In Progress' },
+    { value: 'DONE', label: 'Done' },
+    { value: 'BLOCKED', label: 'Blocked' },
   ];
 
-  // Status options for the task status breakdown
+  //status options for the task status breakdown
   public readonly statusDropdownOptions: StatusDropdownOption[] = [
-    {value: 'TO_DO', label: 'To Do'},
-    {value: 'IN_PROGRESS', label: 'In Progress'},
-    {value: 'DONE', label: 'Done'},
-    {value: 'ARCHIVED', label: 'Archived'}
+    { value: 'TODO', label: 'To Do' },
+    { value: 'IN_PROGRESS', label: 'In Progress' },
+    { value: 'DONE', label: 'Done' },
+    { value: 'BLOCKED', label: 'Blocked' },
   ];
 
   public readonly statusLabels = STATUS_LABELS;
@@ -173,30 +188,67 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public readonly priorityIcons = PRIORITY_ICONS;
   private readonly destroy$ = new Subject<void>();
 
-  // INTEGRATION: Inject tASKservices when integrating with backend
-
-  // Initialize component and load tasks
-
+  //Initialise component and load tasks
   public ngOnInit(): void {
     this.loadTasks();
   }
 
-  // cleanup subscription when the component is destroyed
-
-  public ngOnDestroy(): void { 
+  //cleanup subscription when the component is destroyed
+  public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
+  // loads the logged in user's tasks from GET /api/tasks/my-tasks
+  // TaskService already handles the HttpClient call and logs errors on failure
   public loadTasks(): void {
     this.isLoading.set(true);
+    this.loadError.set(false);
 
-    // INTEGRATION: REPLACE WITH ACTUAL API CALL
-    // ADDED MOCK DATA BELOW FOR DEMONSTRATION
-    this.loadMockData();
+    this.taskService.getMyTasks().subscribe({
+      next: (responses: TaskResponse[]) => {
+        this.tasks.set(responses.map((response) => this.mapToTask(response)));
+        this.applyFilters();
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        //task.service.ts already logs the raw HttpErrorResponse (status, message, url) for its own operation label, this log is just the component-level context
+        console.error('[MyTasksComponent] failed to load my-tasks:', error);
+        this.isLoading.set(false);
+        this.loadError.set(true);
+      },
+    });
   }
 
-  // apply all active filtes to the task list
+  /*
+  converts a raw TaskResponse (backend DTO shape) into the Task shape this component
+  */
+  private mapToTask(response: TaskResponse): Task {
+    return {
+      id: response.id,
+      title: response.title,
+      description: response.description ?? undefined,
+      projectName: response.projectName ?? 'Unknown Project',
+      projectId: response.projectId,
+      status: response.status as TaskStatus,
+      priority: response.priority as TaskPriority,
+      estimatedHours: response.estimatedHours ?? 0,
+      actualHours: response.actualHours ?? 0,
+      jiraTicketKey: response.jiraTicketKey ?? undefined,
+      assignedToName: response.assignedToName ?? 'Unassigned',
+      assignedWorkspaceMemberId:
+        response.assignedWorkspaceMemberId ?? undefined,
+      dueDate: response.dueDate ?? undefined,
+      completedAt: response.completedAt ?? undefined,
+      createdAt: response.createdAt,
+      updatedAt: response.updatedAt,
+      parentTaskId: response.parentTaskId ?? undefined,
+      isDeleted: response.isDeleted ?? false,
+      deletedAt: response.deletedAt ?? undefined,
+    };
+  }
+
+  // apply all active filters to the task list
 
   public applyFilters(): void {
     const currentTasks = this.tasks();
@@ -206,31 +258,36 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     filtered = filtered.filter((task: Task) => !task.isDeleted);
 
     const searchQuery = this.searchQuery().toLowerCase().trim();
-      if (searchQuery) {
-        filtered = filtered.filter((task: Task) => {
-          return task.title.toLowerCase().includes(searchQuery) || task.projectName.toLowerCase().includes(searchQuery) || task.jiraTicketKey?.toLowerCase().includes(searchQuery);
-        });
-      }
+    if (searchQuery) {
+      filtered = filtered.filter((task: Task) => {
+        return (
+          task.title.toLowerCase().includes(searchQuery) ||
+          task.projectName.toLowerCase().includes(searchQuery) ||
+          task.jiraTicketKey?.toLowerCase().includes(searchQuery)
+        );
+      });
+    }
 
     const selectedStatus = this.selectedStatus();
-    if(selectedStatus !== 'ALL') {
-      filtered = filtered.filter((task: Task) => task.status === selectedStatus);
+    if (selectedStatus !== 'ALL') {
+      filtered = filtered.filter(
+        (task: Task) => task.status === selectedStatus,
+      );
     } else {
+      if (!this.showCompleted()) {
+        filtered = filtered.filter((task: Task) => task.status !== 'DONE');
+      }
 
-    if(!this.showCompleted()) {
-      filtered = filtered.filter((task: Task) => task.status !== 'DONE');
+      if (!this.showArchived()) {
+        filtered = filtered.filter((task: Task) => task.status !== 'BLOCKED');
+      }
     }
-
-    if(!this.showArchived()) {
-      filtered = filtered.filter((task: Task) => task.status !== 'ARCHIVED');
-    }
-  }
     this.filteredTasks.set(filtered);
   }
 
   // Handles search input change
 
-  public onSearchChange(event: Event) : void {
+  public onSearchChange(event: Event): void {
     const inputElement = event.target as HTMLInputElement;
     this.searchQuery.set(inputElement.value);
     this.applyFilters();
@@ -241,7 +298,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public onStatusFilterChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedStatus.set(selectElement.value);
-    this.applyFilters(); 
+    this.applyFilters();
   }
 
   // Handles show completed checkbox change
@@ -259,175 +316,129 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     this.showArchived.set(checkbox.checked);
     this.applyFilters();
   }
-// get css class for a task status badge
 
-public getStatusClass(status: TaskStatus):string {
-  return `status-badge ${STATUS_CLASSES[status]}`;
-}
+  // get css class for a task status badge
 
-public getPriorityClass(priority: TaskPriority): string {
-  return `priority-badge ${PRIORITY_CLASSES[priority]}`;
-}
+  public getStatusClass(status: TaskStatus): string {
+    return `status-badge ${STATUS_CLASSES[status]}`;
+  }
 
-public onStatusChange(task: Task, newStatus: string) : void {
-  const status = newStatus as TaskStatus;
+  public getPriorityClass(priority: TaskPriority): string {
+    return `priority-badge ${PRIORITY_CLASSES[priority]}`;
+  }
 
-  // INTEGRATION: REPLACE WITH ACTUAL API WHEN INTEGRATING
-  // MOCK UPDATE FOR DEMMONSTRATION
-  this.updateTaskInTaskList({...task, status});
-}
+  //there's no status field on the GET, i've flagged this with backend, so for now its local
+  public onStatusChange(task: Task, newStatus: string): void {
+    const status = newStatus as TaskStatus;
+    this.updateTaskInTaskList({ ...task, status });
+  }
 
-// Navigate to project
+  //navigate to project
 
-public navigateToProject(projectId: string) : void {
-  // INTEGRATION: Implement navigation to project detail
-  void this.router.navigate(['/projects', projectId])
-}
+  public navigateToProject(projectId: string): void {
+    void this.router.navigate(['/projects', projectId]);
+  }
 
-public onOverlayKeydown (event: KeyboardEvent) : void {
-  if(event.key === 'Enter' || event.key === '') {
-    event.preventDefault();
-    this.closeTaskDetail();
+  public onOverlayKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === '') {
+      event.preventDefault();
+      this.closeTaskDetail();
     }
-}
-
-// Format date string for display
-
-public formatDate(dateString?: string): string {
-  if(!dateString) {
-    return '-';
-  }
-  const date = new Date(dateString);
-
-  if (Number.isNaN(date.getTime())){
-    return '-';
-  }
-  return date.toLocaleDateString('en-ZA', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric'
-  });
-}
-
-public formatDateTime(value?: string): string {
-  if(!value){
-    return '-';
-  }
-  const date = new Date(value);
-  return date.toLocaleString('en-ZA', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-// Track tasks by their id
-
-public trackByTaskId(index: number, task: Task): string {
-  return task.id;
-}
-
-public getStatusIcon(status: TaskStatus): string {
-  const icons: Record<TaskStatus, string> = {
-    TO_DO: 'fa-regular fa-circle',
-    IN_PROGRESS:'fa-regular fa-circle-check',
-    DONE:'fa-solid fa-check-circle',
-    ARCHIVED: 'fa-regular fa-file-zipper'
-  };
-  return icons[status];
-}
-
-// Update task in the task list after status change
-
-private updateTaskInTaskList(updatedTask: Task): void {
-  const currentTasks = this.tasks();
-  const index = currentTasks.findIndex((task: Task) => task.id === updatedTask.id);
-  if (index !== -1){
-    const newTasks = [...currentTasks];
-    newTasks[index] = updatedTask;
-    this.tasks.set(newTasks);
-    this.applyFilters();
-  }
-}
-
-// INTEGRATION: replace the mock lookup with the actual api call
-//  opens th task detail form
-
-public onViewTask(task: Task) {
-  this.detailError.set(null);
-  this.isDetailOpen.set(true);
-  this.isDetailLoading.set(true);
-
-// MOCK stand in for GET /api/tasks/(taskId) response
-  const detail = this.tasks().find((t: Task) => t.id === task.id) ?? task;
-  this.selectedTask.set(detail);
-  this.isDetailLoading.set(false);
-}
-
-public closeTaskDetail(): void {
-  this.isDetailOpen.set(false);
-  this.selectedTask.set(null);
-  this.detailError.set(null);
-}
-
-// closes modal on escape
-@HostListener('document:keydown.escape')
-public onEscapeKey(): void {
-  if(this.isDetailOpen()){
-    this.closeTaskDetail();
-  }
-}
-
-
-private loadMockData(): void {
-  const mockTasks: Task[] = [{
-    id: '1',
-    title: 'Design login flow',
-    description: 'Design the login flow for the application',
-    projectName: 'Project Alpha',
-    projectId: 'proj-1',
-    status: 'IN_PROGRESS',
-    priority: 'HIGH',
-    estimatedHours: 8,
-    actualHours: 6,
-    jiraTicketKey: 'ALPHA-101',
-    assignedToName: 'Thabang Siduke',
-    assignedWorkspaceMemberId: 'user-1',
-    dueDate: '2026-07-28',
-    createdAt: '2026-07-20T10:00:00Z',
-    updatedAt: '2026-07-22T14:30:00Z',
-    isDeleted: false,
-    completedAt: '',
-    parentTaskId: ''
-  },
-  {
-    id: '2',
-    title: 'Implement OAuth callback',
-    description: 'Implement OAuth callback handler',
-    projectName: 'Project Beta',
-    projectId: 'proj-1',
-    status: 'TO_DO',
-    priority: 'LOW',
-    estimatedHours: 5,
-    actualHours: 0,
-    jiraTicketKey: 'ALPHA-102',
-    assignedToName: 'Thabang Siduke',
-    assignedWorkspaceMemberId: 'user-1',
-    dueDate: '2026-07-26',
-    createdAt: '2026-07-20T10:00:00Z',
-    updatedAt: '2026-07-20T10:30:00Z',
-    isDeleted: false,
-    completedAt: '',
-    parentTaskId: ''
   }
 
-];
+  //format date string for display
 
-this.tasks.set(mockTasks);
-this.applyFilters();
-this.isLoading.set(false);
-}
+  public formatDate(dateString?: string): string {
+    if (!dateString) {
+      return '-';
+    }
+    const date = new Date(dateString);
 
+    if (Number.isNaN(date.getTime())) {
+      return '-';
+    }
+    return date.toLocaleDateString('en-ZA', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  }
+
+  public formatDateTime(value?: string): string {
+    if (!value) {
+      return '-';
+    }
+    const date = new Date(value);
+    return date.toLocaleString('en-ZA', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  //track tasks by id
+
+  public trackByTaskId(index: number, task: Task): string {
+    return task.id;
+  }
+
+  public getStatusIcon(status: TaskStatus): string {
+    const icons: Record<TaskStatus, string> = {
+      TODO: 'fa-regular fa-circle',
+      IN_PROGRESS: 'fa-regular fa-circle-check',
+      DONE: 'fa-solid fa-check-circle',
+      BLOCKED: 'fa-solid fa-ban',
+    };
+    return icons[status];
+  }
+
+  //update tasks in the task list after a status change
+
+  private updateTaskInTaskList(updatedTask: Task): void {
+    const currentTasks = this.tasks();
+    const index = currentTasks.findIndex(
+      (task: Task) => task.id === updatedTask.id,
+    );
+    if (index !== -1) {
+      const newTasks = [...currentTasks];
+      newTasks[index] = updatedTask;
+      this.tasks.set(newTasks);
+      this.applyFilters();
+    }
+  }
+
+  //opens the task detail modal, wired to GET /api/tasks/{taskId} for the full record
+  public onViewTask(task: Task): void {
+    this.detailError.set(null);
+    this.isDetailOpen.set(true);
+    this.isDetailLoading.set(true);
+
+    this.taskService.getTaskById(task.id).subscribe({
+      next: (response: TaskResponse) => {
+        this.selectedTask.set(this.mapToTask(response));
+        this.isDetailLoading.set(false);
+      },
+      error: (error) => {
+        console.error('[MyTasksComponent] failed to load task detail:', error);
+        this.detailError.set('Could not load task details, please try again.');
+        this.isDetailLoading.set(false);
+      },
+    });
+  }
+
+  public closeTaskDetail(): void {
+    this.isDetailOpen.set(false);
+    this.selectedTask.set(null);
+    this.detailError.set(null);
+  }
+
+  //this will close modal on escape
+  @HostListener('document:keydown.escape')
+  public onEscapeKey(): void {
+    if (this.isDetailOpen()) {
+      this.closeTaskDetail();
+    }
+  }
 }
