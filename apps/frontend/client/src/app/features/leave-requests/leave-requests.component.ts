@@ -7,6 +7,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ChangeDetectionStrategy, computed, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { BidiModule } from "@angular/cdk/bidi";
 
 export type LeaveType = 'ANNUAL' | 'SICK' | 'MATERNITY' | 'PATERNITY' | 'FAMILY_RESPONSIBILITY' | 'OTHER';
 export type LeaveRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
@@ -168,7 +169,7 @@ const MOCK_LEAVE_REQUESTS: LeaveRequest[] = [
 
 @Component({
   selector: 'app-leave-requests',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, BidiModule],
   templateUrl: './leave-requests.component.html',
   styleUrl: './leave-requests.component.scss',
   standalone: true,
@@ -182,6 +183,9 @@ export class LeaveRequestsComponent {
   readonly uiState = signal<LeaveUiState>('idle');
   readonly errorMessage = signal<string | null>(null);
   readonly submitMessage = signal<string | null>(null);
+  readonly selectedRequest = signal<LeaveRequest | null>(null);
+  readonly isDetailsOpen = signal(false);
+  readonly editingRequestId = signal<string | null>(null);
 
   // INTEGRATION: Replace mock data with the response from the leave request GET endpoint
   readonly leaveRequests = signal<LeaveRequest[]>(MOCK_LEAVE_REQUESTS);
@@ -299,9 +303,16 @@ export class LeaveRequestsComponent {
   // View submitted leave request
   viewRequest(request: LeaveRequest): void {
     // INTEGRATION : navigate or display the selected request
-    console.log('Selected leave request:', request);
+
+    this.selectedRequest.set(request);
+    this.isDetailsOpen.set(true);
+    // console.log('Selected leave request:', request);
   }
 
+  closeRequestDetails(): void {
+    this.isDetailsOpen.set(false);
+    this.selectedRequest.set(null);
+  }
   canEdit(request: LeaveRequest): boolean {
     return request.status === 'PENDING';
   }
@@ -317,7 +328,21 @@ export class LeaveRequestsComponent {
     if (!this.canEdit(request)){
       return;
     }
-     console.log('Successfuly edited:', request);
+
+    this.editingRequestId.set(request.id);
+    
+    this.leaveRequestForm.reset({
+      leave_type: request.leaveType,
+      reason: request.reason ?? '',
+      start_date: request.startDate,
+      end_date: request.endDate,
+      total_days: request.totalDays
+    });
+
+    this.currentView.set('CREATE');
+    this.errorMessage.set(null);
+    this.submitMessage.set(null);
+
   }
 
   cancelRequest(request: LeaveRequest): void {
@@ -328,8 +353,17 @@ export class LeaveRequestsComponent {
       return;
     }
 
-     console.log('Cancel:', request);
+     this.leaveRequests.update(requests =>
+      requests.map(item => item.id === request.id ? {
+        ...item,
+        status: 'CANCELLED',
+        updatedAt: new Date().toISOString()
+      }
+    :item)
+     );
+     this.submitMessage.set('Leave request cancelled successfully.')
   }
+  
   // invlaid entry
   isInvalid(controlName: keyof typeof this.leaveRequestForm.controls): boolean {
     const control = this.leaveRequestForm.controls[controlName];
