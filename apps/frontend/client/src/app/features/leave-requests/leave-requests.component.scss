@@ -248,12 +248,6 @@ button{
     flex-direction: column;
 }
 
-summary-card-label {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-}
-
 .summary-card-label {
     color: var(--color-text-muted);
     font-size: var(--font-size-body);
@@ -267,3 +261,104 @@ summary-card-label {
     color: var(--color-text-body);
 }
 
+// Table
+
+.request-card {
+    padding: var(--space-6);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+}
+
+.request-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+    background: var(--color-white);
+
+    th,td {
+        padding: var(--space-4) var(--space-6);
+        border-bottom: 1px solid var(--color-border);
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    th {
+        background: var(--color-primary-surface);
+        color: var(--color-text-muted);
+        font-size: var(--font-size-caption);
+        font-weight: var(--font-weight-semibold);
+        letter-spacing: var(--letter-spacing-wide);
+        text-transform: uppercase;
+    }
+
+    td {
+        color: var(--color-text-body);
+        font-size: var(--font-size-body);
+    }
+
+    tbody tr {
+        transition: background-color 150ms ease;
+
+        &:hover {
+            background: var(--color-gray-light);
+        }
+
+        &:last-child td {
+            border-bottom: 0;
+        }
+    }
+}
+
+.leave-type-name {
+    font-weight: var(--font-weight-semibold);
+}
+
+.table-action {
+    text-align: center !important;
+}
+
+.action-group {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+// Status chips
+
+.status {
+    display: inline-flex;
+    min-height: 28px;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-value);
+    text-transform: varuppercase;
+
+    &-pending {
+        background: var(--color-status-pending-bg);
+        color: var(--color-status-pending-text);
+    }
+
+    &-approved {
+        background: var(--color-status-approved-bg);
+        color: var(--color-status-approved-text);
+    }
+
+    &-rejected {
+        background: var(--color-status-overdue-bg);
+        color: var(--color-status-overdue-text);
+    }
+
+    &-cancelled {
+        background: var(--color-gray-light);
+        color: var(--color-text-muted);
+    }
+}
