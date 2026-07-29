@@ -1,5 +1,5 @@
 /*
-Covers the sign up request, verifies payload sent to /auth/register, the shape of the response on success
+Covers the sign up request, verifies payload sent to /api/auth/register, the shape of the response on success
 and that a token gets store, it doesnt return one, the user still has to verify(although we dont actually have a verification system) their email and login separately.
 also covers errors, both when the backend sends a message and when it doesnt.
 
@@ -20,7 +20,6 @@ import {
 } from '../../../core/services/auth.service';
 import { SignupComponent } from './signup.component';
 import { FormGroup } from '@angular/forms';
-import { first } from 'rxjs';
 
 interface SignupComponentInternals {
   signupForm: FormGroup;
@@ -51,7 +50,7 @@ describe('AuthService - register', () => {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@momentum.co.za',
-    password: 'Password1!!!!',
+    password: 'Password1!',
   };
 
   beforeEach(() => {
@@ -78,12 +77,12 @@ describe('AuthService - register', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should POST the signup payload to /auth/register', () => {
+  it('should POST the signup payload to /api/auth/register', () => {
     service.register(validPayload).subscribe();
 
     /* matching on url.endsWith rather than a hardcoded full path so this
     doesn't break if environment.apiUrl changes between env */
-    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
 
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(validPayload);
@@ -96,7 +95,6 @@ describe('AuthService - register', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
-      verificationToken: '12345',
     } satisfies RegisterResponse);
   });
 
@@ -105,7 +103,7 @@ describe('AuthService - register', () => {
 
     service.register(validPayload).subscribe((res) => (result = res));
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
     req.flush({
       id: '00000000-0000-0000-0003-000000000001',
       email: validPayload.email,
@@ -114,7 +112,6 @@ describe('AuthService - register', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
-      verificationToken: '12345',
     } satisfies RegisterResponse);
 
     expect(result?.email).toBe(validPayload.email);
@@ -126,7 +123,7 @@ describe('AuthService - register', () => {
     //so unlike login(), there should be nothing written to localStorage here
     service.register(validPayload).subscribe();
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
     req.flush({
       id: '00000000-0000-0000-0003-000000000001',
       email: validPayload.email,
@@ -135,7 +132,6 @@ describe('AuthService - register', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
-      verificationToken: '12345',
     } satisfies RegisterResponse);
 
     expect(localStorage.getItem('auth_token')).toBeNull();
@@ -148,7 +144,7 @@ describe('AuthService - register', () => {
       error: (err) => (error = err),
     });
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
     req.flush(
       { message: 'An account with this email already exists.' },
       { status: 409, statusText: 'Conflict' },
@@ -165,7 +161,7 @@ describe('AuthService - register', () => {
       error: (err) => (error = err),
     });
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
     req.flush(null, { status: 500, statusText: 'Internal Server Error' });
 
     expect(error?.message).toBe('Something went wrong, try again in a bit.');
@@ -192,7 +188,7 @@ describe('SignupComponent', () => {
     name: 'John',
     surname: 'Doe',
     email: 'john@company.com',
-    password: 'Password1!!!',
+    password: 'Password1',
     acceptedTerms: true,
   };
 
@@ -361,7 +357,7 @@ describe('SignupComponent', () => {
 
   //Test that valid passwords do not show errors
   it('should return an empty password error message when password is valid', () => {
-    componentInstance.signupForm.controls['password'].setValue('Password1!!!');
+    componentInstance.signupForm.controls['password'].setValue('Password1');
     componentInstance.signupForm.controls['password'].markAsTouched();
 
     expect(componentInstance.showPasswordError).toBe(false);
@@ -381,14 +377,14 @@ describe('SignupComponent', () => {
     expect(componentInstance.submitted).toBe(true);
     expect(componentInstance.loading).toBe(true);
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
     expect(req.request.method).toBe('POST');
     // firstName/lastName here, not name/surname createAccount() renames them before sending
     expect(req.request.body).toEqual({
       firstName: 'John',
       lastName: 'Doe',
       email: 'john@company.com',
-      password: 'Password1!!!',
+      password: 'Password1',
     });
 
     req.flush({
@@ -399,39 +395,31 @@ describe('SignupComponent', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.',
-      verificationToken: '12345',
     } satisfies RegisterResponse);
   });
 
   // Test that a successful signup stops loading and redirects to /login?registered=true
-  it('should navigate to verify email', () => {
+  it('should navigate to login with registered=true on successful signup', () => {
     const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
 
     componentInstance.signupForm.setValue(validFormValue);
     componentInstance.createAccount();
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
     req.flush({
       id: '00000000-0000-0000-0003-000000000002',
       email: 'john@company.com',
       firstName: 'John',
       lastName: 'Doe',
       createdAt: '2026-07-21T09:00:00.000Z',
-      message:'Registered successfully, please check your email to verify your account.',
-      verificationToken: '12345',
+      message:
+        'Registered successfully, please check your email to verify your account.',
     } satisfies RegisterResponse);
 
     expect(componentInstance.loading).toBe(false);
-    expect(navigateSpy).toHaveBeenCalledWith(
-      ['/verify-email'],
-      {
-        state: {
-            token: '12345',
-            email: 'john@company.com',
-            firstName: 'John'
-        }
-      }
-    );
+    expect(navigateSpy).toHaveBeenCalledWith(['/login'], {
+      queryParams: { registered: 'true' },
+    });
   });
 
   // Test that a failed signup surfaces the backend's error message instead of navigating
@@ -441,7 +429,7 @@ describe('SignupComponent', () => {
     componentInstance.signupForm.setValue(validFormValue);
     componentInstance.createAccount();
 
-    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/register'));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
     req.flush(
       { message: 'An account with this email already exists.' },
       { status: 409, statusText: 'Conflict' },
