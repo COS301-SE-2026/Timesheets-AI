@@ -111,7 +111,7 @@ public class AuthService {
       //     .build();
 
       // DEMO 2
-       return RegisterResponse.builder()
+      return RegisterResponse.builder()
           .id(user.getId().toString())
           .email(user.getEmail())
           .firstName(user.getFirstName())
@@ -184,20 +184,20 @@ public class AuthService {
         userRepository
             .findById(verificationToken.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("user not found"));
-            // DEBUG 
+    // DEBUG
     System.out.println("User before update:" + user.getEmail());
     System.out.println("Verified already" + user.getEmailVerified());
-
 
     user.setEmailVerified(true);
 
     System.out.println("Verified after" + user.getEmailVerified());
-    
+
     // userRepository.save(user);
     userRepository.saveAndFlush(user);
 
     return new MessageResponse("Email verified successfully", "/dashboard");
   }
+
   /*
    * I am using no rollback such that there is no rollback for login failures.
    * I want the login attempts to still register in the DB

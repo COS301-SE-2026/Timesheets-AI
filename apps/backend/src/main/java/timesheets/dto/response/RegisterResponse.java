@@ -18,9 +18,10 @@ public class RegisterResponse {
   private String firstName;
   private String lastName;
   private LocalDateTime createdAt;
-  private String message; // this could be like "Registration successful! Please check your email for the OTP
+  private String
+      message; // this could be like "Registration successful! Please check your email for the OTP
   // to verify your account."
 
-  //FOR DEMO 2
+  // FOR DEMO 2
   private String verificationToken;
 }
