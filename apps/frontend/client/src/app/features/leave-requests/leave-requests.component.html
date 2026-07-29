@@ -189,10 +189,74 @@
                                 {{ reasonCount() }}/500
                             </span>
 
-                            @if ()
+                            @if (isInvalid('reason')){
+                                <p  id="reason-error" class="form-error">
+                                    @if (leaveRequestForm.controls.reason.hasError('required')){
+                                        Please proved a reason
+                                    } @else {The reason cannot exceed 500 characters. }
+                                </p>
+                            }
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="start-date"> 
+                                Start Date
+                                <span class="required" aria-hiiden="true">*</span>
+                            </label>
+
+                            <div class="controlWrapper">
+                                <input id="start-date" type="date" class="form-control form-control-date" formControlName="start-date" [class.form-control-invalid]="isInvalid('start_date')" aria-describedby="start-date-error"/>
+                                <i class="fa-regualr fa-calendar control-wrapper-icon" aria-hidden="true"></i>
+                            </div>
+
+                            @if(isInvalid('start_date')){
+                                <p id="start-date-error" class="form-error">
+                                    Please select a start date
+                                </p>
+                            }
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="end-date">
+                                End date
+                                <span class="required" aria-hideen="true">*</span>
+                            </label>
+
+                            <div class="control-wrapper">
+                                <input id="end-date" type="date" class="form-cntrol form-control-date" formControlName="end_date" [class.form-control-invalid]="isInvalid('end_date') || leaveRequestForm.hasError('invalidDateRange')" aria-describedby="end-date-error"/>
+                                <i class=" fa-regular fa-calendar control-wrapper-icon" aria-hidden="true"></i>
+                            </div>
+
+                            @if (isInvalid('end_date') || leaveRequestForm.hasError('invalidDateRange')){
+                                <p id="end-date-error" class="form-error">
+                                    @if(leaveRequestForm.hasError('invalidDateRange')) {
+                                        End date cannot be before the start date.
+                                    } @else {
+                                        Please select an end date.
+                                    }
+                                </p>
+                            }
+                        </div>
+
+                        <div class="form-filed form-field-full-width">
+                            <label class="form-label" for="total-days">
+                                Total days 
+                                <span class="required" aria-hidden="true">*</span>
+                            </label>
+
+                            <div class="control-wrapper">
+                                <input id="total-days" type="number" class="form-control form-control-readonly number" formControlName="total_days" readonly aria-describedby="total-days-help"/>
+                                <span class="control-wrapper-suffix"> Days </span>
+                            </div>
+
+                            <p id="total-days-help" class="form-help">
+                                Automatically calculated from the start and end dates.
+                            </p>
                         </div>
                     </div>
                 </section>
+
+                
             </form>
         </section>
     }
