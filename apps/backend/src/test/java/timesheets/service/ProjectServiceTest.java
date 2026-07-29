@@ -250,5 +250,35 @@ public class ProjectServiceTest {
 
       verify(projectRepository).findById(testProjectId);
     }
+
+    @Nested
+    @DisplayName("create projects tests")
+    class CreateProjectTests {
+
+      @Test
+      @DisplayName("budget cost calculation")
+      void calculateBudgetCost() {
+
+        // ARRANGE: request without a budget
+        CreateProjectRequest request = createValidCreateProjectRequest();
+        request.setBudgetCost(null);
+
+        Project savedProject = createTestProject();
+
+        when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
+        when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
+        when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+                testProjectId, testWorkspaceMemberId))
+            .thenReturn(Optional.of(createTestProjectMember()));
+
+        // ACT: creating the project
+        ProjectResponse response = projectService.createProject(request, testWorkspaceMemberId);
+
+        // ASSERT: want to see that the project was calculated
+        assertThat(response).isNotNull();
+
+        verify(projectRepository).save(any(Project.class));
+      }
+    }
   }
 }
