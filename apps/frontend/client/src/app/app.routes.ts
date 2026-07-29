@@ -56,6 +56,13 @@ export const routes: Routes = [
         .then(m => m.TimesheetsComponent)
   },
 
+  {
+    path: 'leave-requests',
+    loadComponent: () =>
+      import('./features/leave-requests/leave-requests.component')
+        .then(m => m.LeaveRequestsComponent)
+  },
+
   /* 404 fallback */
   {
     path: 'not-found',
