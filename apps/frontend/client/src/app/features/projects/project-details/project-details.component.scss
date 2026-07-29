@@ -209,6 +209,7 @@ META GRID
     gap: 1rem;
     flex-wrap: wrap;
     grid-template-columns: repeat(5, 1fr);
+    margin-bottom: 2rem;
 }
 
 /*
@@ -222,7 +223,7 @@ META CARD
     border: 1px solid #edf2f7;
     background: white;
     padding: 1.15rem 1.25rem;
-    box-shadow: 0 2px 8px rgba(15, 23, 40, 0.03);
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 40, 0.08);
     transition: 0.2s ease;
     min-width: 120px;
 
