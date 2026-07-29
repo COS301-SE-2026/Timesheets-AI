@@ -11,12 +11,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import timesheets.domain.Project;
 import timesheets.domain.ProjectMember;
 import timesheets.domain.TimeEntry;
@@ -34,16 +37,18 @@ import timesheets.repository.WorkspaceMemberRepository;
 import timesheets.security.SecurityUtils;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("ProjectService Unit Tests")
 public class ProjectServiceTest {
 
   @Mock private SecurityUtils securityUtils;
   @Mock private ProjectRepository projectRepository;
   @Mock private ProjectMemberRepository projectMemberRepository;
-  @Mock private ProjectService projectService;
   @Mock private WorkspaceMemberRepository workspaceMemberRepository;
   @Mock private UserRepository userRepository;
   @Mock private TimeEntryRepository timeEntryRepository;
+
+  @InjectMocks private ProjectService projectService;
 
   private final UUID testUserId = UUID.randomUUID();
   private final UUID testProjectId = UUID.randomUUID();
@@ -139,11 +144,6 @@ public class ProjectServiceTest {
 
       when(securityUtils.isAdmin()).thenReturn(true);
       when(projectRepository.findAllByIsDeletedFalse()).thenReturn(projects);
-
-      // to find the user role in the project
-      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
-              testProjectId, testWorkspaceMemberId))
-          .thenReturn(Optional.of(createTestProjectMember()));
 
       // ACT: the projects are taken
       List<ProjectResponse> responses =
@@ -246,39 +246,40 @@ public class ProjectServiceTest {
       assertThat(response.getMembers()).isNotNull();
       assertThat(response.getMembers()).hasSize(1);
       assertThat(response.getHoursLogged()).isEqualTo(BigDecimal.valueOf(60.0));
-      assertThat(response.getProgressPercentage()).isEqualTo(BigDecimal.valueOf(60.00));
+
+      assertThat(response.getProgressPercentage()).isEqualByComparingTo(BigDecimal.valueOf(60.00));
 
       verify(projectRepository).findById(testProjectId);
     }
+  }
 
-    @Nested
-    @DisplayName("create projects tests")
-    class CreateProjectTests {
+  @Nested
+  @DisplayName("create projects tests")
+  class CreateProjectTests {
 
-      @Test
-      @DisplayName("budget cost calculation")
-      void calculateBudgetCost() {
+    @Test
+    @DisplayName("budget cost calculation")
+    void calculateBudgetCost() {
 
-        // ARRANGE: request without a budget
-        CreateProjectRequest request = createValidCreateProjectRequest();
-        request.setBudgetCost(null);
+      // ARRANGE: request without a budget
+      CreateProjectRequest request = createValidCreateProjectRequest();
+      request.setBudgetCost(null);
 
-        Project savedProject = createTestProject();
+      Project savedProject = createTestProject();
 
-        when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
-        when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
-        when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
-                testProjectId, testWorkspaceMemberId))
-            .thenReturn(Optional.of(createTestProjectMember()));
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
+      when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestProjectMember()));
 
-        // ACT: creating the project
-        ProjectResponse response = projectService.createProject(request, testWorkspaceMemberId);
+      // ACT: creating the project
+      ProjectResponse response = projectService.createProject(request, testWorkspaceMemberId);
 
-        // ASSERT: want to see that the project was calculated
-        assertThat(response).isNotNull();
+      // ASSERT: want to see that the project was calculated
+      assertThat(response).isNotNull();
 
-        verify(projectRepository).save(any(Project.class));
-      }
+      verify(projectRepository).save(any(Project.class));
     }
   }
 }
