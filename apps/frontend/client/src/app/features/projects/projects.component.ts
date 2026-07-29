@@ -62,7 +62,7 @@ export class ProjectsComponent implements OnInit {
   //Hours the logged in user has personally logged, summed across
   //all their projects, not the team total. 
   protected myTotalHoursLoading = true;
-  protected myTotalHoursLabel: string = '0h 0m'
+  protected myTotalHoursLabel = '0h 0m'
 
   ngOnInit(): void {
       this.loading = true;
