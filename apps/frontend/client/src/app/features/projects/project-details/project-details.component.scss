@@ -565,48 +565,56 @@ SIMPLE BAR CHART
 PROGRESS CARD
 */
 .progress-card{
+    display: flex;
+    flex-direction: column;
     align-items: center;
     text-align: center;
+
+    .card-header{
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
 }
 
 .progress-circle-wrapper{
     display: flex;
     justify-content: center;
-    margin: 1.5rem 0;
+    margin: 1.25rem 0 1.5rem 0;
+    align-items: center;
 }
 
 .progress-circle{
-    width: 130px;
-    height: 130px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
+
     background: conic-gradient(
-        $primary calc(var(--progress)* 1%),
-        #e2e8f0
+        #1d4ed8 calc(var(--progress)* 1%),
+        #f1f5f9 0
     );
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 1rem 0;
     position: relative;
 }
 
 .progress-circle::before{
     content: "";
     position: absolute;
-    width: 95px;
-    height: 95px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
     background: white;
+    z-index: 1;
 }
 
 .progress-inner{
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    background: white;
     justify-content: center;
 }
 
@@ -614,11 +622,15 @@ PROGRESS CARD
     font-size: 2rem;
     font-weight: 800;
     color: $text-main;
+    line-height: 1;
+    letter-spacing: -0.02rem;
 }
 
 .progress-label{
-    color: $text-muted;
-    font-size: 0.85rem;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0.3rem;
 }
 
 .progress-description{
@@ -646,29 +658,39 @@ PROGRESS CARD
     background: #f8fafc;
     border-radius: 14px;
     padding: 1rem;
+
+    &.summary-blue{
+            background-color: #eff6ff;
+
+            .icon-blue{
+                color: #2563eb;
+            }
+        }
+
+    &.summary-orange{
+        background-color: #fff7ed;
+
+        .icon-orange{
+            color: #ea580c;
+        }
+    }
 }
 
 .summary-title{
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    color: $text-muted;
+    color: $text-secondary;
     font-size: 0.85rem;
-    margin-bottom: 0.35rem;
-
-    .icon-blue{
-        color: #2563eb;
-    }
-    .icon-orange{
-        color: #ea580c;
-    }
+    margin-bottom: 0.35rem;      
 
 }
 
 .summary-value{
     font-size: 1.7rem;
     font-weight: 700;
-    color: $text-muted;
+    color: $text-main;
+    line-height: 1.1;
 }
 
 
