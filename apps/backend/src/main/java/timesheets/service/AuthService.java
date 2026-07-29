@@ -253,9 +253,10 @@ public class AuthService {
     user.setLockedUntil(null);
     userRepository.save(user);
 
-    if (!Boolean.TRUE.equals(user.getEmailVerified())) {
-      throw new IllegalStateException("please verify your email before logging in");
-    }
+    // TODO
+    // if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+    //   throw new IllegalStateException("please verify your email before logging in");
+    // }
 
     // check if MFA is enabled
     boolean mfaEnabled =
