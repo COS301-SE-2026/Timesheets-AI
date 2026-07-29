@@ -150,21 +150,4 @@ export class ProjectsComponent implements OnInit {
       project.name.toLowerCase().includes(searchValue.toLowerCase()),
     );
   }
-
-  protected filterByProjects(selectedFilter:string): void{
-    this.selectedFilter = selectedFilter;
-    if(selectedFilter === 'ALL'){
-      this.filteredProjects = [...this.projects];
-      return;
-    }
-    this.filteredProjects = this.projects.filter(
-      (project) => project.status === this.selectedFilter,
-    );
-  }
-  protected seachProject(searchValue: string): void{
-    this.searchTerm = searchValue;
-    this.filteredProjects = this.projects.filter((project) =>
-      project.name.toLowerCase().includes(searchValue.toLowerCase()),
-    );
-  }
 }
