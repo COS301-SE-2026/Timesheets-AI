@@ -552,9 +552,8 @@ TEAM CARD
 }
 
 .member-name{
-    color: $text-primary;
-    font-weight: 600;
-    font-size: 1rem;
+    font-weight: 700;
+    
 }
 
 .member-role{
@@ -572,6 +571,17 @@ TEAM CARD
     display: flex;
     align-items: center;
     gap: 1rem;
+}
+
+.member-right{
+    display: flex;
+    align-items: center;
+}
+
+.member-hours{
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: $text-secondary;
 }
 
 .member-details{
