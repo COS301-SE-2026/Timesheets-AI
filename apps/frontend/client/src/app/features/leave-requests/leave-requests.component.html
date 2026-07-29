@@ -256,8 +256,71 @@
                     </div>
                 </section>
 
-                
+                <section class="from-section" aria-labelledby="additional-information-title">
+                    <h2 id="additional-information-title" class="form-section-title">
+                        Additional information
+                    </h2>
+
+                    <div class="form-filed">
+                        <span class="form-labl">
+                            Attachment (Optional)
+                        </span>
+
+                        <div class="attachment-placeholder">
+                            <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+                            <strong> Attachment are not available yet</strong>
+                            <span> The attachment value will remain empty for now</span>
+                        </div>
+
+                        <p class="form-help">
+                            Attachments will be submitted as <code>null</code>
+                        </p>
+                        <!-- INTEGRATION:  -->
+                         <!-- API currently documents attachments as string, integrate when upload support is available -->
+                    </div>
+                </section>
+
+                <section class="form-section" aria-labelledby="submission-title">
+                    <h2 id="submission-title" class="form-section-title"> Submission </h2>
+
+                    <div class="submission-note">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                  
+                        <p>
+                            <strong>Note:</strong>
+                            Your resquest will be submitted for approval.
+                            Ypu will be notified once a decision had been made.
+                        </p>
+                    </div>
+                </section>
+
+                <footer class="form-actions">
+                    <button type="button" class="button button-secondary" (click)="showView('LIST')">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="button button-primary">
+                        <span>Submit request</span>
+                        <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+                    </button>
+                </footer>
             </form>
+
+            <aside class="content-card leave-guide" aria-labelledby="leave-guide-title">
+                <h2 id="leave-guide-title" class="form-section-title">
+                    Leave Types Guide
+                </h2>
+
+                <ul class="leave-guide-list">
+                    @for (type of leaveTypeOptions; track type.value){
+                        <li class="leave-gude-item">
+                            <i [class]="type.icon + '' + iconClass(type.value)" aria-hidden="true"></i>
+                            <strong> {{type.label}}</strong>
+                            <span>{{ type.description }}</span>
+                        </li>
+                    }
+                </ul>
+            </aside>
         </section>
     }
 </main>
