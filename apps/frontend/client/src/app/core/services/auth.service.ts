@@ -52,7 +52,10 @@ const USER_KEY = 'auth_user';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly baseUrl = `${environment.apiUrl}/api/auth`;
+  // the environment already provides '/api' prefix 
+  // keep only "/auth" here to avoid it generating "api/api/* urls" 
+  // this approach works correctly with Nginx reverse proxy 
+  private readonly baseUrl = `${environment.apiUrl}/auth`;
 
   //signal so that any component reacts automatically to the moment login/logout happens.
   //refs: https://angular.dev/guide/signals

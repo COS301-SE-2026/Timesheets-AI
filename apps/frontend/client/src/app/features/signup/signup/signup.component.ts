@@ -53,7 +53,12 @@ export class SignupComponent {
       [
         Validators.required,
         Validators.minLength(8),
-        Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d).+$/)
+        // Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d).+$/)
+        // REGEX need to match backend exactly
+        Validators.pattern(
+            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\S+$).{8,20}$/
+
+        )
       ]
     ],
     acceptedTerms: [false, Validators.requiredTrue]
