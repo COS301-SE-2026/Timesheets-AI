@@ -20,6 +20,7 @@ import {
 } from '../../../core/services/auth.service';
 import { SignupComponent } from './signup.component';
 import { FormGroup } from '@angular/forms';
+import { first } from 'rxjs';
 
 interface SignupComponentInternals {
   signupForm: FormGroup;
@@ -95,6 +96,7 @@ describe('AuthService - register', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
+         verificationToken: '12345',
     } satisfies RegisterResponse);
   });
 
@@ -112,6 +114,7 @@ describe('AuthService - register', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
+         verificationToken: '12345',
     } satisfies RegisterResponse);
 
     expect(result?.email).toBe(validPayload.email);
@@ -132,6 +135,7 @@ describe('AuthService - register', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
+         verificationToken: '12345',
     } satisfies RegisterResponse);
 
     expect(localStorage.getItem('auth_token')).toBeNull();
@@ -395,6 +399,7 @@ describe('SignupComponent', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.',
+       verificationToken: '12345',
     } satisfies RegisterResponse);
   });
 
@@ -414,12 +419,21 @@ describe('SignupComponent', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.',
+      verificationToken: '12345',
     } satisfies RegisterResponse);
 
     expect(componentInstance.loading).toBe(false);
-    expect(navigateSpy).toHaveBeenCalledWith(['/login'], {
-      queryParams: { registered: 'true' },
-    });
+    // expect(navigateSpy).toHaveBeenCalledWith(['/login'], {
+    expect(navigateSpy).toHaveBeenCalledWith(
+      ['/verify-email'],
+      {
+        state: {
+            token: '12345',
+            email: 'john@company.com',
+            firstName: 'John'
+        }
+      }
+    )
   });
 
   // Test that a failed signup surfaces the backend's error message instead of navigating
