@@ -138,7 +138,7 @@
                 </span>
 
                 <div>
-                    <h1 id="create-request-title" class="page-title"> Leave Request </h1>
+                    <h1 id="create-request-title" class="page-title"> {{ editingRequestId() ? 'Edit Leave Request' : 'Leave Request' }} </h1>
                     <p class="page-subtitle"> Submit a request for time off </p>
                 </div>
             </header>
@@ -301,7 +301,7 @@
                     </button>
 
                     <button type="submit" class="button button-primary">
-                        <span>Submit request</span>
+                        <span> {{ editingRequestId() ? 'Update request' : 'Submit request' }}</span>
                         <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
                     </button>
                 </footer>
@@ -324,4 +324,33 @@
             </aside>
         </section>
     }
+
+    @if (isDetailsOpen()){ 
+        @if (selectedRequest(); as request){
+        <div class="modal-overlay" >
+            <button type="button" class="modal-backdrop" aria-label="Close request details" (click)="closeRequestDetails()">
+
+            </button>
+
+            <dialog open class="modal-panel" aria-modal="true" aria-labelledby="request-detail-modal-title" >
+                <header class="modal-header">
+                    <h2 id="request-detail-modal-title"> {{ leaveTypeLabel(request.leaveType) }} </h2>
+
+                    <button type="button" class="icon-button" aria-label="Close request details" (click)="closeRequestDetails()">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    </button>
+                </header>
+
+                <div class="modal-content">
+                    <p><strong>Employee:</strong> {{ request.memberName }}</p>
+                    <p><strong>Start date:</strong> {{ formatDate(request.startDate) }}</p>
+                    <p><strong>End date:</strong> {{ formatDate(request.endDate) }}</p>
+                    <p><strong>Total days:</strong> {{ request.totalDays }}</p>
+                    <p><strong>Status:</strong> {{ statusLabel(request.status) }}</p>
+                    <p><strong>Reason:</strong> {{ request.reason ?? 'No reason provided.' }}</p>
+                </div>
+            </dialog>
+        </div>
+    }
+}
 </main>
