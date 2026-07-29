@@ -218,5 +218,20 @@ class AuthServiceTest {
       assertThat(user.getFailedLoginAttempts()).isEqualTo(0);
       assertThat(user.getLockedUntil()).isNull();
     }
+
+    @Test
+    @DisplayName("reject login with invalid email")
+    void rejectInvalidEmail() {
+
+      // ARRANGE: set up with an invalid email, cause I did not set up that user with email
+      AuthRequest request = createValidAuthRequest();
+
+      when(userRepository.findByEmail(testEmail)).thenReturn(Optional.empty());
+
+      // ACT and ASSERT
+      assertThatThrownBy(() -> authService.login(request))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessageContaining("invalid credentials");
+    }
   }
 }
