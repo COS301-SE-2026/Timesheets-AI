@@ -184,16 +184,11 @@ public class AuthService {
         userRepository
             .findById(verificationToken.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("user not found"));
-    // DEBUG
-    System.out.println("User before update:" + user.getEmail());
-    System.out.println("Verified already" + user.getEmailVerified());
 
     user.setEmailVerified(true);
 
-    System.out.println("Verified after" + user.getEmailVerified());
-
-    // userRepository.save(user);
-    userRepository.saveAndFlush(user);
+    userRepository.save(user);
+    // userRepository.saveAndFlush(user);
 
     return new MessageResponse("Email verified successfully", "/dashboard");
   }
