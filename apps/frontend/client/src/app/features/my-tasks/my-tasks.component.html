@@ -145,7 +145,7 @@
                             </td>
 
                             <td class="project-link">
-                                <a (click)="navigateToProject(task.projectId)" class="project-name-link text-body" [attr.aria-label]="'View project ' + task.projectName">{{ task.projectName }}</a>
+                                <a (click)="navigateToProject(task.projectId)" (keydown.enter) = "navigateToProject(task.projectId)" (keydown.space)= "navigateToProject(task.projectId)" tabindex ="0" class="project-name-link text-body" [attr.aria-label]="'View project ' + task.projectName">{{ task.projectName }}</a>
                             </td>
 
 
@@ -201,8 +201,8 @@
       </section>
 
       @if(isDetailOpen()) {
-        <div class="modal-overlay"  (keydown)="onOverlayKeydown($event)" (click)="closeTaskDetail()">
-            <div class="modal-panel" aria-modal="true" aria-labelledby="task-detail-title"  (keydown)="onOverlayKeydown($event)" (click)="$event.stopPropagation()">
+        <div class="modal-overlay" tabindex="0" (keydown)="onOverlayKeydown($event)" (click)="closeTaskDetail()">
+            <div class="modal-panel" tabindex="0" aria-modal="true" aria-labelledby="task-detail-title"  (keydown)="onOverlayKeydown($event)" (click)="$event.stopPropagation()">
                 <header class="modal-header">
                     <h2 id="task-detail-title" class="modal-title"> Task Detail </h2>
                     <button type="button" class="modal-close" (click)="closeTaskDetail()" aria-label="Close task detail">
