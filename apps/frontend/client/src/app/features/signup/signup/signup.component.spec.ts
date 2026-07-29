@@ -50,7 +50,7 @@ describe('AuthService - register', () => {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@momentum.co.za',
-    password: 'Password1!',
+    password: 'Password1!!!!',
   };
 
   beforeEach(() => {
@@ -188,7 +188,7 @@ describe('SignupComponent', () => {
     name: 'John',
     surname: 'Doe',
     email: 'john@company.com',
-    password: 'Password1',
+    password: 'Password1!!!',
     acceptedTerms: true,
   };
 
@@ -357,7 +357,7 @@ describe('SignupComponent', () => {
 
   //Test that valid passwords do not show errors
   it('should return an empty password error message when password is valid', () => {
-    componentInstance.signupForm.controls['password'].setValue('Password1');
+    componentInstance.signupForm.controls['password'].setValue('Password1!!!');
     componentInstance.signupForm.controls['password'].markAsTouched();
 
     expect(componentInstance.showPasswordError).toBe(false);
@@ -384,7 +384,7 @@ describe('SignupComponent', () => {
       firstName: 'John',
       lastName: 'Doe',
       email: 'john@company.com',
-      password: 'Password1',
+      password: 'Password1!!!',
     });
 
     req.flush({
