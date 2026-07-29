@@ -1,7 +1,9 @@
 #Dev stage (used by docker compose)
 # Node 22 matches the version used in frontend-ci.yml
 FROM node:22-alpine AS dev
-WORKDIR /app/client
+
+## this is the root inside the container
+WORKDIR /app
 
 # Create a non-root user 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -16,7 +18,7 @@ COPY apps/frontend/client/package.json apps/frontend/client/package.json
 RUN yarn install --frozen-lockfile
 
 # Copy angular application 
-COPY apps/frontend/client/ apps/frontend/client
+COPY . .
 
 RUN chown -R appuser:appgroup /app
 USER appuser
@@ -40,7 +42,7 @@ COPY apps/frontend/client/package.json apps/frontend/client/package.json
 RUN yarn install --frozen-lockfile
 
 # Copy angular application 
-COPY apps/frontend/client/ apps/frontend/client
+COPY . .
 
 WORKDIR /app/apps/frontend/client 
 
@@ -58,3 +60,7 @@ COPY apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
 # Nginx port 
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]                                                      
+
+
+# UPDATE THE DOCKERFILE BECAUSE DOCKER SAID IT ONLY RECEIEVED 15kb which is too extrememly small for our setup
+
