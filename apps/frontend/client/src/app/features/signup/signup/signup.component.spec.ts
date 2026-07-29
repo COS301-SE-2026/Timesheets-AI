@@ -96,7 +96,7 @@ describe('AuthService - register', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
-         verificationToken: '12345',
+      verificationToken: '12345',
     } satisfies RegisterResponse);
   });
 
@@ -114,7 +114,7 @@ describe('AuthService - register', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
-         verificationToken: '12345',
+      verificationToken: '12345',
     } satisfies RegisterResponse);
 
     expect(result?.email).toBe(validPayload.email);
@@ -135,7 +135,7 @@ describe('AuthService - register', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
-         verificationToken: '12345',
+      verificationToken: '12345',
     } satisfies RegisterResponse);
 
     expect(localStorage.getItem('auth_token')).toBeNull();
@@ -399,7 +399,7 @@ describe('SignupComponent', () => {
       createdAt: '2026-07-21T09:00:00.000Z',
       message:
         'Registered successfully, please check your email to verify your account.',
-       verificationToken: '12345',
+      verificationToken: '12345',
     } satisfies RegisterResponse);
   });
 
@@ -423,7 +423,6 @@ describe('SignupComponent', () => {
     } satisfies RegisterResponse);
 
     expect(componentInstance.loading).toBe(false);
-    // expect(navigateSpy).toHaveBeenCalledWith(['/login'], {
     expect(navigateSpy).toHaveBeenCalledWith(
       ['/verify-email'],
       {

@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VerifyEmailComponent } from './verify-email.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 describe('VerifyEmailComponent', () => {
   let component: VerifyEmailComponent;
@@ -12,7 +13,10 @@ describe('VerifyEmailComponent', () => {
       imports: [VerifyEmailComponent],
       providers: [
         provideHttpClient(),
-        provideRouter([])
+        provideRouter([]), 
+        {
+          provide: AuthService
+        }
       ]
     })
     .compileComponents();
