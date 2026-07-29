@@ -13,6 +13,37 @@
                     <span>Apply for leave</span>
                 </button>
             </header>
+
+            @if (submitMessage()) {
+                <output class="alert alert-success">
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    <span> {{ submitMessage() }}</span>
+                </output>
+            }
+
+            @if (errorMessage()) {
+                <div class="alert alert-error" role="alert">
+                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                    <span>{{ errorMessage() }}</span>
+                </div>
+            }
+
+            <section class="summary-grid" aria-lable="Leave request summary">
+                @for (card of summaryCards(); track card.label){
+                    <article class="summary-card">
+                        <span class="summary-card-icon" [ngClass]=" 'summary-card-icon-' + card.type">
+                            <i [class]="card.icon" aria-hidden="true"></i>
+                        </span>
+
+                        <div class="summary-card-content">
+                            <span class="summary-card-label"> {{ card.label}} </span>
+                            <strong class="summary-card-value" aria-live="polite"> {{ card.value }}</strong>
+                        </div>
+                    </article>
+                }
+            </section>
+
+            
         </section>
     }
 </main>
