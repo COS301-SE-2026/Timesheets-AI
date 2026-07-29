@@ -93,9 +93,12 @@ export class SignupComponent {
     //       queryParams: {registered: 'true'}
     //     });
     //   },
+
     .subscribe({
       next: (response) => {
         this.loading = false;
+
+        console.log('Navigating to verify-email');
 
         this.router.navigate(['/verify-email'], {
           state: {
@@ -103,7 +106,9 @@ export class SignupComponent {
               email: response.email,
               firstName: response.firstName
           }
-        });
+        }).then(result => {
+        console.log('Navigation result:', result);
+      });
       },
       error: err => {
         this.loading = false;
@@ -111,6 +116,7 @@ export class SignupComponent {
       }
     });
   }
+  
 
   protected get showNameError(): boolean {
     const control = this.signupForm.controls.name;
