@@ -16,9 +16,10 @@
             </div>
             <div class="summary-card-content">
             <div class="summary-card-value" aria-live="polite">
-                {{ totalCount() }}
+                {{ activeCount() }}
             </div>
-            <div class="summary-card-label text-caption"> Total Tasks</div>
+            <div class="summary-card-label text-caption"> Active</div>
+            <div class="summary-card-subtitle text-caption"> Includes To Do &amp; In progress</div>
             </div>
         </div>
 
@@ -60,7 +61,7 @@
             <div class="summary-card-value" aria-live="polite">
                 {{ archivedCount() }}
             </div>
-            <div class="summary-card-label text-caption"> Archived</div>
+            <div class="summary-card-label text-caption"> Blocked</div>
          </div>
         </div>
       </section>
@@ -103,7 +104,7 @@
 
              <label class="checkbox-label">
                 <input type="checkbox" [ngModel]="showArchived()" (ngModelChange)="showArchived.set($event); applyFilters()" aria-label="Show archived tasks"/>
-                Show Archived
+                Show Blocked
              </label>
           </div>
       </section>
