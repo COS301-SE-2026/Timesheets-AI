@@ -16,29 +16,43 @@ type LeaveUiState = 'idle' | 'loading' | 'error';
 
 export interface LeaveRequest {
   id: string;
-  workspace_member_id: string;
-  leave_type: LeaveType;
-  start_date: string;
-  end_date: string;
-  total_days: number;
+  workspaceMemberId: string;
+  leaveType: LeaveType;
+  startDate: string;
+  endDate: string;
+  totalDays: number;
   reason: string | null;
-  attachment: unknown[] | null;
+  attachments: string | null;
   status: LeaveRequestStatus;
-  approve_by_workspace_member_id: string | null;
-  approved_at: string | null;
-  rejection_reason: string | null;
-  availability_id: string | null;
-  created_at: string;
-  updated_at: string;
+  approvedByName: string | null;
+  memberName: string;
+  approvedAt: string | null;
+  rejectionReason: string | null;
+  availabilityId: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateLeaveRequestPayload {
-  leave_type: LeaveType;
-  start_date: string;
-  end_date: string;
-  total_days: number;
+  leaveType: LeaveType;
+  startDate: string;
+  endDate: string;
+  totalDays: number;
   reason: string;
-  attachments: null;
+  attachments: string | null;
+}
+
+export interface UpdateLeaveRequestPayload {
+  leaveType?: LeaveType,
+  startDate?: string,
+  endDate?: string,
+  totalDays?: number,
+  reason?: string,
+  attachments?: string | null;
+}
+
+export interface CancelLeaveRequestPayload {
+  reason: string;
 }
 
 interface LeaveTypeOption {
@@ -66,7 +80,7 @@ const LEAVE_TYPE_LABELS: Record<LeaveType, string> = {
 
 // Status labels
 const STATUS_LABELS: Record<LeaveRequestStatus, string> = {
-  PENDING: 'pending',
+  PENDING: 'Pending',
   APPROVED: 'Approved',
   REJECTED: 'Rejected',
   CANCELLED: 'Cancelled'
@@ -89,7 +103,7 @@ const LEAVE_TYPES: LeaveTypeOption[] = [
   {
     value: 'MATERNITY',
     label: 'Maternity',
-    description: 'Leave for pregnancy and childbirth.',
+    description: 'Leave for pregnancy and child birth.',
     icon: 'fa-solid fa-person-pregnant',
   },
   {
@@ -116,37 +130,39 @@ const LEAVE_TYPES: LeaveTypeOption[] = [
 const MOCK_LEAVE_REQUESTS: LeaveRequest[] = [
   {
     id: '12345',
-    workspace_member_id: '67890',
-    leave_type: 'ANNUAL',
-    start_date: '2025-06-24',
-    end_date: '2025-06-28',
-    total_days: 5,
+    workspaceMemberId: '67890',
+    memberName: 'John Doe',
+    leaveType: 'ANNUAL',
+    startDate: '2025-06-24',
+    endDate: '2025-06-28',
+    totalDays: 5,
     reason: 'Annual holiday',
-    attachment: null,
+    attachments: null,
     status: 'PENDING',
-    approve_by_workspace_member_id: null,
-    approved_at: null,
-    rejection_reason: null,
-    availability_id: null,
-    created_at: '2025-06-10T09:00:00',
-    updated_at: '2025-06-10T09:00:00'
+    approvedByName: null,
+    approvedAt: null,
+    rejectionReason: null,
+    availabilityId: null,
+    createdAt: '2025-06-10T09:00:00Z',
+    updatedAt: '2025-06-10T09:00:00Z'
   },
   {
     id: '11121',
-    workspace_member_id: '14156',
-    leave_type: 'SICK',
-    start_date: '2025-05-10',
-    end_date: '2025-05-12',
-    total_days: 3,
+    workspaceMemberId: '14156',
+    memberName: 'John Doe',
+    leaveType: 'SICK',
+    startDate: '2025-05-10',
+    endDate: '2025-05-12',
+    totalDays: 3,
     reason: 'Medical recovery.',
-    attachment: null,
+    attachments: null,
     status: 'APPROVED',
-    approve_by_workspace_member_id: 'abcde',
-    approved_at: '2025-05-09T14:30:00',
-    rejection_reason: null,
-    availability_id: null,
-    created_at: '2025-05-09T08:00:00',
-    updated_at: '2025-05-09T14:30:00'
+    approvedByName: 'Jane Smith',
+    approvedAt: '2025-05-09T14:30:00Z',
+    rejectionReason: null,
+    availabilityId: null,
+    createdAt: '2025-05-09T08:00:00Z',
+    updatedAt: '2025-05-09T14:30:00Z'
   }
 ];
 
@@ -155,6 +171,7 @@ const MOCK_LEAVE_REQUESTS: LeaveRequest[] = [
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './leave-requests.component.html',
   styleUrl: './leave-requests.component.scss',
+  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
@@ -176,27 +193,27 @@ export class LeaveRequestsComponent {
       leave_type: this.formBuilder.nonNullable.control<LeaveType | ''>('', {
         validators: Validators.required
       }),
-      reason: ['', [Validators.required, Validators.maxLength(500)]],
-      start_date: ['', Validators.required],
-      end_date: ['', Validators.required],
-      total_days: [{ value: 0, disabled: true }]
+      reason: this.formBuilder.nonNullable.control('', {validators: [ Validators.required, Validators.maxLength(500) ] }),
+      start_date: this.formBuilder.nonNullable.control('', { validators: [Validators.required]}) ,
+      end_date: this.formBuilder.nonNullable.control('', { validators: [Validators.required]}) ,
+      total_days:this.formBuilder.nonNullable.control({ value: 0, disabled: true }) 
     },
     {
-      validators: this.dateRangeValidator
+      validators: [this.dateRangeValidator.bind(this)]
     }
   );
 
   readonly summaryCards = computed<SummaryCard[]>(() => [
     {
       label: 'Pending',
-      value: this.countByStatus('Pending'),
+      value: this.countByStatus('PENDING'),
       icon: 'fa-regular fa-hourglass-half',
       type: 'pending'
     },
     {
       label: 'Approved',
       value: this.countByStatus('APPROVED'),
-      icon: 'fa-regular fa-calender-check',
+      icon: 'fa-regular fa-calendar-check',
       type: 'approved',
     },
     {
@@ -208,7 +225,7 @@ export class LeaveRequestsComponent {
     {
       label: 'Total requests',
       value: this.leaveRequests().length,
-      icon: 'fa-solid fa-circle-notch',
+      icon: 'fa-solid fa-circle-check',
       type: 'total'
     }
   ]);
@@ -229,13 +246,15 @@ export class LeaveRequestsComponent {
   }
 
   // View leave request
-  showView(view: LeaveRequestPageView): void {
+  showView(view: LeavePageView): void {
     this.currentView.set(view);
     this.errorMessage.set(null);
 
-    if (view === 'LIST') {
-      this.resetForm();
+    if (view === 'CREATE') {
+      this.submitMessage.set(null);
+      return;
     }
+    this.resetForm();
   }
 
   // Submit leave request function
@@ -250,16 +269,17 @@ export class LeaveRequestsComponent {
 
     const formValue = this.leaveRequestForm.getRawValue();
 
-    if (!formValue) {
+    if (!formValue.leave_type) {
+      this.leaveRequestForm.controls.leave_type.markAsTouched();
       return;
     }
 
     // Leave request payload
     const payload: CreateLeaveRequestPayload = {
-      leave_type: formValue.leave_type,
-      start_date: formValue.start_date,
-      end_date: formValue.end_date,
-      total_days: formValue.total_days,
+      leaveType: formValue.leave_type,
+      startDate: formValue.start_date,
+      endDate: formValue.end_date,
+      totalDays: formValue.total_days,
       reason: formValue.reason.trim(),
       attachments: null
     };
@@ -282,16 +302,159 @@ export class LeaveRequestsComponent {
     console.log('Selected leave request:', request);
   }
 
+  canEdit(request: LeaveRequest): boolean {
+    return request.status === 'PENDING';
+  }
+
+  canCancel(request: LeaveRequest): boolean {
+    return request.status === 'PENDING'
+  }
+
+  editRequest(request: LeaveRequest): void {
+
+    // INTEGRATION: PATCH /api/leave-request/{id}\
+
+    if (!this.canEdit(request)){
+      return;
+    }
+     console.log('Successfuly edited:', request);
+  }
+
+  cancelRequest(request: LeaveRequest): void {
+
+    // integration: POST/API/LEAVE-REQUEST/{ID}/CANCEL
+
+    if(!this.canCancel(request)){
+      return;
+    }
+
+     console.log('Cancel:', request);
+  }
   // invlaid entry
-  isInvalid(controlName: keyof typeof this.leaveRequestForm.controls): void {
+  isInvalid(controlName: keyof typeof this.leaveRequestForm.controls): boolean {
     const control = this.leaveRequestForm.controls[controlName];
     return control.invalid && (control.dirty || control.touched);
   }
 
   leaveTypeLabel(type: LeaveType): string {
-    return (LEAVE_TYPES.find(option => option.value === type)?.label ?? type);
+    return LEAVE_TYPE_LABELS[type];
   }
 
+  // returns the display label for leave request status
 
+  statusLabel(status: LeaveRequestStatus): string {
+    return STATUS_LABELS[status];
+  }
 
+  // Returns the css classes used to style a leave request statys badge
+  statusClass(status: LeaveRequestStatus ): string {
+    return `status status-${status.toLowerCase()}`;
+  }
+
+  // Returns the css class used to display the icon for a leave type
+  iconClass(type: LeaveType): string {
+    return `leave-icon leave-icon-${type.toLowerCase()}`;
+  }
+
+  // Formats a date string into a user friendly display format
+  formatDate(date: string): string {
+    return new Intl.DateTimeFormat('en-ZA', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }).format(this.toDate(date));
+  }
+
+  // Count number of leave requests with the specific status
+  private countByStatus(status: LeaveRequestStatus): number {
+    return this.leaveRequests().filter(request => request.status === status).length;
+  }
+
+  //Calculates and updates the total number of leave days
+  private calculateTotalDays(): void {
+    const { start_date, end_date} = this.leaveRequestForm.getRawValue();
+
+    if(!start_date || !end_date) {
+      this.setTotalDays(0);
+      return;
+    }
+
+    const startDate = this.toDate(start_date);
+    const endDate = this.toDate(end_date);
+
+    const millisecondsPerDay = 86_400_000;
+
+    const totalDays = Math.floor( (endDate.getTime() - startDate.getTime()) / millisecondsPerDay) + 1;
+
+    this.setTotalDays(Math.max(0, totalDays));
+
+    this.leaveRequestForm.updateValueAndValidity({
+      emitEvent: false
+    });
+  }
+
+  // Validates that the end date is not earlier than the start date
+  private dateRangeValidator( control: AbstractControl) : ValidationErrors | null {
+    const startDate = control.get('start_date')?.value as string;
+    const endDate = control.get('end_date')?.value as string;
+
+    if(!startDate || !endDate){
+      return null;
+    }
+
+    return this.toDate(endDate) >= this.toDate(startDate) ? null : {invalidDateRange: true};
+  };
+
+  // Updates the total days filled without triggering additional form events
+  private setTotalDays(days: number) : void {
+    this.leaveRequestForm.controls.total_days.setValue(days, {
+      emitEvent: false
+    });
+  }
+
+  // Converts a date string into a date object
+  private toDate(date: string) : Date {
+    return new Date(`${date}T00:00:00`);
+  }
+
+  // resets the leave request form to it's default values
+  private resetForm(): void {
+    this.leaveRequestForm.reset({
+      leave_type: '',
+      reason: '',
+      start_date: '',
+      end_date: '',
+      total_days: 0
+    });
+  }
+
+  //  INTEGRATION: remove this and use the respons from the POST request
+  // Adds temporary leave request to local list unti backend integration is compplete
+  private addTemporaryRequest(payload: CreateLeaveRequestPayload) : void {
+    const now = new Date().toISOString();
+
+    const request: LeaveRequest = {
+    id: crypto.randomUUID(),
+    workspaceMemberId: 'current-member-id',
+    memberName: 'Current User',
+    leaveType: payload.leaveType,
+    startDate: payload.startDate,
+    endDate: payload.endDate,
+    totalDays: payload.totalDays,
+    reason: payload.reason,
+    attachments: payload.attachments,
+    status: 'PENDING',
+    approvedByName: null,
+    approvedAt: null,
+    rejectionReason: null,
+    availabilityId: null,
+    createdAt: now,
+    updatedAt: now
+  };
+
+  this.leaveRequests.update(requests => [
+    request, ...requests
+  ]);
+}
+  
 }
