@@ -22,6 +22,12 @@ export interface RegisterResponse {
   verificationToken: string;
 }
 
+// DEMO 2 - For verification
+export interface MessageResponse {
+  message: string;
+  redirectUrl: string;
+}
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -83,6 +89,16 @@ export class AuthService {
   register(payload: RegisterRequest): Observable<RegisterResponse> {
     return this.http
       .post<RegisterResponse>(`${this.baseUrl}/register`, payload)
+      .pipe(catchError(this.handleError));
+  }
+
+  // DEMO 2
+  verifyEmail(token: string): Observable<MessageResponse> {
+    return this.http
+      .post<MessageResponse>(
+        `${this.baseUrl}/verify-email?token=${token}`,
+        {}
+      )
       .pipe(catchError(this.handleError));
   }
 
