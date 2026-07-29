@@ -1,0 +1,58 @@
+
+
+// Main page styling
+
+:host {
+    display: block;
+    min-height: 100%;
+    color: var(--color-text-body);
+    background: var(--color-white);
+}
+
+button, input, select, textarea {
+    font: inherit;
+}
+
+button{
+    cursor: pointer;
+}
+
+.leave-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: var(--space-8);
+    background: linear-gradient(135deg, var(--color-primary-surface) 0%, var(--color-white) 30%);
+}
+
+.page-content {
+    width: min(100%, 1440px);
+    margin-inline: auto;
+}
+
+.page-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--font-size-display);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--color-text-primary);
+}
+
+.page-subtitles {
+    margin: var(--space-2) 0 0;
+    font-size: var(--font-size-h3);
+    color: var(--color-text-muted);
+}
+
+.number {
+    font-family: var(--font-mono);
+}
+
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(-space-6);
+    margin-bottom: var(--space-8);
+}
