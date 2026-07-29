@@ -25,12 +25,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import timesheets.domain.EmailVerificationToken;
 import timesheets.domain.User;
+import timesheets.domain.UserIdentityProvider;
 import timesheets.dto.request.AuthRequest;
+import timesheets.dto.request.GoogleAuthRequest;
 import timesheets.dto.request.RegisterRequest;
 import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.enums.UserStatus;
 import timesheets.repository.EmailVerificationTokenRepository;
+import timesheets.repository.UserIdentityProviderRepository;
 import timesheets.repository.UserMfaRepository;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
@@ -53,6 +56,7 @@ class AuthServiceTest {
   @Mock private WorkspaceMemberRepository workspaceMemberRepository;
   @Mock private UserMfaRepository userMfaRepository;
   @Mock private JwtService jwtService;
+  @Mock private UserIdentityProviderRepository userIdentityProviderRepository;
 
   @InjectMocks private AuthService authService;
 
@@ -232,6 +236,44 @@ class AuthServiceTest {
       assertThatThrownBy(() -> authService.login(request))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("invalid credentials");
+    }
+  }
+
+  @Nested
+  @DisplayName("Google Auth Tests")
+  class GoogleAuthTests {
+
+    @Test
+    @DisplayName("existing user should login with google")
+    void loginWithGoogle() {
+
+      // ARRANGE
+      GoogleAuthRequest request = new GoogleAuthRequest();
+      request.setIdToken("swagger-test");
+
+      UserIdentityProvider identityProvider =
+          UserIdentityProvider.builder()
+              .userId(testUserId)
+              .provider("GOOGLE")
+              .providerUserId("google-test-user-123")
+              .build();
+      User user = createTestUser();
+
+      when(userIdentityProviderRepository.findByProviderAndProviderUserId(
+              "GOOGLE", "google-test-user-123"))
+          .thenReturn(Optional.of(identityProvider));
+      when(userRepository.findById(testUserId)).thenReturn(Optional.of(user));
+      when(workspaceMemberRepository.findByUserId(testUserId)).thenReturn(List.of());
+      when(userMfaRepository.findByUserId(testUserId)).thenReturn(Optional.empty());
+      when(jwtService.generateToken(any(User.class), eq(1))).thenReturn("jwt-token");
+
+      // ACT: testing that method
+      AuthResponse response = authService.googleAuth(request);
+
+      // ASSERT
+      assertThat(response).isNotNull();
+      assertThat(response.getToken()).isEqualTo("jwt-token"); // simulating a returned jwt token
+      assertThat(response.getUser().getEmail()).isEqualTo(testEmail);
     }
   }
 }
