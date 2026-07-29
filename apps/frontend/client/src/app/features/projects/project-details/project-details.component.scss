@@ -12,6 +12,9 @@ COLOUR VARIABLES
 $background: #f8fafc;
 $surface: #ffffff;
 $border: #e2e8f0;
+$primary-blue: #2563eb;
+$primary-light-blue: #eff6ff;
+$text-main: #0f172a;
 
 $text-primary: #0f172a;
 $text-secondary: #64748b;
@@ -40,11 +43,11 @@ PAGE LAYOUT
 }
 
 .project-details-container{
-    padding: 2rem 2.5rem;
-    display: flex;
-    flex-direction: column;
+    padding: 2rem;
     gap: 2rem;
     min-height: 100vh;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: $text-main;
 }
 
 /*
@@ -79,7 +82,7 @@ PAGE HEADER
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
 /*
@@ -88,14 +91,15 @@ LEFT HEADER
 .project-header-left{
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .project-title{
     margin: 0;
-    color: $text-primary;
+    color: $text-main;
     font-size: 2.25rem;
     font-weight: 700;
+    letter-spacing: -0.02rem;
 }
 
 .project-avatar{
@@ -124,10 +128,9 @@ LEFT HEADER
 }
 
 .project-description{
-    margin: 0;
-    color: $text-secondary;
-    font-size: 1.1rem;
-    line-height: 1.6;
+    margin: 0.25rem 0 0 0;
+    color: $text-muted;
+    font-size: 0.95rem;
 }
 
 /*
@@ -135,7 +138,6 @@ RIGHT HEADER
 */
 .project-header-right{
     display: flex;
-    align-items: center;
     gap: 0.75rem;
 }
 
@@ -221,7 +223,58 @@ META CARD
     background: transparent;
     padding: 0;
     min-width: 120px;
+
+    .icon-wrapper{
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+
+        &.blue{
+            background-color: #eff6ff;
+            color: #2563eb;
+        }
+        &.blue-light{
+            background-color: #f0f9ff;
+            color: #0284c7;
+        }
+        &.green{
+            background-color: #f0fdf4;
+            color: #16a34a;
+        }
+        &.orange{
+            background-color: #fff7ed;
+            color: #ea580c;
+        }
+        &.purple{
+            background-color: #faf5ff;
+            color: #9333ea;
+        }
+
+        .meta-info{
+            display: flex;
+            flex-direction: column;
+
+            .meta-title{
+                font-size: 0.825rem;
+                font-weight: 500;
+                color: $text-muted;
+            }
+
+            strong{
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: $text-main;
+                margin-top: 0.15rem;
+            }
+        }
+    }
 }
+
+
 
 
 /*
@@ -231,12 +284,6 @@ META CONTENT
     color: #94a3b8;
     font-size: 1rem;
     margin-bottom: 0.4rem;
-}
-
-.meta-title{
-    color: #64748b;
-    font-size: 0.82rem;
-    font-weight: 500;
 }
 
 .meta-value{
@@ -350,6 +397,124 @@ OVERVIEW CARD
 /*
 HOURS CARD
 */
+.hours-summary{
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.hours-value{
+    font-size: 2.3rem;
+    font-weight: 700;
+    color: $text-primary;
+}
+
+.hours-divider{
+    columns: $text-muted;
+    font-size: 1.3rem;
+}
+
+.hours-budget{
+    color: $text-secondary;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.remaining-hours{
+    margin-top: 0.6rem;
+    color: $text-secondary;
+}
+
+.hours-card{
+    .chart-legend{
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+
+        .legend-item{
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.825rem;
+            color: $text-muted;
+
+            .legend-dot{
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+
+                &.legend-logged{
+                    background-color: #2563eb;
+                }
+                &.legend-estimated{
+                    background-color: #e2e8f0;
+                }
+            }
+        }
+    }
+
+        .hours-kpi-row{
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+
+            .hours-kpi-box{
+                display: flex;
+                width: 100%;
+
+                .hours-kpis{
+                    display: flex;
+                    gap: 2rem;
+
+                    .hours-kpi{
+                        display: flex;
+                        flex-direction: column;
+
+                        .kpi-value{
+                            font-size: 1.5rem;
+                            font-weight: 800;
+
+                            &.primary{
+                                color: #2563eb;
+                            }
+                            &.muted{
+                                color: #64748b;
+                            }
+                        }
+
+                        .kpi-label{
+                            font-size: 0.75rem;
+                            color: $text-muted;
+                            margin-top: 0.15rem;
+                        }
+                    }
+                }
+            }
+        }
+
+    .remaining-pill{
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-color: #eff6ff;
+        color: #2563eb;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-container{
+        height: 180px;
+        position: relative;
+    }
+
+}
 
 /*
 SIMPLE BAR CHART
@@ -404,6 +569,12 @@ PROGRESS CARD
     text-align: center;
 }
 
+.progress-circle-wrapper{
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0;
+}
+
 .progress-circle{
     width: 130px;
     height: 130px;
@@ -429,22 +600,25 @@ PROGRESS CARD
 }
 
 .progress-inner{
-    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    z-index: 1;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: white;
+    justify-content: center;
 }
 
 .progress-percentage{
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: $text-primary;
+    font-size: 2rem;
+    font-weight: 800;
+    color: $text-main;
 }
 
 .progress-label{
     color: $text-muted;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
 }
 
 .progress-description{
@@ -456,8 +630,16 @@ PROGRESS CARD
 .progress-summary{
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.progress-footnote{
+    text-align: center;
+    font-size: 0.825rem;
+    color: $text-muted;
+    margin: 0;
 }
 
 .summary-box{
@@ -467,15 +649,26 @@ PROGRESS CARD
 }
 
 .summary-title{
-    color: $text-secondary;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: $text-muted;
     font-size: 0.85rem;
+    margin-bottom: 0.35rem;
+
+    .icon-blue{
+        color: #2563eb;
+    }
+    .icon-orange{
+        color: #ea580c;
+    }
+
 }
 
 .summary-value{
-    display: block;
-    margin-top: 0.4rem;
     font-size: 1.7rem;
     font-weight: 700;
+    color: $text-muted;
 }
 
 
@@ -515,12 +708,14 @@ TEAM CARD
 .team-list{
     display: flex;
     flex-direction: column;
-    gap: 1.4rem;
+    gap: 1.25rem;
+    margin: 1rem 0 1.5rem 0;
+    flex-grow: 1;
 }
 
 .team-member{
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -529,6 +724,41 @@ TEAM CARD
     font-size: 0.85rem;
     font-weight: 700;
     flex-shrink: 0;
+}
+
+.team-avatar{
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.team-member-row{
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.member-top-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.member-left{
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .avatar-blue{
@@ -553,7 +783,8 @@ TEAM CARD
 
 .member-name{
     font-weight: 700;
-    
+    font-size: 0.925rem;
+    color: $text-main;
 }
 
 .member-role{
@@ -561,17 +792,6 @@ TEAM CARD
     font-size: 0.8rem;
 }
 
-.team-member-row{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.member-left{
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
 
 .member-right{
     display: flex;
@@ -579,9 +799,9 @@ TEAM CARD
 }
 
 .member-hours{
-    margin-top: 4px;
-    font-size: 0.85rem;
-    color: $text-secondary;
+    margin-top: 0.1rem;
+    font-size: 0.775rem;
+    color: $text-muted;
 }
 
 .member-details{
@@ -590,12 +810,73 @@ TEAM CARD
 }
 
 .member-role-chip{
-    padding: 0.45rem 1rem;
-    border-radius: 999px;
-    font-size: 0.72rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.675rem;
     font-weight: 700;
-    letter-spacing: 0.05rem;
+    letter-spacing: 0.03rem;
     text-transform: uppercase;
+
+    &.developer-chip{
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+    &.manager-chip{
+        background-color: #f3e8ff;
+        color: #6b21a8;
+    }
+    &.admin-chip{
+        background-color: #fce7f3;
+        color: #9d174d;
+    }
+}
+
+.member-progress-row{
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.member-progress-bar{
+    flex-grow: 1;
+    height: 6px;
+    background-color: #f1f5f9;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.member-progress-fill{
+    height: 100%;
+    border-radius: 9999px;
+}
+
+.member-progress-percent{
+    font-size: 0.75rem;
+    color: $text-muted;
+    font-weight: 600;
+    min-width: 35px;
+    text-align: right;
+}
+
+.view-members-btn{
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #eff6ff;
+    border: none;
+    border-radius: 12px;
+    color: #2563eb;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover{
+        background-color: #dbeafe;
+    }
 }
 
 /*
