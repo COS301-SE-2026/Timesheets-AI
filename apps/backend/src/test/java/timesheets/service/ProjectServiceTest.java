@@ -1,7 +1,7 @@
 package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import timesheets.domain.Project;
 import timesheets.domain.ProjectMember;
+import timesheets.dto.request.CreateProjectRequest;
 import timesheets.dto.response.ProjectResponse;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
@@ -72,6 +73,18 @@ public class ProjectServiceTest {
     return member;
   }
 
+  private CreateProjectRequest createValidCreateProjectRequest() {
+    CreateProjectRequest request = new CreateProjectRequest();
+    request.setName(testProjectName);
+    request.setDescription(testProjectDescription);
+    request.setBudgetHours(testBudgetHours);
+    request.setHourlyRate(testHourlyRate);
+    request.setStartDate(LocalDate.now());
+    request.setEndDate(LocalDate.now().plusMonths(1));
+    request.setManagerIds(List.of());
+    return request;
+  }
+
   @Nested
   @DisplayName("Get Projects Tests")
   class GetProjectsTests {
@@ -106,6 +119,44 @@ public class ProjectServiceTest {
 
       verify(projectRepository)
           .findAllByIsDeletedFalse(); // making sure that the correct repo is called
+    }
+
+    @Test
+    @DisplayName("create project successfully")
+    void createProject() {
+
+      // ARRANGE: setup project creation request
+      CreateProjectRequest request = createValidCreateProjectRequest();
+
+      // simulates what the project returns from DB
+      Project savedProject = createTestProject();
+
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
+      when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
+
+      // determines the users role on a project
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestProjectMember()));
+
+      /*
+      - ACT: Create project
+      - the service: sets the workspace ID
+      - creates a new project entity
+      - calculates the budget cost
+      - saves the project to DB
+      - assignes project managers
+      */
+      ProjectResponse response = projectService.createProject(request, testWorkspaceMemberId);
+
+      // ASSERT: Verify project was created
+      assertThat(response).isNotNull();
+      assertThat(response.getName()).isEqualTo(testProjectName);
+      assertThat(response.getBudgetHours()).isEqualTo(testBudgetHours);
+      assertThat(response.getHourlyRate()).isEqualTo(testHourlyRate);
+      assertThat(response.getBudgetCost()).isEqualTo(testBudgetCost);
+
+      verify(projectRepository).save(any(Project.class));
     }
   }
 }
