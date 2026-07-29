@@ -439,18 +439,7 @@ HOURS CARD
             font-size: 0.825rem;
             color: $text-muted;
 
-            .legend-dot{
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-
-                &.legend-logged{
-                    background-color: #2563eb;
-                }
-                &.legend-estimated{
-                    background-color: #e2e8f0;
-                }
-            }
+            
         }
     }
 
@@ -469,10 +458,17 @@ HOURS CARD
                 .hours-kpis{
                     display: flex;
                     gap: 2rem;
+                    width: 100%;
 
                     .hours-kpi{
                         display: flex;
                         flex-direction: column;
+                        flex: 1;
+                        align-items: center;
+
+                        .hours-kpi:first-child{
+                            border-right: 1px solid #e2e8f0;
+                        }
 
                         .kpi-value{
                             font-size: 1.5rem;
@@ -488,7 +484,7 @@ HOURS CARD
 
                         .kpi-label{
                             font-size: 0.75rem;
-                            color: $text-muted;
+                            color: $text-secondary;
                             margin-top: 0.15rem;
                         }
                     }
@@ -547,14 +543,14 @@ SIMPLE BAR CHART
     height: 12px;
     border-radius: 50%;
     flex-shrink: 0;
-}
 
-.legend-logged{
-    background: #356ae6;
-}
+    &.logged{
+        background-color: #2563eb;
+    }
+    &.estimated{
+        background-color: #e2e8f0;
+    }
 
-.legend-estimated{
-    background: #d9dee8;
 }
 
 .legend-text{
@@ -925,13 +921,6 @@ KPI SECTION STILL NEED TO DO
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-}
-
-.kpi-value{
-    margin-top: 0.5rem;
-    color: $text-primary;
-    font-size: 2rem;
-    font-weight: 700;
 }
 
 /*
