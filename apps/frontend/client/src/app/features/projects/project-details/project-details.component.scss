@@ -205,33 +205,36 @@ ROLE CHIP
 META GRID
 */
 .project-meta-grid{
-    display: flex;
-    align-items: flex-start;
-    gap: 3rem;
+    display: grid;
+    gap: 1rem;
     flex-wrap: wrap;
+    grid-template-columns: repeat(5, 1fr);
 }
 
 /*
 META CARD
 */
-
 .meta-card{
     display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    border: none;
-    background: transparent;
-    padding: 0;
+    align-items: center;
+    gap: 1rem;
+
+    border: 1px solid #edf2f7;
+    background: white;
+    padding: 1.15rem 1.25rem;
+    box-shadow: 0 2px 8px rgba(15, 23, 40, 0.03);
+    transition: 0.2s ease;
     min-width: 120px;
 
-    .icon-wrapper{
+        .icon-wrapper{
         width: 48px;
         height: 48px;
         border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
+        flex-shrink: 0;
+        font-size: 1.5rem;
 
         &.blue{
             background-color: #eff6ff;
@@ -253,29 +256,32 @@ META CARD
             background-color: #faf5ff;
             color: #9333ea;
         }
-
-        .meta-info{
-            display: flex;
-            flex-direction: column;
-
-            .meta-title{
-                font-size: 0.825rem;
-                font-weight: 500;
-                color: $text-muted;
-            }
-
-            strong{
-                font-size: 1.15rem;
-                font-weight: 700;
-                color: $text-main;
-                margin-top: 0.15rem;
-            }
-        }
     }
 }
 
+.meta-info{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
 
+}
 
+.meta-title{
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: $text-muted;
+    margin-bottom: 0.2rem;
+    white-space: nowrap;
+}
+
+.meta-info{
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: $text-primary;
+    white-space: nowrap;
+    line-height: 1.2;
+}
 
 /*
 META CONTENT
@@ -437,9 +443,7 @@ HOURS CARD
             align-items: center;
             gap: 0.4rem;
             font-size: 0.825rem;
-            color: $text-muted;
-
-            
+            color: $text-muted; 
         }
     }
 
