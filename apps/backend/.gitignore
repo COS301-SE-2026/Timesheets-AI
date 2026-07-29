@@ -11,3 +11,11 @@
 
 target/
 
+.turbo/
+**/.turbo/
+
+**/node_modules/
+
+**/dist/
+
+**/coverage/
