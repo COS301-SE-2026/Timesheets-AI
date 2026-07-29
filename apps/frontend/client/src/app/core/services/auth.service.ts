@@ -18,8 +18,8 @@ export interface RegisterResponse {
   lastName: string;
   createdAt: string;
   message: string;
-}
 
+}
 
 export interface LoginRequest {
   email: string;
