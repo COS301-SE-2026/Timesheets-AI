@@ -1,1095 +1,0 @@
-
-[2K[1G[1myarn run v1.22.22[22m
-[2K[1G[2m$ ng test[22m
-[1m[2mDetermining test suites to run...[22m[22m[?2026h[999D[K
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        0 s, estimated 5 s
-[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        0 s, estimated 5 s
-[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        1 s, estimated 5 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        2 s, estimated 5 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        3 s, estimated 5 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        4 s, estimated 5 s
-[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[32m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[37m█[39m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        5 s[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m6 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m7 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m8 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m8 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m8 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/table-card/[22m[1mtable-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/progress-bar/[22m[1mprogress-bar.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[1mTest Suites: [22m0 of 21 total
-[1mTests:       [22m0 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m8 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m2 passed[39m[22m, 2 of 21 total
-[1mTests:       [22m[1m[32m2 passed[39m[22m, 2 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m8 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/hourglass/[22m[1mhourglass.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m2 passed[39m[22m, 2 of 21 total
-[1mTests:       [22m[1m[32m2 passed[39m[22m, 2 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m8 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m3 passed[39m[22m, 3 of 21 total
-[1mTests:       [22m[1m[32m3 passed[39m[22m, 3 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m3 passed[39m[22m, 3 of 21 total
-[1mTests:       [22m[1m[32m3 passed[39m[22m, 3 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m3 passed[39m[22m, 3 of 21 total
-[1mTests:       [22m[1m[32m3 passed[39m[22m, 3 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/status-chip/[22m[1mstatus-chip.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/stats-card/[22m[1mstats-card.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/input-field/[22m[1minput-field.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m3 passed[39m[22m, 3 of 21 total
-[1mTests:       [22m[1m[32m3 passed[39m[22m, 3 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m6 passed[39m[22m, 6 of 21 total
-[1mTests:       [22m[1m[32m6 passed[39m[22m, 6 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m6 passed[39m[22m, 6 of 21 total
-[1mTests:       [22m[1m[32m6 passed[39m[22m, 6 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/projects/[22m[1mprojects.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/not-found/[22m[1mnot-found.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m6 passed[39m[22m, 6 of 21 total
-[1mTests:       [22m[1m[32m6 passed[39m[22m, 6 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m8 passed[39m[22m, 8 of 21 total
-[1mTests:       [22m[1m[32m8 passed[39m[22m, 8 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/pages/component-showcase/[22m[1mcomponent-showcase.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m8 passed[39m[22m, 8 of 21 total
-[1mTests:       [22m[1m[32m8 passed[39m[22m, 8 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m9 passed[39m[22m, 9 of 21 total
-[1mTests:       [22m[1m[32m9 passed[39m[22m, 9 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m9 passed[39m[22m, 9 of 21 total
-[1mTests:       [22m[1m[32m9 passed[39m[22m, 9 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/[22m[1mapp.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/button/[22m[1mbutton.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m9 passed[39m[22m, 9 of 21 total
-[1mTests:       [22m[1m[32m9 passed[39m[22m, 9 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m9 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m11 passed[39m[22m, 11 of 21 total
-[1mTests:       [22m[1m[32m14 passed[39m[22m, 14 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m11 passed[39m[22m, 11 of 21 total
-[1mTests:       [22m[1m[32m18 passed[39m[22m, 18 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/loader/[22m[1mloader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m11 passed[39m[22m, 11 of 21 total
-[1mTests:       [22m[1m[32m18 passed[39m[22m, 18 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m12 passed[39m[22m, 12 of 21 total
-[1mTests:       [22m[1m[32m18 passed[39m[22m, 18 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m12 passed[39m[22m, 12 of 21 total
-[1mTests:       [22m[1m[32m18 passed[39m[22m, 18 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m12 passed[39m[22m, 12 of 21 total
-[1mTests:       [22m[1m[32m18 passed[39m[22m, 18 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/my-tasks/[22m[1mmy-tasks.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/footer/[22m[1mfooter.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/dropdown/[22m[1mdropdown.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m12 passed[39m[22m, 12 of 21 total
-[1mTests:       [22m[1m[32m18 passed[39m[22m, 18 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m15 passed[39m[22m, 15 of 21 total
-[1mTests:       [22m[1m[32m23 passed[39m[22m, 23 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/header/[22m[1mheader.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m15 passed[39m[22m, 15 of 21 total
-[1mTests:       [22m[1m[32m23 passed[39m[22m, 23 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m16 passed[39m[22m, 16 of 21 total
-[1mTests:       [22m[1m[32m29 passed[39m[22m, 29 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/shared/components/sidebar/[22m[1msidebar.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m16 passed[39m[22m, 16 of 21 total
-[1mTests:       [22m[1m[32m29 passed[39m[22m, 29 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m17 passed[39m[22m, 17 of 21 total
-[1mTests:       [22m[1m[32m38 passed[39m[22m, 38 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m17 passed[39m[22m, 17 of 21 total
-[1mTests:       [22m[1m[32m46 passed[39m[22m, 46 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m17 passed[39m[22m, 17 of 21 total
-[1mTests:       [22m[1m[32m53 passed[39m[22m, 53 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/login/[22m[1mlogin.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m17 passed[39m[22m, 17 of 21 total
-[1mTests:       [22m[1m[32m53 passed[39m[22m, 53 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m18 passed[39m[22m, 18 of 21 total
-[1mTests:       [22m[1m[32m63 passed[39m[22m, 63 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m18 passed[39m[22m, 18 of 21 total
-[1mTests:       [22m[1m[32m71 passed[39m[22m, 71 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m11 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m18 passed[39m[22m, 18 of 21 total
-[1mTests:       [22m[1m[31m1 failed[39m[22m, [1m[32m78 passed[39m[22m, 79 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m11 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m18 passed[39m[22m, 18 of 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m84 passed[39m[22m, 88 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m11 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[31m FAIL [39m[22m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m ([0m[1m[41m5.238 s[49m[22m[0m)
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m18 passed[39m[22m, 18 of 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m84 passed[39m[22m, 88 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m11 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[1m[31m  [1m● [22m[1mSignupComponent › should return an empty password error message when password is valid[39m[22m
-
-    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
-
-    Expected: [32mfalse[39m
-    Received: [31mtrue[39m
-[2m[22m
-[2m    [0m [90m 361 |[39m     componentInstance[33m.[39msignupForm[33m.[39mcontrols[[32m'password'[39m][33m.[39mmarkAsTouched()[33m;[39m[22m
-[2m     [90m 362 |[39m[22m
-[2m    [31m[1m>[22m[2m[39m[90m 363 |[39m     expect(componentInstance[33m.[39mshowPasswordError)[33m.[39mtoBe([36mfalse[39m)[33m;[39m[22m
-[2m     [90m     |[39m                                                 [31m[1m^[22m[2m[39m[22m
-[2m     [90m 364 |[39m     expect(componentInstance[33m.[39mpasswordErrorMessage)[33m.[39mtoBe([32m''[39m)[33m;[39m[22m
-[2m     [90m 365 |[39m   })[33m;[39m[22m
-[2m     [90m 366 |[39m[0m[22m
-[2m[22m
-[2m      [2mat [22m[2m[0m[36msrc/app/features/signup/signup/signup.component.spec.ts[39m[0m[2m:363:49[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
-[2m      [2mat ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
-[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
-[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
-
-[1m[31m  [1m● [22m[1mSignupComponent › should call register with the mapped payload when the form is valid[39m[22m
-
-    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
-
-    Expected: [32mtrue[39m
-    Received: [31mfalse[39m
-[2m[22m
-[2m    [0m [90m 371 |[39m   it([32m'should call register with the mapped payload when the form is valid'[39m[33m,[39m () [33m=>[39m {[22m
-[2m     [90m 372 |[39m     componentInstance[33m.[39msignupForm[33m.[39msetValue(validFormValue)[33m;[39m[22m
-[2m    [31m[1m>[22m[2m[39m[90m 373 |[39m     expect(componentInstance[33m.[39msignupForm[33m.[39mvalid)[33m.[39mtoBe([36mtrue[39m)[33m;[39m[22m
-[2m     [90m     |[39m                                                [31m[1m^[22m[2m[39m[22m
-[2m     [90m 374 |[39m[22m
-[2m     [90m 375 |[39m     componentInstance[33m.[39mcreateAccount()[33m;[39m[22m
-[2m     [90m 376 |[39m[0m[22m
-[2m[22m
-[2m      [2mat [22m[2m[0m[36msrc/app/features/signup/signup/signup.component.spec.ts[39m[0m[2m:373:48[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
-[2m      [2mat ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
-[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
-[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
-
-[1m[31m  [1m● [22m[1mSignupComponent › should navigate to login with registered=true on successful signup[39m[22m
-
-    Expected one matching request for criteria "Match by function: ", found none.
-[2m[22m
-[2m    [0m [90m 406 |[39m     componentInstance[33m.[39mcreateAccount()[33m;[39m[22m
-[2m     [90m 407 |[39m[22m
-[2m    [31m[1m>[22m[2m[39m[90m 408 |[39m     [36mconst[39m req [33m=[39m httpMock[33m.[39mexpectOne((r) [33m=>[39m r[33m.[39murl[33m.[39mendsWith([32m'/api/auth/register'[39m))[33m;[39m[22m
-[2m     [90m     |[39m                          [31m[1m^[22m[2m[39m[22m
-[2m     [90m 409 |[39m     req[33m.[39mflush({[22m
-[2m     [90m 410 |[39m       id[33m:[39m [32m'00000000-0000-0000-0003-000000000002'[39m[33m,[39m[22m
-[2m     [90m 411 |[39m       email[33m:[39m [32m'john@company.com'[39m[33m,[39m[0m[22m
-[2m[22m
-[2m      [2mat _HttpClientTestingBackend.expectOne ([22m[2m../../../node_modules/@angular/common/fesm2022/http/testing.mjs[2m:277:19)[22m[2m[22m
-[2m      [2mat [22m[2m[0m[36msrc/app/features/signup/signup/signup.component.spec.ts[39m[0m[2m:408:26[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
-[2m      [2mat ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
-[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
-[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
-
-[1m[31m  [1m● [22m[1mSignupComponent › should show an error message and stop loading when signup fails[39m[22m
-
-    Expected one matching request for criteria "Match by function: ", found none.
-[2m[22m
-[2m    [0m [90m 430 |[39m     componentInstance[33m.[39mcreateAccount()[33m;[39m[22m
-[2m     [90m 431 |[39m[22m
-[2m    [31m[1m>[22m[2m[39m[90m 432 |[39m     [36mconst[39m req [33m=[39m httpMock[33m.[39mexpectOne((r) [33m=>[39m r[33m.[39murl[33m.[39mendsWith([32m'/api/auth/register'[39m))[33m;[39m[22m
-[2m     [90m     |[39m                          [31m[1m^[22m[2m[39m[22m
-[2m     [90m 433 |[39m     req[33m.[39mflush([22m
-[2m     [90m 434 |[39m       { message[33m:[39m [32m'An account with this email already exists.'[39m }[33m,[39m[22m
-[2m     [90m 435 |[39m       { status[33m:[39m [35m409[39m[33m,[39m statusText[33m:[39m [32m'Conflict'[39m }[33m,[39m[0m[22m
-[2m[22m
-[2m      [2mat _HttpClientTestingBackend.expectOne ([22m[2m../../../node_modules/@angular/common/fesm2022/http/testing.mjs[2m:277:19)[22m[2m[22m
-[2m      [2mat [22m[2m[0m[36msrc/app/features/signup/signup/signup.component.spec.ts[39m[0m[2m:432:26[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
-[2m      [2mat ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
-[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
-[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
-
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[32m18 passed[39m[22m, 18 of 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m84 passed[39m[22m, 88 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m11 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m18 passed[39m[22m, 19 of 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m90 passed[39m[22m, 94 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m11 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m18 passed[39m[22m, 19 of 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m96 passed[39m[22m, 100 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m11 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m ([0m[1m[41m5.212 s[49m[22m[0m)
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m18 passed[39m[22m, 19 of 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m96 passed[39m[22m, 100 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m11 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A  [1m● [22mConsole
-
-    [2m[31mconsole.error[39m[22m
-[31m      [TimesheetService] getMyTimesheets failed: {[39m
-[31m        status: 0,[39m
-[31m        message: 'Http failure response for /api/timesheets/me: 0 ',[39m
-[31m        url: '/api/timesheets/me'[39m
-[31m      }[39m
-[2m[22m
-[2m    [0m [90m  96 |[39m   [36mprivate[39m handleError(operation[33m:[39m string) {[22m
-[2m     [90m  97 |[39m     [36mreturn[39m (error[33m:[39m [33mHttpErrorResponse[39m) [33m=>[39m {[22m
-[2m    [31m[1m>[22m[2m[39m[90m  98 |[39m       console[33m.[39merror([32m`[TimesheetService] ${operation} failed:`[39m[33m,[39m {[22m
-[2m     [90m     |[39m               [31m[1m^[22m[2m[39m[22m
-[2m     [90m  99 |[39m         status[33m:[39m error[33m.[39mstatus[33m,[39m[22m
-[2m     [90m 100 |[39m         message[33m:[39m error[33m.[39mmessage[33m,[39m[22m
-[2m     [90m 101 |[39m         url[33m:[39m error[33m.[39murl[33m,[39m[0m[22m
-[2m[22m
-[2m      [2mat [22m[2msrc/app/core/services/timesheet.service.ts[2m:98:15[22m[2m[22m
-[2m      [2mat [22m[2m../../../node_modules/rxjs/src/internal/operators/catchError.ts[2m:115:35[22m[2m[22m
-[2m      [2mat OperatorSubscriber._this._error ([22m[2m../../../node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts[2m:79:13)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber._error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:118:24)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber._error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:118:24)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber._error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:118:24)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat TestRequest.error ([22m[2m../../../node_modules/@angular/common/fesm2022/http/testing.mjs[2m:94:23)[22m[2m[22m
-[2m      [2mat [22m[2msrc/app/features/timesheets/timesheets.component.spec.ts[2m:219:10[22m[2m[22m
-
-    [2m[31mconsole.error[39m[22m
-[31m      [TimesheetService] submitTimesheet failed: {[39m
-[31m        status: 0,[39m
-[31m        message: 'Http failure response for /api/timesheets/timesheet-current/submit: 0 ',[39m
-[31m        url: '/api/timesheets/timesheet-current/submit'[39m
-[31m      }[39m
-[2m[22m
-[2m    [0m [90m  96 |[39m   [36mprivate[39m handleError(operation[33m:[39m string) {[22m
-[2m     [90m  97 |[39m     [36mreturn[39m (error[33m:[39m [33mHttpErrorResponse[39m) [33m=>[39m {[22m
-[2m    [31m[1m>[22m[2m[39m[90m  98 |[39m       console[33m.[39merror([32m`[TimesheetService] ${operation} failed:`[39m[33m,[39m {[22m
-[2m     [90m     |[39m               [31m[1m^[22m[2m[39m[22m
-[2m     [90m  99 |[39m         status[33m:[39m error[33m.[39mstatus[33m,[39m[22m
-[2m     [90m 100 |[39m         message[33m:[39m error[33m.[39mmessage[33m,[39m[22m
-[2m     [90m 101 |[39m         url[33m:[39m error[33m.[39murl[33m,[39m[0m[22m
-[2m[22m
-[2m      [2mat [22m[2msrc/app/core/services/timesheet.service.ts[2m:98:15[22m[2m[22m
-[2m      [2mat [22m[2m../../../node_modules/rxjs/src/internal/operators/catchError.ts[2m:115:35[22m[2m[22m
-[2m      [2mat OperatorSubscriber._this._error ([22m[2m../../../node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts[2m:79:13)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber._error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:118:24)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber._error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:118:24)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber._error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:118:24)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat TestRequest.error ([22m[2m../../../node_modules/@angular/common/fesm2022/http/testing.mjs[2m:94:23)[22m[2m[22m
-[2m      [2mat [22m[2msrc/app/features/timesheets/timesheets.component.spec.ts[2m:295:11[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
-[2m      [2mat ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
-[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
-[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
-
-    [2m[31mconsole.error[39m[22m
-[31m      [TimesheetService] rejectTimesheet failed: {[39m
-[31m        status: 0,[39m
-[31m        message: 'Http failure response for /api/timesheets/timesheet-current/reject: 0 ',[39m
-[31m        url: '/api/timesheets/timesheet-current/reject'[39m
-[31m      }[39m
-[2m[22m
-[2m    [0m [90m  96 |[39m   [36mprivate[39m handleError(operation[33m:[39m string) {[22m
-[2m     [90m  97 |[39m     [36mreturn[39m (error[33m:[39m [33mHttpErrorResponse[39m) [33m=>[39m {[22m
-[2m    [31m[1m>[22m[2m[39m[90m  98 |[39m       console[33m.[39merror([32m`[TimesheetService] ${operation} failed:`[39m[33m,[39m {[22m
-[2m     [90m     |[39m               [31m[1m^[22m[2m[39m[22m
-[2m     [90m  99 |[39m         status[33m:[39m error[33m.[39mstatus[33m,[39m[22m
-[2m     [90m 100 |[39m         message[33m:[39m error[33m.[39mmessage[33m,[39m[22m
-[2m     [90m 101 |[39m         url[33m:[39m error[33m.[39murl[33m,[39m[0m[22m
-[2m[22m
-[2m      [2mat [22m[2msrc/app/core/services/timesheet.service.ts[2m:98:15[22m[2m[22m
-[2m      [2mat [22m[2m../../../node_modules/rxjs/src/internal/operators/catchError.ts[2m:115:35[22m[2m[22m
-[2m      [2mat OperatorSubscriber._this._error ([22m[2m../../../node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts[2m:79:13)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber._error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:118:24)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber._error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:118:24)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber._error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:118:24)[22m[2m[22m
-[2m      [2mat OperatorSubscriber.Subscriber.error ([22m[2m../../../node_modules/rxjs/src/internal/Subscriber.ts[2m:86:12)[22m[2m[22m
-[2m      [2mat TestRequest.error ([22m[2m../../../node_modules/@angular/common/fesm2022/http/testing.mjs[2m:94:23)[22m[2m[22m
-[2m      [2mat [22m[2msrc/app/features/timesheets/timesheets.component.spec.ts[2m:452:11[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
-[2m      [2mat ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
-[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
-[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
-
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/timesheets/[22m[1mtimesheets.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m18 passed[39m[22m, 19 of 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m96 passed[39m[22m, 100 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m11 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m19 passed[39m[22m, 20 of 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m101 passed[39m[22m, 105 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m19 passed[39m[22m, 20 of 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m106 passed[39m[22m, 110 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A[0m[7m[1m[32m PASS [39m[22m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-
-[0m[7m[33m[1m RUNS [22m[39m[27m[0m [2msrc/app/features/users/developer/logtime/[22m[1mlogtime.component.spec.ts[22m
-
-[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m19 passed[39m[22m, 20 of 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m106 passed[39m[22m, 110 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[K[1A
-
-[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m20 passed[39m[22m, 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m107 passed[39m[22m, 111 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m10 s[39m[22m[?2026l[?2026h[K[1A[K[1A[K[1A[K[1A[K[1A[?2026l[999D[K
-[1mSummary of all failing tests[22m
-[0m[7m[1m[31m FAIL [39m[22m[27m[0m [2msrc/app/features/signup/signup/[22m[1msignup.component.spec.ts[22m ([0m[1m[41m5.238 s[49m[22m[0m)
-[1m[31m  [1m● [22m[1mSignupComponent › should return an empty password error message when password is valid[39m[22m
-
-    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
-
-    Expected: [32mfalse[39m
-    Received: [31mtrue[39m
-[2m[22m
-[2m    [0m [90m 361 |[39m     componentInstance[33m.[39msignupForm[33m.[39mcontrols[[32m'password'[39m][33m.[39mmarkAsTouched()[33m;[39m[22m
-[2m     [90m 362 |[39m[22m
-[2m    [31m[1m>[22m[2m[39m[90m 363 |[39m     expect(componentInstance[33m.[39mshowPasswordError)[33m.[39mtoBe([36mfalse[39m)[33m;[39m[22m
-[2m     [90m     |[39m                                                 [31m[1m^[22m[2m[39m[22m
-[2m     [90m 364 |[39m     expect(componentInstance[33m.[39mpasswordErrorMessage)[33m.[39mtoBe([32m''[39m)[33m;[39m[22m
-[2m     [90m 365 |[39m   })[33m;[39m[22m
-[2m     [90m 366 |[39m[0m[22m
-[2m[22m
-[2m      [2mat [22m[2m[0m[36msrc/app/features/signup/signup/signup.component.spec.ts[39m[0m[2m:363:49[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
-[2m      [2mat ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
-[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
-[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
-
-[1m[31m  [1m● [22m[1mSignupComponent › should call register with the mapped payload when the form is valid[39m[22m
-
-    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
-
-    Expected: [32mtrue[39m
-    Received: [31mfalse[39m
-[2m[22m
-[2m    [0m [90m 371 |[39m   it([32m'should call register with the mapped payload when the form is valid'[39m[33m,[39m () [33m=>[39m {[22m
-[2m     [90m 372 |[39m     componentInstance[33m.[39msignupForm[33m.[39msetValue(validFormValue)[33m;[39m[22m
-[2m    [31m[1m>[22m[2m[39m[90m 373 |[39m     expect(componentInstance[33m.[39msignupForm[33m.[39mvalid)[33m.[39mtoBe([36mtrue[39m)[33m;[39m[22m
-[2m     [90m     |[39m                                                [31m[1m^[22m[2m[39m[22m
-[2m     [90m 374 |[39m[22m
-[2m     [90m 375 |[39m     componentInstance[33m.[39mcreateAccount()[33m;[39m[22m
-[2m     [90m 376 |[39m[0m[22m
-[2m[22m
-[2m      [2mat [22m[2m[0m[36msrc/app/features/signup/signup/signup.component.spec.ts[39m[0m[2m:373:48[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
-[2m      [2mat ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
-[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
-[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
-
-[1m[31m  [1m● [22m[1mSignupComponent › should navigate to login with registered=true on successful signup[39m[22m
-
-    Expected one matching request for criteria "Match by function: ", found none.
-[2m[22m
-[2m    [0m [90m 406 |[39m     componentInstance[33m.[39mcreateAccount()[33m;[39m[22m
-[2m     [90m 407 |[39m[22m
-[2m    [31m[1m>[22m[2m[39m[90m 408 |[39m     [36mconst[39m req [33m=[39m httpMock[33m.[39mexpectOne((r) [33m=>[39m r[33m.[39murl[33m.[39mendsWith([32m'/api/auth/register'[39m))[33m;[39m[22m
-[2m     [90m     |[39m                          [31m[1m^[22m[2m[39m[22m
-[2m     [90m 409 |[39m     req[33m.[39mflush({[22m
-[2m     [90m 410 |[39m       id[33m:[39m [32m'00000000-0000-0000-0003-000000000002'[39m[33m,[39m[22m
-[2m     [90m 411 |[39m       email[33m:[39m [32m'john@company.com'[39m[33m,[39m[0m[22m
-[2m[22m
-[2m      [2mat _HttpClientTestingBackend.expectOne ([22m[2m../../../node_modules/@angular/common/fesm2022/http/testing.mjs[2m:277:19)[22m[2m[22m
-[2m      [2mat [22m[2m[0m[36msrc/app/features/signup/signup/signup.component.spec.ts[39m[0m[2m:408:26[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
-[2m      [2mat ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
-[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
-[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
-
-[1m[31m  [1m● [22m[1mSignupComponent › should show an error message and stop loading when signup fails[39m[22m
-
-    Expected one matching request for criteria "Match by function: ", found none.
-[2m[22m
-[2m    [0m [90m 430 |[39m     componentInstance[33m.[39mcreateAccount()[33m;[39m[22m
-[2m     [90m 431 |[39m[22m
-[2m    [31m[1m>[22m[2m[39m[90m 432 |[39m     [36mconst[39m req [33m=[39m httpMock[33m.[39mexpectOne((r) [33m=>[39m r[33m.[39murl[33m.[39mendsWith([32m'/api/auth/register'[39m))[33m;[39m[22m
-[2m     [90m     |[39m                          [31m[1m^[22m[2m[39m[22m
-[2m     [90m 433 |[39m     req[33m.[39mflush([22m
-[2m     [90m 434 |[39m       { message[33m:[39m [32m'An account with this email already exists.'[39m }[33m,[39m[22m
-[2m     [90m 435 |[39m       { status[33m:[39m [35m409[39m[33m,[39m statusText[33m:[39m [32m'Conflict'[39m }[33m,[39m[0m[22m
-[2m[22m
-[2m      [2mat _HttpClientTestingBackend.expectOne ([22m[2m../../../node_modules/@angular/common/fesm2022/http/testing.mjs[2m:277:19)[22m[2m[22m
-[2m      [2mat [22m[2m[0m[36msrc/app/features/signup/signup/signup.component.spec.ts[39m[0m[2m:432:26[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:410:32)[22m[2m[22m
-[2m      [2mat ProxyZoneSpec.onInvoke ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:2219:43)[22m[2m[22m
-[2m      [2mat _ZoneDelegate.invoke ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:409:38)[22m[2m[22m
-[2m      [2mat ZoneImpl.run ([22m[2m../../../node_modules/zone.js/bundles/zone.umd.js[2m:145:47)[22m[2m[22m
-[2m      [2mat Object.wrappedFunc ([22m[2m../../../node_modules/zone.js/bundles/zone-testing.umd.js[2m:449:38)[22m[2m[22m
-
-
-[1mTest Suites: [22m[1m[31m1 failed[39m[22m, [1m[32m20 passed[39m[22m, 21 total
-[1mTests:       [22m[1m[31m4 failed[39m[22m, [1m[32m107 passed[39m[22m, 111 total
-[1mSnapshots:   [22m0 total
-[1mTime:[22m        [1m[33m11.155 s[39m[22m
-[2mRan all test suites[22m[2m.[22m
-[2K[1G[31merror[39m Command failed with exit code 1.
-[2K[1G[34minfo[39m Visit [1mhttps://yarnpkg.com/en/docs/cli/run[22m for documentation about this command.
