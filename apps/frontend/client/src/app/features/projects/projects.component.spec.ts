@@ -5,7 +5,7 @@ fill in each card after, the stats as well. these are like unit tests
 Author: Zamokuhle Zwane
 Date: 29 July 2026
 */
-import { ComponentFixture, flush, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import {signal} from '@angular/core';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
