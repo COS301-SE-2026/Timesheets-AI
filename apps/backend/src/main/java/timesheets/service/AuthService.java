@@ -101,13 +101,23 @@ public class AuthService {
       // send verification email
       emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), token);
 
-      return RegisterResponse.builder()
+      // return RegisterResponse.builder()
+      //     .id(user.getId().toString())
+      //     .email(user.getEmail())
+      //     .firstName(user.getFirstName())
+      //     .lastName(user.getLastName())
+      //     .createdAt(user.getCreatedAt())
+      //     .message("Verification email sent. Please check your inbox.")
+      //     .build();
+
+      // DEMO 2
+       return RegisterResponse.builder()
           .id(user.getId().toString())
           .email(user.getEmail())
           .firstName(user.getFirstName())
           .lastName(user.getLastName())
           .createdAt(user.getCreatedAt())
-          .message("Verification email sent. Please check your inbox.")
+          .message("Account created successfully.")
           .build();
     }
 
@@ -145,6 +155,8 @@ public class AuthService {
         .lastName(user.getLastName())
         .createdAt(user.getCreatedAt())
         .message("Verification email sent. Please check your inbox.")
+        // DEMO 2
+        .verificationToken(token)
         .build();
   }
 
@@ -183,7 +195,7 @@ public class AuthService {
     
     // userRepository.save(user);
     userRepository.saveAndFlush(user);
-    
+
     return new MessageResponse("Email verified successfully", "/dashboard");
   }
   /*
