@@ -30,7 +30,7 @@ export class VerifyEmailComponent {
 
   constructor() {
     console.log('VerifyEmailComponent loaded');
-    const state = history.state;
+    const state = history.state ?? {};
 
     this.token = state.token ?? '';
     this.email = state.email ?? '';
