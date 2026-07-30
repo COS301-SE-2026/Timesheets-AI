@@ -62,3 +62,18 @@ docker-compose.override.yml
 
 #  Turbo 
 .turbo/apps/backend/src/main/resources/db/migration/V2__seed_Data.sql
+
+*.class
+
+*.log
+.env
+*.jar
+*.war
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+target/
+
+**/coverage/

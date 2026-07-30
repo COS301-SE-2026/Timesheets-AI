@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError } from 'rxjs';
@@ -24,30 +24,59 @@ export interface LoginRequest {
   email: string;
   password: string;
 }
-
+export interface AuthUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  emailVerified: boolean;
+  roles: string[];
+  mfaEnabled: boolean;
+}
 export interface AuthResponse {
   token: string;
   expiresAt: string;
   requiresMfa: boolean;
-  user: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    avatarUrl: string | null;
-    emailVerified: boolean;
-    roles: string[];
-    mfaEnabled: boolean;
-  };
+  user: AuthUser;
 }
 
 const TOKEN_KEY = 'auth_token';
+/*
+Patched: Zamokuhle Zwane, 25 July 2026
+login and googleAuth were only ever storing the token
+*/
+const USER_KEY = 'auth_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  private readonly baseUrl = `${environment.apiUrl}/api/auth`;
+  // the environment already provides '/api' prefix 
+  // keep only "/auth" here to avoid it generating "api/api/* urls" 
+  // this approach works correctly with Nginx reverse proxy 
+  private readonly baseUrl = `${environment.apiUrl}/auth`;
+
+  //signal so that any component reacts automatically to the moment login/logout happens.
+  //refs: https://angular.dev/guide/signals
+
+  readonly currentUser = signal<AuthUser | null>(this.loadStoredUser());
+  constructor() {
+    /*
+    if there's a token but no stored user, that's someone who logged in
+    before persistSession() existed, there's no /api/users/me endpoint to
+    backfill the name from, and the JWT itself only carries email/userId,
+    no name. rather than leave them stuck on "Guest" indefinitely, clear
+    the stale token so the route guard kicks them to /login for one clean
+    re-login, after which persistSession() takes over normally
+    */
+    if (this.getToken() && !this.currentUser()) {
+      console.warn(
+        '[AuthService] token found with no stored user, forcing re-login',
+      );
+      localStorage.removeItem(TOKEN_KEY);
+    }
+  }
 
   register(payload: RegisterRequest): Observable<RegisterResponse> {
     return this.http
@@ -57,15 +86,17 @@ export class AuthService {
 
   login(payload: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, payload).pipe(
-      tap((res) => localStorage.setItem(TOKEN_KEY, res.token)),
+      tap((res) => this.persistSession(res)),
       catchError(this.handleError),
     );
   }
-  googleAuth(idToken: string): Observable <AuthResponse> {
-    return this.http.post<AuthResponse> (`${this.baseUrl}/google`, {idToken}).pipe(
-        tap(res => localStorage.setItem(TOKEN_KEY, res.token)),
-        catchError(this.handleError)
-    );
+  googleAuth(idToken: string): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${this.baseUrl}/google`, { idToken })
+      .pipe(
+        tap((res) => this.persistSession(res)),
+        catchError(this.handleError),
+      );
   }
 
   logout(): void {
@@ -78,6 +109,8 @@ export class AuthService {
         .subscribe();
     }
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    this.currentUser.set(null);
     this.router.navigate(['/login']);
   }
 
@@ -87,6 +120,26 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!this.getToken();
+  }
+  //this stores the token and user object on login/googleauth and updates the signal
+  private persistSession(res: AuthResponse): void {
+    localStorage.setItem(TOKEN_KEY, res.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+    this.currentUser.set(res.user);
+  }
+
+  //this will read whstever was last stord, used to seed the signal on app start up and page refress doesnt lose name until next login
+  private loadStoredUser(): AuthUser | null {
+    const raw = localStorage.getItem(USER_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as AuthUser;
+    } catch {
+      //correct or stale values from older app version
+      console.error('[AuthService] failed to parse stored user, clearing it');
+      localStorage.removeItem(USER_KEY);
+      return null;
+    }
   }
 
   // backend sends errors back as MessageResponse { message, redirectUrl }
