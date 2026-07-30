@@ -22,7 +22,7 @@ COPY requirements.txt .
 RUN python -m pip install --upgrade \
     pip==25.0.1 \
     setuptools==75.3.4 \
-    wheel==0.45.1
+    wheel==0.45.1 \
     && pip install --no-cache-dir -r requirements.txt
  
 # Copy only necessary files explicitly
