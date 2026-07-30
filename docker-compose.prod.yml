@@ -1,16 +1,26 @@
 services:
 
+  # EXPLANATION:
+  # acts as public entry point
+  # receieve all HTTP and HTTPS requests from browsers 
+
   nginx:
     # to match the frontend image
+    # non-root user for improved security 
     image: nginxinc/nginx-unprivileged:alpine
     restart: unless-stopped
 
     ports:
       - "80:80"
       - "443:443"
+
     volumes:
-    # ro makes it to be read only 
+    # ro makes it to be read only to avoid it being modified 
+    # nginx must mount the ceritificates, will be used by Nginx 
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/proxy:/etc/nginx/proxy:ro
+      - /etc/letsencrypt/:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
 
     depends_on:
       backend: 
@@ -121,7 +131,7 @@ services:
 
   frontend:
     # so I can build for now
-    image: momently-fronted
+    image: momently-frontend
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
@@ -170,7 +180,6 @@ services:
 
     networks:
       - momently-network
-
 
 volumes:
     postgres_data:
