@@ -181,6 +181,15 @@ export class ProjectDetailsComponent {
             .toUpperCase();
     }
 
+    protected getInitial(name:string):string{
+        return name
+            .split(' ')
+            .map(word=> word[0])
+            .join('')
+            .toUpperCase();
+    }
+
+
     protected getAvatarColour(member: ProjectMember):string{
         const colours=[
             'avatar-blue',
@@ -191,6 +200,19 @@ export class ProjectDetailsComponent {
 
         return colours[
             member.firstName.length%colours.length
+        ];
+    }
+
+    protected getAvatarColours(member: string):string{
+        const colours=[
+            'avatar-blue',
+            'avatar-purple',
+            'avatar-green',
+            'avatar-orange'
+        ];
+
+        return colours[
+            member.length%colours.length
         ];
     }
 

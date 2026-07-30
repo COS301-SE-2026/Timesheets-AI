@@ -955,6 +955,20 @@ KPI SECTION STILL NEED TO DO
     }
 }
 
+.avatar{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 0.85;
+    flex-shrink: 0;
+}
+
+
 .status-badge{
     padding: 0.35rem 0.85rem;
     border-radius: 999px;
@@ -985,12 +999,28 @@ KPI SECTION STILL NEED TO DO
 .assignee{
     display: flex;
     align-items: center;
-    gap: 0.75;
+    gap: 0.85;
 }
 
 .assignee span{
     font-weight: 500;
     color: $text-primary;
+}
+
+.assignee-info{
+    display: flex;
+    flex-direction: column;
+}
+
+.name{
+    font-weight: 600;
+    color: $text-primary;
+}
+
+.role{
+    font-size: 0.78rem;
+    color: $text-secondary;
+    text-transform: capitalize;
 }
 
 .hours{

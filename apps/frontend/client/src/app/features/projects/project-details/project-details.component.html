@@ -443,16 +443,13 @@ Related Requirements: N/A
                             <div class="assignee">
                                 <div 
                                     class="avatar"
-                                    [ngClass]="getAvatarColour(task.assignedToName)">
-                                    {{ getInitials(task.assignedToName) }}
+                                    [ngClass]="getAvatarColours(task.assignedToName)">
+                                    {{ getInitial(task.assignedToName) }}
                                 </div>
 
                                 <div class="assignee-info">
                                     <span class="assignee-name">
                                         {{ task.assignedToName}}
-                                    </span>
-                                    <span class="role">
-                                        {{ task.assignedRole }}
                                     </span>
                                 </div>
                             </div>
