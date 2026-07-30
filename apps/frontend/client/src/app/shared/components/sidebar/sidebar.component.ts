@@ -84,6 +84,21 @@ export class SidebarComponent {
     this.router.navigate([route])
   }
 
+  //adding logout button on the dropdown
+  readonly isMenuOpen = signal<boolean>(false);
+
+  toggleMenu(): void{
+    this.isMenuOpen.update((open) => !open);
+  }
+  onLogout(): void{
+    this.authService.logout();
+  }
+  public onProfileClick(event: MouseEvent): void {
+    const clickedInsideMenu = (event.target as HTMLElement).closest('.user-menu');
+    if (!clickedInsideMenu) {
+      this.toggleMenu();
+    }
+  }
   activeRoute = () => this.router.url;
 
 }
