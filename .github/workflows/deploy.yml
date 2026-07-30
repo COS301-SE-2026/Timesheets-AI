@@ -62,13 +62,13 @@ jobs:
             for i in {1..12}; do
               if curl --fail http://localhost/actuator/health > /dev/null; then
                 echo "Application is healthy"
-                break
+                exit 0
               fi
 
               echo "Waiting ($i/12)"
               sleep 10
 
-              if [ "$i" -eq 12]; then
+              if [ "$i" -eq 12 ]; then
                 echo "Health check failed"
                 exit 1
               fi
