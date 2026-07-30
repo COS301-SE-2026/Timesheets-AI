@@ -61,6 +61,10 @@ public class ProjectServiceTest {
   private final UUID testWorkspaceMemberId = UUID.randomUUID();
 
   // ! helper functions
+  /*
+  - for this one, I am not using BeforeEach and a setup because each test requires diff setups
+  - like I would be mocking unnecessarily if I do that
+  */
   private Project createTestProject() {
     Project project = new Project();
     project.setId(testProjectId);

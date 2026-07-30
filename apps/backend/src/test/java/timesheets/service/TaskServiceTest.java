@@ -1,6 +1,7 @@
 package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -133,6 +134,61 @@ class TaskServiceTest {
       verify(projectRepository).findById(projectId);
       verify(workspaceMemberRepository).findById(assignedWorkspaceMemberId);
       verify(userRepository).findById(userId);
+    }
+  }
+
+  @Nested
+  @DisplayName("Get Task By ID Tests")
+  class GetTaskByIdTests {
+
+    @Test
+    @DisplayName("returns a task when a user has access, successfully")
+    void getTaskById() {
+
+      /*ARRANGE
+      - making sure that a user is a developer
+      - get the task and that it is not deleted
+      - the user has access to the project that the task is in
+      */
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
+      when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
+
+      // the user has access to the project
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+              projectId, workspaceMemberId))
+          .thenReturn(true);
+
+      when(projectRepository.findById(projectId)).thenReturn(Optional.of(project)); // project name
+
+      when(workspaceMemberRepository.findById(assignedWorkspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+      when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+      // ACT: to call the actual method
+      TaskResponse result = taskService.getTaskResponseById(taskId, workspaceMemberId);
+
+      // ASSERT: the values should match what I actually want
+      assertThat(result).isNotNull();
+      assertThat(result.getId()).isEqualTo(taskId);
+      assertThat(result.getTitle()).isEqualTo("Test Task");
+      assertThat(result.getDescription()).isEqualTo("Test Description");
+      assertThat(result.getProjectName()).isEqualTo("Test Project");
+      assertThat(result.getAssignedToName()).isEqualTo("John Doe");
+      assertThat(result.getStatus()).isEqualTo("TODO");
+      assertThat(result.getPriority()).isEqualTo("MEDIUM");
+
+      // Verify all the repository calls happened
+      verify(taskRepository, times(1)).findById(taskId); // tasks were fetched
+
+      // checked the users access to the project, the number of calls should be 1
+      verify(projectMemberRepository, times(1))
+          .existsByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId);
+      verify(projectRepository, times(1)).findById(projectId); // project name retrieved
+      verify(workspaceMemberRepository, times(1)).findById(assignedWorkspaceMemberId);
+      verify(userRepository, times(1)).findById(userId);
     }
   }
 }
