@@ -155,8 +155,6 @@ public class AuthService {
         .lastName(user.getLastName())
         .createdAt(user.getCreatedAt())
         .message("Verification email sent. Please check your inbox.")
-        // DEMO 2
-        .verificationToken(token)
         .build();
   }
 
@@ -253,9 +251,10 @@ public class AuthService {
     user.setLockedUntil(null);
     userRepository.save(user);
 
-    if (!Boolean.TRUE.equals(user.getEmailVerified())) {
-      throw new IllegalStateException("please verify your email before logging in");
-    }
+    // TODO
+    // if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+    //   throw new IllegalStateException("please verify your email before logging in");
+    // }
 
     // check if MFA is enabled
     boolean mfaEnabled =
