@@ -42,7 +42,7 @@ class EmailServiceTest {
 
   @Test
   @DisplayName("should send verification email with correct details")
-  void sendVerificationEmail_ShouldPrintCorrectMessageToConsole() {
+  void sendVerificationEmailPrintToConsole() {
 
     // ARRANGE: need to capture the output, thats what helps with verification
     String testEmail = "john.doe@momentum.co.za";

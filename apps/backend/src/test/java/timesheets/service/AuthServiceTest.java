@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -124,6 +125,11 @@ class AuthServiceTest {
       when(emailVerificationTokenRepository.save(any(EmailVerificationToken.class)))
           .thenReturn(EmailVerificationToken.builder().build());
 
+      // adding this because the tests are failing on CI, but not PC
+      doNothing()
+          .when(emailService)
+          .sendVerificationEmail(eq(testEmail), eq(testFirstName), anyString());
+
       // ACT: testing the register method
       RegisterResponse response = authService.register(request);
 
@@ -152,6 +158,11 @@ class AuthServiceTest {
       when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(existingUser));
       when(emailVerificationTokenRepository.save(any(EmailVerificationToken.class)))
           .thenReturn(EmailVerificationToken.builder().build());
+
+      // adding this because the tests are failing on CI, but not PC
+      doNothing()
+          .when(emailService)
+          .sendVerificationEmail(eq(testEmail), eq(testFirstName), anyString());
 
       // ACT: test the register method
       RegisterResponse response = authService.register(request);
