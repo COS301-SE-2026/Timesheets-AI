@@ -1,6 +1,12 @@
-global:
-  scrape_interval: 15s
+# Explanantion:
+# Prometheus collects metrics. It keeps a history of it 
+# Grafana used Prometheus to visualise these data
 
+global:
+  # this is how frequently Promentheus pulls target 
+  scrape_interval: 15s
+  
+  # we collect these metrics exposed by Spring Boot (application.properties)
 scrape_configs:
   - job_name: "momently-backend"
     metrics_path: /actuator/prometheus
@@ -8,3 +14,10 @@ scrape_configs:
     static_configs:
       - targets:
           - backend:8080
+
+  - job_name: "node"
+    
+    # node exporter is for Docker 
+    static_configs:
+      - targets:
+          - node-exporter:9100
