@@ -910,6 +910,12 @@ KPI SECTION STILL NEED TO DO
     margin-top: 2rem;
 }
 
+.task-title{
+    color: $text-primary;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
 .task-card{
     background: #fff;
     border: 1px solid #e2e8f0;
@@ -999,7 +1005,7 @@ KPI SECTION STILL NEED TO DO
 .assignee{
     display: flex;
     align-items: center;
-    gap: 0.85;
+    gap: 0.95;
 }
 
 .assignee span{
@@ -1010,17 +1016,13 @@ KPI SECTION STILL NEED TO DO
 .assignee-info{
     display: flex;
     flex-direction: column;
+    margin-left: 0.45rem;
 }
 
-.name{
+.assignee-name{
     font-weight: 600;
     color: $text-primary;
-}
-
-.role{
-    font-size: 0.78rem;
-    color: $text-secondary;
-    text-transform: capitalize;
+    font-size: 1rem;
 }
 
 .hours{
