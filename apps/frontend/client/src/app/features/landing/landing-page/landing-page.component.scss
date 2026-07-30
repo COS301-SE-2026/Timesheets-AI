@@ -1,0 +1,51 @@
+/*
+Author: Cleopatra Kwenda
+Date: 2026-07-25
+Purpose: Styling the landing page such 
+it follows our desired wireframe.
+Related Requirement: N/A
+*/
+
+@use '../../../../app/shared/styles/mixins' as *;
+
+// COLOUR PALETTE
+$font-special-gothic: "Special Gothic Expanded One", sans-serif;
+$text-dark: #0f172a;
+$text-muted: #64748b;
+$primary-blue: #2563eb;
+$primary-orange: #ea580c;
+$bg-light: #fafafa;
+$border-colour: #f1f5f9;
+
+.landing-container{
+    min-height: 100vh;
+    background-color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: $text-dark;
+    padding: 0 4rem 4rem 4rem;
+
+    @media (max-width: 768px){
+        padding: 0 1.5rem 2rem 1.5rem;
+    }
+}
+
+.special-gothic-expanded-one-regular {
+    font-family: "Special Gothic Expanded One", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+// HEADER OR NAVBAR(UP THERE)
+.navbar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.75rem 0;
+
+    // LOGO STYLING
+    .brand{
+        @include auth-brand-lockup;
+    }
+}
+        
