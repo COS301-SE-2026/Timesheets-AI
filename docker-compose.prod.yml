@@ -19,8 +19,7 @@ services:
     # nginx must mount the ceritificates, will be used by Nginx 
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/proxy.conf:/etc/nginx/proxy.conf:ro
-      - /etc/letsencrypt/:/etc/letsencrypt:ro
-      - /var/www/certbot:/var/www/certbot:ro
+      - /etc/nginx/certs:/etc/nginx/certs:ro
 
     depends_on:
       frontend:
