@@ -8,18 +8,17 @@ Related Requirement: N/A
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FontAwesomModule } from '@fortawesome/angular-fontaesome'
 import {
   faClock,
   faChartLine,
   faPuzzlePiece,
   faShieldHalved
-} from '@fortawesome/free-solid-svg-core'
+} from '@fortawesome/free-solid-svg-icons'
 
 @Component({
   selector: 'app-landing-page',
   standalone:true,
-  imports: [CommonModule, RouterLink, FontAwesomModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.scss'
 })
