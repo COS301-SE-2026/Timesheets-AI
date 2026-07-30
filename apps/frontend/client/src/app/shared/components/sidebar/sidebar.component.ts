@@ -40,7 +40,7 @@ export class SidebarComponent {
     { label: 'Projects', icon: 'folder', route: '/projects' },
     { label: 'My Tasks', icon: 'assignment', route: '/my-tasks' },
     { label: 'Calendar', icon: 'calendar_month', route: '/calendar' },
-    { label: 'Leave Requests', icon: 'business_center', route: '/leave' },
+    { label: 'Leave Requests', icon: 'business_center', route: '/leave-requests' },
     { label: 'Reports', icon: 'bar_chart', route: '/reports' },
     { label: 'Insights', icon: 'trending_up', route: '/insights' },
     { label: 'Team', icon: 'groups', route: '/team' },
