@@ -211,7 +211,7 @@ export class LeaveRequestsComponent {
     {
       label: 'Pending',
       value: this.countByStatus('PENDING'),
-      icon: 'fa-regular fa-hourglass-half',
+      icon: 'fa-regular fa-hourglass',
       type: 'pending'
     },
     {
@@ -223,13 +223,13 @@ export class LeaveRequestsComponent {
     {
       label: 'Rejected',
       value: this.countByStatus('REJECTED'),
-      icon: 'fa-solid fa-ban',
+      icon: 'fa-regular fa-circle-xmark',
       type: 'rejected'
     },
     {
       label: 'Total requests',
       value: this.leaveRequests().length,
-      icon: 'fa-solid fa-circle-check',
+      icon: 'fa-regular fa-circle-check',
       type: 'total'
     }
   ]);
@@ -289,16 +289,43 @@ export class LeaveRequestsComponent {
     };
 
     // INTEGRATION: Send payload to the POST leave request endpoint
-    console.log('Leave request payload:', payload);
+    const requestId = this.editingRequestId();
 
-    this.addTemporaryRequest(payload);
+    if(requestId) {
+     
+      // INTEGRATION:  PATCH /api/leave-request/{id}
 
-    this.submitMessage.set(
-      'Leave Request submitted successfully.'
-    );
+      console.log(`patch /api/leave-request/${requestId}`, payload);
 
+      // temporary frontend update
+      this.updateTemporaryRequest(requestId, payload);
+      this.submitMessage.set('Leave request updated successfully');
+    } else {
+
+      // INTEGRATION POST /api/leave-requests
+      console.log('POST /api/leave-request', payload);
+    }
+
+    this.editingRequestId.set(null);
     this.showView('LIST');
+    this.resetForm();
   }
+
+private updateTemporaryRequest(id: string, payload: CreateLeaveRequestPayload): void {
+  const updatedAt = new Date().toISOString();
+
+  this.leaveRequests.update(requests => 
+    requests.map( request => request.id === id ? {
+    ...request,
+    leaveType: payload.leaveType,
+    startDate: payload.startDate,
+    endDate: payload.endDate,
+    totalDays: payload.totalDays,
+    reason: payload.reason,
+    attachments: payload.attachments,
+    updatedAt
+  } : request));
+}
 
   // View submitted leave request
   viewRequest(request: LeaveRequest): void {
@@ -329,6 +356,7 @@ export class LeaveRequestsComponent {
       return;
     }
 
+    this.closeRequestDetails();
     this.editingRequestId.set(request.id);
     
     this.leaveRequestForm.reset({
@@ -460,6 +488,8 @@ export class LeaveRequestsComponent {
       end_date: '',
       total_days: 0
     });
+
+    this.editingRequestId.set(null);
   }
 
   //  INTEGRATION: remove this and use the respons from the POST request
