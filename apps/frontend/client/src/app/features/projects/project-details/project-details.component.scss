@@ -906,28 +906,98 @@ TEAM CARD
 /*
 KPI SECTION STILL NEED TO DO
 */
-.kpi-grid{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
+.task-section{
+    margin-top: 2rem;
 }
 
-.kpi-card{
-    background: white;
-    padding: 1.25rem;
-    transition: 0.2s;
+.task-card{
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    overflow: hidden;
 }
 
-.kpi-card:hover{
-    transform: translateY(-3px);
+.task-table{
+    width: 100%;
+    border-collapse: collapse;
+
+    th{
+        padding: 1rem 2rem;
+        background: #f8fafc;
+        text-align: left;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.05rem;
+        text-transform: uppercase;
+        color: $text-muted;
+    }
+
+    td{
+        padding: 1.2rem 2rem;
+        border-top: 1px solid #edf2f7;
+    }
 }
 
-.kpi-title{
-    color: $text-muted;
-    font-size: 0.75rem;
+.task-header{
+    padding: 1.5rem 2rem;
+
+    h3{
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: $text-primary;
+    }
+
+    .subtitle{
+        margin-top: 0.4rem;
+        color: $text-secondary;
+        font-size: 0.95;
+    }
+}
+
+.status-badge{
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
     font-weight: 600;
-    text-transform: uppercase;
 }
+
+.status-progress{
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.status-todo{
+    background: #f1f5f9;
+    color: #334155;
+}
+
+.status-blocked{
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-dones{
+    background: #dcfce7;
+    color: #166534;
+}
+
+.assignee{
+    display: flex;
+    align-items: center;
+    gap: 0.75;
+}
+
+.assignee span{
+    font-weight: 500;
+    color: $text-primary;
+}
+
+.hours{
+    font-weight: 500;
+    color: $text-primary;
+}
+
 
 /*
 RESPOSIVENESS

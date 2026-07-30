@@ -15,6 +15,8 @@ import { ProjectStatus } from "../enums/project-status.enum";
 import { ProjectRole } from "../enums/project-role.enum";
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { PROJECT_TASK } from "../mock/project-task.mock";
+import { ProjectTask } from "../models/project-task.model";
 
 @Component({
     selector: 'app-project-details',
@@ -32,6 +34,10 @@ export class ProjectDetailsComponent {
 
     protected readonly ProjectStatus= ProjectStatus;
     protected readonly ProjectRole= ProjectRole;
+
+    protected readonly tasks=signal<ProjectTask[]>(
+        PROJECT_TASK
+    );
 
     constructor(
         private readonly route: ActivatedRoute,
@@ -186,6 +192,21 @@ export class ProjectDetailsComponent {
         return colours[
             member.firstName.length%colours.length
         ];
+    }
+
+    protected formatStatus(status: string):string{
+        switch(status){
+            case 'IN_PROGRESS':
+                return 'In Progress';
+            case 'TODO':
+                return 'To Do';
+            case 'BLOCKED':
+                return 'Blocked';
+            case 'DONE':
+                return 'Done';
+            default:
+                return status;
+        }
     }
     
 }

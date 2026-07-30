@@ -19,7 +19,7 @@ export const PROJECT_TASK: ProjectTask[]=[
         projectId: PROJECT_DETAIL.id,
         title: 'Design login flow',
         description: '',
-        status: 'IN-PROGRESS',
+        status: 'IN_PROGRESS',
         priority: 'HIGH',
         estimatedHours: 8,
         actualHours: 6,

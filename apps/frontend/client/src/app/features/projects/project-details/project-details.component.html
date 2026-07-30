@@ -407,8 +407,76 @@ Related Requirements: N/A
     TASKS TAB
     -->
     <section
-        class="tasks-section"
+        class="task-section"
         *ngIf="activeTab()=== 'tasks'">
+
+        <article class="task-card">
+            <div class="task-header">
+                <h3>
+                    Tasks
+                </h3>
+
+                <p class="subtitle">
+                    Task assigned to this project
+                </p>
+            </div>
+
+            <table class="task-table">
+                <thead>
+                    
+                    <tr>
+                        <th>Task</th>
+                        <th>Assignee</th>
+                        <th>Status</th>
+                        <th>Estimated</th>
+                        <th>Actual</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr *ngFor="let task of tasks()">
+                        <td class="task-title">
+                            {{ task.title }}
+                        </td>
+
+                        <td>
+                            <div class="assignee">
+                                <div class="team-avatar">
+                                    {{ task.assignedToName.charAt(0) }}
+                                </div>
+
+                                <span>
+                                    {{ task.assignedToName}}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span
+                                class="status-badge"
+                                [ngClass]="{
+                                    'status-todo': task.status === 'TODO',
+                                    'status-progress': task.status === 'IN_PROGRESS',
+                                    'status-done': task.status === 'DONE',
+                                    'status-blocked': task.status === 'BLOCKED'
+                                }">
+
+                                {{ formatStatus(task.status) }}
+                            </span>
+                        </td>
+
+                        <td class="hours">
+                            {{ task.estimatedHours}}h
+                        </td>
+
+                        <td class="hours">
+                            {{ task.actualHours }}h
+                        </td>
+
+                    </tr>
+                </tbody>
+            </table>
+        </article>
 
     </section>
 
