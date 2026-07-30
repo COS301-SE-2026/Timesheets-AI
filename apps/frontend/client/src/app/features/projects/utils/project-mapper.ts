@@ -9,6 +9,7 @@ Date: 28/07/2026
 Patched: 30/07/2026
 still me lol
 
+Another problem was there was a misjudgement, although field says hours, its actually measured as minutes
 added mapToProjects/mapToProjectMember/mapToProjectTask so the project-details page can be wired
 */
 import { Project } from '../models/project.model';
@@ -47,6 +48,10 @@ function toMemberInitials(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 }
 
+//backend labels hoursLogged by its actually minutes
+export function minutesToHours(rawMinutes: number): number{
+  return rawMinutes/60;
+}
 //This function turns decimal hours value(eg 540.66666) into 540h 4m
 export function formatHoursMinutes(decimalHours: number): string {
   const totalMinutes = Math.round(decimalHours * 60);
@@ -58,6 +63,16 @@ export function formatHoursMinutes(decimalHours: number): string {
 //Clamps a percentage to 0-100 for anything that will drive a visual bars width
 export function clampPercentage(value: number): number {
   return Math.min(100, Math.max(0, value));
+}
+//recomputes progress from corrected hours
+export function calculateProgressPercentage(
+  correctedHoursLogged: number,
+  budgetHours: number | null | undefined,
+): number{
+  if(!budgetHours){
+    return 0;
+  }
+  return Math.round((correctedHoursLogged / budgetHours)*10000)/100
 }
 
 //Builds the card shell from the list end before the detail data arrives
@@ -86,8 +101,11 @@ export function applyProjectDetail(
   card: Project,
   detail: ProjectDetailResponse,
 ): void {
-  card.hoursLogged = detail.hoursLogged;
-  card.hoursLoggedLabel = formatHoursMinutes(detail.hoursLogged);
+  const correctedHours = minutesToHours(detail.hoursLogged);
+  const correctedProgress = calculateProgressPercentage(correctedHours, detail.budgetHours);
+
+  card.hoursLogged = correctedHours;
+  card.hoursLoggedLabel = formatHoursMinutes(correctedHours);
   card.progressPercentage = detail.progressPercentage;
   card.progressPercentageClamped = clampPercentage(detail.progressPercentage);
   card.teamMemberInitials = detail.members.map((m) =>
@@ -109,7 +127,7 @@ export function extractMyHoursFromDetail(
   const me = detail.members.find(
     (m) => m.email.toLowerCase() === currentUserEmail.toLowerCase(),
   );
-  return me?.hoursLogged ?? 0;
+  return minutesToHours(me?.hoursLogged ?? 0);
 }
 
 //converts one ProjectMemberInfo entry from thee detail response into
@@ -117,12 +135,14 @@ export function extractMyHoursFromDetail(
 export function mapToProjectMember(
   member: ProjectDetailResponse['members'][number],
 ): ProjectMember{
+  const correctedHours = minutesToHours(member.hoursLogged);
   return {
     workspaceMemberId: member.workspaceMemberId,
     firstName: member.firstName,
     lastName: member.lastName,
     email: member.email,
-    hoursLogged: member.hoursLogged,
+    hoursLogged: correctedHours,
+    hoursLoggedLabel: formatHoursMinutes(correctedHours),
     role: ROLE_MAP[member.role] ?? ProjectRole.DEVELOPER,
     joinedAt: member.joinedAt,
   };
@@ -138,6 +158,8 @@ export function mapToProjectDetails(
   const budgetCost = detail.budgetCost ?? 0;
   const totalCost = detail.totalCost ?? 0;
 
+  const correctedHours = minutesToHours(detail.hoursLogged);
+  const correctedProgress = calculateProgressPercentage(correctedHours, budgetHours);
   return{
     id: detail.id,
     name: detail.name,
@@ -145,13 +167,13 @@ export function mapToProjectDetails(
     description: detail.description ?? '',
     status: STATUS_MAP[detail.status as ProjectResponse['status']] ?? ProjectStatus.ACTIVE,
 
-    hoursLogged: detail.hoursLogged,
-    hoursLoggedLabel: formatHoursMinutes(detail.hoursLogged),
+    hoursLogged: Math.round(minutesToHours(detail.hoursLogged)),
+    hoursLoggedLabel: formatHoursMinutes(correctedHours),
     role: null,
     teamMemberInitials: detail.members.map((m) =>
       toMemberInitials(m.firstName, m.lastName),
     ),
-    progressPercentage: detail.progressPercentage,
+    progressPercentage: correctedProgress,
     progressPercentageClamped: clampPercentage(detail.progressPercentage),
     detailLoaded: true,
     detailError: false,
