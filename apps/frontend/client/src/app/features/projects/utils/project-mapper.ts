@@ -5,14 +5,22 @@ given the time crunch, we dont have hours logged but we do have calculateProject
 I will send the backend engineer a log so we can look into it in the next demo
 Author: Zamokuhle Zwane
 Date: 28/07/2026
+
+Patched: 30/07/2026
+still me lol
+
+added mapToProjects/mapToProjectMember/mapToProjectTask so the project-details page can be wired
 */
 import { Project } from '../models/project.model';
+import { ProjectTask } from '../models/project-task.model';
 import { ProjectRole } from '../enums/project-role.enum';
 import { ProjectStatus } from '../enums/project-status.enum';
 import {
   ProjectResponse,
   ProjectDetailResponse,
 } from '../../../core/services/project.service';
+import { TaskResponse } from '../../../core/services/task.service';
+import { ProjectDetails, ProjectMember } from '../project-details/models/project-details.model';
 
 const STATUS_MAP: Record<ProjectResponse['status'], ProjectStatus> = {
   ACTIVE: ProjectStatus.ACTIVE,
@@ -102,4 +110,82 @@ export function extractMyHoursFromDetail(
     (m) => m.email.toLowerCase() === currentUserEmail.toLowerCase(),
   );
   return me?.hoursLogged ?? 0;
+}
+
+//converts one ProjectMemberInfo entry from thee detail response into
+
+export function mapToProjectMember(
+  member: ProjectDetailResponse['members'][number],
+): ProjectMember{
+  return {
+    workspaceMemberId: member.workspaceMemberId,
+    firstName: member.firstName,
+    lastName: member.lastName,
+    email: member.email,
+    hoursLogged: member.hoursLogged,
+    role: ROLE_MAP[member.role] ?? ProjectRole.DEVELOPER,
+    joinedAt: member.joinedAt,
+  };
+}
+
+//onverts GET /api/projects/{id} into the ProjectDetails shape the project-details expects
+
+export function mapToProjectDetails(
+  detail: ProjectDetailResponse,
+): ProjectDetails {
+  const budgetHours = detail.budgetHours?? 0;
+  const hourlyRate = detail.hourlyRate ?? 0;
+  const budgetCost = detail.budgetCost ?? 0;
+  const totalCost = detail.totalCost ?? 0;
+
+  return{
+    id: detail.id,
+    name: detail.name,
+    initials: toInitials(detail.name),
+    description: detail.description ?? '',
+    status: STATUS_MAP[detail.status as ProjectResponse['status']] ?? ProjectStatus.ACTIVE,
+
+    hoursLogged: detail.hoursLogged,
+    hoursLoggedLabel: formatHoursMinutes(detail.hoursLogged),
+    role: null,
+    teamMemberInitials: detail.members.map((m) =>
+      toMemberInitials(m.firstName, m.lastName),
+    ),
+    progressPercentage: detail.progressPercentage,
+    progressPercentageClamped: clampPercentage(detail.progressPercentage),
+    detailLoaded: true,
+    detailError: false,
+
+    budgetHours,
+    hourlyRate,
+    budgetCost,
+    totalCost,
+    createdAt: detail.createdAt,
+    updatedAt: detail.updatedAt,
+
+    //still gonna do(Nyasha): backend detail endpoint doesn't return these yet
+    myRole: ProjectRole.DEVELOPER,
+    startDate: '',
+    endDate: '',
+
+    members: detail.members.map(mapToProjectMember),
+  };
+}
+
+
+//converts Get /api/projects/{id} into the ProjectTask shape
+export function mapToProjectTask(res: TaskResponse): ProjectTask{
+  return{
+    id: res.id,
+    projectId: res.projectId,
+    title: res.title,
+    description: res.description ?? '',
+    status: res.status,
+    priority: res.priority,
+    estimatedHours: res.estimatedHours ?? 0,
+    actualHours: res.actualHours ?? 0,
+    assignedToName: res.assignedToName ?? '',
+    assignedWorkspaceMemberId: res.assignedWorkspaceMemberId ?? '',
+    dueDate: res.dueDate ?? '',
+  }
 }
