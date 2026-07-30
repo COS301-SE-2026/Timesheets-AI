@@ -20,6 +20,24 @@ export class LandingPageComponent {
   
   protected readonly brandLogo= '/assets/momently.png';
 
+  clientLogos=[
+    {
+      name: 'momentum METROPOLITAN'
+    },
+    {
+      name: ' Gaurdrisk '
+    },
+    {
+      name: 'momentum health'
+    },
+    {
+      name: 'ER24'
+    },
+    {
+      name: 'momentum investments'
+    },
+  ];
+
   features=[
     {
       title: 'Effortless Tracking',

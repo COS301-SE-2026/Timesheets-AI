@@ -103,4 +103,21 @@ Related Requirements: N/A
             </div>
         </div>
     </section>
+
+    <!-- CLIENT NAMES AND LOGOS -->
+    <section class="logos-section">
+        <p class="trust-text">
+            Trusted by development teams that value every moment
+        </p>
+
+        <div class="logos-container">
+            <div 
+                class="logo-item"
+                *ngFor="let client of clientLogos">
+                <span>
+                    {{ client.name }}
+                </span>
+            </div>
+        </div>
+    </section>
 </div>
