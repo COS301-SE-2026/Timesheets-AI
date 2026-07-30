@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import timesheets.domain.Project;
 import timesheets.domain.Task;
+import timesheets.domain.TimeEntry;
 import timesheets.domain.TimerSession;
+import timesheets.domain.Timesheet;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.StartTimerRequest;
 import timesheets.repository.ProjectMemberRepository;
@@ -263,6 +266,56 @@ class TimerServiceTest {
       // checking that the repo was called to get the actual timer
       verify(timerSessionRepository, times(1))
           .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId);
+    }
+  }
+
+  @Nested
+  @DisplayName("Stop Timer Tests")
+  class StopTimerTests {
+
+    @Test
+    @DisplayName("this should stop a timer")
+    void stopTimer() {
+
+      /*
+        ARRANGE
+      - remember how a time-entry is added to a timesheet when a timer is stopped
+      - so we are trying to simulate doing that
+       */
+      TimerSession activeTimer = createActiveTimer();
+      Timesheet timesheet = new Timesheet();
+      timesheet.setId(UUID.randomUUID());
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+
+      // when looking for an active timer, should return the one I just created
+      when(timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId))
+          .thenReturn(Optional.of(activeTimer));
+      when(timesheetService.getOrCreateTimesheet(any(LocalDate.class), any(LocalDate.class)))
+          .thenReturn(timesheet);
+
+      // to create a time entry and timer session, just pass what I give it
+      when(timeEntryRepository.save(any(TimeEntry.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+      when(timerSessionRepository.save(any(TimerSession.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      // ACT: calling the actual stop timer method
+      TimeEntry result = timerService.stopTimer();
+
+      // ASSERT
+      assertThat(result).isNotNull();
+      assertThat(result.getWorkspaceMemberId())
+          .isEqualTo(workspaceMemberId); // should belong to the same user
+      assertThat(result.getEntryType())
+          .isEqualTo("TIMER"); // should mark as how the entry was entered
+      assertThat(result.getIsLocked()).isFalse(); // should not be locked yet since its a draft
+      assertThat(activeTimer.getIsRunning()).isFalse(); // timer should not be running
+      assertThat(activeTimer.getEndedAt()).isNotNull();
+
+      // want to check that the timer got saved and a time entry was saved
+      verify(timerSessionRepository, times(1)).save(activeTimer);
+      verify(timeEntryRepository, times(1)).save(any(TimeEntry.class));
     }
   }
 }
