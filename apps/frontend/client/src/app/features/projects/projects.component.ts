@@ -17,11 +17,12 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { forkJoin, of } from 'rxjs';
+import { RouterModule } from '@angular/router';
 import { catchError, map} from 'rxjs/operators';
 import { Project } from './models/project.model';
 import { ProjectStatus } from './enums/project-status.enum';
 import { PROJECT_FILTERS } from './constants/project-filters.constant';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { StatsCardComponent } from '../../shared/components/stats-card/stats-card.component';
 import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar.component';
@@ -53,8 +54,8 @@ export class ProjectsComponent implements OnInit {
   private readonly projectService = inject(ProjectService);
   private readonly authService = inject(AuthService);
 
-  protected readonly projects: Project[] = PROJECTS;
-  protected filteredProjects: Project[] = [...PROJECTS];
+  protected projects: Project[] = [];
+  protected filteredProjects: Project[] = [];
   protected readonly filters = PROJECT_FILTERS;
   protected selectedFilter = 'All';
   protected searchTerm = '';
@@ -136,7 +137,7 @@ export class ProjectsComponent implements OnInit {
 
   protected get totalHours(): number {
     return this.projects.reduce(
-      (totalHours, project) => totalHours + project.budgetHours,
+      (totalHours, project) => totalHours + (project.hoursLogged ?? 0),
       0,
     );
   }
