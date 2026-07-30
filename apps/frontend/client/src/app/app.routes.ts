@@ -5,22 +5,24 @@
   ============================================================ */
 
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-
   /* Default redirect */
   {
     path: '',
     redirectTo: 'signup',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
 
   /* Log Time page */
   {
     path: 'log-time',
+    canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/users/developer/logtime/logtime.component')
-        .then(m => m.LogtimeComponent)
+      import('./features/users/developer/logtime/logtime.component').then(
+        (m) => m.LogtimeComponent,
+      ),
   },
 
   /* Signup page */
@@ -28,8 +30,9 @@ export const routes: Routes = [
     path: 'signup',
     data: { layout: 'auth' },
     loadComponent: () =>
-      import('./features/signup/signup/signup.component')
-        .then(m => m.SignupComponent)
+      import('./features/signup/signup/signup.component').then(
+        (m) => m.SignupComponent,
+      ),
   },
 
   /* Login page */
@@ -37,23 +40,34 @@ export const routes: Routes = [
     path: 'login',
     data: { layout: 'auth' },
     loadComponent: () =>
-      import('./features/login/login.component')
-        .then(m => m.LoginComponent)
+      import('./features/login/login.component').then((m) => m.LoginComponent),
   },
 
-  /* Log time page (placeholder for Demo 1) */
-  {
-    path: 'log-time',
-    loadComponent: () =>
-      import('./pages/log-time-placeholder/log-time-placeholder.component')
-        .then(m => m.LogTimePlaceholderComponent)
-  },
   /* Timesheets page */
   {
     path: 'timesheets',
+    canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/timesheets/timesheets.component')
-        .then(m => m.TimesheetsComponent)
+      import('./features/timesheets/timesheets.component').then(
+        (m) => m.TimesheetsComponent,
+      ),
+  },
+  
+  /* Projects page */
+  {
+    path: 'projects',
+    loadComponent: () =>
+      import('./features/projects/projects.component')
+        .then(m => m.ProjectsComponent)
+  },
+
+  // Tasks page
+
+  {
+    path: 'my-tasks',
+    loadComponent: () =>
+      import('./features/my-tasks/my-tasks.component')
+        .then(m => m.MyTasksComponent)
   },
 
   /* 404 fallback */
@@ -61,14 +75,14 @@ export const routes: Routes = [
     path: 'not-found',
     data: { layout: 'auth' },
     loadComponent: () =>
-      import('./pages/not-found/not-found.component')
-        .then(m => m.NotFoundComponent)
+      import('./pages/not-found/not-found.component').then(
+        (m) => m.NotFoundComponent,
+      ),
   },
 
   /* Catch-all wildcard (redirects to 404) */
   {
     path: '**',
-    redirectTo: 'not-found'
-  }
-
+    redirectTo: 'not-found',
+  },
 ];

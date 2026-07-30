@@ -6,12 +6,12 @@
  */
 
 import { Component, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 @Component({
   selector: 'app-input-field',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './input-field.component.html',
   styleUrl: './input-field.component.scss'
 })
