@@ -155,10 +155,34 @@ $border-colour: #f1f5f9;
     // SCREENSHOT AREA
     .hero-preview{
         width: 100%;
+        position: relative;
+
+        .hero-glow{
+            position: absolute;
+            inset: -70px;
+            z-index: 0;
+
+            background: 
+                radial-gradient(
+                    circle at 30% 50%,
+                    rgba(26, 101, 191, 0.30),
+                    transparent 60%
+                ),
+
+                radial-gradient(
+                    circle at 75% 40%,
+                    rgba(224, 120, 48, 0.30),
+                    transparent 60%
+                );
+            
+            filter: blur(70px);
+        }
 
         .image-wrapper{
             border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.12);
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
             overflow: hidden;
             border: 1px solid $border-colour;
             background: white;
@@ -169,9 +193,12 @@ $border-colour: #f1f5f9;
                 display: block;
             }
         }
+
     }
 
+
 }
+
 // FEATURE GRID AREA
 
 .features-section {
@@ -255,6 +282,19 @@ $border-colour: #f1f5f9;
         gap: 2rem;
         opacity: 0.6;
         filter: grayscale(100%);
+
+        img{
+            height: 42px;
+            width: auto;
+            opacity: 0.55;
+            filter: grayscale(100%);
+            transition: 0.25s;
+        }
+
+        img:hover{
+            opacity: 0.9;
+            filter: none;
+        }
 
         .logo-item {
             font-size: 1.1rem;
