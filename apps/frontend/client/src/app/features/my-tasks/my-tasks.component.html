@@ -182,7 +182,7 @@
                              <td class="text-body text-right font-mono" > {{ task.estimatedHours }}h </td>
                              <td class="text-body text-right font-mono"> {{ task.actualHours }}h </td>
                              <td class="text-center">
-                                <button type="button"  (keydown)="onOverlayKeydown($event)" class="view-button"  (click)="onViewTask(task)" [attr.aria-label]="'View details for ' + task.title">
+                                <button type="button" class="view-button"  (click)="onViewTask(task)" [attr.aria-label]="'View details for ' + task.title">
                                 <i class="fa-regular fa-eye"></i> 
                                 View </button>
                              </td>
@@ -201,8 +201,21 @@
       </section>
 
       @if(isDetailOpen()) {
-        <div class="modal-overlay" tabindex="0" (keydown)="onOverlayKeydown($event)" (click)="closeTaskDetail()">
-            <div class="modal-panel" tabindex="0" aria-modal="true" aria-labelledby="task-detail-title"  (keydown)="onOverlayKeydown($event)" (click)="$event.stopPropagation()">
+        <div
+            class="modal-overlay"
+            role="button"
+            tabindex="0"
+            aria-label="Close task detail"
+            (click)="onOverlayClick($event)"
+            (keydown.enter)="closeTaskDetail()"
+            (keydown.space)="closeTaskDetail()"
+            >
+            <div
+                class="modal-panel"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="task-detail-title"
+            >
                 <header class="modal-header">
                     <h2 id="task-detail-title" class="modal-title"> Task Detail </h2>
                     <button type="button" class="modal-close" (click)="closeTaskDetail()" aria-label="Close task detail">

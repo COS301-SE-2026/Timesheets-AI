@@ -316,7 +316,11 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     this.showArchived.set(checkbox.checked);
     this.applyFilters();
   }
-
+  public onOverlayClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeTaskDetail();
+    }
+  }
   // get css class for a task status badge
 
   public getStatusClass(status: TaskStatus): string {
@@ -340,7 +344,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   }
 
   public onOverlayKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === '') {
+    if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       this.closeTaskDetail();
     }

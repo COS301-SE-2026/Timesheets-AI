@@ -93,7 +93,12 @@ export class SidebarComponent {
   onLogout(): void{
     this.authService.logout();
   }
-
+  public onProfileClick(event: MouseEvent): void {
+    const clickedInsideMenu = (event.target as HTMLElement).closest('.user-menu');
+    if (!clickedInsideMenu) {
+      this.toggleMenu();
+    }
+  }
   activeRoute = () => this.router.url;
 
 }
