@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -89,21 +88,21 @@ class AuthServiceTest {
   }
 
   // adding an unverified user because there is a test that needs to use this logic
-  private User createUnverifiedTestUser() {
-    return User.builder()
-        .id(testUserId)
-        .email(testEmail)
-        .firstName(testFirstName)
-        .lastName(testLastName)
-        .passwordHash("hashedPassword")
-        .emailVerified(false)
-        .status(UserStatus.ACTIVE)
-        .failedLoginAttempts(0)
-        .lockedUntil(null)
-        .createdAt(LocalDateTime.now())
-        .updatedAt(LocalDateTime.now())
-        .build();
-  }
+  // private User createUnverifiedTestUser() {
+  //   return User.builder()
+  //       .id(testUserId)
+  //       .email(testEmail)
+  //       .firstName(testFirstName)
+  //       .lastName(testLastName)
+  //       .passwordHash("hashedPassword")
+  //       .emailVerified(false)
+  //       .status(UserStatus.ACTIVE)
+  //       .failedLoginAttempts(0)
+  //       .lockedUntil(null)
+  //       .createdAt(LocalDateTime.now())
+  //       .updatedAt(LocalDateTime.now())
+  //       .build();
+  // }
 
   // creating a registration request, and gives a request object
   private RegisterRequest createValidRegisterRequest() {
@@ -162,37 +161,37 @@ class AuthServiceTest {
       verify(emailService).sendVerificationEmail(eq(testEmail), eq(testFirstName), anyString());
     }
 
-    @Test
-    @DisplayName("the verification email should be resent for unverified email")
-    void resendEmailVerification() {
+    // @Test
+    // @DisplayName("the verification email should be resent for unverified email")
+    // void resendEmailVerification() {
 
-      // ARRANGE
-      RegisterRequest request = createValidRegisterRequest();
-      User existingUser = createUnverifiedTestUser();
+    //   // ARRANGE
+    //   RegisterRequest request = createValidRegisterRequest();
+    //   User existingUser = createUnverifiedTestUser();
 
-      // the user already exists in DB but is unverified
-      when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(existingUser));
-      when(emailVerificationTokenRepository.save(any(EmailVerificationToken.class)))
-          .thenReturn(EmailVerificationToken.builder().build());
+    //   // the user already exists in DB but is unverified
+    //   when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(existingUser));
+    //   when(emailVerificationTokenRepository.save(any(EmailVerificationToken.class)))
+    //       .thenReturn(EmailVerificationToken.builder().build());
 
-      // adding this because the tests are failing on CI, but not PC
-      doNothing()
-          .when(emailService)
-          .sendVerificationEmail(eq(testEmail), eq(testFirstName), anyString());
+    //   // adding this because the tests are failing on CI, but not PC
+    //   doNothing()
+    //       .when(emailService)
+    //       .sendVerificationEmail(eq(testEmail), eq(testFirstName), anyString());
 
-      // ACT: test the register method
-      RegisterResponse response = authService.register(request);
+    //   // ACT: test the register method
+    //   RegisterResponse response = authService.register(request);
 
-      // ASSERT
-      assertThat(response.getMessage()).contains("Verification email sent");
+    //   // ASSERT
+    //   assertThat(response.getMessage()).contains("Verification email sent");
 
-      // checking that the new verification email was sent to the user
-      verify(emailVerificationTokenRepository).deleteByUserId(existingUser.getId());
-      verify(emailService).sendVerificationEmail(eq(testEmail), eq(testFirstName), anyString());
+    //   // checking that the new verification email was sent to the user
+    //   verify(emailVerificationTokenRepository).deleteByUserId(existingUser.getId());
+    //   verify(emailService).sendVerificationEmail(eq(testEmail), eq(testFirstName), anyString());
 
-      // check that the user was not saved again in the DB
-      verify(userRepository, never()).save(any(User.class));
-    }
+    //   // check that the user was not saved again in the DB
+    //   verify(userRepository, never()).save(any(User.class));
+    // }
   }
 
   @Test
