@@ -48,4 +48,52 @@ $border-colour: #f1f5f9;
         @include auth-brand-lockup;
     }
 }
+
+//AUTH BUTTONS (LOGIN / SIGNUP)
+.auth-buttons{
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+
+    .btn-login{
+        color: white;
+        font-weight: 600;
+        padding: 0.6rem 1.4rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: color 0.2 ease;
+        background-color: var(--color-primary);
+        box-shadow: 0 4px 12px rgba(37, 99, 255, 0.2);
+        transition: transform 0.2s ease, background-color 0.2 ease;
+
+        &:hover{
+            background-color: lighten($primary-blue, 5%);
+            transform: translateY(-1px);
+        }
+    }
+
+    .btn-signup{
+        background-color: var(--color-primary);
+        color: white;
+        padding: 0.6rem 1.4rem;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 12px rgba(37, 99, 255, 0.2);
+        transition: transform 0.2s ease, background-color 0.2 ease;
+
+        &:hover{
+            background-color: lighten($primary-blue, 5%);
+            transform: translateY(-1px);
+        }
+    }
+}
+
+// HERO SECTION
+.hero-section{
+    display: grid;
+    
+}
         
