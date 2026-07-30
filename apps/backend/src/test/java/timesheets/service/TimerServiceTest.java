@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -85,6 +86,20 @@ class TimerServiceTest {
     request.setTaskId(taskId);
   }
 
+  private TimerSession createActiveTimer() {
+    TimerSession timer = new TimerSession();
+    timer.setId(UUID.randomUUID());
+    timer.setWorkspaceMemberId(workspaceMemberId);
+    timer.setProjectId(projectId);
+    timer.setTaskId(taskId);
+    timer.setStartedAt(LocalDateTime.now().minusHours(1));
+    timer.setIsRunning(true);
+    timer.setIsPaused(false);
+    timer.setPausedDurationSeconds(0L);
+    timer.setPausedAt(null);
+    return timer;
+  }
+
   @Nested
   @DisplayName("Start Timer Tests")
   class StartTimerTests {
@@ -139,6 +154,41 @@ class TimerServiceTest {
       assertThat(result.getPausedDurationSeconds()).isEqualTo(0L);
 
       verify(timerSessionRepository, times(1)).save(any(TimerSession.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Pause Timer Tests")
+  class PauseTimerTests {
+
+    @Test
+    @DisplayName("should pause active timer successfully")
+    void pauseTimer() {
+      // ARRANGE:creating an active timer
+      TimerSession activeTimer = createActiveTimer();
+
+      /*
+      - when returning the current user, test user should be
+      - for an active timer, return the one that was just created
+       */
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId))
+          .thenReturn(Optional.of(activeTimer));
+
+      // when a timer is saved, just give back whatever was saved
+      when(timerSessionRepository.save(any(TimerSession.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      // ACT: calling the pause timer function
+      TimerSession result = timerService.pauseTimer();
+
+      // ASSERT:verifying that the timer is actually paused
+      assertThat(result).isNotNull();
+      assertThat(result.getIsPaused()).isTrue();
+      assertThat(result.getPausedAt()).isNotNull();
+
+      // checking that the timer was paused exactly 1 time
+      verify(timerSessionRepository, times(1)).save(activeTimer);
     }
   }
 }
