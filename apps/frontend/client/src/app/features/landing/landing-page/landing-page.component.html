@@ -6,7 +6,7 @@ the Landing page.
 Related Requirements: N/A
 -->
 
-<div class="landing-container">
+< class="landing-container">
 
     <!-- HEADER AREA -->
     <header class="navbar">
@@ -78,5 +78,37 @@ Related Requirements: N/A
         </div>
     </section>
 
-    
+    <!-- FEATURES GRID AREA -->
+    <section class="features-section">
+        <div class="features-grid">
+            <div 
+                class="features-card"
+                *ngFor="let item of features">
+
+                <div 
+                    class="features-icon"
+                    [style.background-color]="item.bgColor"
+                    [style.color]="item.iconColor">
+
+                    <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.iconPath" />
+                    
+                    </svg>
+                </div>
+
+                <h3>
+                    {{ item.title }}
+                </h3>
+                <p>
+                    {{ item.description}}
+                </p>
+            </div>
+        </div>
+    </section>
 </div>
