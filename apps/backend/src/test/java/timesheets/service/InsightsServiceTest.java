@@ -93,24 +93,25 @@ class InsightsServiceTest {
     assertThat(response.getDailyTrend()).isEmpty();
   }
 
-  // @Test
-  // @DisplayName("returns correct total hours, from many entries")
-  // void getInsightsSummaryTotalHours() {
-  //   // ARRANGE: Create entries for two different days
-  //   LocalDateTime day1 = LocalDateTime.of(2026, 5, 14, 9, 0); // May 14, 2026, 9:00 AM
-  //   LocalDateTime day2 = LocalDateTime.of(2026, 5, 15, 9, 0);
+  @Test
+  @DisplayName("returns correct total hours, from many entries")
+  void getInsightsSummaryTotalHours() {
+    // ARRANGE: Create entries for two different days
+    LocalDateTime day1 = LocalDateTime.of(2026, 5, 14, 9, 0); // May 14 at 09:00
+    LocalDateTime day2 = LocalDateTime.of(2026, 5, 15, 9, 0);
 
-  //   when(securityUtils.getCurrentUserId()).thenReturn(userId);
-  //   when(timeEntryRepository.findByUserIdAndDateRange(any(), any(), any()))
-  //       .thenReturn(
-  //           List.of(entry(8, day1), entry(5, day2))); // 8 hours on day 1 and 5 hours on day 2
+    when(securityUtils.getCurrentUserId()).thenReturn(userId);
+    when(timeEntryRepository.findByUserIdAndDateRange(any(), any(), any()))
+        .thenReturn(
+            List.of(
+                entry(28800, day1), entry(18000, day2))); // 8 hours on day 1 and 5 hours on day 2
 
-  //   // ACT: Get insights summary
-  //   PersonalInsightsResponse response = insightsService.getInsightsSummary(request);
+    // ACT: Get insights summary
+    PersonalInsightsResponse response = insightsService.getInsightsSummary(request);
 
-  //   assertThat(response.getTotalHoursLogged()).isEqualTo(13.0);
-  //   assertThat(response.getTotalDaysLogged()).isEqualTo(2);
-  // }
+    assertThat(response.getTotalHoursLogged()).isEqualTo(13.0);
+    assertThat(response.getTotalDaysLogged()).isEqualTo(2);
+  }
 
   @Test
   @DisplayName("groups hours by projects")
