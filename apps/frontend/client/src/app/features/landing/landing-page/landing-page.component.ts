@@ -1,8 +1,7 @@
 /*
 Author: Cleopatra Kwenda
 Date: 2026-07-30
-Purpose: Display all the necessary components using other project models
-with only mock that should be eaisly integrated.
+Purpose: contains all the necessary data that the website requires.
 Related Requirement: N/A
 */
 
@@ -10,14 +9,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FontAwesomModule } from '@fortawesome/angular-fontaesome'
-import { title } from 'node:process';
 import {
   faClock,
   faChartLine,
   faPuzzlePiece,
   faShieldHalved
 } from '@fortawesome/free-solid-svg-core'
-import { from } from 'node:stream/iter';
 
 @Component({
   selector: 'app-landing-page',
@@ -57,6 +54,6 @@ export class LandingPageComponent {
       iconColor: '#9333ea',
       iconPath: faShieldHalved
     },
-  ]
+  ];
 
 }
