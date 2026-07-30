@@ -18,8 +18,15 @@ export interface ProjectMember{
     joinedAt: string;
 }
 export interface ProjectDetails extends Project{
+    budgetHours: number;
+    hourlyRate: number;
+    budgetCost: number
     totalCost: number;
-    hoursLogged: number
+    createdAt: string;
+    updatedAt:string;
+    myRole: ProjectRole;
+    startDate: string;
+    endDate: string;
     members: ProjectMember[];
     progressPercentage: number;
 }
