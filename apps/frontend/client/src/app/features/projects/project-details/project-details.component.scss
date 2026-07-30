@@ -260,14 +260,6 @@ META CARD
     }
 }
 
-.meta-info{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 0;
-
-}
-
 .meta-title{
     font-size: 0.8rem;
     font-weight: 500;
@@ -277,6 +269,8 @@ META CARD
 }
 
 .meta-info{
+    display: flex;
+    flex-direction: column;
     font-size: 1.15rem;
     font-weight: 700;
     color: $text-primary;
