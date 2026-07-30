@@ -102,7 +102,6 @@ export function applyProjectDetail(
   detail: ProjectDetailResponse,
 ): void {
   const correctedHours = minutesToHours(detail.hoursLogged);
-  const correctedProgress = calculateProgressPercentage(correctedHours, detail.budgetHours);
 
   card.hoursLogged = correctedHours;
   card.hoursLoggedLabel = formatHoursMinutes(correctedHours);
