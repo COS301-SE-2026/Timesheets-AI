@@ -26,28 +26,28 @@ export class LandingPageComponent {
       description: 'Track time in real-time or log it later-quick, simple, and flexible.',
       bgColor: '#eff6ff',
       iconColor: '#2563eb',
-      iconPath: 'fa-solid fa-clock'
+      icon: 'fa-solid fa-clock'
     },
     {
       title: 'Seamless Integrations',
       description: 'Connect with Jira, GitHub, Outlook Calendar and more tools you already use.',
       bgColor: '#f0fdf4',
       iconColor: '#16a34a',
-      iconPath: 'fa-solid fa-puzzle-piece'
+      icon: 'fa-solid fa-puzzle-piece'
     },
     {
       title: 'AI-Powered Insights',
       description: 'Get intelligent analytics and predictive insights that help you work smarter.',
       bgColor: '#fff7ed',
       iconColor: '#ea580c',
-      iconPath: 'fa-solid fa-chart-line'
+      icon: 'fa-solid fa-chart-line'
     },
     {
       title: 'Accurate & Trusted Data',
       description: 'AI detects anomalies and ensures your time data is accurate and reliable.',
       bgColor: '#faf5ff',
       iconColor: '#9333ea',
-      iconPath: 'fa-solid fa-shiel-halved'
+      icon: 'fa-solid fa-shiel-halved'
     },
   ];
 
