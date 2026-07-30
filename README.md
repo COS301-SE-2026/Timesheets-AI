@@ -109,6 +109,17 @@
 | [Demo 1 video](./docs/) | Video recording for demo one |
 
 ---
+| Documentation | Link |
+|------|-------------|
+| System Requirements Specification | [View PDF](./docs/demo-2/srs.pdf)|
+|System Architecture Specification|  [View PDF](./docs/demo-2/sas.pdf) |
+| Coding Standards Handbook |  [View PDF](./docs/demo-2/coding-standards-handbook.pdf) |
+| Testing Policy|  [View PDF](./docs/demo-2/testing-policy.pdf) |
+| User Manual |  [View PDF](./docs/demo-2/user-manual.pdf) |
+| Brand Style Guide |  [View PDF](./docs/demo-2/brand-style-guide.pdf) |
+| Wireframes |  [View PDF](./docs/demo-2/srs.pdf) |
+| Demo 2 video |  [View Video](./docs/demo-2/srs.pdf) |
+| Demo 2 presentation |  [View Video](./docs/demo-2/srs.pdf) |
 
 ## <img src="https://img.icons8.com/?size=100&id=hSm5FhlnhnlL&format=png&color=000000" width="22"> Technology Stack
 
