@@ -101,6 +101,16 @@ jobs:
         run: |
           docker build -t momently-ai:${{ github.sha}} .
 
+#====================== SECURITY scan ================================
+      - name: Scan Docker Image
+        if: github.event_name == 'push' && (steps.filter.outputs.ai == 'true' || steps.retry.outputs.ai == 'true')
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+        with:
+          image-ref: momently-ai:${{ github.sha }}
+          format: table
+          exit-code: 1
+          ignore-unfixed: true
+          severity: CRITICAL,HIGH
 
 #====================== Tag Image ====================================
 

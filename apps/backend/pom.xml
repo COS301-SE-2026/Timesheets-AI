@@ -137,6 +137,13 @@ it must end with:
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- Prometheus dependency -->
+         <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+
         <!-- SpringDoc for documentation  -->
         <dependency>
             <groupId>org.springdoc</groupId>
