@@ -43,7 +43,7 @@ $border-colour: #f1f5f9;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.75rem 0;
+    padding: 1rem 0 ;
     // margin-top: -3rem;
 
     // LOGO STYLING
@@ -97,7 +97,7 @@ $border-colour: #f1f5f9;
 // HERO SECTION
 .hero-section{
     display: grid;
-    grid-template-columns: 0.9fr 1.1fr;
+    grid-template-columns: 1.1fr 1.9fr;
     gap: 3rem;
     align-items: center;
     margin-top: 2.5rem;
@@ -111,13 +111,14 @@ $border-colour: #f1f5f9;
     .hero-content{
         .badge-tag{
             display: inline-flex;
+            align-items: center;
             gap: 0.4rem;
             background-color: #eff6ff;
             color: #2563eb;
             font-size: 0.75rem;
             font-weight: 700;
             letter-spacing: 0.05rem;
-            padding: 0.4rem 0,9rem;
+            padding: 0.65rem 1.2rem;
             border-radius: 999px;
             margin-bottom: 2rem;
 
