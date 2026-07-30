@@ -121,6 +121,58 @@ services:
       timeout: 10s
       retries: 3
 
+# this will record everything that happens 
+# able to query 
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: momently-prometheus
+
+    ports:
+      - "9090:9090"
+
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    
+    depends_on:
+      backend:
+          condition: service_healthy
+      node-exporter:
+          condition: service_healthy
+
+  # provide dashboards
+  # good for visuals 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: momently-grafana
+
+    ports:
+      - "3000:3000"
+    
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+
+    depends_on:
+      - prometheus
+
+    # node exporter extracts raw metrics like CPU usage, memory consumption, traffic
+    # it does not store or analyse data 
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: momently-node-exporter
+
+    ports:
+      - "9100:9100"
+
+    restart: unless-stopped
+
 volumes:
   postgres_data:
     name: momently-postgres-data
+  grafana-storage:
+
+
+# Prometheus, Node exporter & Grafana - https://www.youtube.com/watch?v=8ubjLF-q4sw
+# node exporter runs on linus server, prometheus creates the metrics and stores them histroically and grafana query promethus and shows the metrics in dashboard 

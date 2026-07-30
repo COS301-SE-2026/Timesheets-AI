@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - dev
 
 
 jobs:
@@ -52,6 +53,26 @@ jobs:
               --password-stdin \
               ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
+            echo "Pulling the latest images"
             docker compose --env-file .env.production -f docker-compose.prod.yml pull
+            
+            echo "Starting the containers"
             docker compose --env-file .env.production -f docker-compose.prod.yml up -d --remove-orphans
+            
+            echo "Healthcheck running"
+            for i in {1..12}; do
+              if curl --fail http://localhost/actuator/health > /dev/null; then
+                echo "Application is healthy"
+                exit 0
+              fi
+
+              echo "Waiting ($i/12)"
+              sleep 10
+
+              if [ "$i" -eq 12 ]; then
+                echo "Health check failed"
+                exit 1
+              fi
+            done
+            
             docker image prune -f
