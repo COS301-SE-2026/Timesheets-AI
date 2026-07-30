@@ -166,8 +166,15 @@ PROJECT CARDS
     transition: 0.2s;
 }
 
+.project-card-link{
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
 .project-card:hover{
     transform: translateY(-5px);
+    cursor: pointer;
 }
 
 .project-card-header{
@@ -250,6 +257,7 @@ STATUS BADGES
     font-size: 0.8rem;
     font-weight: 600;
 }
+
 /*
 STATUS DROPDOWN
 */
@@ -262,6 +270,7 @@ STATUS DROPDOWN
     cursor: pointer;
     min-width: 170px;
 }
+
 /*
 DESCRIPTION
 */
@@ -274,7 +283,6 @@ DESCRIPTION
 /*
 TAGS
 */
-
 .tags-title{
     color: #6b7280;
     font-size: 15px;

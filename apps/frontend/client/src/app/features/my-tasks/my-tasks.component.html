@@ -16,9 +16,10 @@
             </div>
             <div class="summary-card-content">
             <div class="summary-card-value" aria-live="polite">
-                {{ totalCount() }}
+                {{ activeCount() }}
             </div>
-            <div class="summary-card-label text-caption"> Total Tasks</div>
+            <div class="summary-card-label text-caption"> Active</div>
+            <div class="summary-card-subtitle text-caption"> Includes To Do &amp; In progress</div>
             </div>
         </div>
 
@@ -60,7 +61,7 @@
             <div class="summary-card-value" aria-live="polite">
                 {{ archivedCount() }}
             </div>
-            <div class="summary-card-label text-caption"> Archived</div>
+            <div class="summary-card-label text-caption"> Blocked</div>
          </div>
         </div>
       </section>
@@ -103,7 +104,7 @@
 
              <label class="checkbox-label">
                 <input type="checkbox" [ngModel]="showArchived()" (ngModelChange)="showArchived.set($event); applyFilters()" aria-label="Show archived tasks"/>
-                Show Archived
+                Show Blocked
              </label>
           </div>
       </section>
@@ -144,7 +145,7 @@
                             </td>
 
                             <td class="project-link">
-                                <a (click)="navigateToProject(task.projectId)" class="project-name-link text-body" [attr.aria-label]="'View project ' + task.projectName">{{ task.projectName }}</a>
+                                <a (click)="navigateToProject(task.projectId)" (keydown.enter) = "navigateToProject(task.projectId)" (keydown.space)= "navigateToProject(task.projectId)" tabindex ="0" class="project-name-link text-body" [attr.aria-label]="'View project ' + task.projectName">{{ task.projectName }}</a>
                             </td>
 
 
@@ -181,7 +182,7 @@
                              <td class="text-body text-right font-mono" > {{ task.estimatedHours }}h </td>
                              <td class="text-body text-right font-mono"> {{ task.actualHours }}h </td>
                              <td class="text-center">
-                                <button type="button"  (keydown)="onOverlayKeydown($event)" class="view-button"  (click)="onViewTask(task)" [attr.aria-label]="'View details for ' + task.title">
+                                <button type="button" class="view-button"  (click)="onViewTask(task)" [attr.aria-label]="'View details for ' + task.title">
                                 <i class="fa-regular fa-eye"></i> 
                                 View </button>
                              </td>
@@ -200,8 +201,21 @@
       </section>
 
       @if(isDetailOpen()) {
-        <div class="modal-overlay"  (keydown)="onOverlayKeydown($event)" (click)="closeTaskDetail()">
-            <div class="modal-panel" aria-modal="true" aria-labelledby="task-detail-title"  (keydown)="onOverlayKeydown($event)" (click)="$event.stopPropagation()">
+        <div
+            class="modal-overlay"
+            role="button"
+            tabindex="0"
+            aria-label="Close task detail"
+            (click)="onOverlayClick($event)"
+            (keydown.enter)="closeTaskDetail()"
+            (keydown.space)="closeTaskDetail()"
+            >
+            <div
+                class="modal-panel"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="task-detail-title"
+            >
                 <header class="modal-header">
                     <h2 id="task-detail-title" class="modal-title"> Task Detail </h2>
                     <button type="button" class="modal-close" (click)="closeTaskDetail()" aria-label="Close task detail">

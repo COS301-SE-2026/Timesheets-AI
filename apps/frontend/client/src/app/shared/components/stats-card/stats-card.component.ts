@@ -8,6 +8,7 @@ import { ProgressBarComponent } from '../progress-bar/progress-bar.component';
   templateUrl: './stats-card.component.html',
   styleUrl: './stats-card.component.scss'
 })
+
 export class StatsCardComponent {
   @Input() label = '';
   @Input() value = '';
