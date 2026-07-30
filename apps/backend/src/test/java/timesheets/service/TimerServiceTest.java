@@ -100,6 +100,14 @@ class TimerServiceTest {
     return timer;
   }
 
+  private TimerSession createPausedTimer() {
+    TimerSession timer = createActiveTimer();
+    timer.setIsPaused(true);
+    timer.setPausedAt(LocalDateTime.now().minusMinutes(30));
+    timer.setPausedDurationSeconds(1800L);
+    return timer;
+  }
+
   @Nested
   @DisplayName("Start Timer Tests")
   class StartTimerTests {
@@ -189,6 +197,38 @@ class TimerServiceTest {
 
       // checking that the timer was paused exactly 1 time
       verify(timerSessionRepository, times(1)).save(activeTimer);
+    }
+  }
+
+  @Nested
+  @DisplayName("Resume Timer Tests")
+  class ResumeTimerTests {
+
+    @Test
+    @DisplayName("should resume paused timer successfully")
+    void resumeTimer() {
+
+      // ARRANGE: trying to simulate the paused timer state
+      TimerSession pausedTimer = createPausedTimer();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+
+      // when an active timer is returned, the paused timer is the one that is returned
+      when(timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId))
+          .thenReturn(Optional.of(pausedTimer));
+      when(timerSessionRepository.save(any(TimerSession.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      // ACT: actually calling the actual resume function
+      TimerSession result = timerService.resumeTimer();
+
+      // ASSERT
+      assertThat(result).isNotNull(); // the timer still exists
+      assertThat(result.getIsPaused()).isFalse(); // no longer paused
+      assertThat(result.getPausedAt()).isNull(); // timestamp cleared
+      assertThat(result.getPausedDurationSeconds()).isGreaterThan(0);
+
+      verify(timerSessionRepository, times(1)).save(pausedTimer);
     }
   }
 }
