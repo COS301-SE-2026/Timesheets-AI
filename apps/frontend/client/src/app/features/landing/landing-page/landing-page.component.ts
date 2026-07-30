@@ -65,7 +65,7 @@ export class LandingPageComponent {
       description: 'AI detects anomalies and ensures your time data is accurate and reliable.',
       bgColor: '#faf5ff',
       iconColor: '#9333ea',
-      icon: 'fa-solid fa-shiel-halved'
+      icon: 'fa-solid fa-shield-halved'
     },
   ];
 
