@@ -14,6 +14,7 @@ export interface ProjectMember{
     lastName: string;
     email: string;
     hoursLogged: number;
+    hoursLoggedLabel: string;
     role: ProjectRole;
     joinedAt: string;
 }
