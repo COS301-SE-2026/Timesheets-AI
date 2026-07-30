@@ -231,4 +231,38 @@ class TimerServiceTest {
       verify(timerSessionRepository, times(1)).save(pausedTimer);
     }
   }
+
+  @Nested
+  @DisplayName("Get Active Timer Tests")
+  class GetActiveTimerTests {
+
+    @Test
+    @DisplayName("returns an active timer")
+    void getActiveTimerExists() {
+
+      // ARRANGE: to simulate an active timer
+      TimerSession activeTimer = createActiveTimer();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+
+      // the test timer should be returned
+      when(timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId))
+          .thenReturn(Optional.of(activeTimer));
+
+      // ACT: calling the method we are testing
+      TimerSession result = timerService.getActiveTimer();
+
+      // ASSERT
+      assertThat(result).isNotNull();
+      assertThat(result.getId())
+          .isEqualTo(
+              activeTimer.getId()); // making sure that the actual test timer is what is returned
+      assertThat(result.getWorkspaceMemberId()).isEqualTo(workspaceMemberId);
+      assertThat(result.getIsRunning()).isTrue();
+
+      // checking that the repo was called to get the actual timer
+      verify(timerSessionRepository, times(1))
+          .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId);
+    }
+  }
 }
