@@ -5,13 +5,14 @@
   ============================================================ */
 
 import { Routes } from '@angular/router';
+import { LandingPageComponent } from './features/landing/landing-page/landing-page.component';
 
 export const routes: Routes = [
 
   /* Default redirect */
   {
     path: '',
-    redirectTo: 'signup',
+    component: LandingPageComponent,
     pathMatch: 'full'
   },
 
