@@ -17,7 +17,13 @@ RUN apt-get update \
  
 # Install dependencies first (layer caching)
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+# upgrade pip tooks
+RUN python -m pip install --upgrade \
+    pip==25.0.1 \
+    setuptools==75.3.4 \
+    wheel==0.45.1
+    && pip install --no-cache-dir -r requirements.txt
  
 # Copy only necessary files explicitly
 COPY main.py .
