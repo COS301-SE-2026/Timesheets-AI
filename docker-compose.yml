@@ -55,13 +55,15 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: dev
 
+      SERVER_PORT: ${SERVER_PORT:-8080}
+
       # FIX: correct Docker networking (NEVER localhost inside containers)
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-momently_dev}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-momently}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
 
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
@@ -89,10 +91,11 @@ services:
     environment:
       API_URL: http://backend:8080
     ports:
+    
       - "4200:4200"
     volumes:
-      - ./apps/frontend/client:/app/client
-      - /app/client/node_modules
+      - ./apps/frontend/client:/app/apps/frontend/client
+      - /app/node_modules
 
   ai-service:
     image: momently-ai

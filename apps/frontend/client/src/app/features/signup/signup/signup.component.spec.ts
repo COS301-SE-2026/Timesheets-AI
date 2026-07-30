@@ -19,6 +19,28 @@ import {
   RegisterResponse,
 } from '../../../core/services/auth.service';
 import { SignupComponent } from './signup.component';
+import { FormGroup } from '@angular/forms';
+
+interface SignupComponentInternals {
+  signupForm: FormGroup;
+  brandLogo: string;
+  showPassword: boolean;
+  submitted: boolean;
+  loading: boolean;
+  errorMessage: string;
+  showNameError: boolean;
+  nameErrorMessage: string;
+  showSurnameError: boolean;
+  surnameErrorMessage: string;
+  showEmailError: boolean;
+  emailErrorMessage: string;
+  showPasswordError: boolean;
+  passwordErrorMessage: string;
+  showTermsError: boolean;
+  termsErrorMessage: string;
+  togglePasswordVisibility(): void;
+  createAccount(): void;
+}
 
 describe('AuthService - register', () => {
   let service: AuthService;
@@ -28,7 +50,7 @@ describe('AuthService - register', () => {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@momentum.co.za',
-    password: 'Password1!',
+    password: 'Password1!!!!',
   };
 
   beforeEach(() => {
@@ -158,7 +180,7 @@ rendering the component and asserting on both its class state and its template o
 describe('SignupComponent', () => {
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
-  let componentInstance: any;
+  let componentInstance: SignupComponentInternals;
   let httpMock: HttpTestingController;
   let router: Router;
 
@@ -166,7 +188,7 @@ describe('SignupComponent', () => {
     name: 'John',
     surname: 'Doe',
     email: 'john@company.com',
-    password: 'Password1',
+    password: 'Password1!!!',
     acceptedTerms: true,
   };
 
@@ -182,7 +204,7 @@ describe('SignupComponent', () => {
 
     fixture = TestBed.createComponent(SignupComponent);
     component = fixture.componentInstance;
-    componentInstance = component as any;
+    componentInstance = component as unknown as SignupComponentInternals;
     httpMock = TestBed.inject(HttpTestingController);
     router = TestBed.inject(Router);
 
@@ -201,11 +223,11 @@ describe('SignupComponent', () => {
   //Test that the signup form starts with default invalid values
   it('should initialise the signup form as invalid', () => {
     expect(componentInstance.signupForm.invalid).toBe(true);
-    expect(componentInstance.signupForm.controls.name.value).toBe('');
-    expect(componentInstance.signupForm.controls.surname.value).toBe('');
-    expect(componentInstance.signupForm.controls.email.value).toBe('');
-    expect(componentInstance.signupForm.controls.password.value).toBe('');
-    expect(componentInstance.signupForm.controls.acceptedTerms.value).toBe(
+    expect(componentInstance.signupForm.controls['name'].value).toBe('');
+    expect(componentInstance.signupForm.controls['surname'].value).toBe('');
+    expect(componentInstance.signupForm.controls['email'].value).toBe('');
+    expect(componentInstance.signupForm.controls['password'].value).toBe('');
+    expect(componentInstance.signupForm.controls['acceptedTerms'].value).toBe(
       false,
     );
   });
@@ -255,8 +277,8 @@ describe('SignupComponent', () => {
 
   //Test name validation rules
   it('should validate name minimum length', () => {
-    componentInstance.signupForm.controls.name.setValue('J');
-    componentInstance.signupForm.controls.name.markAsTouched();
+    componentInstance.signupForm.controls['name'].setValue('J');
+    componentInstance.signupForm.controls['name'].markAsTouched();
 
     expect(componentInstance.showNameError).toBe(true);
     expect(componentInstance.nameErrorMessage).toBe(
@@ -266,8 +288,8 @@ describe('SignupComponent', () => {
 
   //Test that valid names do not show errors
   it('should return an empty name error message when name is valid', () => {
-    componentInstance.signupForm.controls.name.setValue('John');
-    componentInstance.signupForm.controls.name.markAsTouched();
+    componentInstance.signupForm.controls['name'].setValue('John');
+    componentInstance.signupForm.controls['name'].markAsTouched();
 
     expect(componentInstance.showNameError).toBe(false);
     expect(componentInstance.nameErrorMessage).toBe('');
@@ -275,8 +297,8 @@ describe('SignupComponent', () => {
 
   //Test surname validation rules
   it('should validate surname minimum length', () => {
-    componentInstance.signupForm.controls.surname.setValue('D');
-    componentInstance.signupForm.controls.surname.markAsTouched();
+    componentInstance.signupForm.controls['surname'].setValue('D');
+    componentInstance.signupForm.controls['surname'].markAsTouched();
 
     expect(componentInstance.showSurnameError).toBe(true);
     expect(componentInstance.surnameErrorMessage).toBe(
@@ -286,8 +308,8 @@ describe('SignupComponent', () => {
 
   //Test that valid surnames do not show errors
   it('should return an empty surname error message when surname is valid', () => {
-    componentInstance.signupForm.controls.surname.setValue('Doe');
-    componentInstance.signupForm.controls.surname.markAsTouched();
+    componentInstance.signupForm.controls['surname'].setValue('Doe');
+    componentInstance.signupForm.controls['surname'].markAsTouched();
 
     expect(componentInstance.showSurnameError).toBe(false);
     expect(componentInstance.surnameErrorMessage).toBe('');
@@ -295,8 +317,8 @@ describe('SignupComponent', () => {
 
   //Test that terms error disappears once terms are accepted
   it('should return an empty terms error message when terms are accepted', () => {
-    componentInstance.signupForm.controls.acceptedTerms.setValue(true);
-    componentInstance.signupForm.controls.acceptedTerms.markAsTouched();
+    componentInstance.signupForm.controls['acceptedTerms'].setValue(true);
+    componentInstance.signupForm.controls['acceptedTerms'].markAsTouched();
 
     expect(componentInstance.showTermsError).toBe(false);
     expect(componentInstance.termsErrorMessage).toBe('');
@@ -304,8 +326,8 @@ describe('SignupComponent', () => {
 
   //Test email validation for incorrect email formats
   it('should validate email format', () => {
-    componentInstance.signupForm.controls.email.setValue('invalid-email');
-    componentInstance.signupForm.controls.email.markAsTouched();
+    componentInstance.signupForm.controls['email'].setValue('invalid-email');
+    componentInstance.signupForm.controls['email'].markAsTouched();
 
     expect(componentInstance.showEmailError).toBe(true);
     expect(componentInstance.emailErrorMessage).toBe(
@@ -315,8 +337,8 @@ describe('SignupComponent', () => {
 
   //Test that valid emails do not show errors
   it('should return an empty email error message when email is valid', () => {
-    componentInstance.signupForm.controls.email.setValue('john@company.com');
-    componentInstance.signupForm.controls.email.markAsTouched();
+    componentInstance.signupForm.controls['email'].setValue('john@company.com');
+    componentInstance.signupForm.controls['email'].markAsTouched();
 
     expect(componentInstance.showEmailError).toBe(false);
     expect(componentInstance.emailErrorMessage).toBe('');
@@ -324,8 +346,8 @@ describe('SignupComponent', () => {
 
   //Test password validation rules
   it('should validate password length and content requirements', () => {
-    componentInstance.signupForm.controls.password.setValue('password');
-    componentInstance.signupForm.controls.password.markAsTouched();
+    componentInstance.signupForm.controls['password'].setValue('password');
+    componentInstance.signupForm.controls['password'].markAsTouched();
 
     expect(componentInstance.showPasswordError).toBe(true);
     expect(componentInstance.passwordErrorMessage).toBe(
@@ -335,8 +357,8 @@ describe('SignupComponent', () => {
 
   //Test that valid passwords do not show errors
   it('should return an empty password error message when password is valid', () => {
-    componentInstance.signupForm.controls.password.setValue('Password1');
-    componentInstance.signupForm.controls.password.markAsTouched();
+    componentInstance.signupForm.controls['password'].setValue('Password1!!!');
+    componentInstance.signupForm.controls['password'].markAsTouched();
 
     expect(componentInstance.showPasswordError).toBe(false);
     expect(componentInstance.passwordErrorMessage).toBe('');
@@ -362,7 +384,7 @@ describe('SignupComponent', () => {
       firstName: 'John',
       lastName: 'Doe',
       email: 'john@company.com',
-      password: 'Password1',
+      password: 'Password1!!!',
     });
 
     req.flush({

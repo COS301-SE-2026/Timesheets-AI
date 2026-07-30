@@ -1,123 +1,314 @@
-<app-header [title]="'Timesheet'">
-  <div class="header-timeline-picker text-body">
-    <i class="fa-regular fa-calendar-days cal-icon"></i>
-    <strong>Current Week</strong>
-    <!-- Previous / current / next week navigation -->
-    <!-- <div class="chevron-navigation-buttons">
-      <span>&lt;</span>
-      <span class="active-dot">&bull;</span>
-      <span>&gt;</span>
-    </div> -->
-  </div>
-</app-header>
+<div class="timesheets-page">
 
-
-  <!-- created to these cards to add nice visual insights and make the page less tableyy  -->
-  <!-- make use of the shared component progress -->
-
-<div class="timesheet-outer-dashboard-frame">
-  <div class="metrics-summary-overview-grid">
-    <div class="metric-card-widget">
-      <span class="widget-label text-caption">Total Hours</span>
-      <div class="widget-value-row">
-        <h3>27h 30m</h3>
-          <!-- Weekly trend indicator -->
-        <span class="trending-badge upward"><i class="fa-solid fa-arrow-trend-up"></i> +4.2h</span>
-      </div>
-    </div>
-    
-   <!-- Uses shared reusable progress component -->
-   <div class="metric-card-widget">
-    <span class="widget-label text-caption">Weekly Goal Progress</span>
-    <div class="widget-value-row">
-      <app-progress-bar [progress]="68.7" class="weekly-progress-wrapper"></app-progress-bar>
-    </div>
-  </div>
-
-    <div class="metric-card-widget">
-      <span class="widget-label text-caption">Most Active Project</span>
-      <div class="widget-value-row">
-        <h3>Project Data Room </h3>
-        <span class="project-indicator" style="background-color: var(--color-secondary)"></span>
-      </div>
+  <!-- Page header -->
+   <header class="page-header">
+    <div class="page-header-titles">
+      <h1 class="page-header-title"> Timesheets </h1>
+      <p class="page-header-subtitles"> View and manage your timesheets.</p>
     </div>
 
-    <div class="metric-card-widget">
-      <span class="widget-label text-caption">Approval Status</span>
-      <div class="widget-value-row">
-        <span class="status-badge-pill state-draft">In Review</span>
-      </div>
+    <div class="page-header-actions" >
+
+      <!-- INTEGRATION: Oprions come from GET /api/timesheets/me (or status filter), changing selection should load GET /api/timesheets/{id} + /entries -->
+
+      <!-- Week picker -->
+       <label class="week-picker" for="week-picker">
+        <span class="week-picker-name">Week</span>
+        <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+        <select 
+          id="week-picker"
+          class="week-picker-select"
+          [ngModel]="selectedTimesheetId()"
+          (ngModelChange)="onWeekChange($event)"
+          [disabled]="uiState() === 'loading' || filteredTimesheets().length === 0">
+          @for (week of filteredTimesheets(); track week.summary.id) {
+            <option [value]="week.summary.id">
+              Week {{ week.summary.weekNumber }} . {{ week.summary.periodLabel }}
+            </option>
+          }
+        </select>
+        <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
+
+       </label>
+
     </div>
-  </div>
+  </header>
 
-  <!-- timesheet table shows weekday and dates -->
-  <div class="timesheet-data-table-grid-card">
-    
-    <div class="table-grid-row structural-header-columns text-label">
-      <div class="grid-cell alignment-left-column">TASKS</div>
+  <!-- Status filters : Integrate GET /api/timesheets/me/status/{status}
+   UI focuses on weekly detail status chips
+    -->
 
-    <!-- days array in the .ts -->
-      @for (day of days; track day.label) {
-        <div class="grid-cell date-cell" [class.highlighted-today-column]="day.isToday">
-          {{ day.label }}
-        </div>
+    <div class="status-filters" role="tablist" aria-label="Filter timesheets by status">
+      @for (filter of statusFilters; track filter) {
+        <button type="button" role="tab" class="status-filters-chip" [class.is-active]="selectedFilter() === filter" [attr.aria-selected]="selectedFilter() === filter" (click)="onFilterChange(filter)">
+          {{ filter === 'ALL' ? 'All' : statusLabel(filter) }}
+        </button>
       }
     </div>
 
-    @for (taskItem of tasks; track taskItem.title) {
-      <div class="table-grid-row tracking-data-entry-item-row">
-        <div class="grid-cell alignment-left-column task-meta-identity-details">
-          <div class="item-primary-row">
-            <span class="colored-badge-dot" [style.background-color]="taskItem.colorCode"></span>
-            <span class="interactive-task-link text-body-strong">{{ taskItem.title }}</span>
-          </div>
-          <div class="item-sub-metadata-row text-caption">
-            <span class="project-tag-text">{{ taskItem.project }}</span>
-            @if (taskItem.category) {
-              <span class="separator-pipe">|</span>
-              <span class="category-text-label">{{ taskItem.category }}</span>
-            }
-          </div>
-        </div>
+    <!-- Loading -->
 
-         <!-- Time box -->
-        <!-- Filled style only applied if time exists -->
-        @for (hourValue of taskItem.loggedHours; track $index) {
-          <div class="grid-cell segment-time-value" 
-               [class.highlighted-today-column]="days[$index].isToday"
-               [attr.data-intensity]="hourValue !== '-' ? 'high' : 'none'">
-            <div class="time-input-box" [class.filled-box]="hourValue !== '-'">
-              <!-- no time then replaced with a dash -->
-              {{ hourValue === '-' ? '–' : hourValue }}
-            </div>
-          </div>
-        }
-      </div>
+    @if (uiState() === 'loading') {
+      <output class="state-panel state-panel--loading">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Loading timesheets...</p>
+      </output>
     }
 
-    <!-- daily summary row-->
-    <div class="table-grid-row aggregate-summary-values-row text-mono">
-      <div class="grid-cell alignment-left-column text-body-strong summary-title-accent">Total Summary</div>
-      @for (totalAmount of dailyTotals; track $index) {
-        <div class="grid-cell computed-sum-cell" [class.highlighted-today-column]="days[$index].isToday">
-          {{ totalAmount === '-' ? '0:00' : totalAmount }}
-        </div>
+   <!-- Error -->
+
+   @else if (uiState() === 'error') {
+   <div class="state-panel state-panel--error" role="alert">
+    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+    <p>{{ errorMessage() || 'Something went wrong.'}}</p>
+    <button type="button" class="btn btn--secondary" (click)="loadTimesheets()">Try again</button>
+   </div>
+   }
+
+<!-- Empty (no timesheets for filter) -->
+
+@else if (uiState() === 'empty' || !summary()) {
+  <div class="state-panel state-panel--empty">
+    <i class="fa-regular fa-clipboard" aria-hidden="true"></i>
+    <h2>No timesheets found</h2>
+    <p>
+      @if (selectedFilter() !== 'ALL') {
+        No timesheets match the "{{ statusLabel(selectedFilter()) }}" filter.
+      } @else {
+        Timesheets appear automatically when you log time.
       }
-    </div>
-
+    </p>
+    <a class="btn btn--primary" routerLink="/log-time">
+      <i class="fa-regular fa-clock" aria-hidden="true"></i>
+      Log Time
+    </a>
   </div>
+}
 
-  <!--- Submit CTA -->
-  <div class="timesheet-action-footer-toolbar">
-    <div class="left-action-cluster">
-      <!-- using the font awesome icons -->
-      <button class="btn btn-secondary"><i class="fa-solid fa-plus btn-icon"></i>Add new row</button>
-      <button class="btn btn-secondary"><i class="fa-regular fa-copy btn-icon"></i>Copy last week</button>
-      <button class="btn btn-secondary"><i class="fa-regular fa-floppy-disk btn-icon"></i>Save as template</button>
-    </div>
-    <div class="right-action-cluster">
-      <button class="btn btn-primary">Submit for approval</button>
-    </div>
-  </div>
+   <!-- Weekly detail -->
+    @else {
+      @if (summary(); as s) {
+        <!-- Summary card -->
+         <article class="summary-card" aria-label="Timesheet summary">
+          <div class="summary-card-main">
+            <div class="summary-card-period">
+              <span class="summary-card-icon" aria-hidden="true">
+                <i class="fa-regular fa-calendar-days"></i>
+              </span>
+              <div>
+                <strong class="summary-card-week"> Week {{ s.weekNumber }} </strong>
+                <span class="summary-card-dates"> {{ s.periodLabel }} </span>
+              </div>
+            </div>
 
+            <dl class="summary-card-meta">
+
+
+             <div class="summary-meta-card">
+                <i class="fa-regular fa-file-lines summary-meta-icon" aria-hidden="true"></i>
+                <dt>Status</dt>
+                <dd>
+                  <span class="status-badge" [attr.data-status]="s.status">{{ s.status }} </span>
+                </dd>
+            </div>
+            
+            <div class="summary-meta-card">
+              <i class="fa-regular fa-calendar summary-meta-icon" aria-hidden="true"></i>
+                <dt>Submitted On </dt>
+                <dd> {{ formatDate(s.submittedAt) }} </dd>
+            </div>
+
+            <div class="summary-meta-card">
+              <i class="fa-solid fa-lock summary-meta-icon" [class.fa-lock]="s.isLocked" [class.fa-lock-open]="!s.isLocked" aria-hidden="true"></i>
+                <dt>Locked</dt>
+                <dd class="summary-card-locked"> {{ s.isLocked ? 'Yes' : 'No' }}  
+                </dd>
+              </div>
+
+              <div class="summary-meta-card">
+                <i class="fa-regular fa-clock summary-meta-icon" aria-hidden="true"></i>
+                <dt>Updated At</dt>
+                <dd>{{ formatDateTime(s.updatedAt) }} </dd>
+              </div>
+              </dl>
+
+          </div>
+
+          
+          <div class="summary-card-reason">
+            <strong> Reason (if applicable) </strong>
+            <span> {{ s.rejectionReason || '-' }} </span>
+          </div>
+         </article>
+      }
+
+      <!-- Entries table or empty entries -->
+       @if(hasEntries()) {
+       <section class="entry-table-wrapper" aria-label="Weekly time entries">
+        <table class="entry-table">
+          <thead>
+            <tr>
+              <th class="col-task">Task</th>
+              @for (day of days(); track day.dateStr) {
+                <th class="col-day" [class.highlighted-today-column]="day.isToday">
+                  {{ day.label }}
+                </th>
+              }
+              <th class="col-total">Total</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (task of tasks(); track task.id) {
+              <tr>
+                <td class="col-task">
+                  <div class="task-cell">
+                    <span class="task-cell-dot" [style.background-color]="task.colorCode" aria-hidden="true"></span>
+                    <div class="task-cell-text">
+                      <strong class="task-cell-title"> {{ task.title }} </strong>
+                      <span class="task-cell-meta">
+                        {{ task.project }}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+
+                @for (hours of task.loggedHours; track $index) {
+                  <td class="col-day" [class.is-empty]="hours === '-'" [class.highlighted-today-column]="days()[$index].isToday">
+                    {{ displayHours(hours) }}
+                  </td>
+                }
+                
+                <td class="col-total">
+                  {{ task.total }} 
+                </td>
+
+              </tr>
+            }
+          </tbody>
+
+          <tfoot>
+            <tr class="daily-total-row">
+              <td class="col-task"> 
+                <strong>Daily Total</strong>
+              </td>
+              @for (total of dailyTotals(); track $index) {
+                <td class="col-day">
+                  <strong> {{ total }}</strong>
+                </td>
+              }
+              <td class="col-total grand-total"> 
+               {{ grandTotal() }} 
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </section>
+
+       <!-- Role / status actions -->
+        
+       <div class="detail-actions">
+        @if (canSubmit()) {
+          <!-- INTEGRATION: POST /api/timesheets/{id}/submit -->
+
+          <button type="button" class="btn btn--submit" [disabled]="actionPending()" (click)="openSubmitDialog()">
+            <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+             Submit Timesheet</button>
+        }
+
+        @if (summary()?.status === 'SUBMITTED' && !isManager()) {
+            <p class="awaiting-review">
+              <i class="fa-regular fa-clock" aria-hidden="true"></i>
+              Awaiting review
+            </p>          
+        }
+
+        @if (canApproveOrReject()) {
+          <!-- INTEGRATION: POST /api/timesheets/{id}/approvr or reject -->
+           <button type="button" class="btn btn--primary" [disabled]="actionPending()" (click)="onApproveTimesheet()"> Approve</button>
+           <button type="button" class="btn btn--danger" [disabled]="actionPending()" (click)="openRejectDialog()"> Reject</button>
+        }
+
+        @if (isReadOnly() && summary()?.status === 'APPROVED') {
+          <p class="read-only-note"> This timesheet is approved and locked </p>
+        }
+        </div>
+      } @else {
+        <!-- Timesheets exist but not entries yet -->
+         <section class="state-panel state-panel--empty">
+          <i class="fa-regular fa-clock" aria-hidden="true"></i>
+          <h2>No time entries yet</h2>
+          <p>You haven't logged any time entries for this week. Log time to populate this timesheet.</p>
+          <a class="btn btn--primary" routerLink="/log-time">
+            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+            Log Time
+          </a>
+         </section>
+      }
+    }
+
+    <!-- Submit confirmation modal -->
+    @if (showSubmitDialog()){
+    <button = "button" aria-label="Close dialog" (click)="closeSubmitDialog()" ></button>
+
+    <dialog class="modal" aria-labelledby="submit-modal-title" open>
+      <div class="modal-icon" aria-hidden="true">
+        <i class="fa-regular fa-paper-plane"></i>
+      </div>
+
+      <h2 id="submit-modal-title"> Submit timesheet</h2>
+      <p>This timesheet will be sent for approval and cannot be edited while under review.</p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn--secondary" [disabled]="actionPending()" (click)="closeSubmitDialog()"> Cancel</button>
+        <button type="button" class="btn btn--secondary" [disabled]="actionPending()" (click)="confirmSubmitTimesheet()"> Submit </button>
+      </div>
+    </dialog>
+    }
+
+    <!-- Submission sucees modal -->
+
+    @if (showSubmitSuccessDialog()) {
+      <div class="modal-backdrop"></div>
+
+      <dialog class="modal" aria-labelledby="success-modal-title" open>
+        <div class="modal-icon modal-icon--success" aria-hidden="true">
+          <i class="fa-solid fa-check"></i>
+        </div>
+
+        <h2>Timesheet submitted</h2>
+        <p>Your timesheet was submitted successfully and is awaiting review.</p>
+
+        <div class="modal-actions modal-actions--center">
+          <button type="button" class="btn btn--primary" (click)="closeSubmissionSuccessDialog()">Done</button>
+        </div>
+      </dialog>
+    }
+      <!-- Rject Reason dialog -->
+
+      @if (showRejectDialog()) {
+        <div class="dialog-backdrop" aria-hidden="true"></div>
+        <dialog class="dialog" aria-labelledby="reject-dialog-title" open>
+          <h2 id="reject-dialog-title"> Reject Timesheet </h2>
+          <p>Please provide a reason for rejection. The employee will see this on their timesheet.</p>
+          <label class="dialog-label" for="reject-reason">Reason</label>
+          <textarea id="reject-reason" class="dialog-textarea" rows="4" [ngModel]="rejectReason()" (ngModelChange)="rejectReason.set($event)" placeholder="Enter rejection reason..."></textarea>
+          <div class="dialog-actions">
+            <button type="button" class="btn btn--secondary" (click)="closeRejectDialog()">Cancel</button>
+            <button type="button" class="btn btn--danger" [disabled]="!rejectReason().trim() || actionPending()" (click)="onConfirmReject()"> Confirm Reject </button>
+          </div>
+        </dialog>
+      }
+
+   <!-- Success toast -->
+
+   @if (toastMessage(); as toast) {
+    <output class="toast">
+      <span> {{ toast }} </span>
+      <button type="button" class="toast-dismiss" (click)="dismissToast()" aria-label="Dismiss">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </output>
+   }
+    
 </div>

@@ -1,0 +1,57 @@
+# this is the deployment workflow
+
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    # the workflow can only reads 
+    permissions:
+      contents: read
+
+    steps: 
+        # clone repo into Github Actions runner
+      - name: Checkout Repo
+        uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
+
+      # appleboy is plugin to SSH into a server e.g. ec2 instance
+      # so no need to open terminal, ssh -i privatekey.pem ubuntu@IP
+      # it runs all the steps specified in script 
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262
+        with:
+        # EC2 instance connection which are stored as GitHub Secrets
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER}}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+        # these comments below corresponds to the lines below 
+        # Line 46 - set -e wlll make script to end when an error occurs
+        # Line 47 - go to project dir on EC2
+        # Line 48 - 52 - Authenticate Docker with Amazon ECR so that it can get and pull latest images 
+        # Line 54 - Download the latest Docker images from ECR
+        # Line 55 - Restart the containers using updated images 
+        # Line 56 Remove old Docker images 
+        # remove-orphans is to prevent old services containers running and being used. That were used in old docker-compose.yml
+      
+          script: |
+            set -e
+            cd ~/projects/Timesheets-AI 
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
+            | docker login \
+              --username AWS \
+              --password-stdin \
+              ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+            docker compose --env-file .env.production -f docker-compose.prod.yml pull
+            docker compose --env-file .env.production -f docker-compose.prod.yml up -d --remove-orphans
+            docker image prune -f
