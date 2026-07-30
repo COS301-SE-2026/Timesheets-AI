@@ -1,6 +1,8 @@
 package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -95,6 +97,45 @@ class TimesheetServiceTest {
       verify(timesheetRepository)
           .findByWorkspaceMemberIdAndPeriodStartAndPeriodEnd(
               workspaceMemberId, periodStart, periodEnd);
+    }
+  }
+
+  @Nested
+  @DisplayName("Submit Timesheet Tests")
+  class SubmitTimesheetTests {
+
+    @Test
+    @DisplayName("submits a draft timesheet successfully")
+    void submitTimesheet() {
+
+      // ARRANGE
+      // should return the test user
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+
+      // to simulate saving we just return the same object
+      when(timesheetRepository.save(any(Timesheet.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      // ACT: calling the method, to simulate handling the action
+      Timesheet result = timesheetService.submitTimesheet(timesheetId);
+
+      /*
+      - I am expecting that:
+      - the timsheet exists
+      - the status has changed from draft to submitted
+      - the timesheet gets locked
+      - that the locked at is recorded, so just making sure that it is not null
+      - that submitted at is recorded */
+      assertThat(result).isNotNull();
+      assertThat(result.getStatus()).isEqualTo("SUBMITTED");
+      assertThat(result.getIsLocked()).isTrue();
+      assertThat(result.getLockedAt()).isNotNull();
+      assertThat(result.getSubmittedAt()).isNotNull();
+
+      // want to make sure that the repo got called, and timesheet was fetched
+      verify(timesheetRepository, times(1)).findById(timesheetId);
+      verify(timesheetRepository, times(1)).save(any(Timesheet.class));
     }
   }
 }
