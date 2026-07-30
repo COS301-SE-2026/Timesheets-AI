@@ -85,7 +85,8 @@ Related Requirements: N/A
         <div class="features-grid">
             <div 
                 class="features-card"
-                *ngFor="let item of features">
+                *ngFor="let item of features"
+                [style.background]="item.bgColor">
 
                 <div 
                     class="features-icon"

@@ -195,38 +195,43 @@ $border-colour: #f1f5f9;
             border-radius: 16px;
             padding: 1.75rem;
             border: 1px solid $border-colour;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-        &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03);
-        }
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03);
+            }
 
-        .features-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.25rem;
-            font-size: 1.25rem;
-        }
+            .features-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 1.25rem;
+                font-size: 1.25rem;
 
-        h3 {
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin: 0 0 0.5rem 0;
-            color: $text-dark;
-        }
+                i{
+                    font-size: 1.75rem;
+                }
+            }
 
-        p {
-            font-size: 0.875rem;
-            color: $text-muted;
-            line-height: 1.5;
-            margin: 0;
+            h3 {
+                font-size: 1.05rem;
+                font-weight: 700;
+                margin: 0 0 0.5rem 0;
+                color: $text-dark;
+            }
+
+            p {
+                font-size: 0.875rem;
+                color: $text-muted;
+                line-height: 1.5;
+                margin: 0;
+            }
         }
-    }
     }
 }
 
