@@ -74,7 +74,7 @@ export class ProjectDetailsComponent {
 
         return Math.max(
             0,
-            project.budgetHours- project.hoursLogged,
+            project.budgetHours- (project.hoursLogged ?? 0),
         );
 
     });
