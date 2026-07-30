@@ -116,7 +116,6 @@ services:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-frontend:latest
     env_file:
       - .env.production
-    container_name: momently-frontend
     restart: unless-stopped
 
     depends_on:
