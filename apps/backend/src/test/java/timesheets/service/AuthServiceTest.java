@@ -88,6 +88,23 @@ class AuthServiceTest {
         .build();
   }
 
+  // adding an unverified user because there is a test that needs to use this logic
+  private User createUnverifiedTestUser() {
+    return User.builder()
+        .id(testUserId)
+        .email(testEmail)
+        .firstName(testFirstName)
+        .lastName(testLastName)
+        .passwordHash("hashedPassword")
+        .emailVerified(false)
+        .status(UserStatus.ACTIVE)
+        .failedLoginAttempts(0)
+        .lockedUntil(null)
+        .createdAt(LocalDateTime.now())
+        .updatedAt(LocalDateTime.now())
+        .build();
+  }
+
   // creating a registration request, and gives a request object
   private RegisterRequest createValidRegisterRequest() {
     RegisterRequest request = new RegisterRequest();
@@ -151,8 +168,7 @@ class AuthServiceTest {
 
       // ARRANGE
       RegisterRequest request = createValidRegisterRequest();
-      User existingUser = createTestUser();
-      existingUser.setEmailVerified(false);
+      User existingUser = createUnverifiedTestUser();
 
       // the user already exists in DB but is unverified
       when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(existingUser));
