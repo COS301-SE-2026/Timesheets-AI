@@ -236,7 +236,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                                 Logged
                             </span>
                             <span class="kpi-value primary">
-                                {{ project().hoursLogged }}h
+                                {{ project().hoursLoggedLabel }}h
                             </span>
                         </div>
 
@@ -317,7 +317,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                     </div>
 
                     <span class="summary-value">
-                        {{ project().hoursLogged }}h
+                        {{ project().hoursLoggedLabel }}h
                     </span>
                 </div>
 
@@ -375,7 +375,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                                 </span>
 
                                 <span class="member-hours">
-                                    {{ member.hoursLogged }} hours logged
+                                    {{ member.hoursLoggedLabel }} hours logged
                                 </span>
                             </div>
                         </div>
