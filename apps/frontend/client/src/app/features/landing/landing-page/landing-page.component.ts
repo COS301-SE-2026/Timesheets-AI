@@ -7,6 +7,7 @@ Related Requirement: N/A
 
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import {
   faClock,
   faChartLine,
@@ -17,12 +18,15 @@ import {
 @Component({
   selector: 'app-landing-page',
   standalone:true,
-  imports: [CommonModule],
+  imports: [CommonModule, FontAwesomeModule],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.scss'
 })
+
 export class LandingPageComponent {
   
+  protected readonly brandLogo= '/assets/momently.png';
+
   features=[
     {
       title: 'Effortless Tracking',
