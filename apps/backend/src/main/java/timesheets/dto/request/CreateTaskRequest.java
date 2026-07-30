@@ -27,7 +27,7 @@ public class CreateTaskRequest {
   @NotNull(message = "Project ID is required")
   private UUID projectId;
 
-  private String jiraTicketId;
+  private String jiraTicketKey;
 
   private UUID parentTaskId;
 
