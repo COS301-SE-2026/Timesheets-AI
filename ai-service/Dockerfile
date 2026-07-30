@@ -17,6 +17,13 @@ RUN apt-get update \
  
 # Install dependencies first (layer caching)
 COPY requirements.txt .
+
+# upgrade pip tooks
+RUN python -m pip install --upgrade \
+    pip \
+    setuptools\
+    wheel
+    
 RUN pip install --no-cache-dir -r requirements.txt
  
 # Copy only necessary files explicitly
