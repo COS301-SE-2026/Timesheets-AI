@@ -21,4 +21,7 @@ public class RegisterResponse {
   private String
       message; // this could be like "Registration successful! Please check your email for the OTP
   // to verify your account."
+
+  // FOR DEMO 2
+  private String verificationToken;
 }
