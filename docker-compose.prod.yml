@@ -65,7 +65,14 @@ services:
       - momently-network 
 
   backend:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-backend:latest
+    # so I can build for now
+    image: momently-backend
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+
+
+    # image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-backend:latest
     restart: unless-stopped
 
     env_file:
@@ -113,7 +120,13 @@ services:
   
 
   frontend:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-frontend:latest
+    # so I can build for now
+    image: momently-fronted
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+
+    # image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-frontend:latest
     env_file:
       - .env.production
     restart: unless-stopped
@@ -127,7 +140,14 @@ services:
 
 
   ai-service:
-    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-ai:latest
+    # so I can build for now
+    image: momently-ai
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+
+
+    # image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-ai:latest
     env_file:
       - .env.production
     restart: unless-stopped
