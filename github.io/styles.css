@@ -1,0 +1,45 @@
+@keyframes float{
+    50%{
+        transform: translateY(12px);
+    }
+}
+
+@media (max-width:800px){
+    header{
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    nav{
+        gap: 10px;
+    }
+
+    .hero,
+    .three,
+    .two,
+    .swatches,
+    .form-grid,
+    .changes{
+        grid-template-columns: 1fr;
+    }
+
+    .hero{
+        min-height: auto;
+    }
+
+    .hero img{
+        max-height: 300px;
+    }
+
+    .dark,
+    .tint{
+        padding-inline: 20px !important; 
+    }
+}
+
+@media (prefers-reduced-motion: reduce){
+    *{
+        animation: none !important;
+        scroll-behavior: auto !important;
+    }
+}
