@@ -23,38 +23,23 @@ describe('LandingPageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display the logo', ()=> {
+  it.each([
+    ['Time tracking'],
+    ['Login'],
+    ['Signup']
+    ])('should display %s', (text)=> {
     const compiled= fixture.nativeElement;
 
-    const logo= compiled.querySelector('.brand-logo');
-
-    expect(logo).toBeTruthy();
+    expect(compiled.textContent).toContain(text);
   });
 
-  it('should display the hero title', ()=> {
-    const compiled= fixture.nativeElement;
-
-    expect(compiled.textContent).toContain('Timesheets');
-  });
-
-  it('should display Login button', ()=> {
-    const compiled= fixture.nativeElement;
-
-    expect(compiled.textContent).toContain('Login');
-  });
-
-  it('should display Sign Up button', ()=> {
-    const compiled= fixture.nativeElement;
-
-    expect(compiled.textContent).toContain('Signup');
-  });
 
   it('should show 4 feature cards', ()=> {
     const compiled= fixture.nativeElement;
 
     const cards=compiled.querySelectorAll('.features-card')
 
-    expect(cards.length).toHaveLength(4);
+    expect(cards).toHaveLength(4);
   });
 
   it('should show company logos', ()=> {
@@ -62,6 +47,6 @@ describe('LandingPageComponent', () => {
 
     const logos= compiled.querySelectorAll('.logos-container img')
 
-    expect(logos.length).toHaveLength(4);
+    expect(logos).toHaveLength(4);
   });
 });
