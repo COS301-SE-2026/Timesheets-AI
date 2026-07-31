@@ -53,7 +53,7 @@
 [![User Manual](https://img.shields.io/badge/User_Manual-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/User-Manual.pdf)
 [![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/Brand-Style-Guide.pdf)
 [![Wireframes](https://img.shields.io/badge/Wireframes-View_PDF-0F4C91?style=for-the-badge&logo=figma&logoColor=white)](./docs/demo-2/wireframes.pdf)
-[![Demo 2 Video](https://img.shields.io/badge/Demo_2-View_Video-E07830?style=for-the-badge&logo=youtube&logoColor=white)](./docs/demo-2/demo2.pdf)
+[![Demo 2 Video](https://img.shields.io/badge/Demo_2-View_Video-E07830?style=for-the-badge&logo=youtube&logoColor=white)]([./docs/demo-2/demo2.pdf](https://drive.google.com/file/d/13bZs6xgG3BOoadcaZzuUZsnlmnaiI3qu/view?usp=drive_link))
 [![Demo 2 Slides](https://img.shields.io/badge/Demo_2-View_Slides-0F4C91?style=for-the-badge&logo=googleslides&logoColor=white)](https://canva.link/4vyzjoad934wpsx)
 
 
@@ -65,10 +65,11 @@
 | Testing Policy | [View PDF](./docs/demo-2/testing-policy.pdf) |
 | User Manual | [View PDF](./docs/demo-2/User-Manual.pdf) |
 | Brand Style Guide | [View PDF](./docs/demo-2/Brand-Style-Guide.pdf) |
-| Wireframes | [View PDF](./docs/demo-2/wireframes.pdf) |
-| Demo 2 Video | [View Video](./docs/demo-2/demo2.pdf) |
+| Wireframes | [View Figma ](https://www.figma.com/design/Ras0nDzb87hQtSOP5NZPZK/Wireframe-1?node-id=126-1521&t=H2hiPy2OuQYZ0KTM-1) |
+| Demo 2 Video | [View Video](https://drive.google.com/file/d/13bZs6xgG3BOoadcaZzuUZsnlmnaiI3qu/view?usp=drive_link) |
 | Demo 2 Slides | [View Slides](https://canva.link/4vyzjoad934wpsx) |
 | Brand Style Site | [View Site](https://momently-brand-style.netlify.app/) |
+
 </div>
 </details>
 
