@@ -9,6 +9,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
+
 @Component({
   selector: 'app-landing-page',
   standalone:true,
@@ -20,6 +21,7 @@ import { RouterLink } from '@angular/router';
 export class LandingPageComponent {
   
   protected readonly brandLogo= '/assets/momently.png';
+  activeTab= 'home';
 
   clientLogos=[
     {
@@ -70,4 +72,7 @@ export class LandingPageComponent {
     },
   ];
 
+  setActiveTab(tab: string): void{
+    this.activeTab=tab;
+  }
 }

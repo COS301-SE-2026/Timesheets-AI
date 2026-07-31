@@ -17,7 +17,8 @@ Related Requirements: N/A
         <!-- LOGO AREA -->
         <a 
             class="brand brand--hero" 
-            routerLink="/"
+            (click)="setActiveTab('home')"
+            style="cursor: pointer;"
             aria-label="Momently home">
 
             <img 
@@ -39,6 +40,14 @@ Related Requirements: N/A
 
         <!-- AUTH BUTTON( LOG-IN / SIGN-UP) -->
         <div class="auth-buttons">
+            <button 
+                type="button"
+                class="nav-tab-btn"
+                [class.active]="activeTab === 'help'"
+                (click)="setActiveTab('help')">
+                Help
+            </button>
+
             <a routerLink="/login" class="btn-login">
                 Login
             </a>
