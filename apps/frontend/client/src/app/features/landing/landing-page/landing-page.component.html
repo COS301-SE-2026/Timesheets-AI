@@ -17,7 +17,7 @@ Related Requirements: N/A
         <!-- LOGO AREA -->
         <a 
             class="brand brand--hero" 
-            (click)="setActiveTab('home')"
+            (click)="goHome()"
             style="cursor: pointer;"
             aria-label="Momently home">
 
@@ -48,8 +48,9 @@ Related Requirements: N/A
                 type="button"
                 class="btn-sign-up"
                 [class.active]="activeTab === 'help'"
-                (click)="setActiveTab('help')">
-                Help Menu
+                (click)="setActiveTab(activeTab=== 'home'? 'help': 'home')">
+
+                {{ activeTab === 'home' ? 'Help Menu' : 'Home'}}
             </button>
 
             <a routerLink="/login" class="btn-login">

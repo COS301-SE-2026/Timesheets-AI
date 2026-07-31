@@ -8,12 +8,13 @@ Related Requirement: N/A
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { HourglassComponent } from '../../../shared/components/hourglass/hourglass.component';
 
 
 @Component({
   selector: 'app-landing-page',
   standalone:true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, HourglassComponent],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.scss'
 })
@@ -21,7 +22,7 @@ import { RouterLink } from '@angular/router';
 export class LandingPageComponent {
   
   protected readonly brandLogo= '/assets/momently.png';
-  activeTab= 'home';
+  activeTab: 'home' | 'help' = 'home';
 
   clientLogos=[
     {
@@ -72,7 +73,23 @@ export class LandingPageComponent {
     },
   ];
 
-  setActiveTab(tab: string): void{
+  toggleTab():void{
+    this.activeTab= this.activeTab === 'home' ? 'help' : 'home';
+  }
+
+  goHome():void{
+    this.activeTab = 'home';
+  }
+  
+  setActiveTab(tab: 'home' | 'help'): void{
     this.activeTab=tab;
+  }
+
+  downloadManual():void{
+    window.open('/assets/images/momentum.png', '_blank');
+  }
+
+  watchDemo(): void{
+        window.open('/assets/images/momentum.png', '_blank');
   }
 }

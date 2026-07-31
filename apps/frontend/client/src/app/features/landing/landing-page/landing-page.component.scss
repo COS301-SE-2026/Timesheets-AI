@@ -57,6 +57,23 @@ $border-colour: #f1f5f9;
     align-items: center;
     gap: 1.25rem;
 
+    .nav-toggle-btn{
+        background: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: $text-dark;
+        cursor: pointer;
+        transition: color 0.2s ease;
+
+        &:hover, &.active{
+            color: var(--color-primary);
+        }
+    }
+
     .btn-login{
         color: white;
         font-weight: 600;
