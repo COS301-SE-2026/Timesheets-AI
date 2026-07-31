@@ -217,3 +217,69 @@ article {
 .dark code {
     color: color;
 }
+
+.btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 10px 18px;
+        border: 1px solid var(--blue);
+        border-radius: 8px;
+        background: var(--blue);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+}
+
+.btn:hover {
+    background: var(--hover);
+}
+
+.secondary {
+    background: var(--orange);
+    border-color: var(--orange);
+}
+
+.outline {
+    background: transparent;
+    color: var(--blue);
+}
+
+.danger {
+    background: #EFB3B3;
+    color: #5C0F0F;
+    border-color: #EFB3B3;
+}
+
+.btn:disabled {
+    opacity: .45;
+}
+
+.swatches {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.swatches div {
+    display: grid;
+    gap: 5px;
+    padding: 18px;
+    border-radius: var(--r);
+    background: #fff;
+    box-shadow: var(--shadow);
+}
+
+.swatches div:before {
+    content: "";
+    height: 100px;
+    border-radius: 10px;
+    background: var(--c);
+}
+
+.swatches span{
+    color: #6B7A99;
+    font-size: 12px;
+}
