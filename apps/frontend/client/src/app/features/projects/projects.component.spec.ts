@@ -70,7 +70,7 @@ const KARABO_MINUTES_RAW = KARABO_HOURS_LOGGED * 60;
 const KEITUMETSE_MINUTES_RAW = 34
 const PROJ1_TEAM_TOTAL_HOURS = 780.0666666666667;
 const PROJ1_TEAM_TOTAL_MINUTES_RAW = PROJ1_TEAM_TOTAL_HOURS * 60; //46804
-const PROJ1_PROGRESS_OVER_BUDGET = 174.62; // deliberately over 100, tests clamping
+const PROJ1_PROGRESS_OVER_BUDGET = 156.01; // deliberately over 100, tests clamping
 
 describe('ProjectsComponent', () => {
   let component: ProjectsComponent;

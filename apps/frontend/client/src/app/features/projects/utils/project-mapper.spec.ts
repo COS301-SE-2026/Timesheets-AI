@@ -29,7 +29,7 @@ const THABANG_HOURS_LOGGED = 240;
 const AMAHLE_HOURS_LOGGED = 0;
 const TEAM_TOTAL_HOURS = 780.0666666666667; // -> "~780h 4m", tests minute rounding
 const TEAM_TOTAL_MINUTES_RAW = TEAM_TOTAL_HOURS*60
-const PROGRESS_OVER_BUDGET = 174.62; //deliberately over 100, tests clamping to 100%
+const PROGRESS_OVER_BUDGET = 156.01; //deliberately over 100, tests clamping to 100%
 
 const ENZOKUHLE_EMAIL = 'enzokuhle.khumalo@momentum.co.za';
 const ENZOKUHLE_MINUTES_LOGGED = 750;
