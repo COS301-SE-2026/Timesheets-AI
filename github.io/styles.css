@@ -99,3 +99,29 @@ header {
     color: var(--blue);
 }
 
+.brand img{
+    width: 34px;
+}
+
+.brand strong {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+nav {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+nav a {
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+nav a:hover{
+  color: var(--blue);
+}
+
