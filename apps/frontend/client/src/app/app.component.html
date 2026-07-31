@@ -1,17 +1,23 @@
 <div class="app-layout">
 
-  <app-sidebar *ngIf="showSidebar"></app-sidebar>
+  @if (showSidebar) {
+    <app-sidebar></app-sidebar>
+  }
 
   <div class="main-layout">
 
-    <app-header *ngIf="showHeader"></app-header>
+    @if (showHeader) {
+      <app-header></app-header>
+    }
 
-  
+
     <main class="page-content" [class.page-content--fullscreen]="isFullscreenPage">
       <router-outlet></router-outlet>
     </main>
 
-    <app-footer *ngIf="showFooter"></app-footer>
+    @if (showFooter) {
+      <app-footer></app-footer>
+    }
 
   </div>
 

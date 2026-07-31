@@ -5,10 +5,10 @@
  * Related Requirement: FR-01 - Application layout
  */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { CommonModule } from '@angular/common';
+
 
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from './shared/components/header/header.component';
@@ -19,15 +19,17 @@ import { FooterComponent } from './shared/components/footer/footer.component';
   standalone: true,
   imports: [
     RouterOutlet,
-    CommonModule,
     SidebarComponent,
     HeaderComponent,
     FooterComponent
-  ],
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
+
 export class AppComponent {
+  private readonly router = inject(Router);
+
   showSidebar = true;
   showHeader = true;
   showFooter = true;
@@ -35,7 +37,7 @@ export class AppComponent {
 
   private readonly hideLayoutRoutes = ['/login', '/signup', '/not-found'];
 
-  constructor(private readonly router: Router) {
+  constructor() {
     this.updateLayout(this.router.url);
     
     this.router.events
@@ -47,11 +49,16 @@ export class AppComponent {
 
 
     private updateLayout(url: string) : void {
-        const isFullscreenPage = this.hideLayoutRoutes.some(r => url.startsWith(r));
-          this.showSidebar = !isFullscreenPage;
-          this.showHeader = !isFullscreenPage;
-          this.showFooter = !isFullscreenPage;
-          this.isFullscreenPage = isFullscreenPage;
+      const isLandingPage = url ==='/';
+
+      const isFullscreenPage = 
+        isLandingPage ||
+        this.hideLayoutRoutes.some(r => url.startsWith(r));
+
+      this.showSidebar = !isFullscreenPage;
+      this.showHeader = !isFullscreenPage;
+      this.showFooter = !isFullscreenPage;
+      this.isFullscreenPage = isFullscreenPage;
 
   }
 }

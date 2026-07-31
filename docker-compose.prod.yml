@@ -1,7 +1,50 @@
 services:
+
+  # EXPLANATION:
+  # acts as public entry point
+  # receieve all HTTP and HTTPS requests from browsers 
+
+  nginx:
+    # to match the frontend image
+    # non-root user for improved security 
+    image: nginxinc/nginx-unprivileged:alpine
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+    # ro makes it to be read only to avoid it being modified 
+    # nginx must mount the ceritificates, will be used by Nginx 
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/proxy.conf:/etc/nginx/proxy.conf:ro
+      - /etc/letsencrypt/:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+
+    depends_on:
+      frontend:
+        condition: service_started
+
+      backend: 
+        condition: service_healthy
+      
+      ai-service:
+        condition: service_healthy
+
+      
+
+    healthcheck: 
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+    networks:
+      - momently-network 
+
   postgres:
     image: postgres:15-alpine
-    container_name: momently-postgres
     restart: unless-stopped
 
     environment:
@@ -19,9 +62,11 @@ services:
       timeout: 5s
       retries: 5
 
+    networks:
+      - momently-network 
+
   redis:
     image: redis:7-alpine
-    container_name: momently-redis
     restart: unless-stopped
 
     healthcheck:
@@ -30,10 +75,16 @@ services:
       timeout: 5s
       retries: 5
 
+    networks:
+      - momently-network 
+
   backend:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-backend:latest
-    container_name: momently-backend
     restart: unless-stopped
+
+    env_file:
+      - .env.production
+    
   
     depends_on:
       postgres:
@@ -47,29 +98,50 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
 
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
 
-    ports:
-      - "8080:8080"
+      SERVER_PORT: ${SERVER_PORT}
+
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+
+      AWS_REGION: ${AWS_REGION}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+    networks:
+      - momently-network
+  
 
   frontend:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-frontend:latest
-    container_name: momently-frontend
+    env_file:
+      - .env.production
     restart: unless-stopped
 
-    depends_on:
-      - backend
+    # this does not need backend in order to start 
 
-    ports:
-      - "80:8080"
+    networks:
+      - momently-network
+
 
   ai-service:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/momently-ai:latest
-    container_name: momently-ai
+    env_file:
+      - .env.production
     restart: unless-stopped
 
     depends_on:
@@ -81,12 +153,22 @@ services:
       BACKEND_URL: http://backend:8080
       ENVIRONMENT: production
 
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
-    ports:
-      - "8000:8000"
+    networks:
+      - momently-network
 
 volumes:
     postgres_data:
       name: momently-postgres-data
 
+# all service container will inside the this network - way better
+networks:
+  momently-network:
+    driver: bridge
 

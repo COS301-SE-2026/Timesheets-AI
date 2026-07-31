@@ -48,30 +48,27 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
-  // TODO: temporarily commented out since another feature is taking priority for now, coming back
-  // to this
   /*
-  @PostMapping("/forgot-password")
-  public ResponseEntity<MessageResponse> forgotPassword(
-  @Valid @RequestBody ForgotPasswordRequest request) {
-  MessageResponse response = authService.forgotPassword(request);
-  return ResponseEntity.ok(response);
-  }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<MessageResponse> forgotPassword(
+        @Valid @RequestBody ForgotPasswordRequest request) {
+      MessageResponse response = authService.forgotPassword(request);
+      return ResponseEntity.ok(response);
+    }
 
-  @PostMapping("/reset-password")
-  public ResponseEntity<MessageResponse> resetPassword(
-  @Valid @RequestBody ResetPasswordRequest request) {
-  MessageResponse response = authService.resetPassword(request);
-  return ResponseEntity.ok(response);
-  }
+    @PostMapping("/reset-password")
+    public ResponseEntity<MessageResponse> resetPassword(
+        @Valid @RequestBody ResetPasswordRequest request) {
+      MessageResponse response = authService.resetPassword(request);
+      return ResponseEntity.ok(response);
+    }
+  */
 
   @PostMapping("/logout")
-  public ResponseEntity<Void> logout(@RequestHeader("Authorization") String
-  authorization) {
-  authService.logout(authorization);
-  return ResponseEntity.noContent().build();
+  public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorization) {
+    authService.logout(authorization);
+    return ResponseEntity.noContent().build();
   }
-  */
 
   @PostMapping("/google")
   public ResponseEntity<AuthResponse> googleAuth(@Valid @RequestBody GoogleAuthRequest request) {

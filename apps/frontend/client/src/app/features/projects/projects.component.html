@@ -1,0 +1,215 @@
+<!--
+Author: Cleopatra Kwenda
+Date: 2026-07-17
+Purpose: will display our desired wireframe of
+all the project that specific user is on.
+Related Requirements: N/A
+
+Updated: 2026-07-28, wired to live endpoints, client/tags removed (no
+backend source for either), hoursLogged/progress now per-card from
+GET /api/projects/{id}.
+Purpose: will display our desired wireframe of
+all the project that specific user is on.
+Related Requirements: N/A
+-->
+
+<!--
+HEADER
+-->
+<app-header [title] ="'Projects'">
+  <div class="header-search">
+    <label for="project-search" class="visually-hid">
+      Search projects
+    </label>
+
+    <input
+      id="project-search"
+      class="project-search-input"
+      type="search"
+      placeholder="Search projects..."
+      [value]="searchTerm"
+      (input)="searchProjects($any($event.target).value)"
+      >
+
+  </div>
+</app-header>
+
+<div class="projects-page-container">
+  <!--
+  PAGE HEADING
+  -->
+  @if (loading) {
+    <div class = "loading-spinner">
+      <i class = "fa-solid fa-spinner fa-spin"></i> Loading projects...
+    </div>
+  }
+
+  @if (error) {
+    <div class = "error-banner">
+      <i class ="fa-solid fa-triangle-exclamation"></i>
+      Couldn't load your projects. Please try again
+    </div>
+  }
+
+  @if (!loading && !error) {
+    <!--
+    STATS CARDS
+    -->
+    <section class="projects-statistics-grid">
+      <app-stats-card
+        label="Projects"
+        [value]="totalProjects.toString()"
+        description="Total assigned projects"
+        [progress]="100"
+        icon="fa-regular fa-folder-open"
+        iconClass="blue">
+      </app-stats-card>
+      <app-stats-card
+        label="Active"
+        [value]="activeProjects.toString()"
+        description="Currently active"
+        [progress]="75"
+        icon="fa-solid fa-check"
+        iconClass="green">
+      </app-stats-card>
+      <app-stats-card
+        label="Completed"
+        [value]="completedProjects.toString()"
+        description="Completed projects"
+        [progress]="100"
+        icon="fa-solid fa-flag-checkered"
+        iconClass="orange">
+      </app-stats-card>
+      <!--
+      Total hours logged across all YOUR projects summed from /api/projects/{id}
+      member entries matched by email, not the team total
+      -->
+      <app-stats-card
+        label="Your Hours"
+        [value]="myTotalHoursLoading ? '...': myTotalHoursLabel"
+        description="Your hours across all projects"
+        [progress]="100"
+        icon="fa-regular fa-clock"
+        iconClass="purple">
+      </app-stats-card>
+    </section>
+    <!--
+    FILTER BUTTONS SECTION
+    -->
+    <section class="project-filter-row">
+      @for (filter of filters; track filter){
+        <button
+          class="project-filter-button"
+          [class.selected-filter]="selectedFilter===filter"
+          (click)="filterProjects(filter)">
+          {{filter}}
+        </button>
+      }
+    </section>
+    <!--
+    PROJECTS :)
+    -->
+    <section class="projects-grid">
+      @for (project of filteredProjects; track project.id){
+        <article 
+          class="project-card"
+          [routerLink]="['/projects', project.id]"
+        >
+          <div class="project-card-header">
+            <div class="project-title-row">
+              <div class="project-avatar">
+                {{project.initials}}
+              </div>
+              <div class="project-title-content">
+                <h2 class="project-name">
+                  {{project.name}}
+                </h2>
+              </div>
+            </div>
+            <span class="project-status-badge">
+              {{project.status}}
+            </span>
+          </div>
+          <!--
+          DESCRIPTIONS
+          -->
+          <p class="project-description">
+            {{project.description}}
+          </p>
+          <!--
+          PROGRESS OF PROJECTS, so this is driven by progressPercentage from
+          GET /api/projects/{id}, no frontend math involved
+          -->
+          @if (project.detailLoaded &&
+            !project.detailError) {
+            <div class="project-progress">
+              <div class="progress-header">
+                <span class="progress-title">
+                  Hours Logged
+                </span>
+                <span class="progress-value">
+                  {{project.hoursLoggedLabel}}
+                </span>
+              </div>
+              <app-progress-bar
+                [progress]="project.progressPercentageClamped!">
+              </app-progress-bar>
+              <span class="progress-value">
+                Progress: {{project.progressPercentageClamped}}%
+              </span>
+            </div>
+          } @else {
+            @if (!project.detailError) {
+              <div class="project-progress">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading hours...
+              </div>
+            }
+            @if (project.detailError) {
+              <div class="project-progress-error">
+                <i class="fa-solid fa-triangle-exclamation"></i> Couldn't load hours
+              </div>
+            }
+          }
+          <!--
+          FOOTER OF CARD
+          -->
+          <div class="project-card-footer">
+            <span
+              class="role-chip"
+                            [ngClass]="{
+                                'developer-chip': project.role ==='Developer',
+                                'manager-chip': project.role ==='Manager',
+                                'admin-chip': project.role ==='Admin'
+                            }">
+              {{project.role}}
+            </span>
+          </div>
+          <!--
+          TEAM MEMEBERS
+          -->
+          @if (project.teamMemberInitials; as members) {
+            <div class="project-team">
+              <span class="team-count">
+                <i class="fa-solid fa-user"></i>
+                {{members.length}}
+                members
+              </span>
+              <div class="team-members">
+                @for (initials of members.slice(0,4); track initials){
+                  <span class="team-member">
+                    {{initials}}
+                  </span>
+                }
+                @if(members.length >4){
+                  <span class="team-member-more">
+                    +{{members.length -4}}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </article>
+      }
+    </section>
+  }
+</div>
