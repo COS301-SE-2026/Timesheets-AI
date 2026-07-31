@@ -299,6 +299,24 @@ $border-colour: #f1f5f9;
         border-color: darken($border-colour, 8%);
         transform: translateY(-1px);
     }
+
+    
+}
+
+.btn-orange{
+    background: $primary-orange;
+    color: white;
+    &:hover{
+        border-color: darken($primary-orange, 8%);
+    }
+}
+
+.btn-blue{
+    background: $primary-blue;
+    color: white;
+    &:hover{
+        border-color: darken($primary-blue, 8%);
+    }
 }
 
 //  NAMES AND LOGO AREA
@@ -341,5 +359,131 @@ $border-colour: #f1f5f9;
             color: $text-muted;
             letter-spacing: -0.02em;
         }
+    }
+}
+
+// HELP PAGE MENU
+.help-view-wrapper{
+    margin-top: 5rem;
+
+    .hero-section{
+    display: grid;
+    max-width: 1400px;
+    grid-template-columns: 1.1fr 1.9fr;
+    gap: 7rem;
+    align-items: center;
+    margin: 4rem auto;
+
+    .hero-content{
+        max-width: 620px;
+    }
+
+    .hero-title{
+        font-size: 5rem;
+    }
+
+    .hero-preview{
+        display: flex;
+        justify-content: center;
+    }
+
+    app-hourglass{
+        transform: scale(1.35);
+    }
+}
+}
+
+.help-cards-section{
+    margin-top: 4rem;
+}
+
+.help-grid{
+    grid-template-columns: repeat(2, minmax(320px, 420px));
+    justify-content: center;
+    gap: 2rem;
+
+    @media (max-width: 900px){
+        grid-template-columns: 1fr;
+    }
+}
+
+.help-card{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    min-height: 360px;
+    padding: 2rem;
+    border-radius: 22px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    transition: 0.2s ease;
+
+    &:hover{
+        transform: translateY(-6px);
+        box-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
+    }
+
+    h3{
+        margin: 1.5rem 0.75rem;
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    p{
+        flex: 1;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: $text-muted;
+        margin-bottom: 2rem;
+    }
+}
+
+.help-card .features-icon{
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+
+    i{
+        font-size: 2rem;
+    }
+}
+
+.help-card:first-child{
+    background: #fff6f0;
+    border: 1px solid #ffd7bf;
+}
+
+.help-card:last-child{
+    background: #f2f7ff;
+    border: 1px solid #d7e6ff;
+}
+
+.icon-orange{
+    background: rgba(234, 88, 12, 0.12);
+    color: $primary-orange;
+}
+
+.icon-blue{
+    background: rgba(37, 99, 235, 0.12);
+    color: $primary-blue;
+}
+
+.help-badge{
+    background: #eef5ff;
+    color: $primary-blue;
+
+    i{
+        font-size: 0.9rem;
+    }
+
+    span{
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
     }
 }
