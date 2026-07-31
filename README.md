@@ -33,7 +33,31 @@
 
 **Momently** is a web-based time-tracking and productivity insights platform built for Momentum Life's IT department. Where existing tools track hours, Momently understands them - surfacing AI-driven insights into where effort goes, flagging anomalies, integrating with Jira and GitHub, and giving managers the visibility they need to lead high-performing teams.
 
+## Documentation
+<details open>
+<summary><strong>Demo 2 Documentation</strong><summary>
+<br>
 
+<div align="center">
+
+[![System Requirements Specification](https://img.shields.io/badge/System_Requirements_Specification-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/SRS.pdf)
+[![System Architecture Specification](https://img.shields.io/badge/System_Architecture_Specification-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/SAS.pdf)
+[![Coding Standards Handbook](https://img.shields.io/badge/Coding_Standards-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/Coding-Standards-Handbook.pdf)
+[![Testing Policy](https://img.shields.io/badge/Testing_Policy-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/testing-policy.pdf)
+[![User Manual](https://img.shields.io/badge/User_Manual-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/User-Manual.pdf)
+[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/Brand-Style-Guide.pdf)
+[![Wireframes](https://img.shields.io/badge/Wireframes-View_PDF-0F4C91?style=for-the-badge&logo=figma&logoColor=white)](./docs/demo-2/wireframes.pdf)
+[![Demo 2 Video](https://img.shields.io/badge/Demo_2-View_Video-0F4C91?style=for-the-badge&logo=youtube&logoColor=white)](./docs/demo-2/demo2.pdf)
+[![Demo 2 Slides](https://img.shields.io/badge/Demo_2-View_Slides-0F4C91?style=for-the-badge&logo=googleslides&logoColor=white)](https://canva.link/4vyzjoad934wpsx)
+
+
+
+</div>
+</details>
+
+<details>
+<summary><strong>Demo 1 Documentation</strong></summary>
+</details>
 
 ## Project Dashboard
 
@@ -108,18 +132,8 @@
 | [Architecture](./docs/architecture/) | Domain model and ERD |
 | [Demo 1 video](./docs/) | Video recording for demo one |
 
----
-| Documentation | Link |
-|------|-------------|
-| System Requirements Specification | [View PDF](./docs/demo-2/SRS.pdf)|
-|System Architecture Specification|  [View PDF](./docs/demo-2/SAS.pdf) |
-| Coding Standards Handbook |  [View PDF](./docs/demo-2/Coding-Standards-Handbook.pdf) |
-| Testing Policy|  [View PDF](./docs/demo-2/testing-policy.pdf) |
-| User Manual |  [View PDF](./docs/demo-2/User-Manual.pdf) |
-| Brand Style Guide |  [View PDF](./docs/demo-2/brand-style-guide.pdf) |
-| Wireframes |  [View PDF](./docs/demo-2/srs.pdf) |
-| Demo 2 video |  [View Video](./docs/demo-2/srs.pdf) |
-| Demo 2 presentation |  [View Video](./docs/demo-2/srs.pdf) |
+
+
 
 ## <img src="https://img.icons8.com/?size=100&id=hSm5FhlnhnlL&format=png&color=000000" width="22"> Technology Stack
 
