@@ -125,3 +125,45 @@ nav a:hover{
   color: var(--blue);
 }
 
+main>section {
+    max-width: 1100px;
+    margin: auto;
+    padding: 70px 20px;
+}
+
+.hero {
+    min-height: 75vh;
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    align-items: center;
+    gap: 50px;
+}
+
+.hero img {
+    width: min(100%, 380px);
+    margin: auto;
+    animation: float 4s ease-in-out infinite;
+}
+
+h1, h2, h3 {
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 0;
+}
+
+h1 {
+    font: 400 clamp(42px, 7vw, 76px)/1 'Special Gothic Expanded One';
+    color: var(--blue);
+}
+
+h2{
+    font-size: 34px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+.display {
+    font-family: 'Special Gothic Expanded One'
+}
+
