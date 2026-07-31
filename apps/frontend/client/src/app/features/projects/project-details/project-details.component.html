@@ -1,0 +1,506 @@
+<!--
+Author: Cleopatra Kwenda
+Date: 2026-07-17
+Purpose: will display our desired wireframe of 
+all the project details page.
+Related Requirements: N/A
+
+Patched: 30/07/2026
+Wrapped in loading error guard since now content now comes from GET /api/projects/{id} 
+-->
+@if (loading()){
+<div class="project-details-container">
+    <p class="project-datils-loading"> Loading project... </p>
+</div>
+} @else if (error()) {
+    <div class="project-details-container">
+        <p class="project-details-error">
+            Couldn't load this project. It may not exist, or you may not have access to it.
+        </p>
+        <button class="back-link-btn" type="button" routerLink="/projects">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Projects
+        </button>
+    </div>
+} @else {
+<div class="project-details-container">
+    <!--
+    BACK BUTTON
+    -->
+
+    <button
+        class="back-link-btn"
+        type="button"
+        routerLink="/projects">
+    
+        <i class="fa-solid fa-arrow-left"></i>
+        Back to Projects
+
+    </button>
+
+    <!--
+    PAGE HEADER
+    -->
+    <header class="project-header">
+        <div class="project-header-left">
+            <div class="project-avatar">
+                {{ getProjectInitials() }}
+            </div>
+
+            <div class="project-heading">
+                <h1 class="project-title">
+                    {{ project().name }}
+                </h1>
+
+                <p class="project-description">
+                    {{ project().description }}
+                </p>
+            </div>
+        </div>
+
+        <div class="project-header-right">
+            <span
+                class="project-status-badge"
+                [ngClass]="{
+                    'status-active': project().status === ProjectStatus.ACTIVE,
+                    'status-completed': project().status === ProjectStatus.COMPLETED,
+                    'status-hold': project().status === ProjectStatus.ON_HOLD
+                }">
+                {{ project().status }}
+
+            </span>
+
+            <span
+                class="role-chip"
+                [ngClass]="{
+                    'developer-chip': project().myRole === ProjectRole.DEVELOPER,
+                    'manager-chip': project().myRole === ProjectRole.MANAGER,
+                    'admin-chip': project().myRole === ProjectRole.ADMIN
+                }">
+
+                {{ project().myRole }}
+
+            </span>
+
+        </div>
+    </header>
+
+    <section class="project-meta-grid">
+        <div class="meta-card">
+            <div class="icon-wrapper blue">
+                <i class="fa-regular fa-clock"></i>
+            </div>
+
+            <div class="meta-info">
+                <span class="meta-title">
+                    Budget Hours
+                </span>
+
+                <strong>
+                    {{ project().budgetHours }}h
+                </strong>
+            </div>
+        </div>
+
+        <div class="meta-card">
+            <div class="icon-wrapper blue-light">
+                <i class="fa-solid fa-coins"></i>
+            </div>
+            
+            <div class="meta-info">
+                <span class="meta-title">
+                    Hourly Rate
+                </span>
+
+                <strong>
+                    R{{ project().hourlyRate }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="meta-card">
+            <div class="icon-wrapper green">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            
+            <div class="meta-info">
+                <span class="meta-title">
+                    Budget Cost
+                </span>
+
+                <strong>
+                    R{{ project().budgetCost }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="meta-card">
+            <div class="icon-wrapper orange">
+                <i class="fa-regular fa-calendar"></i>
+            </div>
+            
+            <div class="meta-info">
+                <span class="meta-title">
+                    End Date
+                </span>
+
+                <strong>
+                    {{ project().endDate | date }}
+                </strong>
+            </div>
+        </div>
+        
+
+        <div class="meta-card">
+            <div class="icon-wrapper purple">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            
+            <div class="meta-info">
+                <span class="meta-title">
+                    Team Members
+                </span>
+
+                <strong>
+                    {{ project().members.length || 0 }}
+                </strong>
+            </div>
+        </div>
+        
+    </section>
+
+    <!--
+    NAVIGATION TABS
+    -->
+    <nav class="project-tabs">
+        <button
+            class="tab-button"
+            [class.active]="activeTab() === 'overview'"
+            (click)="setActiveTab('overview')">
+
+            Overview
+
+        </button>
+
+        <button
+            class="tab-button"
+            [class.active]="activeTab() === 'tasks'"
+            (click)="setActiveTab('tasks')">
+
+            Tasks
+
+        </button>
+    </nav>
+
+    <!--
+    OVERVIEW
+    -->
+        @if (activeTab()==='overview'){
+        <section class ="overview-grid">
+
+        <!--
+        Hours
+        -->
+        <article class="overview-card hours-card">
+
+            <div class="card-header">
+                    <h3 class="overview-card-title">
+                        Hours Logged vs Budget
+                    </h3>
+            
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-dot logged"></span>
+
+                        <span class="legend-text">
+                            Logged
+                        </span>
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot estimated"></span>
+                        
+                        <span class="legend-text">
+                            Budget
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hours-kpi-row">
+                <div class="hours-kpi-box">
+                    <div class="hours-kpis">
+
+                        <div class="hours-kpi">
+                            <span class="kpi-label">
+                                Logged
+                            </span>
+                            <span class="kpi-value primary">
+                                {{ project().hoursLoggedLabel }}h
+                            </span>
+                        </div>
+
+                        <div class="hours-kpi">
+                            <span class="kpi-label">
+                                Budget
+                            </span>
+                            <span class="kpi-value muted">
+                                {{ project().budgetHours }}h
+                            </span>
+                        
+                        </div>
+                    </div>
+                
+
+                </div>
+            </div>
+            
+
+            <div class="remaining-pill">
+                    {{ remainingHours() | number:'1.1-1' }} hours remaining
+            </div>
+
+            <div class="chart-container">
+                <canvas 
+                    baseChart
+                    [data]="hoursChartData"
+                    [options]="hoursChartOptions"
+                    [type]="'bar'">
+                </canvas>
+            </div>
+        </article>
+
+        <!--
+        Progress
+        -->
+        <article class="overview-card progress-card">
+            <div class="card-header">
+                <div>
+                    <h3 class="overview-card-title">
+                        Project Progress
+                    </h3>
+
+                    <p class="overview-card-subtitle">
+                        Based on logged hours
+                    </p>
+                </div>
+            </div>
+            
+
+            <div class="progress-circle-wrapper">
+                <div 
+                    class="progress-circle"
+                    [style.--progress]="project().progressPercentage">
+
+                    <div class="progress-inner">
+                        <span class="progress-percentage">
+                            {{ project().progressPercentage }}%
+                        </span>
+
+                        <span class="progress-label">
+                            Complete
+                        </span>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-summary">
+                <div class="summary-box summary-blue">
+
+                    <div class="summary-title">
+                        
+                        <i class="fa-regular fa-clock icon-blue"></i>
+                        <span>
+                            Logged
+                        </span> 
+                    </div>
+
+                    <span class="summary-value">
+                        {{ project().hoursLoggedLabel }}h
+                    </span>
+                </div>
+
+                <div class="summary-box summary-orange">
+                    <div class="summary-title">
+                        <i class="fa-solid fa-hourglass-half icon-orange"></i>
+                        Remaining
+                    </div>
+
+                    <span class="summary-value">
+                        {{ remainingHours() | number:'1.1-1' }}h
+                    </span>
+                </div>
+            </div>
+
+            <p class="progress-footnote">
+                {{ ((remainingHours() / project().budgetHours)*100) | number:'1.1-1'}}% of budget hours remaining
+            </p>
+            
+        </article>
+
+        <!--
+        Team
+        -->
+        <article class="overview-card team-card">
+            <div class="card-header">
+                <h3 class="overview-card-title">
+                    Team Members
+                </h3>
+
+                <p class="overview-card-subtitle">
+                    Assigned project members
+                </p>
+            </div>
+            
+
+            <div class="team-list">
+                @for (member of project().members; track member.workspaceMemberId) {
+                <div class="team-member-row">
+
+                    <div class="member-top-row">
+                        
+                        <div class="member-left">
+
+                            <div
+                                class="team-avatar"
+                                [ngClass]="getAvatarColour(member)">
+                                {{ getInitials(member) }}
+                            </div>
+
+                            <div class="member-details">
+                                <span class="member-name">
+                                    {{ getMemberName(member) }}
+                                </span>
+
+                                <span class="member-hours">
+                                    {{ member.hoursLoggedLabel }} hours logged
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="member-right">
+                            <span
+                                class="member-role-chip"
+                                [ngClass]="{
+                                    'developer-chip': member.role === ProjectRole.DEVELOPER,
+                                    'manager-chip': member.role === ProjectRole.MANAGER,
+                                    'admin-chip': member.role === ProjectRole.ADMIN,
+                                }">
+                                {{ member.role }}
+                            </span>
+
+                        </div>
+                    </div>
+
+                    <div class="member-progress-row">
+                        <div class="member-progress-bar">
+                            <div 
+                                class="member-progress-fill"
+                                [ngClass]="getAvatarColour(member)"
+                                [style.width.%]="(member.hoursLogged / project().budgetHours)*100">
+                            </div>
+                        </div>
+
+                        <span class="member-progress-percent">
+                            {{ ((member.hoursLogged / project().budgetHours)*100) | number:'1.1-1'}}%
+                        </span>
+                    </div>
+                </div>
+                }
+            </div>
+ 
+            <button class="view-members-btn">
+                <i class="fa-solid fa-user-group"></i>
+                View all members
+            </button>
+            
+        </article>
+
+    </section>
+    }
+
+    <!--
+    TASKS TAB
+    -->
+    @if (activeTab() === 'tasks') {
+    <section class="task-section">
+
+        <article class="task-card">
+            <div class="task-header">
+                <h3>
+                    Tasks
+                </h3>
+
+                <p class="subtitle">
+                    Task assigned to this project
+                </p>
+            </div>
+
+            <table class="task-table">
+                <thead>
+                    
+                    <tr>
+                        <th>Task</th>
+                        <th>Assignee</th>
+                        <th>Status</th>
+                        <th>Estimated</th>
+                        <th>Actual</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (task of tasks(); track task.id) {
+                    <tr>
+                        <td class="task-title">
+                            {{ task.title }}
+                        </td>
+
+                        <td>
+                            <div class="assignee">
+                                <div 
+                                    class="avatar"
+                                    [ngClass]="getAvatarColours(task.assignedToName)">
+                                    {{ getInitial(task.assignedToName) }}
+                                </div>
+
+                                <div class="assignee-info">
+                                    <span class="assignee-name">
+                                        {{ task.assignedToName}}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span
+                                class="status-badge"
+                                [ngClass]="{
+                                    'status-todo': task.status === 'TODO',
+                                    'status-progress': task.status === 'IN_PROGRESS',
+                                    'status-done': task.status === 'DONE',
+                                    'status-blocked': task.status === 'BLOCKED'
+                                }">
+
+                                {{ formatStatus(task.status) }}
+                            </span>
+                        </td>
+
+                        <td class="hours">
+                            {{ task.estimatedHours}}h
+                        </td>
+
+                        <td class="hours">
+                            {{ task.actualHours }}h
+                        </td>
+
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </article>
+
+    </section>
+    }
+</div>
+}

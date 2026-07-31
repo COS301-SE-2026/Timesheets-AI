@@ -1,0 +1,304 @@
+/*
+Author: Cleopatra Kwenda
+Date: 2026-07-25
+Purpose: Styling the landing page such 
+it follows our desired wireframe.
+Related Requirement: N/A
+*/
+
+@use '../../../../app/shared/styles/mixins' as *;
+
+// COLOUR PALETTE
+$font-special-gothic: "Special Gothic Expanded One", sans-serif;
+$text-dark: #0f172a;
+$text-muted: #64748b;
+$primary-blue: #2563eb;
+$primary-orange: #ea580c;
+$bg-light: #fafafa;
+$border-colour: #f1f5f9;
+
+.landing-container{
+    min-height: 100vh;
+    background-color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: $text-dark;
+    padding: 0 2rem 4rem;
+    max-width: 1700px;
+    margin: 0 auto;
+
+    @media (max-width: 768px){
+        padding: 0 1.5rem 2rem 1.5rem;
+    }
+}
+
+.special-gothic-expanded-one-regular {
+    font-family: "Special Gothic Expanded One", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+// HEADER OR NAVBAR(UP THERE)
+.navbar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0 ;
+
+    // LOGO STYLING
+    .brand{
+        @include auth-brand-lockup;
+    }
+}
+
+//AUTH BUTTONS (LOGIN / SIGNUP)
+.auth-buttons{
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+
+    .btn-login{
+        color: white;
+        font-weight: 600;
+        padding: 0.6rem 1.4rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-size: 0.95rem;
+        background-color: var(--color-primary);
+        box-shadow: 0 4px 12px rgba(37, 99, 255, 0.2);
+        transition: transform 0.2s ease, background-color 0.2 ease;
+
+        &:hover{
+            background-color: lighten($primary-blue, 5%);
+            transform: translateY(-1px);
+        }
+    }
+
+    .btn-signup{
+        background-color: var(--color-primary);
+        color: white;
+        padding: 0.6rem 1.4rem;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 12px rgba(37, 99, 255, 0.2);
+        transition: transform 0.2s ease, background-color 0.2 ease;
+
+        &:hover{
+            background-color: lighten($primary-blue, 5%);
+            transform: translateY(-1px);
+        }
+    }
+}
+
+// HERO SECTION
+.hero-section{
+    display: grid;
+    grid-template-columns: 1.1fr 1.9fr;
+    gap: 3rem;
+    align-items: center;
+    margin-top: 2.5rem;
+    margin-bottom: 5rem;
+
+    @media (max-width: 1024px){
+        grid-template-columns: 1fr;
+        margin-top: 1.5rem;
+    }
+
+    .hero-content{
+        .badge-tag{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background-color: #eff6ff;
+            color: #2563eb;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05rem;
+            padding: 0.65rem 1.2rem;
+            border-radius: 999px;
+            margin-bottom: 2rem;
+
+            .sparkle{
+                font-size: 0.85rem;
+            }
+        }
+
+        .hero-title{
+            font-family: $font-special-gothic;
+            font-weight: 600;
+            font-size: 3.5rem;
+            line-height: 1.12;
+            letter-spacing: -0.01em;
+            margin: 0 0 1.5rem 0;
+
+            .highlight{
+                color: $primary-orange;
+            }
+
+            @media (max-width: 768px){
+                font-size: 2.25rem;
+            }
+        }
+
+        .hero-description{
+            font-size: 1.1rem;
+            color: var(--color-text-muted);
+            line-height: 1.6;
+            max-width: 440px;
+        }
+    }
+
+    // SCREENSHOT AREA
+    .hero-preview{
+        width: 100%;
+        position: relative;
+
+        .hero-glow{
+            position: absolute;
+            inset: -70px;
+            z-index: 0;
+
+            background: 
+                radial-gradient(
+                    circle at 30% 50%,
+                    rgba(26, 101, 191, 0.30),
+                    transparent 60%
+                ),
+
+                radial-gradient(
+                    circle at 75% 40%,
+                    rgba(224, 120, 48, 0.30),
+                    transparent 60%
+                );
+            
+            filter: blur(70px);
+        }
+
+        .image-wrapper{
+            border-radius: 16px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
+            overflow: hidden;
+            border: 1px solid $border-colour;
+            background: white;
+
+            .preview-img{
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+        }
+
+    }
+
+
+}
+
+// FEATURE GRID AREA
+
+.features-section {
+    margin-bottom: 5rem;
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+
+        @media (max-width: 1024px) {
+            grid-template-columns: repeat(2,1fr);
+        }
+
+        @media (max-width: 640px) {
+            grid-template-columns: 1fr;
+        }
+
+        .features-card {
+            background: $bg-light;
+            border-radius: 16px;
+            padding: 1.75rem;
+            border: 1px solid $border-colour;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03);
+            }
+
+            .features-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 1.25rem;
+                font-size: 1.25rem;
+
+                i{
+                    font-size: 1.75rem;
+                }
+            }
+
+            h3 {
+                font-size: 1.05rem;
+                font-weight: 700;
+                margin: 0 0 0.5rem 0;
+                color: $text-dark;
+            }
+
+            p {
+                font-size: 0.875rem;
+                color: $text-muted;
+                line-height: 1.5;
+                margin: 0;
+            }
+        }
+    }
+}
+
+//  NAMES AND LOGO AREA
+
+.logos-section {
+    text-align: center;
+
+    .trust-text {
+        font-size: 0.95rem;
+        color: $text-muted;
+        font-weight: 500;
+        margin-bottom: 2.5rem;
+    }
+
+    .logos-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 2rem;
+        opacity: 0.6;
+        filter: grayscale(100%);
+
+        img{
+            height: 160px;
+            width: auto;
+            opacity: 0.55;
+            filter: grayscale(100%);
+            transition: 0.25s;
+        }
+
+        img:hover{
+            opacity: 0.9;
+            filter: none;
+        }
+
+        .logo-item {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: $text-muted;
+            letter-spacing: -0.02em;
+        }
+    }
+}

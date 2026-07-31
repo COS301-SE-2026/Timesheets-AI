@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - main
-      - dev
 
 
 jobs:
@@ -57,7 +56,7 @@ jobs:
             docker compose --env-file .env.production -f docker-compose.prod.yml pull
             
             echo "Starting the containers"
-            docker compose --env-file .env.production -f docker-compose.prod.yml up -d --remove-orphans
+            docker compose --env-file .env.production -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
             
             echo "Healthcheck running"
             for i in {1..12}; do

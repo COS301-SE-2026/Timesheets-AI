@@ -62,11 +62,14 @@ const DESIGN_SYSTEM_RATE = 65;
 const DESIGN_SYSTEM_BUDGET_COST = 9750;
 
 const THABANG_HOURS_LOGGED = 240;
+const THABANG_MINUTES_RAW = THABANG_HOURS_LOGGED * 60
 const USER_HOURS_LOGGED = 540.0666666666667; // -> "540h 4m", tests minute rounding
+const USER_MINUTES_RAW = USER_HOURS_LOGGED * 60; //32404
 const KARABO_HOURS_LOGGED = 330;
-const KEITUMETSE_HOURS_LOGGED = 34 / 60; // -> "0h 34m", tests sub-hour case isn't swallowed
-
+const KARABO_MINUTES_RAW = KARABO_HOURS_LOGGED * 60;
+const KEITUMETSE_MINUTES_RAW = 34
 const PROJ1_TEAM_TOTAL_HOURS = 780.0666666666667;
+const PROJ1_TEAM_TOTAL_MINUTES_RAW = PROJ1_TEAM_TOTAL_HOURS * 60; //46804
 const PROJ1_PROGRESS_OVER_BUDGET = 174.62; // deliberately over 100, tests clamping
 
 describe('ProjectsComponent', () => {
@@ -149,7 +152,7 @@ describe('ProjectsComponent', () => {
             lastName: 'Siduke',
             email: 'thabang.siduke@momentum.co.za',
             role: 'DEVELOPER',
-            hoursLogged: THABANG_HOURS_LOGGED,
+            hoursLogged: THABANG_MINUTES_RAW,
             joinedAt: FIXTURE_TIMESTAMP,
           },
           {
@@ -158,11 +161,11 @@ describe('ProjectsComponent', () => {
             lastName: 'Khumalo',
             email: USER_EMAIL,
             role: 'DEVELOPER',
-            hoursLogged: USER_HOURS_LOGGED,
+            hoursLogged: USER_MINUTES_RAW,
             joinedAt: FIXTURE_TIMESTAMP,
           },
         ],
-        hoursLogged: PROJ1_TEAM_TOTAL_HOURS,
+        hoursLogged: PROJ1_TEAM_TOTAL_MINUTES_RAW,
         progressPercentage: PROJ1_PROGRESS_OVER_BUDGET,
         createdAt: FIXTURE_TIMESTAMP,
         updatedAt: FIXTURE_TIMESTAMP,
@@ -183,11 +186,11 @@ describe('ProjectsComponent', () => {
             lastName: 'Modise',
             email: 'karabo.modise@momentum.co.za',
             role: 'DEVELOPER',
-            hoursLogged: KARABO_HOURS_LOGGED,
+            hoursLogged: KARABO_MINUTES_RAW,
             joinedAt: FIXTURE_TIMESTAMP,
           },
         ],
-        hoursLogged: KARABO_HOURS_LOGGED,
+        hoursLogged: KARABO_MINUTES_RAW,
         progressPercentage: 110,
         createdAt: FIXTURE_TIMESTAMP,
         updatedAt: FIXTURE_TIMESTAMP,
@@ -208,11 +211,11 @@ describe('ProjectsComponent', () => {
             lastName: 'Motaung',
             email: 'keitumetse.motaung@momentum.co.za',
             role: 'DEVELOPER',
-            hoursLogged: KEITUMETSE_HOURS_LOGGED,
+            hoursLogged: KEITUMETSE_MINUTES_RAW,
             joinedAt: FIXTURE_TIMESTAMP,
           },
         ],
-        hoursLogged: KEITUMETSE_HOURS_LOGGED,
+        hoursLogged: KEITUMETSE_MINUTES_RAW,
         progressPercentage: 0.38,
         createdAt: FIXTURE_TIMESTAMP,
         updatedAt: FIXTURE_TIMESTAMP,
