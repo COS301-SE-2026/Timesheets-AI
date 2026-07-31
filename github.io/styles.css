@@ -283,3 +283,37 @@ article {
     color: #6B7A99;
     font-size: 12px;
 }
+
+.status-row, .demo-row {
+    display: grid;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 22px;
+}
+
+.status-row span {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.success {
+    background: #D7F5D3;
+    color: #0E3D0B;
+}
+
+.warning {
+    background: #F0D49A;
+    color: #4A2D00;
+}
+
+.error {
+    background: #EFB3B3;
+    color: #5C0F0F;
+}
+
+.info {
+    background: #EDE0FF;
+    color: #3B0F8C;
+}
+
