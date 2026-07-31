@@ -67,11 +67,10 @@ const USER_HOURS_LOGGED = 540.0666666666667; // -> "540h 4m", tests minute round
 const USER_MINUTES_RAW = USER_HOURS_LOGGED * 60; //32404
 const KARABO_HOURS_LOGGED = 330;
 const KARABO_MINUTES_RAW = KARABO_HOURS_LOGGED * 60;
-const KEITUMETSE_HOURS_LOGGED = 34 / 60; // -> "0h 34m", tests sub-hour case isn't swallowed
 const KEITUMETSE_MINUTES_RAW = 34
 const PROJ1_TEAM_TOTAL_HOURS = 780.0666666666667;
 const PROJ1_TEAM_TOTAL_MINUTES_RAW = PROJ1_TEAM_TOTAL_HOURS * 60; //46804
-const PROJ1_PROGRESS_OVER_BUDGET = 174.62; // deliberately over 100, tests clamping
+const PROJ1_PROGRESS_OVER_BUDGET = 156.01; // deliberately over 100, tests clamping
 
 describe('ProjectsComponent', () => {
   let component: ProjectsComponent;

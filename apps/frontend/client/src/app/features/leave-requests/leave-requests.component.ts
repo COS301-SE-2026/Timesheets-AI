@@ -2,12 +2,15 @@
  * Author: Lerato Sibanda
  * Date: 2026-07-27
  * Related Requirement: Leave Requests
+ * Patched: Zamokuhle Zwane 31 July 2026
+ * swapped the mock values for real calls against leaverequest service in order to integrate
  */
 
 import { CommonModule } from '@angular/common';
-import { Component, ChangeDetectionStrategy, computed, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, computed, inject, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { BidiModule } from "@angular/cdk/bidi";
+import { LeaveRequestService, LeaveRequestResponse } from '../../core/services/leave-request.service';
 
 export type LeaveType = 'ANNUAL' | 'SICK' | 'MATERNITY' | 'PATERNITY' | 'FAMILY_RESPONSIBILITY' | 'OTHER';
 export type LeaveRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
@@ -127,45 +130,6 @@ const LEAVE_TYPES: LeaveTypeOption[] = [
   }
 ];
 
-// MOCK data for UI
-const MOCK_LEAVE_REQUESTS: LeaveRequest[] = [
-  {
-    id: '12345',
-    workspaceMemberId: '67890',
-    memberName: 'John Doe',
-    leaveType: 'ANNUAL',
-    startDate: '2025-06-24',
-    endDate: '2025-06-28',
-    totalDays: 5,
-    reason: 'Annual holiday',
-    attachments: null,
-    status: 'PENDING',
-    approvedByName: null,
-    approvedAt: null,
-    rejectionReason: null,
-    availabilityId: null,
-    createdAt: '2025-06-10T09:00:00Z',
-    updatedAt: '2025-06-10T09:00:00Z'
-  },
-  {
-    id: '11121',
-    workspaceMemberId: '14156',
-    memberName: 'John Doe',
-    leaveType: 'SICK',
-    startDate: '2025-05-10',
-    endDate: '2025-05-12',
-    totalDays: 3,
-    reason: 'Medical recovery.',
-    attachments: null,
-    status: 'APPROVED',
-    approvedByName: 'Jane Smith',
-    approvedAt: '2025-05-09T14:30:00Z',
-    rejectionReason: null,
-    availabilityId: null,
-    createdAt: '2025-05-09T08:00:00Z',
-    updatedAt: '2025-05-09T14:30:00Z'
-  }
-];
 
 @Component({
   selector: 'app-leave-requests',
@@ -176,8 +140,9 @@ const MOCK_LEAVE_REQUESTS: LeaveRequest[] = [
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class LeaveRequestsComponent {
+export class LeaveRequestsComponent implements OnInit {
   private readonly formBuilder = new FormBuilder();
+  private readonly leaveRequestService = inject(LeaveRequestService);
 
   readonly currentView = signal<LeavePageView>('LIST');
   readonly uiState = signal<LeaveUiState>('idle');
@@ -188,7 +153,7 @@ export class LeaveRequestsComponent {
   readonly editingRequestId = signal<string | null>(null);
 
   // INTEGRATION: Replace mock data with the response from the leave request GET endpoint
-  readonly leaveRequests = signal<LeaveRequest[]>(MOCK_LEAVE_REQUESTS);
+  readonly leaveRequests = signal<LeaveRequest[]>([]);
 
   readonly leaveTypeOptions = LEAVE_TYPES;
 
@@ -243,7 +208,6 @@ export class LeaveRequestsComponent {
     startDateControl.valueChanges.subscribe(() => {
       this.calculateTotalDays();
     });
-
     endDateControl.valueChanges.subscribe(() => {
       this.calculateTotalDays();
     });
@@ -260,6 +224,50 @@ export class LeaveRequestsComponent {
     }
     this.resetForm();
   }
+  //this kicks off the initial load
+    ngOnInit(): void{
+      this.loadRequests();
+    }
+
+    //loads the logged in users leave requests
+    loadRequests(): void{
+      this.uiState.set('loading');
+      this.errorMessage.set(null);
+
+      this.leaveRequestService.getMyLeaveRequest().subscribe({
+        next: (responses: LeaveRequestResponse[]) => {
+          this.leaveRequests.set(responses.map((response) => 
+          this.mapToLeaveRequest(response)));
+          this.uiState.set('idle');
+        },
+        error: (error)=> {
+          console.error('[LeaveRequestsComponent] failed to load my requests:', error);
+          this.uiState.set('error');
+          this.errorMessage.set('Could not load your leave requests. Please try again.');
+        }
+      });
+    }
+    //..converts a raw LeaveRequestResponse into the shape this component uses
+    private mapToLeaveRequest(response: LeaveRequestResponse): LeaveRequest{
+      return {
+        id: response.id,
+        workspaceMemberId: response.workspaceMemberId,
+        memberName: response.memberName,
+        leaveType: response.leaveType as LeaveType,
+        startDate: response.startDate,
+        endDate: response.endDate,
+        totalDays: response.totalDays,
+        reason: response.reason,
+        attachments: response.attachments,
+        status: response.status as LeaveRequestStatus,
+        approvedByName: response.approvedByName,
+        approvedAt: response.approvedAt,
+        rejectionReason: response.rejectionReason,
+        availabilityId: response.availabilityId,
+        createdAt: response.createdAt,
+        updatedAt: response.updatedAt
+      };
+    }
 
   // Submit leave request function
   submitLeaveRequest(): void {
@@ -294,46 +302,43 @@ export class LeaveRequestsComponent {
     if(requestId) {
      
       // INTEGRATION:  PATCH /api/leave-request/{id}
-
-      console.log(`patch /api/leave-request/${requestId}`, payload);
-
-      // temporary frontend update
-      this.updateTemporaryRequest(requestId, payload);
-      this.submitMessage.set('Leave request updated successfully');
-    } else {
-
-      // INTEGRATION POST /api/leave-requests
-      console.log('POST /api/leave-request', payload);
+      this.leaveRequestService.updateLeaveRequest(requestId, payload).subscribe({
+        next: (response) =>{
+          this.leaveRequests.update(requests =>
+            requests.map(request=> request.id === requestId?
+              this.mapToLeaveRequest(response): request)
+            );
+            this.submitMessage.set('Leave request updated successfully');
+            this.editingRequestId.set(null);
+            this.showView('LIST');
+            this.resetForm();
+        },
+          error: (error)=> {
+            console.error('[LeaveRequestComponent] failed to update leave request:', error);
+            this.errorMessage.set('Could not update your leave request. Please try again.');
+          }
+      });
+      return;
     }
-
-    this.editingRequestId.set(null);
-    this.showView('LIST');
-    this.resetForm();
+    this.leaveRequestService.createLeaveRequest(payload).subscribe({
+      next: (response) => {
+        this.leaveRequests.update(requests => [this.mapToLeaveRequest(response), ...requests]);
+        this.submitMessage.set('Leave request submitted successfully');
+        this.showView('LIST');
+        this.resetForm();
+      },
+      error: (error) => {
+        console.error('[LeaveRequestsComponent] failed to create leave request:', error);
+        this.errorMessage.set('Could not submit your leave request. Please try again.');
+      }
+    });
   }
-
-private updateTemporaryRequest(id: string, payload: CreateLeaveRequestPayload): void {
-  const updatedAt = new Date().toISOString();
-
-  this.leaveRequests.update(requests => 
-    requests.map( request => request.id === id ? {
-    ...request,
-    leaveType: payload.leaveType,
-    startDate: payload.startDate,
-    endDate: payload.endDate,
-    totalDays: payload.totalDays,
-    reason: payload.reason,
-    attachments: payload.attachments,
-    updatedAt
-  } : request));
-}
 
   // View submitted leave request
   viewRequest(request: LeaveRequest): void {
-    // INTEGRATION : navigate or display the selected request
 
     this.selectedRequest.set(request);
-    this.isDetailsOpen.set(true);
-    // console.log('Selected leave request:', request);
+    this.isDetailsOpen.set(true); 
   }
 
   closeRequestDetails(): void {
@@ -373,23 +378,26 @@ private updateTemporaryRequest(id: string, payload: CreateLeaveRequestPayload): 
 
   }
 
+  //canceld a pending request
   cancelRequest(request: LeaveRequest): void {
-
-    // integration: POST/API/LEAVE-REQUEST/{ID}/CANCEL
-
-    if(!this.canCancel(request)){
+    if (!this.canCancel(request)) {
       return;
     }
 
-     this.leaveRequests.update(requests =>
-      requests.map(item => item.id === request.id ? {
-        ...item,
-        status: 'CANCELLED',
-        updatedAt: new Date().toISOString()
+    const reason = 'Cancelled by requester';
+
+    this.leaveRequestService.cancelLeaveRequest(request.id, reason).subscribe({
+      next: (response) => {
+        this.leaveRequests.update(requests =>
+          requests.map(item => item.id === request.id ? this.mapToLeaveRequest(response) : item)
+        );
+        this.submitMessage.set('Leave request cancelled successfully.');
+      },
+      error: (error) => {
+        console.error('[LeaveRequestsComponent] failed to cancel leave request:', error);
+        this.errorMessage.set('Could not cancel your leave request. Please try again.');
       }
-    :item)
-     );
-     this.submitMessage.set('Leave request cancelled successfully.')
+    });
   }
   
   // invlaid entry
@@ -491,34 +499,5 @@ private updateTemporaryRequest(id: string, payload: CreateLeaveRequestPayload): 
 
     this.editingRequestId.set(null);
   }
-
-  //  INTEGRATION: remove this and use the respons from the POST request
-  // Adds temporary leave request to local list unti backend integration is compplete
-  private addTemporaryRequest(payload: CreateLeaveRequestPayload) : void {
-    const now = new Date().toISOString();
-
-    const request: LeaveRequest = {
-    id: crypto.randomUUID(),
-    workspaceMemberId: 'current-member-id',
-    memberName: 'Current User',
-    leaveType: payload.leaveType,
-    startDate: payload.startDate,
-    endDate: payload.endDate,
-    totalDays: payload.totalDays,
-    reason: payload.reason,
-    attachments: payload.attachments,
-    status: 'PENDING',
-    approvedByName: null,
-    approvedAt: null,
-    rejectionReason: null,
-    availabilityId: null,
-    createdAt: now,
-    updatedAt: now
-  };
-
-  this.leaveRequests.update(requests => [
-    request, ...requests
-  ]);
 }
-  
-}
+

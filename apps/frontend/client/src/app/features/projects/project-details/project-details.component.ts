@@ -64,6 +64,8 @@ const EMPTY_PROJECT_DETAILS: ProjectDetails = {
 })
 
 export class ProjectDetailsComponent {
+    private readonly route = inject(ActivatedRoute);
+
 
     protected readonly ProjectStatus= ProjectStatus;
     protected readonly ProjectRole= ProjectRole;
@@ -76,9 +78,7 @@ export class ProjectDetailsComponent {
 
     protected readonly tasks=signal<ProjectTask[]>([]);
 
-    constructor(
-        private readonly route: ActivatedRoute,
-    ){
+    constructor(){
         this.loadProject();
 
         //this should keep the chart in sync whenever fresh project data comes in, because ng2-charts doesnt pick up mutations
