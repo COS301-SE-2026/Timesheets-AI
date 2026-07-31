@@ -44,7 +44,6 @@ $border-colour: #f1f5f9;
     align-items: center;
     justify-content: space-between;
     padding: 1rem 0 ;
-    // margin-top: -3rem;
 
     // LOGO STYLING
     .brand{
@@ -65,7 +64,6 @@ $border-colour: #f1f5f9;
         border-radius: 10px;
         text-decoration: none;
         font-size: 0.95rem;
-        transition: color 0.2 ease;
         background-color: var(--color-primary);
         box-shadow: 0 4px 12px rgba(37, 99, 255, 0.2);
         transition: transform 0.2s ease, background-color 0.2 ease;
