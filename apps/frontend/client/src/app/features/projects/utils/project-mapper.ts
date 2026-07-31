@@ -102,11 +102,12 @@ export function applyProjectDetail(
   detail: ProjectDetailResponse,
 ): void {
   const correctedHours = minutesToHours(detail.hoursLogged);
+  const correctedProgress = calculateProgressPercentage(correctedHours, detail.budgetHours);
 
   card.hoursLogged = correctedHours;
   card.hoursLoggedLabel = formatHoursMinutes(correctedHours);
-  card.progressPercentage = detail.progressPercentage;
-  card.progressPercentageClamped = clampPercentage(detail.progressPercentage);
+  card.progressPercentage = correctedProgress;
+  card.progressPercentageClamped = clampPercentage(correctedProgress);
   card.teamMemberInitials = detail.members.map((m) =>
     toMemberInitials(m.firstName, m.lastName),
   );
@@ -173,7 +174,7 @@ export function mapToProjectDetails(
       toMemberInitials(m.firstName, m.lastName),
     ),
     progressPercentage: correctedProgress,
-    progressPercentageClamped: clampPercentage(detail.progressPercentage),
+    progressPercentageClamped: clampPercentage(correctedProgress),
     detailLoaded: true,
     detailError: false,
 
