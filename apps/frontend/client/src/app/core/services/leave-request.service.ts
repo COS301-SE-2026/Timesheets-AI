@@ -5,8 +5,7 @@ create, update, get, approve, reject, cancel so we can drop mock data
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs';
+import { Observable, throwError, catchError } from 'rxjs';
 
 //matches LeaveRequestResponse.java field for field
 export interface LeaveRequestResponse {
