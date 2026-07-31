@@ -5,14 +5,14 @@
   ============================================================ */
 
 import { Routes } from '@angular/router';
+import { LandingPageComponent } from './features/landing/landing-page/landing-page.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   /* Default redirect */
   {
     path: '',
-    redirectTo: 'signup',
-    pathMatch: 'full',
+    component: LandingPageComponent,
   },
 
   /* Log Time page */
@@ -75,6 +75,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/my-tasks/my-tasks.component')
         .then(m => m.MyTasksComponent)
+  },
+
+  {
+    path: 'leave-requests',
+    loadComponent: () =>
+      import('./features/leave-requests/leave-requests.component')
+        .then(m => m.LeaveRequestsComponent)
   },
 
   /* 404 fallback */
