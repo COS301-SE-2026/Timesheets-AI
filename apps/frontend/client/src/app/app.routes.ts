@@ -5,14 +5,14 @@
   ============================================================ */
 
 import { Routes } from '@angular/router';
+import { LandingPageComponent } from './features/landing/landing-page/landing-page.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   /* Default redirect */
   {
     path: '',
-    redirectTo: 'signup',
-    pathMatch: 'full',
+    component: LandingPageComponent,
   },
 
   /* Log Time page */
