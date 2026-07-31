@@ -167,3 +167,53 @@ h3 {
     font-family: 'Special Gothic Expanded One'
 }
 
+.body {
+    font-family: Inter;
+}
+
+.grid {
+    display: grid;
+    gap: 18px;
+}
+
+.two {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.three {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+article {
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    background: #fff;
+    box-shadow: var(--shadow);
+}
+
+.tint {
+    max-width: none !important;
+    padding-inline: max(20px, calc(100% - 1100px)/2) !important;
+    background: linear-gradient(#f9fcff, var(--tint));
+}
+
+.dark {
+    max-width: none !important;
+    padding-inline: max(20px, calc((100% - 1100px)/2)) !important;
+    background: var(--navy);
+    color: #eaf1ff;
+}
+
+.dark h2, .dark h3 {
+    color: #fff;
+}
+
+.dark article {
+    background: #ffffff10;
+    border-color: #ffffff25;
+}
+
+.dark code {
+    color: color;
+}
