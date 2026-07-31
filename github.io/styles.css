@@ -44,7 +44,7 @@ header {
     padding: 14px max(20px, calc((100% - 1100px)/2));
     background: #fffffff2;
     border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(10px)
+    backdrop-filter: blur(10px);
 }
 
 .brand {
@@ -60,9 +60,7 @@ header {
 }
 
 .brand strong {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
+   font: 700 18px 'DM Sans', sans-serif;
 }
 
 nav {
@@ -103,6 +101,7 @@ main>section {
 
 h1, h2, h3 {
     font-family: 'DM Sans', sans-serif;
+    color: var(--text);
     margin-top: 0;
 }
 
@@ -119,12 +118,19 @@ h3 {
     font-size: 18px;
 }
 
+.eyebrow {
+    color: var(--orange);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+}
+
 .display {
-    font-family: 'Special Gothic Expanded One'
+    font-family: 'Special Gothic Expanded One';
 }
 
 .body {
-    font-family: Inter;
+    font-family: Inter, sans-serif;
 }
 
 .grid {
@@ -150,7 +156,7 @@ article {
 
 .tint {
     max-width: none !important;
-    padding-inline: max(20px, calc(100% - 1100px)/2) !important;
+    padding-inline: max(20px, calc((100% - 1100px)/2)) !important;
     background: linear-gradient(#f9fcff, var(--tint));
 }
 
@@ -171,7 +177,7 @@ article {
 }
 
 .dark code {
-    color: color;
+    color: #ffd5b8;
 }
 
 .btn {
@@ -241,7 +247,7 @@ article {
 }
 
 .status-row, .demo-row {
-    display: grid;
+    display: flex;
     gap: 10px;
     flex-wrap: wrap;
     margin-top: 22px;
@@ -329,13 +335,13 @@ footer {
     padding: 24px;
     text-align: center;
     background: #F7F9FC;
-    color: #64728f;
+    color: var(--text);
     border-top: 1px solid var(--border);
 }
 
 @keyframes float{
     50%{
-        transform: translateY(12px);
+        transform: translateY(-12px);
     }
 }
 
