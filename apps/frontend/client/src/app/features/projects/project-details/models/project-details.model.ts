@@ -14,12 +14,20 @@ export interface ProjectMember{
     lastName: string;
     email: string;
     hoursLogged: number;
+    hoursLoggedLabel: string;
     role: ProjectRole;
     joinedAt: string;
 }
 export interface ProjectDetails extends Project{
+    budgetHours: number;
+    hourlyRate: number;
+    budgetCost: number
     totalCost: number;
-    hoursLogged: number
+    createdAt: string;
+    updatedAt:string;
+    myRole: ProjectRole;
+    startDate: string;
+    endDate: string;
     members: ProjectMember[];
     progressPercentage: number;
 }
