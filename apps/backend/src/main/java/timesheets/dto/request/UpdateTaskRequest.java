@@ -63,7 +63,7 @@ public class UpdateTaskRequest {
     private LocalDate dueDate;
 
     private UUID projectId;
-    private String jiraTicketId;
+    private String jiraTicketKey;
     private UUID parentTaskId;
   }
 

@@ -288,13 +288,12 @@ public class ProjectService {
             .endDate(project.getEndDate())
             .myRole(role)
             .createdAt(project.getCreatedAt())
-            .updatedAt(project.getUpdatedAt());
+            .updatedAt(project.getUpdatedAt())
+            .budgetHours(project.getBudgetHours())
+            .hourlyRate(project.getHourlyRate());
 
     if (showCostInfo) {
-      builder
-          .budgetHours(project.getBudgetHours())
-          .hourlyRate(project.getHourlyRate())
-          .budgetCost(project.getBudgetCost());
+      builder.budgetCost(project.getBudgetCost());
     }
 
     return builder.build();
@@ -317,13 +316,12 @@ public class ProjectService {
             .hoursLogged(totalHoursLogged)
             .progressPercentage(progressPercentage)
             .createdAt(project.getCreatedAt())
-            .updatedAt(project.getUpdatedAt());
+            .updatedAt(project.getUpdatedAt())
+            .budgetHours(project.getBudgetHours())
+            .hourlyRate(project.getHourlyRate());
 
     if (showCostInfo) {
-      builder
-          .budgetHours(project.getBudgetHours())
-          .hourlyRate(project.getHourlyRate())
-          .budgetCost(project.getBudgetCost());
+      builder.budgetCost(project.getBudgetCost());
 
       if (project.getBudgetHours() != null && project.getHourlyRate() != null) {
         BigDecimal totalCost = project.getBudgetHours().multiply(project.getHourlyRate());

@@ -4,8 +4,24 @@ Date: 2026-07-17
 Purpose: will display our desired wireframe of 
 all the project details page.
 Related Requirements: N/A
--->
 
+Patched: 30/07/2026
+Wrapped in loading error guard since now content now comes from GET /api/projects/{id} 
+-->
+<div *ngIf = "loading()" class="project-details-container">
+    <p class="project-datils-loading"> Loading project... </p>
+</div>
+
+<div *ngIf="!loading() && error()" class="project-details-container">
+    <p class="project-details-error">
+        Couldn't load this project. It may not exist, or you may not have access to it.
+    </p>
+    <button class="back-link-btn" type="button" routerLink="/projects">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back to Projects
+    </button>
+</div>
+<ng-container *ngIf="!loading() && !error()">
 <div class="project-details-container">
     <!--
     BACK BUTTON
@@ -220,7 +236,7 @@ Related Requirements: N/A
                                 Logged
                             </span>
                             <span class="kpi-value primary">
-                                {{ project().hoursLogged }}h
+                                {{ project().hoursLoggedLabel }}h
                             </span>
                         </div>
 
@@ -301,7 +317,7 @@ Related Requirements: N/A
                     </div>
 
                     <span class="summary-value">
-                        {{ project().hoursLogged }}h
+                        {{ project().hoursLoggedLabel }}h
                     </span>
                 </div>
 
@@ -359,7 +375,7 @@ Related Requirements: N/A
                                 </span>
 
                                 <span class="member-hours">
-                                    {{ member.hoursLogged }} hours logged
+                                    {{ member.hoursLoggedLabel }} hours logged
                                 </span>
                             </div>
                         </div>
@@ -485,3 +501,4 @@ Related Requirements: N/A
     </section>
 
 </div>
+</ng-container>
