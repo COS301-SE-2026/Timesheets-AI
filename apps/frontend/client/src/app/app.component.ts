@@ -26,6 +26,7 @@ import { FooterComponent } from './shared/components/footer/footer.component';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
+
 export class AppComponent {
   private readonly router = inject(Router);
 
@@ -48,11 +49,16 @@ export class AppComponent {
 
 
     private updateLayout(url: string) : void {
-        const isFullscreenPage = this.hideLayoutRoutes.some(r => url.startsWith(r));
-          this.showSidebar = !isFullscreenPage;
-          this.showHeader = !isFullscreenPage;
-          this.showFooter = !isFullscreenPage;
-          this.isFullscreenPage = isFullscreenPage;
+      const isLandingPage = url ==='/';
+
+      const isFullscreenPage = 
+        isLandingPage ||
+        this.hideLayoutRoutes.some(r => url.startsWith(r));
+
+      this.showSidebar = !isFullscreenPage;
+      this.showHeader = !isFullscreenPage;
+      this.showFooter = !isFullscreenPage;
+      this.isFullscreenPage = isFullscreenPage;
 
   }
 }
