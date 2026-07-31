@@ -150,7 +150,7 @@ Related Requirements: N/A
         <div class="help-view-wrapper">
 
             <!-- HELP HERO SECTION -->
-            <div class="hero-section">
+            <section class="hero-section">
                 <div class="hero-content">
                     <div class="badge-tag">
                         <i class="fa-solid fa-circle-question">
@@ -173,8 +173,39 @@ Related Requirements: N/A
                     </p>
                 </div>
 
-                
-            </div>
+                <!-- HOURGLASS COMPONENT -->
+                <div class="hero-preview">
+                    <app-hourglass></app-hourglass>
+                </div>
+            </section>
+
+            <!--  HELP CARDS AREA-->
+            <section class="features-section help-cards-section">
+                <div class="features-grid help-grid">
+                    <div class="features-card help-card">
+                        <div class="features-icon icon-orange">
+                            <i class="fa-solid fa-circle-play"></i>
+                        </div>
+
+                        <h3>
+                            Watch Demo Video
+                        </h3>
+                        <p>
+                            Take a guided visual tour of Momently's
+                            task dashboard and workflow features.
+                        </p>
+                        <button 
+                            class="btn-card-action btn-orange"
+                            (click)="watchDemo()">
+
+                            <i class="fa-solid fa-play"></i>Watch Video
+                        
+                        </button>
+                    </div>
+
+                    
+                </div>
+            </section>
         </div>
     }
 </div>
