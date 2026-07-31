@@ -56,6 +56,19 @@
 [![Demo 2 Video](https://img.shields.io/badge/Demo_2-View_Video-E07830?style=for-the-badge&logo=youtube&logoColor=white)](./docs/demo-2/demo2.pdf)
 [![Demo 2 Slides](https://img.shields.io/badge/Demo_2-View_Slides-0F4C91?style=for-the-badge&logo=googleslides&logoColor=white)](https://canva.link/4vyzjoad934wpsx)
 
+
+| Document | Link |
+|---|---|
+| System Requirements Specification | [View PDF](./docs/demo-2/SRS.pdf) |
+| System Architecture Specification | [View PDF](./docs/demo-2/SAS.pdf) |
+| Coding Standards Handbook | [View PDF](./docs/demo-2/Coding-Standards-Handbook.pdf) |
+| Testing Policy | [View PDF](./docs/demo-2/testing-policy.pdf) |
+| User Manual | [View PDF](./docs/demo-2/User-Manual.pdf) |
+| Brand Style Guide | [View PDF](./docs/demo-2/Brand-Style-Guide.pdf) |
+| Wireframes | [View PDF](./docs/demo-2/wireframes.pdf) |
+| Demo 2 Video | [View Video](./docs/demo-2/demo2.pdf) |
+| Demo 2 Slides | [View Slides](https://canva.link/4vyzjoad934wpsx) |
+| Brand Style Site | [View Site](https://momently-brand-style.netlify.app/) |
 </div>
 </details>
 
