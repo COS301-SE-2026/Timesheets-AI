@@ -106,7 +106,7 @@ h1, h2, h3 {
 }
 
 h1 {
-    font: 400 clamp(42px, 7vw, 76px)/1 'Special Gothic Expanded One';
+    font: 400 clamp(42px, 7vw, 76px)/1 'Special Gothic Expanded One', sans-serif;
     color: var(--blue);
 }
 
@@ -126,7 +126,7 @@ h3 {
 }
 
 .display {
-    font-family: 'Special Gothic Expanded One';
+    font-family: 'Special Gothic Expanded One', sans-serif;
 }
 
 .body {
