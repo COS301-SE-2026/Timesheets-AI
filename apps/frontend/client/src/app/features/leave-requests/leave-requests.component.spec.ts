@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { LeaveRequestsComponent } from './leave-requests.component';
 
 describe('LeaveRequestsComponent', () => {
@@ -8,7 +9,11 @@ describe('LeaveRequestsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LeaveRequestsComponent]
+      imports: [LeaveRequestsComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
     })
     .compileComponents();
 

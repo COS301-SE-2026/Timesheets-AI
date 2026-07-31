@@ -8,20 +8,21 @@ Related Requirements: N/A
 Patched: 30/07/2026
 Wrapped in loading error guard since now content now comes from GET /api/projects/{id} 
 -->
-<div *ngIf = "loading()" class="project-details-container">
+@if (loading()){
+<div class="project-details-container">
     <p class="project-datils-loading"> Loading project... </p>
 </div>
-
-<div *ngIf="!loading() && error()" class="project-details-container">
-    <p class="project-details-error">
-        Couldn't load this project. It may not exist, or you may not have access to it.
-    </p>
-    <button class="back-link-btn" type="button" routerLink="/projects">
-        <i class="fa-solid fa-arrow-left"></i>
-        Back to Projects
-    </button>
-</div>
-<ng-container *ngIf="!loading() && !error()">
+} @else if (error()) {
+    <div class="project-details-container">
+        <p class="project-details-error">
+            Couldn't load this project. It may not exist, or you may not have access to it.
+        </p>
+        <button class="back-link-btn" type="button" routerLink="/projects">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Projects
+        </button>
+    </div>
+} @else {
 <div class="project-details-container">
     <!--
     BACK BUTTON
@@ -194,9 +195,8 @@ Wrapped in loading error guard since now content now comes from GET /api/project
     <!--
     OVERVIEW
     -->
-    <section 
-        class="overview-grid"
-        *ngIf="activeTab()==='overview'">
+        @if (activeTab()==='overview'){
+        <section class ="overview-grid">
 
         <!--
         Hours
@@ -355,9 +355,8 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             
 
             <div class="team-list">
-                <div
-                    class="team-member-row"
-                    *ngFor="let member of project().members">
+                @for (member of project().members; track member.workspaceMemberId) {
+                <div class="team-member-row">
 
                     <div class="member-top-row">
                         
@@ -408,8 +407,9 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                         </span>
                     </div>
                 </div>
+                }
             </div>
-
+ 
             <button class="view-members-btn">
                 <i class="fa-solid fa-user-group"></i>
                 View all members
@@ -418,13 +418,13 @@ Wrapped in loading error guard since now content now comes from GET /api/project
         </article>
 
     </section>
+    }
 
     <!--
     TASKS TAB
     -->
-    <section
-        class="task-section"
-        *ngIf="activeTab()=== 'tasks'">
+    @if (activeTab() === 'tasks') {
+    <section class="task-section">
 
         <article class="task-card">
             <div class="task-header">
@@ -450,7 +450,8 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                 </thead>
 
                 <tbody>
-                    <tr *ngFor="let task of tasks()">
+                    @for (task of tasks(); track task.id) {
+                    <tr>
                         <td class="task-title">
                             {{ task.title }}
                         </td>
@@ -494,11 +495,12 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                         </td>
 
                     </tr>
+                    }
                 </tbody>
             </table>
         </article>
 
     </section>
-
+    }
 </div>
-</ng-container>
+}
