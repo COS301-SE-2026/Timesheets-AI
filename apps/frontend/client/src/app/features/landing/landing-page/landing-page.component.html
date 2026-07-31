@@ -17,7 +17,8 @@ Related Requirements: N/A
         <!-- LOGO AREA -->
         <a 
             class="brand brand--hero" 
-            routerLink="/"
+            (click)="setActiveTab('home')"
+            style="cursor: pointer;"
             aria-label="Momently home">
 
             <img 
@@ -42,9 +43,15 @@ Related Requirements: N/A
             <a href="https://momently-brand-style.netlify.app/" class="btn-signup">
                 Brand Style Guide
             </a>
-            <a routerLink="/signup" class="btn-signup">
+
+            <button 
+                type="button"
+                class="btn-sign-up"
+                [class.active]="activeTab === 'help'"
+                (click)="setActiveTab('help')">
                 Help Menu
-            </a>
+            </button>
+
             <a routerLink="/login" class="btn-login">
                 Login
             </a>
