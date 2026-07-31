@@ -111,11 +111,11 @@
 ---
 | Documentation | Link |
 |------|-------------|
-| System Requirements Specification | [View PDF](./docs/demo-2/srs.pdf)|
-|System Architecture Specification|  [View PDF](./docs/demo-2/sas.pdf) |
-| Coding Standards Handbook |  [View PDF](./docs/demo-2/coding-standards-handbook.pdf) |
+| System Requirements Specification | [View PDF](./docs/demo-2/SRS.pdf)|
+|System Architecture Specification|  [View PDF](./docs/demo-2/SAS.pdf) |
+| Coding Standards Handbook |  [View PDF](./docs/demo-2/Coding-Standards-Handbook.pdf) |
 | Testing Policy|  [View PDF](./docs/demo-2/testing-policy.pdf) |
-| User Manual |  [View PDF](./docs/demo-2/user-manual.pdf) |
+| User Manual |  [View PDF](./docs/demo-2/User-Manual.pdf) |
 | Brand Style Guide |  [View PDF](./docs/demo-2/brand-style-guide.pdf) |
 | Wireframes |  [View PDF](./docs/demo-2/srs.pdf) |
 | Demo 2 video |  [View Video](./docs/demo-2/srs.pdf) |
