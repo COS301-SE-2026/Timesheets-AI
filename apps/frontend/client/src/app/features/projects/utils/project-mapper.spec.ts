@@ -28,9 +28,11 @@ const MOBILE_APP_BUDGET_COST = 37500;
 const THABANG_HOURS_LOGGED = 240;
 const AMAHLE_HOURS_LOGGED = 0;
 const TEAM_TOTAL_HOURS = 780.0666666666667; // -> "~780h 4m", tests minute rounding
+const TEAM_TOTAL_MINUTES_RAW = TEAM_TOTAL_HOURS*60
 const PROGRESS_OVER_BUDGET = 174.62; //deliberately over 100, tests clamping to 100%
 
 const ENZOKUHLE_EMAIL = 'enzokuhle.khumalo@momentum.co.za';
+const ENZOKUHLE_MINUTES_LOGGED = 750;
 const ENZOKUHLE_HOURS_LOGGED = 12.5;
 
 describe('project-mapper', () => {
@@ -121,7 +123,7 @@ describe('project-mapper', () => {
           joinedAt: FIXTURE_TIMESTAMP,
         },
       ],
-      hoursLogged: TEAM_TOTAL_HOURS,
+      hoursLogged: TEAM_TOTAL_MINUTES_RAW,
       progressPercentage: PROGRESS_OVER_BUDGET,
       createdAt: FIXTURE_TIMESTAMP,
       updatedAt: FIXTURE_TIMESTAMP,
@@ -172,11 +174,11 @@ describe('project-mapper', () => {
           lastName: 'Khumalo',
           email: ENZOKUHLE_EMAIL,
           role: 'DEVELOPER',
-          hoursLogged: ENZOKUHLE_HOURS_LOGGED,
+          hoursLogged: ENZOKUHLE_MINUTES_LOGGED,
           joinedAt: '',
         },
       ],
-      hoursLogged: ENZOKUHLE_HOURS_LOGGED,
+      hoursLogged: ENZOKUHLE_MINUTES_LOGGED,
       progressPercentage: 50,
       createdAt: '',
       updatedAt: '',
