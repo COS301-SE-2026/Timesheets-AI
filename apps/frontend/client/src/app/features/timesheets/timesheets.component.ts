@@ -27,8 +27,7 @@ import { TaskService, TaskResponse } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import {forkJoin, Observable, of} from 'rxjs';
-import { catchError, tap } from 'rxjs';
+import {forkJoin, Observable, of, catchError, tap} from 'rxjs';
 
 type StatusFilter = 'ALL' | TimesheetStatus;
 type UiState = 'idle' | 'loading' | 'error' | 'empty';
