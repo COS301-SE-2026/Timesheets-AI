@@ -185,8 +185,9 @@ export class LogtimeComponent implements OnDestroy {
   readonly pausedElapsedSeconds = signal(0);
   readonly filterFrom = signal(this.today());
   readonly filterTo = signal(this.today());
+  readonly durationPreviewSeconds = signal(3600);
 
-  /*
+  /*  
   tracks the current period's timesheet, submit now happens at this level not per entry, since status/submittedAt/approvedAt/isLocked all live on
   the timesheets table per backend schema, not on time_entries
   */
@@ -486,9 +487,7 @@ export class LogtimeComponent implements OnDestroy {
       Converting here so the rest of the app (formatDuration, totals, etc) works with real minutes. If the backend fixes this field, remove this division
       */
       const normalisedEntry: TimeEntry = {
-        ...savedEntry,
-        durationSeconds: savedEntry.durationMinutes, // backend is returning seconds in the durationMinutes field, so preserve that as-is
-        durationMinutes: Math.round(savedEntry.durationMinutes / 60),
+        ...this.normaliseEntryDuration(savedEntry),
         status:
           savedEntry.status ??
           (this.isEditMode()
@@ -704,21 +703,7 @@ export class LogtimeComponent implements OnDestroy {
     }
 
     this.timerService.discardTimer().subscribe({
-      next: () => {
-        this.activeTimer.set(null);
-        this.elapsedSeconds.set(0);
-        this.isTimerPaused.set(false);
-        this.pausedElapsedSeconds.set(0);
-        this.clearTimerInterval();
-        this.timerForm.enable({ emitEvent: false });
-        this.timerForm.reset({
-          projectId: this.projects()[0]?.id ?? '',
-          taskId: '',
-          description: '',
-        });
-        this.toastMessage.set('Timer entry discarded.');
-        this.closePanel();
-      },
+      next: () => this.resetTimerState('Timer entry discarded.'),
       error: (error) =>
         this.conflictMessage.set(
           error.error?.message ?? 'Unable to discard the timer.',
@@ -732,22 +717,7 @@ export class LogtimeComponent implements OnDestroy {
   */
   private persistTimerEntry(): void {
     const timer = this.activeTimer();
-    const stopAndReset = () => {
-      this.activeTimer.set(null);
-      this.elapsedSeconds.set(0);
-      this.isTimerPaused.set(false);
-      this.pausedElapsedSeconds.set(0);
-      this.clearTimerInterval();
-      this.timerForm.enable({ emitEvent: false });
-      this.timerForm.reset({
-        projectId: this.projects()[0]?.id ?? '',
-        taskId: '',
-        description: '',
-      });
-      this.toastMessage.set('Timer entry saved.');
-      this.closePanel();
-    };
-    const attachNotesIfPresent = (createdEntryId: string) => {
+    const attachNotesIfPresent = (createdEntryId: string): void => {
       const notes = timer?.notes?.trim();
       if (!notes) {
         return;
@@ -771,7 +741,6 @@ export class LogtimeComponent implements OnDestroy {
       this.timeEntryService
         .updateEntry(createdEntryId, updateRequest)
         .subscribe({
-          next: () => this.loadEntries(),
           error: (error) =>
             console.error(
               'LogtimeComponent: Failed to attach notes to timer entry',
@@ -788,9 +757,16 @@ export class LogtimeComponent implements OnDestroy {
       )
       .subscribe({
         next: (response) => {
-          attachNotesIfPresent(response.createdTimeEntry.id);
+          if(!response.createdTimeEntry?.id) {
+            console.error(
+              '[LogTimeComponent] StopTimerResponse missing createdTimeEntry.id',
+              response,
+            );
+          }else{
+            attachNotesIfPresent(response.createdTimeEntry.id);
+          }
           this.loadEntries();
-          stopAndReset();
+          this.resetTimerState('Timer entry saved.');
         },
         error: (error) =>
           this.conflictMessage.set(
@@ -981,8 +957,7 @@ export class LogtimeComponent implements OnDestroy {
     const form = context === 'manual' ? this.entryForm : this.timerForm;
     return form.controls.taskId.value;
   }
-  readonly durationPreviewSeconds = signal(3600);
-
+  
   private updateDuration(): void {
     const duration = Math.max(
       0,
@@ -1115,11 +1090,7 @@ export class LogtimeComponent implements OnDestroy {
         next: (entries) =>
           this.entries.set(
             //same durationMinutes-is-actually-seconds fix as onSaved() in saveEntry() — see that comment for the full explanation
-            entries.map((entry) => ({
-              ...entry,
-              durationSeconds: entry.durationMinutes,
-              durationMinutes: Math.round(entry.durationMinutes / 60),
-            })),
+            entries.map((entry) => this.normaliseEntryDuration(entry))
           ),
         error: (error) =>
           this.conflictMessage.set(
@@ -1294,5 +1265,34 @@ export class LogtimeComponent implements OnDestroy {
       clearInterval(this.timerIntervalId);
       this.timerIntervalId = null;
     }
+  }
+
+  /*
+  sonarqube was complaining about the duplicated lines as a maintenance risk, so i factored them out
+  into a single helper function to reduce duplication and make it easier to change the logic in one place if needed
+  */
+ private resetTimerState(toastMessage: string): void {
+    this.activeTimer.set(null);
+    this.elapsedSeconds.set(0);
+    this.isTimerPaused.set(false);
+    this.pausedElapsedSeconds.set(0);
+    this.clearTimerInterval();
+    this.timerForm.enable({ emitEvent: false });
+    this.timerForm.reset({
+      projectId: this.projects()[0]?.id ?? '',
+      taskId: '',
+      description: '',
+    });
+    this.toastMessage.set(toastMessage);
+  }
+
+  private normaliseEntryDuration<T extends { durationMinutes: number; durationSeconds: number }>(
+    entry: T,
+  ): T & { durationSeconds: number}{
+    return {
+      ...entry,
+      durationSeconds: entry.durationMinutes, 
+      durationMinutes: Math.round(entry.durationMinutes / 60),
+    };
   }
 }
