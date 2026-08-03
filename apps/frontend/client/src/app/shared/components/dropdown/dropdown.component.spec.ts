@@ -34,10 +34,10 @@ describe('DropdownComponent', ()=> {
     //TC4: dropdown is associated with and ID for verification
     test('should make a new unique dropdownId that start with "dropdownid-', ()=> {
         //assert
-        expect(component.dropdownId()).toContain('dropdown-');
+        expect(component.dropdownId).toContain('dropdown-');
 
         //assert
-        expect(component.dropdownId()).toBeGreaterThan(10);
+        expect(component.dropdownId.length).toBeGreaterThan(10);
     });
 
     //TC5: testing edge cases 
