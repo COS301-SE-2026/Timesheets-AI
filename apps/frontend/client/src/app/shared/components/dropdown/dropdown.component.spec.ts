@@ -13,5 +13,16 @@ describe('DropdownComponent', ()=> {
         expect(component.selectedOption()).toBe('');
     })
 
-    
+    //TC2: when dropdown is clicked
+    test('should go to state isOpen when DropDown is called', ()=> {
+        //act
+        component.toggleDropDown();
+        //assert
+        expect(component.isOpen()).toBe(true);
+
+        //act
+        component.toggleDropDown();
+        //assert
+        expect(component.selectedOption()).toBe(false);
+    });
 })
