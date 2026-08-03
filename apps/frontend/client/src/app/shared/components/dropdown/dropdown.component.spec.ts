@@ -27,7 +27,7 @@ describe('DropdownComponent', ()=> {
     });
 
     //TC4: dropdown is associated with and ID for verification
-    test('should go to state isOpen when DropDown is called', ()=> {
+    test('should make a new unique dropdownId that start with "dropdownid-', ()=> {
         //assert
         expect(component.dropdownId()).toContain('dropdown-');
 
@@ -35,5 +35,14 @@ describe('DropdownComponent', ()=> {
         expect(component.dropdownId()).toBeGreaterThan(10);
     });
 
-    
+    //TC5: testing edge cases 
+    test('should accept input that is disabled', ()=> {
+        //arrange
+        fixture.componentRef.setInput('disabled', true);
+        fixture.detectChanges();
+                
+        //assert
+        expect(component.disabled()).toBe(true);
+
+    });
 })
