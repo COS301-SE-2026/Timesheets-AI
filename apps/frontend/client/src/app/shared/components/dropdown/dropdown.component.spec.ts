@@ -1,11 +1,16 @@
 import { DropdownComponent } from './dropdown.component';
-import { createComponentTest } from '../../testing/component-test-helper';
+import { configureTestBed, createComponentTest } from '../../testing/component-test-helper';
 import { assert } from 'node:console';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 createComponentTest(DropdownComponent, 'DropdownComponent');
 
 describe('DropdownComponent', ()=> {
-    const { component, fixture } = createComponentTest( DropdownComponent, 'DropdownComponent');
+    let component: DropdownComponent;
+    let fixture: ComponentFixture<DropdownComponent>;
+    beforeEach(async ()=>{
+        ({ component, fixture}=await configureTestBed(DropdownComponent))
+    })
 
     //TC1: Fisrt state
     test('should be closed with no selection', ()=> {
