@@ -25,4 +25,15 @@ describe('DropdownComponent', ()=> {
         //assert
         expect(component.selectedOption()).toBe(false);
     });
+
+    //TC4: dropdown is associated with and ID for verification
+    test('should go to state isOpen when DropDown is called', ()=> {
+        //assert
+        expect(component.dropdownId()).toContain('dropdown-');
+
+        //assert
+        expect(component.dropdownId()).toBeGreaterThan(10);
+    });
+
+    
 })
