@@ -19,7 +19,7 @@ describe('DropdownComponent', ()=> {
     })
 
     //TC2: when dropdown is clicked
-    test('should go to state isOpen when DropDown is called', ()=> {
+    test('should go to state isOpen when DropDown is called the closed', ()=> {
         //act
         component.toggleDropDown();
         //assert
@@ -28,7 +28,7 @@ describe('DropdownComponent', ()=> {
         //act
         component.toggleDropDown();
         //assert
-        expect(component.selectedOption()).toBe(false);
+        expect(component.isOpen()).toBe(false);
     });
 
     //TC4: dropdown is associated with and ID for verification
