@@ -104,6 +104,24 @@ class TimesheetServiceTest {
   }
 
   @Nested
+  @DisplayName("Get Or Create Current Timesheet Tests")
+  class GetOrCreateCurrentTimesheetTests {
+    // I want to do tests for this
+  }
+
+  @Nested
+  @DisplayName("Get Timesheet by ID Tests")
+  class GetTimesheetByIdTests {
+    // tests for this
+  }
+
+  @Nested
+  @DisplayName("Get Timesheets by member Tests")
+  class GetTimesheetsByMemberTests {
+    // tests for this
+  }
+
+  @Nested
   @DisplayName("Create Timesheet Tests")
   class CreateTimesheetTests {
 
@@ -405,5 +423,11 @@ class TimesheetServiceTest {
       verify(timesheetRepository, times(1)).findById(timesheetId);
       verify(timesheetRepository, never()).save(any());
     }
+  }
+
+  @Nested
+  @DisplayName("Helper Functions Tests")
+  class HelperFunctionsTests {
+    // tests here as well
   }
 }
