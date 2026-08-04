@@ -284,5 +284,26 @@ class TimesheetServiceTest {
       verify(timesheetRepository, times(1)).findById(timesheetId);
       verify(timesheetRepository, times(1)).save(any(Timesheet.class));
     }
+
+    @Test
+    @DisplayName("throws exception when a user approves their own timesheet")
+    void approveTimesheetOwnTimesheet() {
+
+      // ARRANGE: making sure that the reviewer is the same as the timesheet owner
+      UUID reviewerId = workspaceMemberId;
+      timesheet.setStatus("SUBMITTED");
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+
+      // ACT and ASSERT
+      assertThatThrownBy(() -> timesheetService.approveTimesheet(timesheetId, reviewerId))
+          .isInstanceOf(RuntimeException.class)
+          .hasMessage("You cannot approve your own timesheet");
+
+      // making sure that it did not get saved
+      verify(timesheetRepository, times(1)).findById(timesheetId);
+      verify(timesheetRepository, never()).save(any());
+    }
   }
 }
