@@ -221,6 +221,24 @@ class TimesheetServiceTest {
       verify(timesheetRepository, times(1)).findById(timesheetId);
       verify(timesheetRepository, never()).save(any());
     }
+
+    @Test
+    @DisplayName("throws exception when timesheet does not exist")
+    void submitTimesheet_notFound_throwsException() {
+
+      // ARRANGE: when someone tries to submit a timesheet with an invalid ID
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.empty());
+
+      // ACT and ASSERT: an exception should be thrown
+      assertThatThrownBy(() -> timesheetService.submitTimesheet(timesheetId))
+          .isInstanceOf(RuntimeException.class)
+          .hasMessage("Timesheet not found");
+
+      verify(timesheetRepository, times(1)).findById(timesheetId);
+      verify(timesheetRepository, never())
+          .save(any()); // should not be saved since the operation is not valid
+    }
   }
 
   @Nested
