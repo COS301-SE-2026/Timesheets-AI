@@ -175,6 +175,29 @@ class TimesheetServiceTest {
       verify(timesheetRepository, times(1)).findById(timesheetId);
       verify(timesheetRepository, times(1)).save(any(Timesheet.class));
     }
+
+    @Test
+    @DisplayName("throw exception when one tries to submit another user timesheet")
+    void submitTimesheetOfAnotherUser() {
+      /*
+      ARRANGE
+      - a user tries to submit someone elses timesheet
+      - mocking to make it that the logged in user is not the owner of the timesheet
+      - ideally on the UI side a user would not even see other peoples timesheets, but the security needs to be there
+      */
+      UUID differentUser = UUID.randomUUID();
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(differentUser);
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+
+      // ACT and ASSERT
+      assertThatThrownBy(() -> timesheetService.submitTimesheet(timesheetId))
+          .isInstanceOf(RuntimeException.class)
+          .hasMessage("You can only submit your own timesheets");
+
+      verify(timesheetRepository, times(1)).findById(timesheetId);
+      // making sure that nothing got saved, because it should not be saved
+      verify(timesheetRepository, never()).save(any());
+    }
   }
 
   @Nested
