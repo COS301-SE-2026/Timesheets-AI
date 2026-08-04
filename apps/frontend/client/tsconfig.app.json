@@ -22,6 +22,7 @@
   /*dont want them to run in production*/
    "exclude": [
     "src/**/*.spec.ts",
-    "src/**/*.test.ts"
+    "src/**/*.test.ts",
+    "src/app/shared/testing/component-test-helper.ts"
   ]
 }
