@@ -216,9 +216,9 @@
                 type="text"
                 readonly
                 [value]="
-                  formatDuration(entryForm.controls.durationMinutes.value)
+                  formatDuration(durationPreviewSeconds())
                 "
-              />
+              /> 
             </label>
           </div>
 
@@ -234,7 +234,7 @@
 
           <!-- Form actions: cancel or save/update -->
           <div class="manual-form__actions">
-            <button class="btn btn--ghost" type="button" (click)="closePanel()">
+            <button class="btn btn--ghost" type="button" (click)="cancelTimer()">
               Cancel
             </button>
             <!-- Button label changes based on whether we're creating or editing -->
@@ -396,7 +396,7 @@
               <button
                 class="btn btn--ghost"
                 type="button"
-                (click)="closePanel()"
+                (click)="cancelTimer()"
               >
                 Cancel
               </button>
@@ -415,7 +415,7 @@
           <h2>{{ entriesCardTitle() }}</h2>
           <!-- Total duration badge across all filtered entries -->
           <span class="total-badge"
-            >Total: {{ formatDuration(totalMinutes()) }}</span
+            >Total: {{ formatDuration(totalSeconds()) }}</span
           >
         </div>
       </header>
@@ -491,7 +491,7 @@
                     {{ entry.entryType }}
                   </span>
                 </td>
-                <td>{{ formatDuration(entry.durationMinutes) }}</td>
+                <td>{{ formatDuration(entry.durationSeconds) }}</td>
                 <td class="col-description">
                   <span>{{ entry.description }}</span>
                   <!-- Status notes shown below description -->

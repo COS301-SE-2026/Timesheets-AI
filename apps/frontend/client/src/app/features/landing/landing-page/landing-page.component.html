@@ -85,19 +85,20 @@ Related Requirements: N/A
     <!-- FEATURES GRID AREA -->
     <section class="features-section">
         <div class="features-grid">
-            <div 
-                class="features-card"
-                *ngFor="let item of features"
-                [style.background]="item.bgColor">
-
+            @for (item of features; track item.title) {
                 <div 
-                    class="features-icon"
-                    [style.background-color]="item.bgColor"
-                    [style.color]="item.iconColor">
+            
+                    class="features-card"
+                    [style.background]="item.bgColor">
 
-                    <i [class]="item.icon"></i>
+                    <div 
+                        class="features-icon"
+                        [style.background-color]="item.bgColor"
+                        [style.color]="item.iconColor">
 
-                </div>
+                        <i [class]="item.icon"></i>
+
+                    </div>
 
                 <h3>
                     {{ item.title }}
@@ -106,6 +107,7 @@ Related Requirements: N/A
                     {{ item.description}}
                 </p>
             </div>
+            }
         </div>
     </section>
 
