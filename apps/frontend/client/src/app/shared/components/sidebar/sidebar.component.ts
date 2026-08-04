@@ -38,9 +38,8 @@ export class SidebarComponent {
     { label: 'Timesheets', icon: 'description', route: '/timesheets' }, 
     { label: 'Log Time', icon: 'schedule', route: '/log-time' },
     { label: 'Projects', icon: 'folder', route: '/projects' },
-    { label: 'My Tasks', icon: 'assignment', route: '/my-tasks' },
     { label: 'Calendar', icon: 'calendar_month', route: '/calendar' },
-    { label: 'Leave Requests', icon: 'business_center', route: '/leave' },
+    { label: 'Leave Requests', icon: 'business_center', route: '/leave-requests' },
     { label: 'Reports', icon: 'bar_chart', route: '/reports' },
     { label: 'Insights', icon: 'trending_up', route: '/insights' },
     { label: 'Team', icon: 'groups', route: '/team' },
@@ -84,6 +83,21 @@ export class SidebarComponent {
     this.router.navigate([route])
   }
 
+  //adding logout button on the dropdown
+  readonly isMenuOpen = signal<boolean>(false);
+
+  toggleMenu(): void{
+    this.isMenuOpen.update((open) => !open);
+  }
+  onLogout(): void{
+    this.authService.logout();
+  }
+  public onProfileClick(event: MouseEvent): void {
+    const clickedInsideMenu = (event.target as HTMLElement).closest('.user-menu');
+    if (!clickedInsideMenu) {
+      this.toggleMenu();
+    }
+  }
   activeRoute = () => this.router.url;
 
 }

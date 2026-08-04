@@ -96,6 +96,18 @@ jobs:
         # docker has image locally
         #  so example: momently-backend:544dr55645
         # ecr DOES NOT have this image - only Github runner knows
+
+
+#====================== SECURITY scan ================================
+        - name: Scan Docker Image
+          if: github.event_name == 'push' && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+          uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+          with:
+            image-ref: momently-frontend:${{ github.sha }}
+            format: table
+            exit-code: 1
+            ignore-unfixed: true
+            severity: CRITICAL
         
 #====================== Tag Image ====================================
 

@@ -17,11 +17,12 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { forkJoin, of } from 'rxjs';
+import { RouterModule } from '@angular/router';
 import { catchError, map} from 'rxjs/operators';
 import { Project } from './models/project.model';
 import { ProjectStatus } from './enums/project-status.enum';
 import { PROJECT_FILTERS } from './constants/project-filters.constant';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { StatsCardComponent } from '../../shared/components/stats-card/stats-card.component';
 import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar.component';
@@ -39,13 +40,16 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     HeaderComponent,
     StatsCardComponent,
     ProgressBarComponent,
+    NgClass
   ],
   templateUrl: './projects.component.html',
   styleUrl: './projects.component.scss',
 })
+  
 export class ProjectsComponent implements OnInit {
   private readonly projectService = inject(ProjectService);
   private readonly authService = inject(AuthService);
@@ -131,6 +135,13 @@ export class ProjectsComponent implements OnInit {
     ).length;
   }
 
+  protected get totalHours(): number {
+    return this.projects.reduce(
+      (totalHours, project) => totalHours + (project.hoursLogged ?? 0),
+      0,
+    );
+  }
+
   protected filterProjects(selectedFilter: string): void {
     this.selectedFilter = selectedFilter;
 
@@ -150,4 +161,15 @@ export class ProjectsComponent implements OnInit {
       project.name.toLowerCase().includes(searchValue.toLowerCase()),
     );
   }
+
+  protected getProjectInitials(name:string):string{
+    if(!name) return '';
+    return name
+        .split(' ')
+        .map(word=> word[0])
+        .join('')
+        .substring(0, 2)
+        .toUpperCase();
+    }
+
 }

@@ -1,0 +1,356 @@
+
+<main class="leave-page">
+    @if (currentView() === 'LIST'){
+        <section class="page-container" aria-labelledby="leave-request-title" >
+            <header class="page-header">
+                <div class="page-header-content">
+                    <h1 id="leave-request-title" class="page-title"> Leave Request</h1>
+                    <p class="page-subtitle">Everything you've requested and where it stands.</p>
+                </div>
+
+                <button type="button" class="button button-primary" (click)="showView('CREATE')">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                    <span>Apply for leave</span>
+                </button>
+            </header>
+
+            @if (submitMessage()) {
+                <output class="alert alert-success">
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    <span> {{ submitMessage() }}</span>
+                </output>
+            }
+
+            @if (errorMessage()) {
+                <div class="alert alert-error" role="alert">
+                    <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                    <span>{{ errorMessage() }}</span>
+                </div>
+            }
+
+            <section class="summary-grid" aria-label="Leave request summary">
+                @for (card of summaryCards(); track card.label){
+                    <article class="summary-card">
+                        <span class="summary-card-icon" [ngClass]=" 'summary-card-icon-' + card.type">
+                            <i [class]="card.icon" aria-hidden="true"></i>
+                        </span>
+
+                        <div class="summary-card-content">
+                            <span class="summary-card-label"> {{ card.label}} </span>
+                            <strong class="summary-card-value" aria-live="polite"> {{ card.value }}</strong>
+                        </div>
+                    </article>
+                }
+            </section>
+
+            @if (uiState() === 'loading') {
+                <section class="state-panel" aria-live="polite">
+                    <i class="fa-solid fa-spinner fa-spin state-panel-icon" aria-hidden="true"></i>
+                    <p> Loading leave requests...</p>
+                </section>
+            } @else if(uiState() === 'error'){
+                <section class="state-panel">
+                    <i class="fa-solid fa-triangle-exclamation state-panel-icon" aria-hidden="true"></i>
+                    <h2> Unable to load leave requests</h2>
+                    <p>{{ errorMessage() ?? 'Please try again later.' }}</p>
+                </section>
+            } @else if (leaveRequests().length > 0){
+                <section class="content-card request-card" aria-labelledby="request-table-title">
+                    <h2 id="request-table-title" class="section-heading"> Your leave requests </h2>
+                    <div class="table-wrapper">
+                        <table class="request-table">
+                            <caption class="visually-hidden">
+                                Your submitted leave requests
+                            </caption>
+
+                            <thead>
+                                <tr>
+                                    <th scope="col">Leave Type</th>
+                                    <th scope="col">Start Date</th>
+                                    <th scope="col">End Date</th>
+                                    <th scope="col">Total Days</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col" class="table-action">Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @for (request of leaveRequests(); track request.id) {
+                                    <tr>
+                                        <td data-label="Leave Type">
+                                            <strong class="leave-type-name"> {{ leaveTypeLabel(request.leaveType) }}</strong>
+                                        </td>
+
+                                        <td data-label="Start Date"> {{ formatDate(request.startDate) }}</td>
+                                        <td data-label="End Date"> {{ formatDate(request.endDate) }}</td>
+                                        <td data-label="Total Days"> 
+                                            <span class="number"> {{request.totalDays | number: '1.1-1' }}</span>
+                                        </td>
+                                        <td data-label="Status">
+                                            <span [class]="statusClass(request.status)"> {{ statusLabel(request.status) }}</span>
+                                        </td>
+                                        
+                                        <td data-label="Action" class="table-action">
+                                            <div class="action-group">
+                                                <button type="button" class="button button-outline button-small" [attr.aria-label]=" 'View ' + leaveTypeLabel(request.leaveType) + ' request'" (click)="viewRequest(request)">
+                                                    View
+                                                </button>
+
+                                                @if (canEdit(request)){
+                                                    <button type="button" class="icon-button" [attr.aria-label]="'Edit '+ leaveTypeLabel(request.leaveType) + ' request'" title="Edit Request" (click)="editRequest(request)">
+                                                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                                                    </button>
+
+                                                    <button type="button" class="icon-button icon-button-danger" [attr.aria-label]="'Cancel ' + leaveTypeLabel(request.leaveType) + ' request'" title="Cancel request" (click)="cancelRequest(request)">
+                                                        <i class="fa-solid fa-ban" aria-hidden="true"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            } @else {
+                <section class="content-card empty-state" aria-labelledby="empty-state-title">
+                    <div class="empty-state-illustration">
+                        <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+                    </div>
+
+                    <h2 id="empty-state-title"> No leave requests yet</h2>
+                    <p>You haven't made any leave requests.</p>
+                    <button type="button" class="button button-primary" (click)="showView('CREATE')">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                        <span> Apply for leave</span>
+                    </button>
+
+                </section>
+            }
+
+        </section>
+    } @else {
+        <section class="page-container create-page" aria-labelledby="create-request-title">
+            <header class="create-header">
+                <span class="create-header-icon" aria-hidden="true">
+                    <i class="fa-regular fa-calendar"></i>
+                </span>
+
+                <div>
+                    <h1 id="create-request-title" class="page-title"> {{ editingRequestId() ? 'Edit Leave Request' : 'Leave Request' }} </h1>
+                    <p class="page-subtitle"> Submit a request for time off </p>
+                </div>
+            </header>
+
+            <form class="request-form" [formGroup]="leaveRequestForm" (ngSubmit)="submitLeaveRequest()" novalidate>
+                <section class="form-section" aria-labelledby="request-details-title">
+                    <h2 id="request-details-title" class="form-section-title"> Request Details </h2>
+
+                    <div class="form-grid">
+                        <div class="form-field" >
+                            <label class="form-label" for="leave-type">
+                                 Leave Type
+                                <span class="required" aria-hidden="true"> * </span>
+                            </label>    
+
+                            <div class="control-wrapper">
+                                <select id="leave-type" class="form-control" formControlName="leave_type" [class.form-control-invalid]="isInvalid('leave_type')" aria-describedby="leave-type-error">
+                                    <option value="" disabled>
+                                        Select leave type
+                                    </option>
+
+                                    @for (type of leaveTypeOptions; track type.value) {
+                                        <option [value]="type.value">
+                                            {{ type.label}}
+                                        </option>
+                                    }
+                                </select>
+
+                                <i class="fa-solid fa-chevron-down control-wrapper-icon" aria-hidden="true"></i>
+                            </div>
+
+                            @if (isInvalid('leave_type')) {
+                                <p id="leave-type-error" class="form-error"> Please select a leave type </p>
+                            }
+                        </div>
+
+                        <div class="form-field form-field-reason">
+                            <label class="form-label" for="leave-reason">
+                                Reason
+                                <span class="required" aria-hidden="true">*</span>
+                            </label>
+
+                            <textarea id="leave-reason" class="form-control form-control-textarea" rows="5" maxlength="500" formControlName="reason" placeholder="Please provide a reason for your leave request" [class.form-control-invalid]="isInvalid('reason')" aria-describedby="reason-error reason-counter">
+
+                            </textarea>
+
+                            <span id="reason-counter" class="character-counter">
+                                {{ reasonCount() }}/500
+                            </span>
+
+                            @if (isInvalid('reason')){
+                                <p  id="reason-error" class="form-error">
+                                    @if (leaveRequestForm.controls.reason.hasError('required')){
+                                        Please provide a reason
+                                    } @else {The reason cannot exceed 500 characters. }
+                                </p>
+                            }
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="start-date"> 
+                                Start Date
+                                <span class="required" aria-hidden="true">*</span>
+                            </label>
+
+                            <div class="control-wrapper">
+                                <input id="start-date" type="date" class="form-control form-control-date" formControlName="start_date" [class.form-control-invalid]="isInvalid('start_date')" aria-describedby="start-date-error"/>
+                                <i class="fa-regular fa-calendar control-wrapper-icon" aria-hidden="true"></i>
+                            </div>
+
+                            @if(isInvalid('start_date')){
+                                <p id="start-date-error" class="form-error">
+                                    Please select a start date
+                                </p>
+                            }
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label" for="end-date">
+                                End date
+                                <span class="required" aria-hidden="true">*</span>
+                            </label>
+
+                            <div class="control-wrapper">
+                                <input id="end-date" type="date" class="form-control form-control-date" formControlName="end_date" [class.form-control-invalid]="isInvalid('end_date') || leaveRequestForm.hasError('invalidDateRange')" aria-describedby="end-date-error"/>
+                                <i class=" fa-regular fa-calendar control-wrapper-icon" aria-hidden="true"></i>
+                            </div>
+
+                            @if (isInvalid('end_date') || leaveRequestForm.hasError('invalidDateRange')){
+                                <p id="end-date-error" class="form-error">
+                                    @if(leaveRequestForm.hasError('invalidDateRange')) {
+                                        End date cannot be before the start date.
+                                    } @else {
+                                        Please select an end date.
+                                    }
+                                </p>
+                            }
+                        </div>
+
+                 
+                        <div class="form-field form-field-full-width">
+                            <label class="form-label" for="total-days">
+                                Total Days 
+                                <span class="required" aria-hidden="true">*</span>
+                            </label>
+
+                            <div class="control-wrapper">
+                                <input id="total-days" type="number" class="form-control form-control-readonly number" formControlName="total_days" readonly aria-describedby="total-days-help"/>
+                                <span class="control-wrapper-suffix"> Days </span>
+                            </div>
+
+                            <p id="total-days-help" class="form-help">
+                                Automatically calculated from the start and end dates.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="form-section" aria-labelledby="additional-information-title">
+                    <h2 id="additional-information-title" class="form-section-title">
+                        Additional information
+                    </h2>
+
+                    <div class="form-field">
+                        <span class="form-label">
+                            Attachment (Optional)
+                        </span>
+
+                        <div class="attachment-placeholder">
+                            <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+                            <strong> Attachments are not available yet</strong>
+                            <span> The attachment value will remain empty for now</span>
+                        </div>
+
+                        <p class="form-help">
+                            Attachments will be submitted as <code>null</code>
+                        </p>
+                        <!-- INTEGRATION:  -->
+                         <!-- API currently documents attachments as string, integrate when upload support is available -->
+                    </div>
+                </section>
+
+                <section class="form-section" aria-labelledby="submission-title">
+                    <h2 id="submission-title" class="form-section-title"> Submission </h2>
+
+                    <div class="submission-note">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                  
+                        <p>
+                            <strong>Note:</strong>
+                            Your request will be submitted for approval.
+                            You will be notified once a decision has been made.
+                        </p>
+                    </div>
+                </section>
+
+                <footer class="form-actions">
+                    <button type="button" class="button button-secondary" (click)="showView('LIST')">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="button button-primary">
+                        <span> {{ editingRequestId() ? 'Update request' : 'Submit request' }}</span>
+                        <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+                    </button>
+                </footer>
+            </form>
+
+            <aside class="content-card leave-guide" aria-labelledby="leave-guide-title">
+                <h2 id="leave-guide-title" class="form-section-title">
+                    Leave Types Guide
+                </h2>
+
+                <ul class="leave-guide-list">
+                    @for (type of leaveTypeOptions; track type.value){
+                        <li class="leave-guide-item">
+                            <i [class]="type.icon + ' ' + iconClass(type.value)" aria-hidden="true"></i>
+                            <strong> {{type.label}}</strong>
+                            <span>{{ type.description }}</span>
+                        </li>
+                    }
+                </ul>
+            </aside>
+        </section>
+    }
+
+    @if (isDetailsOpen()){ 
+        @if (selectedRequest(); as request){
+        <div class="modal-overlay" >
+            <button type="button" class="modal-backdrop" aria-label="Close request details" (click)="closeRequestDetails()">
+
+            </button>
+
+            <dialog open class="modal-panel" aria-modal="true" aria-labelledby="request-detail-modal-title" >
+                <header class="modal-header">
+                    <h2 id="request-detail-modal-title"> {{ leaveTypeLabel(request.leaveType) }} </h2>
+
+                    <button type="button" class="icon-button" aria-label="Close request details" (click)="closeRequestDetails()">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    </button>
+                </header>
+
+                <div class="modal-content">
+                    <p><strong>Employee:</strong> {{ request.memberName }}</p>
+                    <p><strong>Start date:</strong> {{ formatDate(request.startDate) }}</p>
+                    <p><strong>End date:</strong> {{ formatDate(request.endDate) }}</p>
+                    <p><strong>Total days:</strong> {{ request.totalDays }}</p>
+                    <p><strong>Status:</strong> {{ statusLabel(request.status) }}</p>
+                    <p><strong>Reason:</strong> {{ request.reason ?? 'No reason provided.' }}</p>
+                </div>
+            </dialog>
+        </div>
+    }
+}
+</main>

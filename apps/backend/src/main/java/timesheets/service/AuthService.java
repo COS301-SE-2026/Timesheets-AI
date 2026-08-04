@@ -51,7 +51,7 @@ public class AuthService {
   private final TotpUtils totpUtils;
   private final EmailVerificationTokenRepository emailVerificationTokenRepository;
 
-  // private final TokenBlacklistService tokenBlacklistService;
+  private final TokenBlacklistService tokenBlacklistService;
   private final JwtService jwtService;
 
   // private final OtpService otpService;
@@ -155,8 +155,6 @@ public class AuthService {
         .lastName(user.getLastName())
         .createdAt(user.getCreatedAt())
         .message("Verification email sent. Please check your inbox.")
-        // DEMO 2
-        .verificationToken(token)
         .build();
   }
 
@@ -253,9 +251,10 @@ public class AuthService {
     user.setLockedUntil(null);
     userRepository.save(user);
 
-    if (!Boolean.TRUE.equals(user.getEmailVerified())) {
-      throw new IllegalStateException("please verify your email before logging in");
-    }
+    // TODO
+    // if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+    //   throw new IllegalStateException("please verify your email before logging in");
+    // }
 
     // check if MFA is enabled
     boolean mfaEnabled =
@@ -319,14 +318,15 @@ public class AuthService {
   // return new MessageResponse("Password reset successfully", "/login");
   // }
 
-  // public void logout(String token) {
-  // // extract token from bearer string if needed
-  // if (token.startsWith("Bearer ")) {
-  // token = token.substring(7);
-  // }
+  @Transactional
+  public void logout(String token) {
+    // extract token from bearer string if needed
+    if (token.startsWith("Bearer ")) {
+      token = token.substring(7);
+    }
 
-  // tokenBlacklistService.blacklistToken(token);
-  // }
+    tokenBlacklistService.blacklistToken(token);
+  }
 
   @Transactional
   public AuthResponse googleAuth(GoogleAuthRequest request) {
