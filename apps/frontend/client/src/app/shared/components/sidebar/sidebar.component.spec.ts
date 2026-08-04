@@ -57,7 +57,7 @@ describe('SidebarCoponent', () => {
 
     // Load all sidebar navigation items
     it('should contain all navigation items', () => {
-        expect(component.navItems()).toHaveLength(10);
+        expect(component.navItems()).toHaveLength(11);
     });
 
     // should return the users full name

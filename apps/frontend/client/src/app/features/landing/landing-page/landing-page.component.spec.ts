@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { LandingPageComponent } from './landing-page.component';
-import { log } from 'node:console';
 
 describe('LandingPageComponent', () => {
   let component: LandingPageComponent;
