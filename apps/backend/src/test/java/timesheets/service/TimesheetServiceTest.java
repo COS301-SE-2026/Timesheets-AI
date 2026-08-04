@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import timesheets.domain.Timesheet;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.repository.TimesheetRepository;
@@ -134,6 +136,54 @@ class TimesheetServiceTest {
       assertThat(result.getSubmittedAt()).isNotNull();
 
       // want to make sure that the repo got called, and timesheet was fetched
+      verify(timesheetRepository, times(1)).findById(timesheetId);
+      verify(timesheetRepository, times(1)).save(any(Timesheet.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Reject Timesheet Tests")
+  class RejectTimesheetTests {
+
+    @Test
+    @DisplayName("rejects a timesheet that is submitted")
+    void rejectTimesheet() {
+
+      // ARRANGE: having a random reviewer, and a reason
+      UUID reviewerId = UUID.randomUUID();
+      String rejectionReason = "Docs missing";
+
+      // simulating a submitted timesheet, remember that the timesheet gets locked
+      timesheet.setStatus("SUBMITTED");
+      timesheet.setIsLocked(true);
+
+      when(securityUtils.isManager()).thenReturn(false);
+
+      // basically returning a mock timesheet, as if the actual repository was called
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+      when(timesheetRepository.save(any(Timesheet.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      // ACT: calling actual reject timesheet function
+      Timesheet result = timesheetService.rejectTimesheet(timesheetId, reviewerId, rejectionReason);
+
+      /*
+      ASSERT:
+      - need to check that the timesheet is returned
+      - that the status changes to rejected
+      - that it gets unlocked
+      - that the locked_at is no longer there- previously changed this to remove ambiguity
+      - it has a rejection reason
+      */
+      assertThat(result).isNotNull();
+      assertThat(result.getStatus()).isEqualTo("REJECTED");
+      assertThat(result.getIsLocked()).isFalse();
+      assertThat(result.getLockedAt()).isNull();
+      assertThat(result.getRejectedAt()).isNotNull();
+      assertThat(result.getApprovedByWorkspaceMemberId()).isEqualTo(reviewerId);
+      assertThat(result.getRejectionReason()).isEqualTo(rejectionReason);
+
+      // those checks about making sure that the repository was called once
       verify(timesheetRepository, times(1)).findById(timesheetId);
       verify(timesheetRepository, times(1)).save(any(Timesheet.class));
     }
