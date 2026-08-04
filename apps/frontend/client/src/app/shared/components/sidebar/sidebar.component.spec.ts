@@ -74,5 +74,44 @@ describe('SidebarCoponent', () => {
         component.setActive('/projects');
 
         expect(routerMock.navigate).toHaveBeenCalledWith(['/projects']);
-    })
+    });
+
+    // shouuld open and close the profile menu
+    it('should toggle the menu state', () => {
+        expect(component.isMenuOpen()).toBe(false);
+
+        component.toggleMenu();
+        expect(component.isMenuOpen()).toBe(true);
+
+        component.toggleMenu();
+        expect(component.isMenuOpen()).toBe(false);
+    });
+
+    // should call the logout service
+    it('should logout the user', () => {
+        component.onLogout();
+
+        expect(authServiceMock.logout).toHaveBeenCalled();
+    });
+
+    // should return the current route
+    it('should return the active route', () => {
+        expect(component.activeRoute()).toBe('/dashboard');
+    });
+
+    // should open menu when clicking outside it
+    it('should toggle menu when clicking outside the menu', () => {
+        const element = document.createElement('div');
+        jest.spyOn(element, 'closest').mockReturnValue(null);
+
+        const event = {
+            target: element,
+        } as unknown as MouseEvent;
+
+        component.onProfileClick(event);
+
+        expect(component.isMenuOpen()).toBe(true);
+    });
+
+
 })
