@@ -198,6 +198,29 @@ class TimesheetServiceTest {
       // making sure that nothing got saved, because it should not be saved
       verify(timesheetRepository, never()).save(any());
     }
+
+    @Test
+    @DisplayName("throws exception when trying to submit a timesheet that is no longer a draft")
+    void submitTimesheetNotDraft() {
+
+      // ARRANGE: mocking a timesheet that is already submitted
+      timesheet.setStatus("SUBMITTED");
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+
+      /*
+      ACT and ASSERT
+      - an exception should be thrown
+      - the repo should be called so the timesheet can be found
+      - the timesheet did not get saved
+       */
+      assertThatThrownBy(() -> timesheetService.submitTimesheet(timesheetId))
+          .isInstanceOf(RuntimeException.class)
+          .hasMessage("Timesheet has already been submitted");
+
+      verify(timesheetRepository, times(1)).findById(timesheetId);
+      verify(timesheetRepository, never()).save(any());
+    }
   }
 
   @Nested
