@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import timesheets.domain.Timesheet;
+import timesheets.dto.request.TimesheetRequest;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.repository.TimesheetRepository;
 import timesheets.security.SecurityUtils;
@@ -99,6 +100,41 @@ class TimesheetServiceTest {
       verify(timesheetRepository)
           .findByWorkspaceMemberIdAndPeriodStartAndPeriodEnd(
               workspaceMemberId, periodStart, periodEnd);
+    }
+  }
+
+  @Nested
+  @DisplayName("Create Timesheet Tests")
+  class CreateTimesheetTests {
+
+    @Test
+    @DisplayName("creates a new timesheet successfully")
+    void createTimesheet() {
+      /*
+      ARRANGE
+      - simulating a user creating a timesheet for the week
+      - the timesheet is created for a certain start and end date
+       */
+      TimesheetRequest request = new TimesheetRequest();
+      request.setPeriodStart(periodStart);
+      request.setPeriodEnd(periodEnd);
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(timesheetRepository.save(any(Timesheet.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      // ACT: calls the actual create timesheet function
+      Timesheet result = timesheetService.createTimesheet(request);
+
+      // ASSERT: making sure that all the details I expect match
+      assertThat(result).isNotNull();
+      assertThat(result.getWorkspaceMemberId()).isEqualTo(workspaceMemberId);
+      assertThat(result.getPeriodStart()).isEqualTo(periodStart);
+      assertThat(result.getPeriodEnd()).isEqualTo(periodEnd);
+      assertThat(result.getStatus()).isEqualTo("DRAFT"); // should be a draft
+      assertThat(result.getIsLocked()).isFalse();
+
+      verify(timesheetRepository, times(1)).save(any(Timesheet.class));
     }
   }
 
