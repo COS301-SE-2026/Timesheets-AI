@@ -49,4 +49,18 @@ describe('DropdownComponent', ()=> {
         expect(component.disabled()).toBe(true);
 
     });
+
+    //TC6: testing  selection of dropdown options 
+    test('should select desired option then the dropdown should collapse', ()=> {
+        //arrange
+        component.toggleDropDown();
+        expect(component.isOpen()).toBe(true);
+
+        component.selectOption('Option 1');
+
+        //assert
+        expect(component.isOpen()).toBe(false);
+        expect(component.selectedOption()).toBe('Option 1');
+    });
+
 })
