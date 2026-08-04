@@ -206,5 +206,27 @@ describe('SidebarCoponent', () => {
         expect(component.initials()).toBe('J');
     });
 
+    // should test for null undefined fields
+
+    it('should return ? when name fields are undefined', () => {
+        currentUser.set({ roles: ['ROLE_ADMIN']} as unknown as MockUser);
+        expect(component.initials()).toBe('?')
+    });
+
+    it('should return only the last initial  when firstName is undefined', () => {
+        currentUser.set({ lastName: 'Doe', roles: []} as unknown as MockUser);
+        expect(component.initials()).toBe('D')
+    });
+
+    it('should return first initial when the last name is undefined ', () => {
+        currentUser.set({ firstName: 'John', roles: []} as unknown as MockUser);
+        expect(component.initials()).toBe('J')
+    });
+
+    it('should return empty role when roles is undefined', () => {
+        currentUser.set({ firstName: 'A', lastName: 'B'} as unknown as MockUser);
+        expect(component.initials()).toBe('AB')
+    });
+
 
 });
