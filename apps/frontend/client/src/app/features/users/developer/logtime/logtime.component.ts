@@ -14,6 +14,11 @@
  *
  * Patched: Zamokuhle Zwane, 2026-07-28
  * SO that the timer doesnt persist, so when i go to the next page, it goes away and thats a problem because that means the timer would never stop and its a silent error
+ *
+ * Patched: Zamokuhle Zwane, 03 August 2026
+ * Fixed time related issues, it was 2 hours behind, 
+ * so i added a new function to format the duration to show hours, minutes and seconds
+ * i also fixed the total duration to show the correct total duration across all filtered entries
  */
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -22,8 +27,12 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import {
   TimerService,
   ActiveTimerResponse,
+  StopTimerResponse,
 } from '../../../../core/services/timer.service';
-
+import {
+  TimeEntryService,
+  TimeEntryRequest as TimeEntryApiRequest,
+} from '../../../../core/services/time-entry.service';
 //type definitions and interface
 
 type ViewOption = 'Day' | 'Week' | 'Month';
@@ -56,6 +65,7 @@ interface TimeEntry {
   entryType: EntryType;
   startTime: string; // ISO String (YYYY-MM-DDTHH:mm:ss)
   endTime: string; // ISO String (YYYY-MM-DDTHH:mm:ss)
+  durationSeconds: number;
   durationMinutes: number;
   description: string;
   status: TimeEntryStatus;
@@ -138,6 +148,7 @@ export class LogtimeComponent implements OnDestroy {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = '/api';
   private readonly timerService = inject(TimerService);
+  private readonly timeEntryService = inject(TimeEntryService);
 
   //I used Enzokuhle Khumalo's workspace_members.id (real seed data), because it didnt need mfa
   private readonly workspaceMemberId =
@@ -174,8 +185,9 @@ export class LogtimeComponent implements OnDestroy {
   readonly pausedElapsedSeconds = signal(0);
   readonly filterFrom = signal(this.today());
   readonly filterTo = signal(this.today());
+  readonly durationPreviewSeconds = signal(3600);
 
-  /*
+  /*  
   tracks the current period's timesheet, submit now happens at this level not per entry, since status/submittedAt/approvedAt/isLocked all live on
   the timesheets table per backend schema, not on time_entries
   */
@@ -278,6 +290,13 @@ export class LogtimeComponent implements OnDestroy {
   readonly totalMinutes = computed(() =>
     this.filteredEntries().reduce(
       (total, entry) => total + entry.durationMinutes,
+      0,
+    ),
+  );
+
+  readonly totalSeconds = computed(() =>
+    this.filteredEntries().reduce(
+      (total, entry) => total + entry.durationMinutes * 60,
       0,
     ),
   );
@@ -467,9 +486,8 @@ export class LogtimeComponent implements OnDestroy {
       a 1-hour entry (09:00–10:00) displaying as "60h" and a 1-minute entry (08:00–08:01) displaying as "1h", both exactly 60 times too large
       Converting here so the rest of the app (formatDuration, totals, etc) works with real minutes. If the backend fixes this field, remove this division
       */
-      const normalizedEntry: TimeEntry = {
-        ...savedEntry,
-        durationMinutes: Math.round(savedEntry.durationMinutes / 60),
+      const normalisedEntry: TimeEntry = {
+        ...this.normaliseEntryDuration(savedEntry),
         status:
           savedEntry.status ??
           (this.isEditMode()
@@ -481,14 +499,14 @@ export class LogtimeComponent implements OnDestroy {
       if (this.isEditMode()) {
         this.entries.update((entries) =>
           entries.map((existingEntry) =>
-            existingEntry.id === normalizedEntry.id
-              ? normalizedEntry
+            existingEntry.id === normalisedEntry.id
+              ? normalisedEntry
               : existingEntry,
           ),
         );
         this.toastMessage.set('Time entry updated.');
       } else {
-        this.entries.update((entries) => [normalizedEntry, ...entries]);
+        this.entries.update((entries) => [normalisedEntry, ...entries]);
         this.toastMessage.set('Time entry saved.');
       }
       this.conflictMessage.set('');
@@ -658,6 +676,7 @@ export class LogtimeComponent implements OnDestroy {
           this.entries.set(
             fetchedEntries.map((entry) => ({
               ...entry,
+              durationSeconds: entry.durationMinutes, 
               durationMinutes: Math.round(entry.durationMinutes / 60),
             })),
           );
@@ -674,33 +693,80 @@ export class LogtimeComponent implements OnDestroy {
       });
   }
 
+  //discard the active time because it doesnt stop it properly
+  cancelTimer(): void {
+    const timer = this.activeTimer();
+    if (!timer) {
+      //no timer running, nothing to cancel, just close the panel
+      this.closePanel();
+      return;
+    }
+
+    this.timerService.discardTimer().subscribe({
+      next: () => this.resetTimerState('Timer entry discarded.'),
+      error: (error) =>
+        this.conflictMessage.set(
+          error.error?.message ?? 'Unable to discard the timer.',
+        ),
+    });
+  }
+
   /*
    this persists a stopped timer as a time entry via the backend, split out from stopTimer() so the overlap-check step above can gate this
    without duplicating the save logic
   */
   private persistTimerEntry(): void {
-    const stopAndReset = () => {
-      this.activeTimer.set(null);
-      this.elapsedSeconds.set(0);
-      this.isTimerPaused.set(false);
-      this.pausedElapsedSeconds.set(0);
-      this.clearTimerInterval();
-      this.timerForm.enable({ emitEvent: false });
-      this.timerForm.reset({
-        projectId: this.projects()[0]?.id ?? '',
-        taskId: '',
-        description: '',
-      });
-      this.toastMessage.set('Timer entry saved.');
-      this.closePanel();
+    const timer = this.activeTimer();
+    const attachNotesIfPresent = (createdEntryId: string): void => {
+      const notes = timer?.notes?.trim();
+      if (!notes) {
+        return;
+      }
+      const updateRequest: TimeEntryApiRequest = {
+        projectId: timer!.projectId,
+        taskId: timer!.taskId ?? '',
+        startTime: this.toDateTimeValue(
+          this.dateFromDate(timer!.startedAt),
+          this.toTimeValue(timer!.startedAt),
+        ),
+        endTime: this.toDateTimeValue(
+          this.dateFromDate(new Date()),
+          this.toTimeValue(new Date()),
+        ),
+        durationSeconds: this.elapsedSeconds(),
+        entryType: 'TIMER',
+        description: notes,
+      };
+
+      this.timeEntryService
+        .updateEntry(createdEntryId, updateRequest)
+        .subscribe({
+          error: (error) =>
+            console.error(
+              'LogtimeComponent: Failed to attach notes to timer entry',
+              { entryId: createdEntryId, error },
+            ),
+        });
     };
 
     this.http
-      .post(`${this.apiBaseUrl}/timers/stop`, null, this.requestOptions())
+      .post<StopTimerResponse>(
+        `${this.apiBaseUrl}/timers/stop`,
+        null,
+        this.requestOptions(),
+      )
       .subscribe({
-        next: () => {
+        next: (response) => {
+          if(!response.createdTimeEntry?.id) {
+            console.error(
+              '[LogTimeComponent] StopTimerResponse missing createdTimeEntry.id',
+              response,
+            );
+          }else{
+            attachNotesIfPresent(response.createdTimeEntry.id);
+          }
           this.loadEntries();
-          stopAndReset();
+          this.resetTimerState('Timer entry saved.');
         },
         error: (error) =>
           this.conflictMessage.set(
@@ -728,14 +794,16 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   // Custom visual modifier turning simple dynamic counts into compressed time descriptors
-  formatDuration(minutes = 0): string {
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
+  formatDuration(totalSeconds = 0): string {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
 
-    if (hours === 0) return `${remainingMinutes}m`;
-    if (remainingMinutes === 0) return `${hours}h`;
+    if (hours === 0 && minutes === 0) return `${seconds}s`;
+    if (hours === 0) return seconds === 0 ? `${minutes}m` : `${minutes}m ${seconds}s`;
+    if (minutes === 0 && seconds === 0) return `${hours}h`;
 
-    return `${hours}h ${remainingMinutes}m`;
+    return `${hours}h ${minutes}m`;
   }
 
   selectStatus(status: StatusOption): void {
@@ -889,7 +957,7 @@ export class LogtimeComponent implements OnDestroy {
     const form = context === 'manual' ? this.entryForm : this.timerForm;
     return form.controls.taskId.value;
   }
-
+  
   private updateDuration(): void {
     const duration = Math.max(
       0,
@@ -901,8 +969,9 @@ export class LogtimeComponent implements OnDestroy {
     this.entryForm.controls.durationMinutes.setValue(duration, {
       emitEvent: false,
     });
+    this.durationPreviewSeconds.set(duration * 60);
   }
-
+  
   private buildEntryFromForm(request: TimeEntryRequest): TimeEntry {
     /*
     note: buildTimeEntryRequestFromForm() now returns durationSeconds not durationMinutes (matches the real request schema), but the local
@@ -918,6 +987,7 @@ export class LogtimeComponent implements OnDestroy {
       entryType: request.entryType,
       startTime: request.startTime,
       endTime: request.endTime,
+      durationSeconds: request.durationSeconds,
       durationMinutes: this.entryForm.controls.durationMinutes.value,
       description: request.description,
       status: 'DRAFT',
@@ -1020,10 +1090,7 @@ export class LogtimeComponent implements OnDestroy {
         next: (entries) =>
           this.entries.set(
             //same durationMinutes-is-actually-seconds fix as onSaved() in saveEntry() — see that comment for the full explanation
-            entries.map((entry) => ({
-              ...entry,
-              durationMinutes: Math.round(entry.durationMinutes / 60),
-            })),
+            entries.map((entry) => this.normaliseEntryDuration(entry))
           ),
         error: (error) =>
           this.conflictMessage.set(
@@ -1120,7 +1187,7 @@ export class LogtimeComponent implements OnDestroy {
       projectId: response.project.id,
       taskId: response.task?.id ?? null,
       notes: '',
-      startedAt: new Date(response.startedAt),
+      startedAt: this.parseServerTimestamp(response.startedAt), //was new Date(response.startedAt), but that was failing to parse the string correctly in some browsers, so now we force it into a valid ISO format with parseServerTimestamp()
     };
 
     this.activeTimer.set(timer);
@@ -1145,6 +1212,13 @@ export class LogtimeComponent implements OnDestroy {
       }, 1000);
     }
   }
+
+  //helper function to force the string timestamp into a valid ISO format for Date parsing, appending 'Z' if no timezone is present
+  private parseServerTimestamp(value: string): Date {
+    const hasTimeZone = /Z$|[+-]\d{2}:\d{2}$/.test(value);
+    return new Date(hasTimeZone ? value : `${value}Z`); // Append 'Z' if no timezone is present
+  }
+
   /*
   fetches the current period's timesheet so the submit button has something to act on. Uses GET /api/timesheets/me, which returns an
   array, taking the entry matching the current filter period since there's no single "current timesheet" endpoint documented in swagger
@@ -1191,5 +1265,34 @@ export class LogtimeComponent implements OnDestroy {
       clearInterval(this.timerIntervalId);
       this.timerIntervalId = null;
     }
+  }
+
+  /*
+  sonarqube was complaining about the duplicated lines as a maintenance risk, so i factored them out
+  into a single helper function to reduce duplication and make it easier to change the logic in one place if needed
+  */
+ private resetTimerState(toastMessage: string): void {
+    this.activeTimer.set(null);
+    this.elapsedSeconds.set(0);
+    this.isTimerPaused.set(false);
+    this.pausedElapsedSeconds.set(0);
+    this.clearTimerInterval();
+    this.timerForm.enable({ emitEvent: false });
+    this.timerForm.reset({
+      projectId: this.projects()[0]?.id ?? '',
+      taskId: '',
+      description: '',
+    });
+    this.toastMessage.set(toastMessage);
+  }
+
+  private normaliseEntryDuration<T extends { durationMinutes: number; durationSeconds: number }>(
+    entry: T,
+  ): T & { durationSeconds: number}{
+    return {
+      ...entry,
+      durationSeconds: entry.durationMinutes, 
+      durationMinutes: Math.round(entry.durationMinutes / 60),
+    };
   }
 }
