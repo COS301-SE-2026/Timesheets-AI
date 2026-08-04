@@ -4,12 +4,24 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "chart.js": ["./node_modules/chart.js"],
+      "ng2-charts": ["./node_modules/ng2-charts"]
+    }
   },
   "files": [
     "src/main.ts"
   ],
   "include": [
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/**/*.ts"
+  ],
+
+  /*excluding test files becase jest globals are not defined */
+  /*dont want them to run in production*/
+   "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
   ]
 }
