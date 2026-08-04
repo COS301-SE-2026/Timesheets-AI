@@ -12,10 +12,13 @@ jobs:
   check-branch: 
     runs-on: ubuntu-latest
 
+    env:
+      SOURCE_BRANCH: ${{ github.head_ref }}
+
     steps:  
       - name: Only Dev
         run: |
-          if ["${{ github.head_ref }}" != "dev"]; then
+          if ["$SOURCE_BRANCH" != "dev"]; then
             echo "Only dev can be merged into main branch"
             exit 1
           fi 
