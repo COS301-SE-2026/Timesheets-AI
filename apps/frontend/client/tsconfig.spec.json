@@ -8,7 +8,11 @@
     "types": [
       "jest", 
       "node"
-    ]
+    ],
+    "paths": {
+      "chart.js": ["node_modules/chart.js"],
+      "ng2-charts": ["node_modules/ng2-charts"]
+    }
   },
   "include": [
     "src/**/*.spec.ts",
