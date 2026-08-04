@@ -106,7 +106,38 @@ class TimesheetServiceTest {
   @Nested
   @DisplayName("Get Or Create Current Timesheet Tests")
   class GetOrCreateCurrentTimesheetTests {
-    // I want to do tests for this
+
+    @Test
+    @DisplayName("returns existing current week's timesheet")
+    void getOrCreateCurrentTimesheet() {
+
+      // ARRANGE: a timesheet already exists, it should return that existing timesheet
+      LocalDate today = LocalDate.now();
+      LocalDate monday = today.with(java.time.DayOfWeek.MONDAY);
+      LocalDate sunday = today.with(java.time.DayOfWeek.SUNDAY);
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+
+      // fins the existing timesheets and should return it
+      when(timesheetRepository.findByWorkspaceMemberIdAndPeriodStartAndPeriodEnd(
+              workspaceMemberId, monday, sunday))
+          .thenReturn(Optional.of(timesheet));
+
+      // ACT: calling the actual function
+      Timesheet result = timesheetService.getOrCreateCurrentTimesheet();
+
+      /*
+      ASSERT
+      - the timesheet should be returned, not null
+      - the repo should find it
+      - there should be not save call, since this is just getting */
+      assertThat(result).isNotNull();
+      assertThat(result.getId()).isEqualTo(timesheetId);
+
+      verify(timesheetRepository, times(1))
+          .findByWorkspaceMemberIdAndPeriodStartAndPeriodEnd(workspaceMemberId, monday, sunday);
+      verify(timesheetRepository, never()).save(any());
+    }
   }
 
   @Nested
