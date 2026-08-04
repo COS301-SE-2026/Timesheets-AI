@@ -1,7 +1,9 @@
 package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -184,6 +186,28 @@ class TimesheetServiceTest {
       // those checks about making sure that the repository was called once
       verify(timesheetRepository, times(1)).findById(timesheetId);
       verify(timesheetRepository, times(1)).save(any(Timesheet.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when a dev tries to reject")
+    void rejectTimesheetByDev() {
+
+      // ARRANGE
+      UUID reviewerId = UUID.randomUUID();
+      String rejectionReason = "Missing docs";
+
+      // the person trying to reject the timesheets is neither a manager or an admin
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
+      // ACT and ASSERT
+      assertThatThrownBy(
+              () -> timesheetService.rejectTimesheet(timesheetId, reviewerId, rejectionReason))
+          .isInstanceOf(RuntimeException.class)
+          .hasMessage("Only Admins and Managers can reject timesheets");
+
+      verify(timesheetRepository, never()).findById(any());
+      verify(timesheetRepository, never()).save(any());
     }
   }
 }
