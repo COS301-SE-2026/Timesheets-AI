@@ -6,6 +6,9 @@
  * 
  * patched: Zamokuhle Zwane, 26 July 2026
  * user-profile is hardcoded to JD, John Doe / software developer
+ * 
+ * patched: Zamokuhle Zwane,  03 August 2026
+ * I fixed the problem with my tasks page not showing up on the sidebar. I added a new route for my tasks and updated the navItems array to include it. I also added a new icon for my tasks.
  */
 
 import { Component, signal, inject, computed} from '@angular/core'; // UI componenet and signal store state, uodate UI changes automatically 
@@ -38,6 +41,7 @@ export class SidebarComponent {
     { label: 'Timesheets', icon: 'description', route: '/timesheets' }, 
     { label: 'Log Time', icon: 'schedule', route: '/log-time' },
     { label: 'Projects', icon: 'folder', route: '/projects' },
+    {label: 'My Tasks', icon: 'task', route: '/my-tasks'},
     { label: 'Calendar', icon: 'calendar_month', route: '/calendar' },
     { label: 'Leave Requests', icon: 'business_center', route: '/leave-requests' },
     { label: 'Reports', icon: 'bar_chart', route: '/reports' },
