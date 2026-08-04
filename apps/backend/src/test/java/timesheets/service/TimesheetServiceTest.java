@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import timesheets.domain.Timesheet;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.repository.TimesheetRepository;
@@ -157,7 +155,7 @@ class TimesheetServiceTest {
       timesheet.setStatus("SUBMITTED");
       timesheet.setIsLocked(true);
 
-      when(securityUtils.isManager()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(true);
 
       // basically returning a mock timesheet, as if the actual repository was called
       when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
