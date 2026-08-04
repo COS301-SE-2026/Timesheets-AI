@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import timesheets.domain.Timesheet;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.repository.TimesheetRepository;
@@ -208,6 +210,33 @@ class TimesheetServiceTest {
 
       verify(timesheetRepository, never()).findById(any());
       verify(timesheetRepository, never()).save(any());
+    }
+
+
+    @Test
+    @DisplayName("throws exception when user rejects their own timesheet")
+    void rejectTimesheetOwnTimesheet() {
+
+        /*
+        ARRANGE
+        - remember that a user is not allowed to reject their own timesheet
+        - setting the reviewer id to be the same as the workspace member id
+        - even if they are an admin they cannot rejet their own timesheet
+         */
+        UUID reviewerId = workspaceMemberId;
+        String rejectionReason = "Missing docs";
+
+        timesheet.setStatus("SUBMITTED");
+
+        when(securityUtils.isAdmin()).thenReturn(true);
+        when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+
+        // ACT and ASSERT
+        assertThatThrownBy(() -> timesheetService.rejectTimesheet(timesheetId, reviewerId, rejectionReason)).isInstanceOf(RuntimeException.class).hasMessage("You cannot reject your own timesheet");
+
+        //need to make sure that the repo is only called once and that that is not saved, because it is not allowed
+        verify(timesheetRepository, times(1)).findById(timesheetId);
+        verify(timesheetRepository, never()).save(any());
     }
   }
 }
