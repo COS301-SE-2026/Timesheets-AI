@@ -1,0 +1,22 @@
+# this workflow was to restrict developers from creating a PR using other branches 
+# except dev to main
+
+name: Merge To Main using Dev Branch 
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-branch: 
+    runs-on: ubuntu-latest
+
+    steps:  
+      - name: Only Dev
+        run: |
+          if ["${{ github.head_ref }}" != "dev"]; then
+            echo "Only dev can be merged into main branch"
+            exit 1
+          fi 
+
