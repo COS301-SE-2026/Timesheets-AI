@@ -1,7 +1,6 @@
 import { DropdownComponent } from './dropdown.component';
 import { configureTestBed, createComponentTest } from '../../testing/component-test-helper';
-import { assert } from 'node:console';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture } from '@angular/core/testing';
 
 createComponentTest(DropdownComponent, 'DropdownComponent');
 
