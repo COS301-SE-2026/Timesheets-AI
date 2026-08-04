@@ -9,8 +9,6 @@
  *          - added cancel_on_tap_outside: false to the Google SDK initialization. 
  */
 
-
-
 import {
   AfterViewInit,
   Component,

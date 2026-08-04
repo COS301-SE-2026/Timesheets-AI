@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import timesheets.domain.Timesheet;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.repository.TimesheetRepository;
@@ -148,7 +146,7 @@ class TimesheetServiceTest {
   class RejectTimesheetTests {
 
     @Test
-    @DisplayName("rejects a timesheet that is submitted")
+    @DisplayName("rejects a timesheet that is submitted") // should reject successfully
     void rejectTimesheet() {
 
       // ARRANGE: having a random reviewer, and a reason
@@ -212,31 +210,79 @@ class TimesheetServiceTest {
       verify(timesheetRepository, never()).save(any());
     }
 
-
     @Test
     @DisplayName("throws exception when user rejects their own timesheet")
     void rejectTimesheetOwnTimesheet() {
 
-        /*
-        ARRANGE
-        - remember that a user is not allowed to reject their own timesheet
-        - setting the reviewer id to be the same as the workspace member id
-        - even if they are an admin they cannot rejet their own timesheet
-         */
-        UUID reviewerId = workspaceMemberId;
-        String rejectionReason = "Missing docs";
+      /*
+      ARRANGE
+      - remember that a user is not allowed to reject their own timesheet
+      - setting the reviewer id to be the same as the workspace member id
+      - even if they are an admin they cannot rejet their own timesheet
+       */
+      UUID reviewerId = workspaceMemberId;
+      String rejectionReason = "Missing docs";
 
-        timesheet.setStatus("SUBMITTED");
+      timesheet.setStatus("SUBMITTED");
 
-        when(securityUtils.isAdmin()).thenReturn(true);
-        when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
 
-        // ACT and ASSERT
-        assertThatThrownBy(() -> timesheetService.rejectTimesheet(timesheetId, reviewerId, rejectionReason)).isInstanceOf(RuntimeException.class).hasMessage("You cannot reject your own timesheet");
+      // ACT and ASSERT
+      assertThatThrownBy(
+              () -> timesheetService.rejectTimesheet(timesheetId, reviewerId, rejectionReason))
+          .isInstanceOf(RuntimeException.class)
+          .hasMessage("You cannot reject your own timesheet");
 
-        //need to make sure that the repo is only called once and that that is not saved, because it is not allowed
-        verify(timesheetRepository, times(1)).findById(timesheetId);
-        verify(timesheetRepository, never()).save(any());
+      // need to make sure that the repo is only called once and that that is not saved, because it
+      // is not allowed
+      verify(timesheetRepository, times(1)).findById(timesheetId);
+      verify(timesheetRepository, never()).save(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("Approve Timesheet Tests")
+  class ApproveTimesheetTests {
+
+    @Test
+    @DisplayName("approves a timesheet that is submitted") // should approve successfully
+    void approveTimesheet() {
+
+      // ARRANGE: having a random reviewer
+      UUID reviewerId = UUID.randomUUID();
+
+      // simulating a submitted timesheet, remember that the timesheet gets locked
+      timesheet.setStatus("SUBMITTED");
+      timesheet.setIsLocked(true);
+
+      when(securityUtils.isManager()).thenReturn(true);
+
+      // basically returning a mock timesheet, as if the actual repository was called
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+      when(timesheetRepository.save(any(Timesheet.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      // ACT: calling actual reject timesheet function
+      Timesheet result = timesheetService.approveTimesheet(timesheetId, reviewerId);
+
+      /*
+      ASSERT:
+      - need to check that the timesheet is returned
+      - that the status changes to accepted
+      - that it stays as locked
+      */
+      assertThat(result).isNotNull();
+      assertThat(result.getStatus()).isEqualTo("APPROVED");
+      assertThat(result.getIsLocked()).isTrue();
+      assertThat(result.getLockedAt()).isNotNull();
+      assertThat(result.getApprovedAt()).isNotNull();
+      assertThat(result.getRejectedAt()).isNull();
+      assertThat(result.getApprovedByWorkspaceMemberId()).isEqualTo(reviewerId);
+
+      // those checks about making sure that the repository was called once
+      verify(timesheetRepository, times(1)).findById(timesheetId);
+      verify(timesheetRepository, times(1)).save(any(Timesheet.class));
     }
   }
 }
