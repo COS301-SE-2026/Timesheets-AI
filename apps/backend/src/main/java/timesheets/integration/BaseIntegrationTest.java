@@ -31,6 +31,15 @@ import org.testcontainers.junit.jupiter.Testcontainers; //testcontainers support
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) 
 
 public abstract class BaseIntegrationTest {
-    
+    @LocalServerPort
+    protected int port; //assigns random port 
+
+    // creates a PostgreSQL Docker container
+    // docker start this container, creates database and spring connects to it 
+    // and when the tests are done, the container stops and deleted 
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine").withDatabaseName("momently_integration_test").withUsername("integrator").withPassword("test123");
+
+
 }
 
