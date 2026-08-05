@@ -40,6 +40,24 @@ public abstract class BaseIntegrationTest {
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine").withDatabaseName("momently_integration_test").withUsername("integrator").withPassword("test123");
 
+    // how the Spring Boot to connect the database
+    // it will connect to the temporary PostgreSQL container
+    @DynamicPropertySource
+    static void connectToDBS(DynamicPropertyRegistry registry){
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::password);
+        registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
+    }
 
+    // verify the port and connect to the right port
+    @BeforeEach
+    void setup(){
+        RestAssured.port = port;
+    }
 }
+
+/*
+JUnit starts -> Testcontainers starts a PostgreSQL Docker container -> PostgreSQL creates the database -> Spring Boot starts the application -> DynamicPropertySource give Spring databse URL, username, password -> Spring connects to PostgreSQL container -> Spring starts on a corect port -> BeforeEach method tells RestAssured to use random port 
+*/
 
