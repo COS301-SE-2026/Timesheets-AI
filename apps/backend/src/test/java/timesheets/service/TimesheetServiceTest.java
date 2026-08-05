@@ -196,6 +196,25 @@ class TimesheetServiceTest {
       assertThat(result.getId()).isEqualTo(timesheetId);
       verify(timesheetRepository, times(1)).findById(timesheetId);
     }
+
+    @Test
+    @DisplayName("throws exception when timesheet does not exist")
+    void getTimesheetByIdNotExist() {
+      /*
+      ARRANGE
+      - similar to if a user tries to access a timesheet that does not exist
+      - ideally UI should not allow this, but the edges cases should be prevented in backend
+      */
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.empty());
+
+      // ACT & ASSERT: it throws an exception, and a clear message
+      assertThatThrownBy(() -> timesheetService.getTimesheetById(timesheetId))
+          .isInstanceOf(RuntimeException.class)
+          .hasMessage("Timesheet not found");
+
+      // checking that the repository got called, and that the DB did not skip it
+      verify(timesheetRepository, times(1)).findById(timesheetId);
+    }
   }
 
   @Nested
