@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -220,7 +221,33 @@ class TimesheetServiceTest {
   @Nested
   @DisplayName("Get Timesheets by member Tests")
   class GetTimesheetsByMemberTests {
-    // tests for this
+
+    @Test
+    @DisplayName("returns list of timesheets for a member")
+    void getTimesheetsByMemberTimesheetList() {
+
+      // this will simulate what a DB returns, a list of timesheets
+      List<Timesheet> expectedTimesheets = List.of(timesheet);
+
+      // mocks a repo to return the timesheet list
+      when(timesheetRepository.findByWorkspaceMemberId(workspaceMemberId))
+          .thenReturn(expectedTimesheets);
+
+      // ACT
+      List<Timesheet> result = timesheetService.getTimesheetsByMember(workspaceMemberId);
+
+      /*
+      ASSERT
+      - the list should have the one timesheet I mocked
+      - need to make sure that the timesheet is the one we expect
+       */
+      assertThat(result).isNotNull();
+      assertThat(result).hasSize(1);
+      assertThat(result.get(0).getId()).isEqualTo(timesheetId);
+
+      // the repo should only be called once
+      verify(timesheetRepository, times(1)).findByWorkspaceMemberId(workspaceMemberId);
+    }
   }
 
   @Nested
