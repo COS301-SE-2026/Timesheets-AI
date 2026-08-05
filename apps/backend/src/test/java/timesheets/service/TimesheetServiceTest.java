@@ -138,6 +138,44 @@ class TimesheetServiceTest {
           .findByWorkspaceMemberIdAndPeriodStartAndPeriodEnd(workspaceMemberId, monday, sunday);
       verify(timesheetRepository, never()).save(any());
     }
+
+    @Test
+    @DisplayName("creates timesheet for the current week when it does not exist")
+    void getOrCreateCurrentTimesheetCreate() {
+
+      /*
+      ARRANGE
+      - no timesheet exists for the current week
+      - the system has to create a new draft timesheets
+      - just indicating when a new timesheet should range from
+       */
+      LocalDate today = LocalDate.now();
+      LocalDate monday = today.with(java.time.DayOfWeek.MONDAY);
+      LocalDate sunday = today.with(java.time.DayOfWeek.SUNDAY);
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(timesheetRepository.findByWorkspaceMemberIdAndPeriodStartAndPeriodEnd(
+              workspaceMemberId, monday, sunday))
+          .thenReturn(Optional.empty());
+      // saved is mocked, since when a new timesheet is created it should be saved as well
+      when(timesheetRepository.save(any(Timesheet.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
+
+      // ACT
+      Timesheet result = timesheetService.getOrCreateCurrentTimesheet();
+
+      // ASSERT
+      assertThat(result).isNotNull();
+      assertThat(result.getWorkspaceMemberId()).isEqualTo(workspaceMemberId);
+      assertThat(result.getPeriodStart()).isEqualTo(monday);
+      assertThat(result.getPeriodEnd()).isEqualTo(sunday);
+      assertThat(result.getStatus()).isEqualTo("DRAFT"); // the status should be in drafts
+      assertThat(result.getIsLocked()).isFalse();
+
+      verify(timesheetRepository, times(1))
+          .findByWorkspaceMemberIdAndPeriodStartAndPeriodEnd(workspaceMemberId, monday, sunday);
+      verify(timesheetRepository, times(1)).save(any(Timesheet.class));
+    }
   }
 
   @Nested
