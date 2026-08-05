@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -106,5 +107,35 @@ class TimeEntryServiceTest {
 
     // make sure that the save function was called
     verify(timeEntryRepository).save(any(TimeEntry.class));
+  }
+
+  @Nested
+  @DisplayName("Get My Time Entries Tests")
+  class GetMyTimeEntriesTests {
+    //my tests here
+  }
+
+  @Nested
+  @DisplayName("Get Time Entry By ID Tests")
+  class GetTimeEntryByIdTests {
+    //my tests her
+  }
+
+  @Nested
+  @DisplayName("Delete Time Entry Tests")
+  class DeleteTimeEntryTests {
+    //my tests here
+  }
+
+  @Nested
+  @DisplayName("Update Time Entry Tests")
+  class UpdateTimeEntryTests {
+    //my tests here
+  }
+
+  @Nested
+  @DisplayName("Get Entries By Timesheet Tests")
+  class GetEntriesByTimesheetTests {
+    //my tests here
   }
 }
