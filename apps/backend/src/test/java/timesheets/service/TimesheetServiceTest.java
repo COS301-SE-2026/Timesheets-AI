@@ -181,7 +181,21 @@ class TimesheetServiceTest {
   @Nested
   @DisplayName("Get Timesheet by ID Tests")
   class GetTimesheetByIdTests {
-    // tests for this
+    @Test
+    @DisplayName("returns timesheet when it exists")
+    void getTimesheetByIdExists() {
+
+      // ARRANGE: a timesheet exists in the database, so looks for this timesheet in theDB
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+
+      // ACT: call the actual method
+      Timesheet result = timesheetService.getTimesheetById(timesheetId);
+
+      // ASSERT: finds the exact timesheet, and calls repo only once
+      assertThat(result).isNotNull();
+      assertThat(result.getId()).isEqualTo(timesheetId);
+      verify(timesheetRepository, times(1)).findById(timesheetId);
+    }
   }
 
   @Nested
