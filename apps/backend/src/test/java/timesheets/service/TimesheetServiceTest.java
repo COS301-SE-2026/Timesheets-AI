@@ -248,6 +248,29 @@ class TimesheetServiceTest {
       // the repo should only be called once
       verify(timesheetRepository, times(1)).findByWorkspaceMemberId(workspaceMemberId);
     }
+
+    @Test
+    @DisplayName("empty list returned when the user has not timesheets")
+    void getTimesheetsByMemberEmptyList() {
+
+      // because you know nulls give unexpected results, so we need empty lists not null things
+
+      // ARRANGE: mocking the repo returning an empty list
+      when(timesheetRepository.findByWorkspaceMemberId(workspaceMemberId)).thenReturn(List.of());
+
+      // ACT: calls the actual actual method
+      List<Timesheet> result = timesheetService.getTimesheetsByMember(workspaceMemberId);
+
+      /*
+      ASSERT
+      - checking that it is not null, and empty list does not mean null
+      - making sure the repo is only called once
+      */
+      assertThat(result).isNotNull();
+      assertThat(result).isEmpty();
+
+      verify(timesheetRepository, times(1)).findByWorkspaceMemberId(workspaceMemberId);
+    }
   }
 
   @Nested
