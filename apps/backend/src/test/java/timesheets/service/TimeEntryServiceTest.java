@@ -2,6 +2,7 @@ package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -9,6 +10,8 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.dto.request.TimeEntryRequest;
@@ -112,11 +116,39 @@ class TimeEntryServiceTest {
   @Nested
   @DisplayName("Get My Time Entries Tests")
   class GetMyTimeEntriesTests {
-    //my tests here
+
+    @Test
+    @DisplayName("returns all time entries for user that is signed in")
+    void getMyTimeEntriesList() {
+        /*
+        ARRANGE
+        - 
+         */
+        UUID workspaceMemberId = UUID.randomUUID();
+        TimeEntry entry1 = createTimeEntry(UUID.randomUUID(), workspaceMemberId);
+        TimeEntry entry2 = createTimeEntry(UUID.randomUUID(), workspaceMemberId);
+        List<TimeEntry> expectedEntries = List.of(entry1, entry2);
+
+        when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+        when(timeEntryRepository.findByWorkspaceMemberIdOrderByStartTimeDesc(workspaceMemberId))
+            .thenReturn(expectedEntries);
+
+        // ACT
+        List<TimeEntry> result = timeEntryService.getMyTimeEntries();
+
+        // ASSERT
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getId()).isEqualTo(entry1.getId());
+        assertThat(result.get(1).getId()).isEqualTo(entry2.getId());
+
+        verify(timeEntryRepository, times(1))
+            .findByWorkspaceMemberIdOrderByStartTimeDesc(workspaceMemberId);
+    }
   }
 
   @Nested
-  @DisplayName("Get Time Entry By ID Tests")
+  @DisplayName("Get Time Entry by ID Tests")
   class GetTimeEntryByIdTests {
     //my tests her
   }
