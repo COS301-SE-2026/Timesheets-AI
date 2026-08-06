@@ -1,6 +1,7 @@
 package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.never;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import timesheets.domain.Project;
 import timesheets.domain.Task;
 import timesheets.domain.TimeEntry;
@@ -326,7 +329,7 @@ class TimerServiceTest {
 
     @Test
     @DisplayName("should discard active timer successfully")
-    void discardTimer_success() {
+    void discardTimer() {
 
       // ARRANGE: an active timer exists
       TimerSession activeTimer = createActiveTimer();
@@ -343,6 +346,28 @@ class TimerServiceTest {
       // ASSERT: verifying that the timer was actually deleted and that nothing was saved
       verify(timerSessionRepository, times(1)).delete(activeTimer);
       verify(timerSessionRepository, never()).save(any());
+    }
+
+
+    @Test
+    @DisplayName("should throw an exception when there is no timer to discard")
+    void discardTimerWhenNoActiveTimer() {
+
+      // ARRANGE: simulating what happens when there is no active timer
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+
+      //simulating how when a repo is called and then no timer is returned
+      when(timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId))
+          .thenReturn(Optional.empty());
+
+       
+      //ACT & ASSERT: a proper error message should be returned
+      assertThatThrownBy(() -> timerService.discardTimer())
+          .isInstanceOf(IllegalStateException.class)
+          .hasMessage("No active timer found to discard");
+
+      //confirming that it was never deleted
+      verify(timerSessionRepository, never()).delete(any());
     }
   }
 }
