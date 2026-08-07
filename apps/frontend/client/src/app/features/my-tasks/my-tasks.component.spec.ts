@@ -111,7 +111,7 @@ describe('MyTasksComponent', () => {
  
       expect(component.isLoading()).toBe(false);
       expect(component.loadError()).toBe(false);
-      expect(component.tasks().length).toBe(3);
+      expect(component.tasks()).toHaveLength(3);
       expect(component.tasks()[0].title).toBe('Implement login screen');
     });
 
@@ -193,7 +193,7 @@ describe('MyTasksComponent', () => {
  
     it('should hide DONE and BLOCKED tasks by default (showCompleted/showArchived both false)', () => {
       //applyFilters() runs automatically after loadTasks() resolves
-      expect(component.filteredTasks().length).toBe(1);
+      expect(component.filteredTasks()).toHaveLength(1);
       expect(component.filteredTasks()[0].status).toBe('TODO');
     });
  
@@ -217,7 +217,7 @@ describe('MyTasksComponent', () => {
       component.selectedStatus.set('DONE');
       component.applyFilters();
  
-      expect(component.filteredTasks().length).toBe(1);
+      expect(component.filteredTasks()).toHaveLength(1);
       expect(component.filteredTasks()[0].status).toBe('DONE');
     });
  
@@ -227,7 +227,7 @@ describe('MyTasksComponent', () => {
       component.searchQuery.set('MOM-103');
       component.applyFilters();
  
-      expect(component.filteredTasks().length).toBe(1);
+      expect(component.filteredTasks()).toHaveLength(1);
       expect(component.filteredTasks()[0].jiraTicketKey).toBe('MOM-103');
     });
  
@@ -237,7 +237,7 @@ describe('MyTasksComponent', () => {
       component.searchQuery.set('  fix oauth  ');
       component.applyFilters();
  
-      expect(component.filteredTasks().length).toBe(1);
+      expect(component.filteredTasks()).toHaveLength(1);
       expect(component.filteredTasks()[0].id).toBe(blockedTaskId);
     });
   });
@@ -333,7 +333,7 @@ describe('MyTasksComponent', () => {
       component.onSearchChange(event);
  
       expect(component.searchQuery()).toBe('login');
-      expect(component.filteredTasks().length).toBe(1);
+      expect(component.filteredTasks()).toHaveLength(1);
     });
     /*
     okay so test failed becaise <select only accepts .value = 'X' if a matching <option>

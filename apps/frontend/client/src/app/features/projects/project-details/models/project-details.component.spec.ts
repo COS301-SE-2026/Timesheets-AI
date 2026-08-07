@@ -162,7 +162,7 @@ function makeProjectDetailResponse(
       expect(taskReq.request.method).toBe('GET');
       taskReq.flush([makeTaskResponse()]);
  
-      expect(component.tasks().length).toBe(1);
+      expect(component.tasks()).toHaveLength(1);
       expect(component.tasks()[0].title).toBe('Wire the hours chart');
     });
      it('should set error and stop loading when the project detail request fails, and never request tasks', async () => {

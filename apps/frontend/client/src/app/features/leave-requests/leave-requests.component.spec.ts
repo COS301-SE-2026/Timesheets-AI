@@ -5,6 +5,8 @@ The tests cover component initialization, data binding, user interactions, and i
 
 Author: Zamokuhle Zwane
 Date: 04 July 2026
+
+Patch: i updated the file to fix sonarqube issues
 */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
@@ -98,7 +100,7 @@ describe('LeaveRequestsComponent', () => {
       req.flush(mockRequests);
  
       expect(component.uiState()).toBe('idle');
-      expect(component.leaveRequests().length).toBe(3);
+      expect(component.leaveRequests()).toHaveLength(3);
       expect(component.leaveRequests()[0].memberName).toBe('Enzokuhle Khumalo');
     });
 
@@ -330,10 +332,11 @@ describe('LeaveRequestsComponent', () => {
  
     it('should do nothing for a request that is not PENDING', () => {
       const approved = component.leaveRequests().find((r) => r.id === approvedId)!;
- 
+      const statusBefore = approved.status;
+
       component.cancelRequest(approved);
- 
       httpMock.expectNone(`/api/leave-requests/${approvedId}/cancel`);
+      expect(approved.status).toBe(statusBefore);
     });
 
      it('should POST /api/leave-requests/{id}/cancel for a PENDING request and update the list', () => {
