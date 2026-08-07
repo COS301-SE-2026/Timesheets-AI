@@ -45,11 +45,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     String token = authHeader.substring(7); // 7 is length of "Bearer "
-
+    // NEED TO FIX THIS
     if (tokenBlacklistService.isBlacklisted(
         token)) { // 'blacklist' check to prevent use of tokens that have been invalidated (e.g.on
       // logout)
-      filterChain.doFilter(request, response);
+      
+      // this line is skipping authentication so a blacklisted token will reach the controller as unauthenticated request
+      filterChain.doFilter(request, response); 
       return;
     }
     // validate token and set authentication if valid
