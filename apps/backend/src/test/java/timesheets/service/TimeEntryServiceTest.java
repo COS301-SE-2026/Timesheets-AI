@@ -10,6 +10,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -166,7 +167,30 @@ class TimeEntryServiceTest {
   @Nested
   @DisplayName("Get Time Entry by ID Tests")
   class GetTimeEntryByIdTests {
-    // my tests here
+    @Test
+    @DisplayName("returns time entry when it exists")
+    void getTimeEntryById() {
+
+      /*
+      ARRANGE
+      - when a time entry exists in the database
+      - teh service should give it back
+       */
+      UUID timeEntryId = UUID.randomUUID();
+      TimeEntry entry = createTimeEntry(timeEntryId, workspaceMemberId);
+
+      when(timeEntryRepository.findById(timeEntryId)).thenReturn(Optional.of(entry));
+
+      // ACT
+      TimeEntry result = timeEntryService.getTimeEntryById(timeEntryId);
+
+      // ASSERT: making sure that the entry is found and returned
+      assertThat(result).isNotNull();
+      assertThat(result.getId()).isEqualTo(timeEntryId);
+
+      // making sure that the repo is called once and with the correct id
+      verify(timeEntryRepository, times(1)).findById(timeEntryId);
+    }
   }
 
   @Nested
