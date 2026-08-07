@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.dto.request.TimeEntryRequest;
@@ -196,7 +198,42 @@ class TimeEntryServiceTest {
   @Nested
   @DisplayName("Delete Time Entry Tests")
   class DeleteTimeEntryTests {
-    // my tests here
+
+    @Test
+    @DisplayName("this should soft delete a time entry")
+    void deleteTimeEntry() {
+        /*
+        ARRANGE
+        - this is for when user owns a time entry that is not locked
+        - since this is a soft delete the isDeleted column is flagged
+        - the entry is hidden from normal view
+         */
+        UUID timeEntryId = UUID.randomUUID();
+        TimeEntry entry = createTimeEntry(timeEntryId, workspaceMemberId);
+        entry.setIsLocked(false);
+
+        when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+        when(timeEntryRepository.findById(timeEntryId)).thenReturn(Optional.of(entry));
+
+        //just simulating a DB save
+        when(timeEntryRepository.save(any(TimeEntry.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // ACT: calling the actual delete onn the time entry
+        timeEntryService.deleteTimeEntry(timeEntryId);
+
+        /* 
+        ASSERT
+        - we need to make sure that the record is not removed from the DB
+        - that the deletedAt field is not null
+        - I need to also make sure that the entry is got based on the id
+        - the entry gets saved when the deleted flag is set to
+        */
+        assertThat(entry.getIsDeleted()).isTrue();
+        assertThat(entry.getDeletedAt()).isNotNull();
+
+        verify(timeEntryRepository, times(1)).findById(timeEntryId);
+        verify(timeEntryRepository, times(1)).save(entry);
+    }
   }
 
   @Nested
