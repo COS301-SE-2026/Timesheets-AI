@@ -191,4 +191,16 @@ class TaskServiceTest {
       verify(userRepository, times(1)).findById(userId);
     }
   }
+
+  @Nested
+  @DisplayName("Get My Tasks Tests")
+  class GetMyTasksTests {
+    // my tests
+  }
+
+  @Nested
+  @DisplayName("Create Task Tests")
+  class CreateTaskTests {
+    // my tests
+  }
 }
