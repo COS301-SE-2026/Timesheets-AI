@@ -51,9 +51,6 @@ public abstract class BaseIntegrationTest {
           .withUsername("integrator")
           .withPassword("test123");
 
-  static {
-    postgres.start();
-  }
 
   // how the Spring Boot to connect the database
   // it will connect to the temporary PostgreSQL container
