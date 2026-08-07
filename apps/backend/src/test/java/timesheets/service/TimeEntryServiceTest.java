@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.dto.request.TimeEntryRequest;
+import timesheets.dto.response.TimeEntryResponse;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.security.SecurityUtils;
 
@@ -289,6 +290,43 @@ class TimeEntryServiceTest {
   @Nested
   @DisplayName("Get Entries By Timesheet Tests")
   class GetEntriesByTimesheetTests {
-    // my tests here
+    @Test
+    @DisplayName("returns all time entries for a timesheet")
+    void getEntriesByTimesheetGetList() {
+      /*
+      ARRANGE
+      - a timesheet has time entries
+      - gets all the entries for a specific timesheet
+       */
+      UUID timesheetId = UUID.randomUUID();
+
+      TimeEntry entry1 = createTimeEntry(UUID.randomUUID(), workspaceMemberId);
+      entry1.setTimesheetId(timesheetId);
+
+      TimeEntry entry2 = createTimeEntry(UUID.randomUUID(), workspaceMemberId);
+      entry2.setTimesheetId(timesheetId);
+
+      List<TimeEntry> expectedEntries = List.of(entry1, entry2);
+
+      when(timeEntryRepository.findByTimesheetId(timesheetId)).thenReturn(expectedEntries);
+
+      /*
+      ACT
+      - the user will request all entries for a timesheet
+      - the method should get all the entries from the repo
+       */
+      List<TimeEntryResponse> result = timeEntryService.getEntriesByTimesheet(timesheetId);
+
+      // ASSERT
+      assertThat(result).isNotNull();
+      assertThat(result).hasSize(2); // expecting the 2 entries we want
+      assertThat(result.get(0).getId()).isEqualTo(entry1.getId());
+      assertThat(result.get(1).getId()).isEqualTo(entry2.getId());
+
+      // checking that theres dtos and not just entities
+      assertThat(result.get(0)).isInstanceOf(TimeEntryResponse.class);
+
+      verify(timeEntryRepository, times(1)).findByTimesheetId(timesheetId);
+    }
   }
 }
