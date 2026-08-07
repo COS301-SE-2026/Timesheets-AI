@@ -9,9 +9,8 @@ import static org.mockito.Mockito.when;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.List;
-
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.dto.request.TimeEntryRequest;
@@ -66,6 +64,26 @@ class TimeEntryServiceTest {
 
     timesheet = new Timesheet();
     timesheet.setId(timesheetId);
+  }
+
+  // ! helper so that I can just keep reusing it with default values for testing
+  private TimeEntry createTimeEntry(UUID id, UUID memberId) {
+    TimeEntry entry = new TimeEntry();
+    entry.setId(id);
+    entry.setWorkspaceMemberId(memberId);
+    entry.setTimesheetId(UUID.randomUUID());
+    entry.setProjectId(projectId);
+    entry.setTaskId(taskId);
+    entry.setStartTime(LocalDateTime.now().minusHours(2));
+    entry.setEndTime(LocalDateTime.now());
+    entry.setDurationSeconds(7200);
+    entry.setEntryType("MANUAL");
+    entry.setDescription("Test entry");
+    entry.setIsLocked(false);
+    entry.setIsDeleted(false);
+    entry.setCreatedAt(LocalDateTime.now());
+    entry.setUpdatedAt(LocalDateTime.now());
+    return entry;
   }
 
   @Test
@@ -120,54 +138,52 @@ class TimeEntryServiceTest {
     @Test
     @DisplayName("returns all time entries for user that is signed in")
     void getMyTimeEntriesList() {
-        /*
-        ARRANGE
-        - 
-         */
-        UUID workspaceMemberId = UUID.randomUUID();
-        TimeEntry entry1 = createTimeEntry(UUID.randomUUID(), workspaceMemberId);
-        TimeEntry entry2 = createTimeEntry(UUID.randomUUID(), workspaceMemberId);
-        List<TimeEntry> expectedEntries = List.of(entry1, entry2);
 
-        when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
-        when(timeEntryRepository.findByWorkspaceMemberIdOrderByStartTimeDesc(workspaceMemberId))
-            .thenReturn(expectedEntries);
+      // ARRANGE: this creates the entries using the helper method I defined
+      UUID workspaceMemberId = UUID.randomUUID();
+      TimeEntry entry1 = createTimeEntry(UUID.randomUUID(), workspaceMemberId);
+      TimeEntry entry2 = createTimeEntry(UUID.randomUUID(), workspaceMemberId);
+      List<TimeEntry> expectedEntries = List.of(entry1, entry2);
 
-        // ACT
-        List<TimeEntry> result = timeEntryService.getMyTimeEntries();
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(timeEntryRepository.findByWorkspaceMemberIdOrderByStartTimeDesc(workspaceMemberId))
+          .thenReturn(expectedEntries);
 
-        // ASSERT
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).getId()).isEqualTo(entry1.getId());
-        assertThat(result.get(1).getId()).isEqualTo(entry2.getId());
+      // ACT
+      List<TimeEntry> result = timeEntryService.getMyTimeEntries();
 
-        verify(timeEntryRepository, times(1))
-            .findByWorkspaceMemberIdOrderByStartTimeDesc(workspaceMemberId);
+      // ASSERT: the entries should be what we expect, not null, exactly 2 entries, and they match
+      assertThat(result).isNotNull();
+      assertThat(result).hasSize(2);
+      assertThat(result.get(0).getId()).isEqualTo(entry1.getId());
+      assertThat(result.get(1).getId()).isEqualTo(entry2.getId());
+
+      verify(timeEntryRepository, times(1))
+          .findByWorkspaceMemberIdOrderByStartTimeDesc(workspaceMemberId);
     }
   }
 
   @Nested
   @DisplayName("Get Time Entry by ID Tests")
   class GetTimeEntryByIdTests {
-    //my tests her
+    // my tests here
   }
 
   @Nested
   @DisplayName("Delete Time Entry Tests")
   class DeleteTimeEntryTests {
-    //my tests here
+    // my tests here
   }
 
   @Nested
   @DisplayName("Update Time Entry Tests")
   class UpdateTimeEntryTests {
-    //my tests here
+    // my tests here
   }
 
   @Nested
   @DisplayName("Get Entries By Timesheet Tests")
   class GetEntriesByTimesheetTests {
-    //my tests here
+    // my tests here
   }
 }
