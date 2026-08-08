@@ -5,6 +5,11 @@ manual time entry CRUD.4
 
 Author: Zamokuhle Zwane
 Date: 23 July 2026
+
+Patched: Zamokuhle Zwane, 03 August 2026
+I fixed the problem with the timer not showing up on the log time page,
+it was because the timer component was not being rendered on the log time page
+so i added it to the log time page and it now shows up correctly
  */
 
 import { Injectable, inject } from '@angular/core';
@@ -36,7 +41,7 @@ export interface StopTimerResponse {
   timerId: string;
   stoppedAt: string;
   durationMinutes: number;
-  createdTimerEntry: {
+  createdTimeEntry: {
     id: string;
     project: {
       id: string;
@@ -47,18 +52,8 @@ export interface StopTimerResponse {
       title: string;
     };
     date: string;
-    startTime: {
-      hour: number;
-      minute: number;
-      second: number;
-      nano: number;
-    };
-    endTime: {
-      hour: number;
-      minute: number;
-      second: number;
-      nano: number;
-    };
+    startTime: string;
+    endTime: string;
     durationMinutes: number;
     status: string;
   };

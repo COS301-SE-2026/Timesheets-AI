@@ -172,7 +172,7 @@ describe('LogtimeComponent', () => {
     expect(component.entryForm.controls.durationMinutes.value).toBe(150);
     expect(
       component.formatDuration(
-        component.entryForm.controls.durationMinutes.value,
+        component.entryForm.controls.durationMinutes.value * 60,
       ),
     ).toBe('2h 30m');
   });
@@ -391,7 +391,36 @@ describe('LogtimeComponent', () => {
     //then calls /timers/stop...
     const stopReq = httpMock.expectOne('/api/timers/stop');
     expect(stopReq.request.method).toBe('POST');
-    stopReq.flush({});
+    stopReq.flush({
+      timerId: 'timer-1',
+      stoppedAt: `${today()}T13:00:00`,
+      durationMinutes: 3600, //1 hour, in seconds
+      createdTimeEntry: {
+        id: 'entry-timer',
+        project: {
+          id: projectTwoId,
+          name: 'Backend API',
+        },
+        task: {
+          id: taskTwoId,
+          title: 'Create Timesheet API',
+        },
+        date: today(),
+        startTime: `${today()}T12:00:00`,
+        endTime: `${today()}T13:00:00`,
+        durationMinutes: 3600,
+        status: 'DRAFT',
+      },
+    });
+
+  const attachNotesReq = httpMock.expectOne('/api/time-entries/entry-timer');
+  expect(attachNotesReq.request.method).toBe('PUT');
+  expect(attachNotesReq.request.body.description).toBe('Timer tracked work.');
+  attachNotesReq.flush({
+    ...mockEntries[0],
+    id: 'entry-timer',
+    description: 'Timer tracked work.',
+  });
 
     //then reloads entries again via loadEntries()
     const reloadReq = httpMock.expectOne('/api/time-entries/me');
@@ -572,10 +601,12 @@ describe('LogtimeComponent', () => {
 
   // Duration formatting
   it('should format duration values correctly', () => {
-    expect(component.formatDuration(30)).toBe('30m');
-    expect(component.formatDuration(60)).toBe('1h');
-    expect(component.formatDuration(75)).toBe('1h 15m');
-    expect(component.formatDuration(0)).toBe('0m');
+    expect(component.formatDuration(30*60)).toBe('30m');
+    expect(component.formatDuration(60*60)).toBe('1h');
+    expect(component.formatDuration(75*60)).toBe('1h 15m');
+    expect(component.formatDuration(0)).toBe('0s');
+    expect(component.formatDuration(45)).toBe('45s');
+    expect(component.formatDuration(90)).toBe('1m 30s');
   });
 
   // Time formatting
