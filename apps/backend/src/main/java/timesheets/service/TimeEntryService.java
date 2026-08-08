@@ -31,12 +31,12 @@ public class TimeEntryService {
 
   // FLAG:
   /*
-    The current createTimeEntry() does not actually validate project, task or time range. 
+    The current createTimeEntry() does not actually validate project, task or time range.
     what it does:
     1. Get workspace for authenicated member
     2. Create or Get the timesheet
-    3. Copy the request values into a TimeEntry 
-    4. Save it 
+    3. Copy the request values into a TimeEntry
+    4. Save it
 
   */
 
