@@ -29,6 +29,17 @@ public class TimeEntryService {
   private final TimesheetService timesheetService;
   private final SecurityUtils securityUtils;
 
+  // FLAG:
+  /*
+    The current createTimeEntry() does not actually validate project, task or time range. 
+    what it does:
+    1. Get workspace for authenicated member
+    2. Create or Get the timesheet
+    3. Copy the request values into a TimeEntry 
+    4. Save it 
+
+  */
+
   // this would be if they need to create a time entry manually
   @Transactional
   public TimeEntry createTimeEntry(TimeEntryRequest request) {
