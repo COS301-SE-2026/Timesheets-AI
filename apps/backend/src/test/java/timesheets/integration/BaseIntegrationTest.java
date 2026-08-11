@@ -26,6 +26,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.response.AuthResponse;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 
 @SpringBootTest(
     webEnvironment =
@@ -44,6 +45,7 @@ public abstract class BaseIntegrationTest {
   // docker start this container, creates database and spring connects to it
   // and when the tests are done, the container stops and deleted
   @Container
+  @ServiceConnection
   static PostgreSQLContainer<?> postgres =
       new PostgreSQLContainer<>("postgres:15-alpine")
           .withDatabaseName("momently_integration_test")
