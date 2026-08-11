@@ -54,13 +54,14 @@ public abstract class BaseIntegrationTest {
 
   // how the Spring Boot to connect the database
   // it will connect to the temporary PostgreSQL container
-  @DynamicPropertySource
-  static void connectToDBS(DynamicPropertyRegistry registry) {
-    registry.add("spring.datasource.url", postgres::getJdbcUrl);
-    registry.add("spring.datasource.username", postgres::getUsername);
-    registry.add("spring.datasource.password", postgres::getPassword);
-    registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
-  }
+  // no longer used because Spring Boot will get the PostgreSQL connection info from ServiceConnection
+  // @DynamicPropertySource
+  // static void connectToDBS(DynamicPropertyRegistry registry) {
+  //   registry.add("spring.datasource.url", postgres::getJdbcUrl);
+  //   registry.add("spring.datasource.username", postgres::getUsername);
+  //   registry.add("spring.datasource.password", postgres::getPassword);
+  //   registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
+  // }
 
   // verify the port and connect to the right port
   @BeforeEach
