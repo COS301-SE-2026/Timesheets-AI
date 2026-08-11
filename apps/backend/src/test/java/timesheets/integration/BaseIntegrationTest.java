@@ -6,7 +6,6 @@
    - Start PostgreSQL using Testcontainers
    - Start the Spring Boot application
    -  Run Flyway miggrations
-   - Configure to use MockMvc (confirmed in pom.xml) NO
    - Now, using RestAssured is better for integration test: https://stackoverflow.com/questions/52051570/whats-the-difference-between-mockmvc-restassured-and-testresttemplate?rq=1
    - Include Helper functions such as login methods, it call POST /api/auth/login and extracts the JWT and return it
 */
@@ -23,8 +22,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.response.AuthResponse;
 
