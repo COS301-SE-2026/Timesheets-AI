@@ -29,7 +29,6 @@ import timesheets.dto.response.AuthResponse;
     webEnvironment =
         SpringBootTest.WebEnvironment
             .RANDOM_PORT) // assign another random port (NOT 8080 to avoid conflicts)
-@Testcontainers
 @ActiveProfiles("test") // use application-test.properties
 // JUnit create a new object for every method so with PER_CLASS, it creates one object and reuse it
 // in the class
@@ -41,7 +40,6 @@ public abstract class BaseIntegrationTest {
   // creates a PostgreSQL Docker container
   // docker start this container, creates database and spring connects to it
   // and when the tests are done, the container stops and deleted
-  @Container
   static PostgreSQLContainer<?> postgres =
       new PostgreSQLContainer<>("postgres:15-alpine")
           .withDatabaseName("momently_integration_test")
