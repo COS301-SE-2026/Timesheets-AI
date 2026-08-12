@@ -288,8 +288,7 @@ it must end with:
                 - this should run in the prepare package of the Maven lifecycle
                 - the command that is executed downloads the OpenAPI spec and saves it as a json
                 - also there is a skip to allow the plugin to be skipped during the build
-
-            -->
+                - also I have now added a check that if the backend is not running, then the build won'r fail-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -306,8 +305,12 @@ it must end with:
                             <arguments>
                                 <argument>-c</argument>
                                 <argument>
-                                    mkdir -p ${project.basedir}/../docs &amp;&amp;
-                                    curl -o ${project.basedir}/../docs/openapi.json http://localhost:8080/v3/api-docs
+                                    if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health | grep -q "200"; then
+                                        mkdir -p ${project.basedir}/../docs &amp;&amp;
+                                        curl -o ${project.basedir}/../docs/openapi.json http://localhost:8080/v3/api-docs
+                                    else
+                                        echo "Backend not running, skipping file generation."
+                                    fi
                                 </argument>
                             </arguments>
                             <skip>${skip.openapi.generation}</skip>
