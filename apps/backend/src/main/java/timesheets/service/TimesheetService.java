@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.dto.request.TimesheetRequest;
@@ -76,12 +78,14 @@ public class TimesheetService {
             .findById(timesheetId)
             .orElseThrow(() -> new RuntimeException("Timesheet not found"));
 
+    //only the owner should be able to submit their timesheet
     if (!timesheet.getWorkspaceMemberId().equals(currentMemberId)) {
       throw new RuntimeException("You can only submit your own timesheets");
     }
 
-    if (!"DRAFT".equals(timesheet.getStatus())) {
-      throw new RuntimeException("Timesheet has already been submitted");
+    //only draft and rejected timesheets can be submitted
+    if (!"DRAFT".equals(timesheet.getStatus()) && !"REJECTED".equals(timesheet.getStatus())) {
+      throw new RuntimeException("Only draft or rejected timesheets can be submitted");
     }
 
     timesheet.setIsLocked(true);
@@ -99,6 +103,9 @@ public class TimesheetService {
 
     return timesheetRepository.save(timesheet);
   }
+
+
+  
 
   @Transactional
   public Timesheet approveTimesheet(UUID timesheetId, UUID reviewerId) {
