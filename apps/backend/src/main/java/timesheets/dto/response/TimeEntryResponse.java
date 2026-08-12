@@ -23,7 +23,7 @@ public class TimeEntryResponse {
   private UUID taskId;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
-  private Integer durationMinutes;
+  private Integer durationSeconds;
   private String entryType;
   private String description;
   private Boolean isDeleted;
@@ -40,7 +40,7 @@ public class TimeEntryResponse {
         .taskId(entry.getTaskId())
         .startTime(entry.getStartTime())
         .endTime(entry.getEndTime())
-        .durationMinutes(entry.getDurationSeconds())
+        .durationSeconds(entry.getDurationSeconds())
         .entryType(entry.getEntryType())
         .description(entry.getDescription())
         .isDeleted(entry.getIsDeleted())
