@@ -194,22 +194,46 @@ export class TimesheetsComponent {
     return list.filter((ts) => ts.summary.status === filter);
   });
 
-  readonly selectedWeek = computed<TimesheetWeekView | null>(() => {
-    const list = this.filteredTimesheets();
-    if (list.length === 0) {
-      return null;
+  readonly reviewWeekOptions = computed(() => {
+    const keys = new Map<string, { key: string; label: string; start: string}>();
+    for (const row of this.reviewRows()) {
+      const key = row.summary.periodStart;
+      if (!keys.has(key)) {
+        keys.set(key, {
+          key, 
+          start: key,
+          label: `Week ${row.summary.weekNumber} · ${row.summary.periodLabel}`,
+        });
+      }
     }
-    const match = list.find(
-      (ts) => ts.summary.id === this.selectedTimesheetId(),
-    );
-    return match ?? list[0];
+    return Array.from(keys.values()).sort((a,b) => a.start.localeCompare(b.start));
   });
 
-  readonly summary = computed<TimesheetSummary | null>(
-    () => this.selectedWeek()?.summary ?? null,
+
+  readonly filteredReviewRows = computed(() => {
+    const filter = this.reviewFilter();
+    const weekKey = this.reviewWeekKey();
+    return this.reviewRows().filter((row) => {
+      const statusOk = filter === 'ALL' || row.summary.status === filter;
+      const weekOk = !weekKey || row.summary.periodStart === weekKey;
+      return statusOk && weekOk;
+    });
+  });
+
+  readonly awaitingReviewCount = computed(
+    () =>
+      this.filteredReviewRows().filter((r) => r.summary.status === 'SUBMITTED')
+    .length,
   );
 
-  readonly tasks = computed<TaskRow[]>(() => this.selectedWeek()?.tasks ?? []);
+  readonly selectedWeek = computed<TimesheetWeekView | null>(() => {
+    const list = this.filteredTimesheets();
+    if (list.length === 0) return null;
+    return (
+      list.find((ts) => ts.summary.id === this.selectedTimesheetId()) ?? list[0]
+    );
+  });
+  
   readonly days = computed(() => this.selectedWeek()?.days ?? []);
   readonly dailyTotals = computed<string[]>(
     () => this.selectedWeek()?.dailyTotals ?? [],
