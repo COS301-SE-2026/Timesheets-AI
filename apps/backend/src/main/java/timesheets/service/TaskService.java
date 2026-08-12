@@ -132,6 +132,7 @@ public class TaskService {
             || securityUtils.isAdmin()
             || securityUtils.isManager();
 
+    // developers should not be able to create tasks and assign them to others
     if (!isTaskAssigner
         && request.getAssignedWorkspaceMemberId() != null
         && !request.getAssignedWorkspaceMemberId().equals(workspaceMemberId)) {
