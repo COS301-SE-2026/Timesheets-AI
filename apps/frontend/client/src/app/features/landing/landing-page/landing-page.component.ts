@@ -86,10 +86,10 @@ export class LandingPageComponent {
   }
 
   downloadManual():void{
-    window.open('/assets/images/momentum.png', '_blank');
+    window.open('/docs/demo-2/User-Manual.pdf', '_blank');
   }
 
   watchDemo(): void{
-        window.open('/assets/images/momentum.png', '_blank');
+        window.open('/docs/demo-2/User-Manual.pdf', '_blank');
   }
 }
