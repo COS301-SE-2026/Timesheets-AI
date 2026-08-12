@@ -78,6 +78,14 @@ export class TimesheetService {
       .pipe(catchError(this.handleError('submitTimesheet')));
   }
 
+  // Manager/admin review queue
+  getReviewTimesheets(status?: string): Observable<TimesheetResponse[]> {
+    const url = status ? `${this.baseUrl}?status=${encodeURIComponent(status)}` : this.baseUrl;
+    return this.http
+    .get<TimesheetResponse[]>(url)
+    .pipe(catchError(this.handleError('getReviewTimesheets')));
+  }
+  
   //a post request for managaer approvals screen, not used on this page yet
   approveTimesheet(id: string): Observable<TimesheetResponse> {
     return this.http
