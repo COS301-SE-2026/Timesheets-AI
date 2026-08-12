@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import timesheets.domain.Project;
 import timesheets.domain.ProjectMember;
 import timesheets.domain.Task;
@@ -266,24 +264,31 @@ class TaskServiceTest {
       CreateTaskRequest request = createValidRequest();
       request.setAssignedWorkspaceMemberId(workspaceMemberId);
 
-      //simulating that they are a developer because they are not another role
+      // simulating that they are a developer because they are not another role
       when(securityUtils.isAdmin()).thenReturn(false);
       when(securityUtils.isManager()).thenReturn(false);
 
-      //the user has access to the project, but they are not a manager
-      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)).thenReturn(true);
-      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)).thenReturn(Optional.of(new ProjectMember()));
+      // the user has access to the project, but they are not a manager
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+              projectId, workspaceMemberId))
+          .thenReturn(true);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              projectId, workspaceMemberId))
+          .thenReturn(Optional.of(new ProjectMember()));
 
-      //the project exists but is not archived
+      // the project exists but is not archived
       when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
-      when(taskRepository.save(any(Task.class))).thenAnswer(inv -> inv.getArgument(0)); //when the task is saved, it gives back the project
+      when(taskRepository.save(any(Task.class)))
+          .thenAnswer(
+              inv -> inv.getArgument(0)); // when the task is saved, it gives back the project
 
-      when(workspaceMemberRepository.findById(workspaceMemberId)).thenReturn(Optional.of(workspaceMember));
+      when(workspaceMemberRepository.findById(workspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
       when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
       /*
       ACT
-      - the service should allow task creation since they have access to the project 
+      - the service should allow task creation since they have access to the project
       - they are assigning the task to themselves
        */
       TaskResponse result = taskService.createTask(request, workspaceMemberId);
