@@ -294,12 +294,6 @@ $border-colour: #f1f5f9;
     i{
         font-size: 0.8rem;
     }
-    &:hover{
-        background-color: $bg-light;
-        border-color: darken($border-colour, 8%);
-        transform: translateY(-1px);
-    }
-
     
 }
 
@@ -307,7 +301,7 @@ $border-colour: #f1f5f9;
     background: $primary-orange;
     color: white;
     &:hover{
-        border-color: darken($primary-orange, 8%);
+        background: lighten($primary-orange, 20px);
     }
 }
 
@@ -315,7 +309,7 @@ $border-colour: #f1f5f9;
     background: $primary-blue;
     color: white;
     &:hover{
-        border-color: darken($primary-blue, 8%);
+        background: lighten($primary-blue, 20px);
     }
 }
 
