@@ -11,6 +11,9 @@ import timesheets.service.ReportsService;
 // controller for handling report-related endpoints,
 // currently includes an endpoint for generating a productivity report based on time entries for a
 // given user and date range
+
+// TODO: change this from using placeholder project and task names, to use the actual names
+
 @RestController
 @RequestMapping("/api/reports")
 @RequiredArgsConstructor
