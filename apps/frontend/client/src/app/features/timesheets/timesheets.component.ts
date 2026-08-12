@@ -4,12 +4,13 @@
  * Purpose: Display weekly timesheets overview with task breakdown and totals.
  * Related Requirement: -
  *
- * Patched: Zamokuhle Zwane, 07/25/2026
- *
+ * Patched: Zamokuhle Zwane, 25/07/2026
+ * Patched: Zamokuhle Zwane, 03/08/2026
+ * i fixed errors with the total duration and daily totals, they were showing up as 0hr 0m even when there were entries
+ * I fixed the logic to calculate the totals correctly
  */
 
 import { Component, computed, inject, signal } from '@angular/core';
-import { forkJoin } from 'rxjs';
 import {
   TimeEntryService,
   TimeEntryResponse,
@@ -26,6 +27,7 @@ import { TaskService, TaskResponse } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import {forkJoin, Observable, of, catchError, tap} from 'rxjs';
 
 type StatusFilter = 'ALL' | TimesheetStatus;
 type UiState = 'idle' | 'loading' | 'error' | 'empty';
@@ -270,20 +272,59 @@ export class TimesheetsComponent {
   private loadEntriesForWeek(timesheetId: string): void {
     this.timesheetService.getEntriesForTimesheet(timesheetId).subscribe({
       next: (entries) => {
-        this.allTimesheets.update((list) =>
-          list.map((week) => {
-            if (week.summary.id !== timesheetId) return week;
-            const { tasks, dailyTotals, grandTotal } = this.buildTaskRows(
-              entries,
-              week.days,
-            );
-            return { ...week, tasks, dailyTotals, grandTotal };
-          }),
-        );
+        //resolve any taskIds missing because it automatically says "Unknown tasks" silently
+        this.resolveMissingTasks(entries).subscribe(() => {
+          this.allTimesheets.update((list) =>
+            list.map((week) => {
+              if (week.summary.id !== timesheetId) return week;
+              const { tasks, dailyTotals, grandTotal } = this.buildTaskRows(
+                entries,
+                week.days,
+              );
+              return { ...week, tasks, dailyTotals, grandTotal };
+            }),
+          );
+        });
       },
       error: () =>
         this.errorMessage.set('Unable to load entries for this week'),
     });
+  }
+
+  //helper function to fetch any missing tasks that are referenced by entries but not in the rawTasks list
+
+  private resolveMissingTasks(entries: TimeEntryResponse[]): Observable<unknown> {
+    const knownIds = new Set(this.rawTasks().map((t) => t.id));
+    const missingIds = Array.from(
+      new Set(
+        entries
+        .map((e) => e.taskId)
+        .filter((id): id is string => !!id&& !knownIds.has(id)),
+      ),
+    );
+
+    if(missingIds.length === 0) {
+      return of(null); //nothing missing skip the trip entirely
+    }
+    return forkJoin(
+      missingIds.map((id) =>
+        this.taskService.getTaskById(id).pipe(
+          catchError((err) => {
+            console.error(
+            `[TimesheetsComponent] getTaskById failed for missing task ${id}: will display as "Unknown task"`, err,
+          );
+          return of(null); 
+        }),
+        ),
+      ),
+    ).pipe(
+      tap((results) => {
+        const resolved = results.filter((t): t is TaskResponse => !!t);
+        if(resolved.length > 0){
+          this.rawTasks.update((list) => [...list, ...resolved]);
+        }
+      }),
+    );
   }
 
   private buildTaskRows(
@@ -292,47 +333,73 @@ export class TimesheetsComponent {
   ): { tasks: TaskRow[]; dailyTotals: string[]; grandTotal: string } {
     const tasksById = new Map(this.rawTasks().map((t) => [t.id, t]));
     const projectById = new Map(this.rawProjects().map((p) => [p.id, p.name]));
-    const minutesByTask = new Map<string, number[]>();
+    const secondsByGroup = new Map<string, number[]>();
     const dayTotals = new Array(days.length).fill(0);
-
+    console.log('[TimesheetsComponent] buildTaskRows received', entries.length, 'entries');
+    
+    const NO_TASK_KEY = '__no_task__';
+   
     for (const entry of entries) {
-      if (!entry.taskId) continue;
       const dayIndex = days.findIndex(
         (d) => d.dateStr === entry.startTime.slice(0, 10),
       );
-      if (dayIndex == -1) continue;
-
-      const minutes = Math.round(entry.durationMinutes / 60);
-      if (!minutesByTask.has(entry.taskId)) {
-        minutesByTask.set(entry.taskId, new Array(days.length).fill(0));
+      if (dayIndex == -1){
+        console.log('[TimesheetsComponent] skipping entry, no matching day:', {
+          entryStartTime: entry.startTime,
+          expectedDates: days.map(d => d.dateStr),
+        });
+        continue;
       }
-      minutesByTask.get(entry.taskId)![dayIndex] += minutes;
-      dayTotals[dayIndex] += minutes;
+      const groupKey = entry.taskId? entry.taskId: `${NO_TASK_KEY}:${entry.projectId}`;
+
+      const seconds = entry.durationMinutes;
+      if (!secondsByGroup.has(groupKey)) {
+        secondsByGroup.set(groupKey, new Array(days.length).fill(0));
+      }
+      secondsByGroup.get(groupKey)![dayIndex] += seconds;
+      dayTotals[dayIndex] += seconds;
     }
-    const tasks = Array.from(minutesByTask.entries()).map(
-      ([taskId, minutesPerDay]) => {
-        const task = tasksById.get(taskId);
+    const tasks = Array.from(secondsByGroup.entries()).map(
+      ([groupKey, secondsPerDay]) => {
+        const isNoTask = groupKey.startsWith(`${NO_TASK_KEY}:`);
+        const totalSecondsForGroup = secondsPerDay.reduce((a, b) => a + b, 0);
         const style =
-          TASK_STYLE_PALETTE[hashTaskId(taskId) % TASK_STYLE_PALETTE.length];
-        const total = minutesPerDay.reduce((sum, m) => sum + m, 0);
-        return {
-          id: taskId,
-          title: task?.title ?? 'Unknown task',
-          project: task
-            ? (projectById.get(task.projectId) ?? 'Unknown project')
-            : 'Unknown project',
-          iconClass: style.iconClass,
-          colorCode: style.colorCode,
-          loggedHours: minutesPerDay.map((m) =>
-            m > 0 ? this.formatDuration(m) : '-',
-          ),
-          total: this.formatDuration(total),
+            TASK_STYLE_PALETTE[hashTaskId(groupKey) % TASK_STYLE_PALETTE.length];
+
+        if(isNoTask){
+          const projectId = groupKey.slice(NO_TASK_KEY.length+1);
+          return {
+            id: groupKey,
+            title: 'No task',
+            project: projectById.get(projectId) ?? 'Unknown project',
+            iconClass: style.iconClass,
+            colorCode: style.colorCode,
+            loggedHours: secondsPerDay.map((s) =>
+              s > 0 ? this.formatDuration(s) : '-',
+            ),
+            total: this.formatDuration(totalSecondsForGroup),
         };
-      },
+      }
+
+      const taskId = groupKey;
+      const task = tasksById.get(taskId);
+      return {
+        id: taskId,
+        title: task?.title ?? 'Unknown task',
+        project: projectById.get(task?.projectId ?? '') ?? 'Unknown project',
+        iconClass: style.iconClass,
+        colorCode: style.colorCode,
+        loggedHours: secondsPerDay.map((s) =>
+          s > 0 ? this.formatDuration(s) : '-',
+        ),
+        total: this.formatDuration(totalSecondsForGroup),
+      };
+    },
     );
+
     return {
       tasks,
-      dailyTotals: dayTotals.map((m) => (m > 0 ? this.formatDuration(m) : '-')),
+      dailyTotals: dayTotals.map((s) => (s > 0 ? this.formatDuration(s) : '-')),
       grandTotal: this.formatDuration(dayTotals.reduce((a, b) => a + b, 0)),
     };
   }
@@ -392,11 +459,14 @@ export class TimesheetsComponent {
     return `${year}-${month}-${day}`;
   }
 
-  private formatDuration(minutes: number): string {
-    if (minutes <= 0) return '-';
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}hr ${mins}m` : `${mins}m`;
+  private formatDuration(totalSeconds: number): string {
+    if (totalSeconds <= 0) return '-';
+    const hours = Math.floor(totalSeconds / 3600);
+    const mins = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    if(hours > 0) return seconds > 0 ? `${hours}hr ${mins}m ${seconds}s` : `${hours}hr ${mins}m`;
+    if(mins > 0) return seconds > 0 ? `${mins}m ${seconds}s`: `${mins}m`;
+    return `${seconds}s`;
   }
 
   onFilterChange(filter: StatusFilter): void {
