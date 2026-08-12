@@ -233,32 +233,30 @@ export class TimesheetsComponent {
       list.find((ts) => ts.summary.id === this.selectedTimesheetId()) ?? list[0]
     );
   });
-  
-  readonly days = computed(() => this.selectedWeek()?.days ?? []);
-  readonly dailyTotals = computed<string[]>(
-    () => this.selectedWeek()?.dailyTotals ?? [],
-  );
-  readonly grandTotal = computed<string>(
-    () => this.selectedWeek()?.grandTotal ?? '0h 00m',
-  );
-  readonly hasEntries = computed(() => this.tasks().length > 0);
 
-  readonly weekPickerLabel = computed(() => {
-    const s = this.summary();
-    if (!s) {
-      return 'Select week';
-    }
-    return `Week ${s.weekNumber} . ${s.periodLabel}`;
-  });
+  readonly summary = computed(() => this.selectedWeek()?.summary ?? null);
+  readonly tasks = computed(() => this.selectedWeek()?.tasks ?? []);
+
+  readonly days = computed(() => this.selectedWeek()?.days ?? []);
+  readonly dailyTotals = computed(() => this.selectedWeek()?.dailyTotals ?? []);
+  readonly grandTotal = computed(
+    () => this.selectedWeek()?.grandTotal ?? '0hr 0m',
+  );
+
+  readonly hasEntries = computed(() => this.tasks().length > 0);
 
   readonly canSubmit = computed(() => {
     const s = this.summary();
-    return !!s && s.status === 'DRAFT' && !s.isLocked;
+    return (
+      !!s &&
+      !s.isLocked && 
+      (s.status === 'DRAFT' || s.status === 'REJECTED')
+    );
   });
 
   readonly canApproveOrReject = computed(() => {
-    const s = this.summary();
-    return this.isManager() && !!s && s.status === 'SUBMITTED';
+    const target = this.reviewTarget();
+    return ( this.isManager() && !!target && target.summary.status === 'SUBMITTED');
   });
 
   readonly isReadOnly = computed(() => {
@@ -269,8 +267,9 @@ export class TimesheetsComponent {
     return s.isLocked || s.status === 'SUBMITTED' || s.status === 'APPROVED';
   });
 
+  readonly rejectedReasonCount = computed(() => this.rejectReason().length);
+
   constructor() {
-    // INTEGRATION: Call loadTimesheets() on init once timesheetService exist.
     this.loadTimesheets();
   }
 
@@ -278,6 +277,8 @@ export class TimesheetsComponent {
   // this.uiState.set('loading');
   // this.timesheetService.getMyTimesheets(this.selectedFilter()).subscribe
   // Then for the selected id, GET /api/timesheets/{id}/entries and map entries intp task rows (resolve project/task name via project & task APIs)
+
+
 
   loadTimesheets(): void {
     this.uiState.set('loading');
