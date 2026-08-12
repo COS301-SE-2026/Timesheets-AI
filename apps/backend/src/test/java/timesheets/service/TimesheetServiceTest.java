@@ -386,7 +386,7 @@ class TimesheetServiceTest {
        */
       assertThatThrownBy(() -> timesheetService.submitTimesheet(timesheetId))
           .isInstanceOf(RuntimeException.class)
-          .hasMessage("Timesheet has already been submitted");
+          .hasMessage("Only draft or rejected timesheets can be submitted");
 
       verify(timesheetRepository, times(1)).findById(timesheetId);
       verify(timesheetRepository, never()).save(any());

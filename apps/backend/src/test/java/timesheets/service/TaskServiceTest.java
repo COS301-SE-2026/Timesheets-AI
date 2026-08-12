@@ -230,10 +230,4 @@ class TaskServiceTest {
           .findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId);
     }
   }
-
-  @Nested
-  @DisplayName("Create Task Tests")
-  class CreateTaskTests {
-    // my tests
-  }
 }
