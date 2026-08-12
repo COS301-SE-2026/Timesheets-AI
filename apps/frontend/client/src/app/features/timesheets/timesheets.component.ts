@@ -1,46 +1,53 @@
 /**
  * Author: Kgaugelo Matsena & Lerato Sibanda
  * Date: 2026-05-19
- * Purpose: Display weekly timesheets overview with task breakdown and totals.
- * Related Requirement: -
+ * Purpose: Weekly timesheets + mnager review/approve/reject flow
+ * Related Requirement: UC3, UC7
  *
  * Patched: Zamokuhle Zwane, 25/07/2026
  * Patched: Zamokuhle Zwane, 03/08/2026
  * i fixed errors with the total duration and daily totals, they were showing up as 0hr 0m even when there were entries
  * I fixed the logic to calculate the totals correctly
+ * Patched: Lerato Sibanda, 12/08.2026 - manager review Timesheets tab + modal
  */
 
 import { Component, computed, inject, signal } from '@angular/core';
 import {
-  TimeEntryService,
-  TimeEntryResponse,
-} from '../../core/services/time-entry.service';
-import {
+//   TimeEntryService,
+//   TimeEntryResponse,
+// } from '../../core/services/time-entry.service';
+// import {
   TimesheetService,
   TimesheetResponse,
 } from '../../core/services/timesheet.service';
 import {
   ProjectService,
+  ProjectMemberInfo,
   ProjectResponse,
 } from '../../core/services/project.service';
 import { TaskService, TaskResponse } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import {forkJoin, Observable, of, catchError, tap} from 'rxjs';
+import {forkJoin, Observable, of, catchError, tap, map, switchMap } from 'rxjs';
+import { TimeEntryResponse } from '../../core/services/time-entry.service';
 
 type StatusFilter = 'ALL' | TimesheetStatus;
+type ReviewStatusFilter = 'ALL' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+type PageTab = 'mine' | 'review';
 type UiState = 'idle' | 'loading' | 'error' | 'empty';
+type TimesheetStatus = TimesheetResponse['status'];
 
 //types
 export interface Day {
   label: string; //Mon, Jul 21
+  shortLabel: string;
   dateStr: string;
   isToday?: boolean;
 }
-type TimesheetStatus = TimesheetResponse['status'];
 interface TimesheetSummary {
   id: string;
+  workspaceMemberId: string;
   status: TimesheetStatus;
   isLocked: boolean;
   periodStart: string;
@@ -60,6 +67,7 @@ interface TimesheetWeekView {
   tasks: TaskRow[];
   dailyTotals: string[];
   grandTotal: string;
+  grandTptalShort: string;
 }
 
 interface TaskRow {
@@ -69,7 +77,29 @@ interface TaskRow {
   iconClass: string;
   colorCode: string;
   loggedHours: string[]; //7 entries
+  loggedHoursShort: string[];
   total: string;
+  totalShort: string;
+}
+
+interface MemberInfo {
+  name: string;
+  role: string;
+  initials: string;
+  avatarColor: string;
+}
+
+interface ReviewRow {
+  summary: TimesheetSummary;
+  employeeName: string;
+  employeeRole: string;
+  initials: string;
+  avatarColor: string;
+  totalHours: string;
+  days: Day[];
+  tasks: TaskRow[];
+  dailyTotals: string[];
+  grandTotalShort: string;
 }
 
 const TASK_STYLE_PALETTE: { iconClass: string; colorCode: string }[] = [
