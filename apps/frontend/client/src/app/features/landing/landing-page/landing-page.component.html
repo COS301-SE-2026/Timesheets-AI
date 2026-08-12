@@ -89,14 +89,16 @@ Related Requirements: N/A
                         class="preview-img"/>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- FEATURES GRID AREA -->
-        <section class="features-section">
-            <div class="features-grid">
+    <!-- FEATURES GRID AREA -->
+    <section class="features-section">
+        <div class="features-grid">
+            @for (item of features; track item.title) {
                 <div 
+            
                     class="features-card"
-                    *ngFor="let item of features"
                     [style.background]="item.bgColor">
 
                     <div 
@@ -105,6 +107,8 @@ Related Requirements: N/A
                         [style.color]="item.iconColor">
 
                         <i [class]="item.icon"></i>
+
+                    </div>
 
                     </div>
 
