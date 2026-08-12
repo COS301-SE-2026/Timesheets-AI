@@ -143,10 +143,13 @@ export class TimesheetsComponent {
   );
 
   //  INTEGRATION: Replace with GET /api/timesheets/me (or filtered status endpoints)
+  readonly pageTab = signal<PageTab>('mine');
   private readonly rawProjects = signal<ProjectResponse[]>([]);
   private readonly rawTasks = signal<TaskResponse[]>([]);
+  private readonly memberById = signal<Map<string, MemberInfo>>(new Map());
 
   private readonly allTimesheets = signal<TimesheetWeekView[]>([]);
+  private readonly reviewRows = signal<ReviewRow[]>([]);
 
   readonly statusFilters: StatusFilter[] = [
     'ALL',
@@ -155,19 +158,32 @@ export class TimesheetsComponent {
     'APPROVED',
     'REJECTED',
   ];
+
+  readonly reviewStatusFilters: ReviewStatusFilter[] = [
+    'ALL',
+    'SUBMITTED',
+    'APPROVED',
+    'REJECTED'
+  ];
+
   readonly selectedFilter = signal<StatusFilter>('ALL');
+  readonly reviewFilter = signal<ReviewStatusFilter>('SUBMITTED');
   readonly selectedTimesheetId = signal<string>('');
+  readonly reviewWeekKey = signal<string>('');
   readonly uiState = signal<UiState>('idle');
+  readonly reviewUiState = signal<UiState>('idle');
   readonly errorMessage = signal<string | null>(null);
   readonly toastMessage = signal<string | null>(null);
 
-  readonly showRejectDialog = signal(false);
-  readonly rejectReason = signal('');
-
   readonly showSubmitDialog = signal(false);
   readonly showSubmitSuccessDialog = signal(false);
+  readonly showReviewModal = signal(false);
+  readonly reviewTarget = signal<ReviewRow | null>(null);
+  readonly rejectReason = signal('');
+  readonly showRejectReason = signal(false);
 
   readonly actionPending = signal(false);
+  readonly maxRejectLength = 500;
 
   readonly filteredTimesheets = computed(() => {
     const filter = this.selectedFilter();
