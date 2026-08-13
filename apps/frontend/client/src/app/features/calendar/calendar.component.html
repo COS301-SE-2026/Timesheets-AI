@@ -1,1 +1,86 @@
-<p>calendar works!</p>
+<!--
+Author: Cleopatra Kwenda
+Date: 2026-07-30
+Purpose: will display our desired wireframe of 
+the Calendar page.
+Related Requirements: N/A
+-->
+
+<main class="main-content">
+
+    <!-- header area -->
+    <header class="page-header">
+        <div class="header-title">
+            <h1>
+                Calendar
+            </h1>
+            <p>
+                Read-only view of your Outlook calendar. We'll
+                help you make sense of your day.
+            </p>
+        </div>
+
+        <!-- calendar comoan statuts badge -->
+        <div class="outlook-badge">
+            <i class="fa-brands fa-microdoft outlook-iccon"></i>
+            <div class="status">
+                <strong> Outlook connected</strong>
+                <small> Last synced 3 minutes ago</small>
+            </div>
+
+            <button class="btn-sync">
+                <i class="fa-solid fa-rotate"></i>Sync now
+            </button>
+        </div>
+
+        <!-- date switch controlls -->
+        <div class="calendar-controls">
+            <button class="btn-secondary">
+                Today
+            </button>
+
+            <div class="btn-group">
+                <button class="btn-icon">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button class="btn-icon">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="date-picker-trigger">
+                <span> August 2026</span>
+                <i class="fa-regular fa-calendar"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- main calender place -->
+    <div class="workspace">
+
+        <!-- calender view area -->
+        <div class="calendar-view-container">
+
+            <!-- tab toggles -->
+            <div class="tabs-bar">
+                <div class="tab-group">
+                    <button 
+                        [class.active]="activeView() === 'day'"
+                        (click)="setView('day')">
+                        Day
+                    </button>
+                    <button 
+                        [class.active]="activeView() === 'day'"
+                        (click)="setView('day')">
+                        Day
+                    </button>
+                    <button 
+                        [class.active]="activeView() === 'month'"
+                        (click)="setView('month')">
+                        Month
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
