@@ -26,7 +26,7 @@ public interface TimesheetRepository extends JpaRepository<Timesheet, UUID> {
   List<Timesheet> findByWorkspaceMemberIdAndStatus(UUID workspaceMemberId, String status);
 
   /*
-    FOR MANAGER!
+    MANAGER
     - this will get all the timesheets in a specific workspace
     - they will only see submitted, approved, rejected
     - they cannot see the drafts because they are not ready for view
@@ -41,4 +41,18 @@ public interface TimesheetRepository extends JpaRepository<Timesheet, UUID> {
           + "AND timesheet.status != 'DRAFT' "
           + "ORDER BY timesheet.createdAt DESC")
   List<Timesheet> findByWorkspaceIdExcludingDraft(@Param("workspaceId") UUID workspaceId);
+
+  /*
+    MANAGER
+    - this will get all the timesheets in a specific workspace by that status
+    - will help with the filtering
+  */
+  @Query(
+      "SELECT timesheet FROM Timesheet timesheet "
+          + "JOIN WorkspaceMember workspaceMember ON timesheet.workspaceMemberId = workspaceMember.id "
+          + "WHERE workspaceMember.workspaceId = :workspaceId "
+          + "AND timesheet.status = :status "
+          + "ORDER BY timesheet.createdAt DESC")
+  List<Timesheet> findByWorkspaceIdAndStatus(
+      @Param("workspaceId") UUID workspaceId, @Param("status") String status);
 }
