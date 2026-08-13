@@ -70,9 +70,9 @@ Related Requirements: N/A
                         Day
                     </button>
                     <button 
-                        [class.active]="activeView() === 'day'"
-                        (click)="setView('day')">
-                        Day
+                        [class.active]="activeView() === 'week'"
+                        (click)="setView('week')">
+                        Week
                     </button>
                     <button 
                         [class.active]="activeView() === 'month'"
@@ -80,7 +80,11 @@ Related Requirements: N/A
                         Month
                     </button>
                 </div>
+                <span class="current-date-label"> Saturday, 15 August 2026</span>
             </div>
+
+            <!-- tab switchers -->
+            
         </div>
     </div>
 </main>
