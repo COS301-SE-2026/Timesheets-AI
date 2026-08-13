@@ -35,7 +35,9 @@ Related Requirements: N/A
 
         <!-- date switch controlls -->
         <div class="calendar-controls">
-            <button class="btn-secondary">
+            <button 
+                class="btn-secondary"
+                (click)="goToToday()">
                 Today
             </button>
 
@@ -49,7 +51,7 @@ Related Requirements: N/A
             </div>
 
             <div class="date-picker-trigger">
-                <span> August 2026</span>
+                <span> {{ currentDate() | date: 'MMMM yyyy'}}</span>
                 <i class="fa-regular fa-calendar"></i>
             </div>
         </div>
@@ -80,11 +82,14 @@ Related Requirements: N/A
                         Month
                     </button>
                 </div>
-                <span class="current-date-label"> Saturday, 15 August 2026</span>
+                <span class="current-date-label"> {{ currentDate() | date: 'EEEE,d MMMM yyyy'}}</span>
             </div>
 
             <!-- tab switchers -->
-            
+            @switch (activeView()){
+                <!-- month view -->
+                <div class="month-grid-view"></div>
+            }
         </div>
     </div>
 </main>
