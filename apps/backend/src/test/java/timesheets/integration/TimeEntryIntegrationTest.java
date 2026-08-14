@@ -153,7 +153,9 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
   // 1. Reject Create A Time Entry Without JWT
   @Test
   void shouldRejectCreateTimeEntryWithoutJwt() {
-    //no login() call, hitting the endpoint unauthenticated on purpose this is what actually protects it: timesheets.config.SecurityConfig permits /api/auth/** only, everything else needs a valid Bearer token
+    // no login() call, hitting the endpoint unauthenticated on purpose this is what actually
+    // protects it: timesheets.config.SecurityConfig permits /api/auth/** only, everything else
+    // needs a valid Bearer token
     TimeEntryRequest request = validRequest();
 
     RestAssured.given()
@@ -176,7 +178,7 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
     String token = loginEmployee();
 
     TimeEntryRequest request = validRequest();
-    request.setProjectId(UUID.randomUUID()); //its guaranteed not to exist
+    request.setProjectId(UUID.randomUUID()); // its guaranteed not to exist
 
     RestAssured.given()
         .header("Authorization", "Bearer " + token)
@@ -185,7 +187,7 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
         .when()
         .post("/api/time-entries")
         .then()
-        .statusCode(500); //FLAG: should be 400 once project existence is validated
+        .statusCode(500); // FLAG: should be 400 once project existence is validated
   }
 
   /*
@@ -207,12 +209,12 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
         .when()
         .post("/api/time-entries")
         .then()
-        .statusCode(500); //another FLAG: should be 400 once task existence/ownership is validated
+        .statusCode(500); // another FLAG: should be 400 once task existence/ownership is validated
   }
 
-  /* 
+  /*
     4. Reject Invalid Time Range
-    
+
     FLAG: there is no check anywhere in TimeEntryService that endTime is after startTime This request is backwards and the backend happily saves it as-is.
     Documenting current "wrong" behavior so this test flips red the moment someone adds the validation, that's the signal to come flip this test to expect 400
   */
@@ -222,7 +224,7 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
 
     TimeEntryRequest request = validRequest();
     request.setStartTime(LocalDateTime.of(2026, 8, 5, 11, 0));
-    request.setEndTime(LocalDateTime.of(2026, 8, 5, 9, 0)); //before it starts
+    request.setEndTime(LocalDateTime.of(2026, 8, 5, 9, 0)); // before it starts
 
     RestAssured.given()
         .header("Authorization", "Bearer " + token)
@@ -231,11 +233,12 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
         .when()
         .post("/api/time-entries")
         .then()
-        .statusCode(201); //FLAG: should be 400, raising an issue for backend
+        .statusCode(201); // FLAG: should be 400, raising an issue for backend
   }
 
-  //5. Reject Missing Required Fields 
-  //this one IS enforced: TimeEntryRequest.projectId has @NotNull, caught by MethodArgumentNotValidException, and GlobalExceptionHandler does handle that one
+  // 5. Reject Missing Required Fields
+  // this one IS enforced: TimeEntryRequest.projectId has @NotNull, caught by
+  // MethodArgumentNotValidException, and GlobalExceptionHandler does handle that one
   @Test
   void shouldRejectTimeEntryWithMissingRequiredFields() {
     String token = loginEmployee();
@@ -273,7 +276,7 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
     assertTrue(entries.stream().anyMatch(e -> e.getId().equals(created.getId())));
   }
 
-  //2. Get Entry By Id
+  // 2. Get Entry By Id
   @Test
   void shouldGetEntryById() {
     String token = loginEmployee();
@@ -293,7 +296,7 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
     assertEquals("Integration test entry", fetched.getDescription());
   }
 
-  //3. Update Time Entry
+  // 3. Update Time Entry
   @Test
   void shouldUpdateTimeEntry() {
     String token = loginEmployee();
@@ -316,7 +319,7 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
             .as(TimeEntryResponse.class);
 
     assertEquals("Updated description", updated.getDescription());
-    assertEquals(3600, updated.getDurationMinutes()); //yes, this field is actually seconds :)
+    assertEquals(3600, updated.getDurationMinutes()); // yes, this field is actually seconds :)
   }
 
   /*
@@ -331,7 +334,7 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
     String token = loginEmployee();
     TimeEntryResponse created = createEntry(token, validRequest());
 
-    //manually lock it, the way TimesheetService.submitTimesheet() should in practice
+    // manually lock it, the way TimesheetService.submitTimesheet() should in practice
     var entry = timeEntryRepository.findById(created.getId()).orElseThrow();
     entry.setIsLocked(true);
     timeEntryRepository.save(entry);
@@ -346,10 +349,10 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
         .when()
         .put("/api/time-entries/" + created.getId())
         .then()
-        .statusCode(500); //FLAGGING: should be 409 Conflict once RuntimeException is handled
+        .statusCode(500); // FLAGGING: should be 409 Conflict once RuntimeException is handled
   }
 
-  //delete Time Entry
+  // delete Time Entry
   @Test
   void shouldDeleteTimeEntry() {
     String token = loginEmployee();
@@ -362,24 +365,26 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
         .then()
         .statusCode(204);
 
-    //service does a soft delete (isDeleted flag), confirm that rather than expecting the row to be gone entirely
+    // service does a soft delete (isDeleted flag), confirm that rather than expecting the row to be
+    // gone entirely
     var deletedEntry = timeEntryRepository.findById(created.getId()).orElseThrow();
     assertTrue(deletedEntry.getIsDeleted());
   }
 
-  //6. Reject Delete Without Authentication
+  // 6. Reject Delete Without Authentication
   @Test
   void shouldRejectDeleteWithoutAuthentication() {
     String token = loginEmployee();
     TimeEntryResponse created = createEntry(token, validRequest());
 
     RestAssured.given()
-        //no Authorization header this time
+        // no Authorization header this time
         .when()
         .delete("/api/time-entries/" + created.getId())
         .then()
         .statusCode(403);
   }
+
   /*
   7. Reject Access To Another User's Entry
   FLAG: this is the big one. TimeEntryService.getTimeEntryById() does not check the ownership at all, it's just a findById(), i dont should happen, any authenticated user can technically GET any
@@ -399,6 +404,6 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
         .get("/api/time-entries/" + created.getId())
         .then()
         .statusCode(Matchers.anyOf(Matchers.is(403), Matchers.is(404)));
-    //FLAG: currently returns 200, no ownership check on GET by id
+    // FLAG: currently returns 200, no ownership check on GET by id
   }
 }
