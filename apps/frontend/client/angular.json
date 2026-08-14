@@ -86,6 +86,10 @@
             "development": {
               "buildTarget": "client:build:development",
               "proxyConfig": "proxy.conf.local.json"
+            },
+            "docker": {
+              "buildTarget": "client:build:development",
+              "proxyConfig": "proxy.conf.docker.json"
             }
           },
           "defaultConfiguration": "development"
