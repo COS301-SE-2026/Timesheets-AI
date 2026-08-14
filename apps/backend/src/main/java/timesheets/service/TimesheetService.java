@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.domain.WorkspaceMember;
@@ -25,6 +27,7 @@ public class TimesheetService {
   private final SecurityUtils securityUtils;
   private final WorkspaceMemberRepository workspaceMemberRepository;
 
+  //creates a new draft timesheet for the current user
   @Transactional
   public Timesheet createTimesheet(TimesheetRequest request) {
 
@@ -40,7 +43,7 @@ public class TimesheetService {
     return timesheetRepository.save(timesheet);
   }
 
-  // get existing timesheet or create a new one
+  // get existing timesheet or create a new draft one
   @Transactional
   public Timesheet getOrCreateTimesheet(LocalDate periodStart, LocalDate periodEnd) {
 
@@ -70,6 +73,37 @@ public class TimesheetService {
     return getOrCreateTimesheet(periodStart, periodEnd);
   }
 
+  /*
+  - this will get all the timesheets for a specific member
+  - used for dev, manager or admin to view their own timesheets
+  - OR also, manager and admin can see timesheets of any member in workspace
+  */
+  public List<Timesheet> getTimesheetsByMember(UUID workspaceMemberId) {
+
+      UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+      UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+
+    //devs should only be able to see their own timesheets
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+        if (!workspaceMemberId.equals(currentMemberId)) {
+            throw new RuntimeException("You can only view your own timesheets");
+        }
+        return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
+    }
+    
+    //checking that the requested member exists in the workspace
+    WorkspaceMember member = workspaceMemberRepository.findById(workspaceMemberId).orElseThrow(() -> new RuntimeException("Workspace member not found"));
+    
+    if (!member.getWorkspaceId().equals(workspaceId)) {
+        throw new RuntimeException("Cannot view timesheets from another workspace");
+    }
+    
+    //managers are allowed to view any members timesheets from the workspace
+    return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
+    
+  }
+
+  //submits a timesheet so it can be approved
   @Transactional
   public Timesheet submitTimesheet(UUID timesheetId) {
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
@@ -115,6 +149,7 @@ public class TimesheetService {
     return timesheetRepository.save(timesheet);
   }
 
+  //approves a submitted timesheet
   @Transactional
   public Timesheet approveTimesheet(UUID timesheetId, UUID reviewerId) {
 
@@ -161,6 +196,7 @@ public class TimesheetService {
     return timesheetRepository.save(timesheet);
   }
 
+  //rejects a submitted timesheet
   @Transactional
   public Timesheet rejectTimesheet(UUID timesheetId, UUID reviewerId, String reason) {
 
@@ -236,6 +272,7 @@ public class TimesheetService {
   }
 
   // this will get the users timesheets by the status
+  //admins see all, managers see all besides their own
   @Transactional
   public List<Timesheet> getWorkspaceTimesheetsByStatus(String status) {
 
@@ -277,14 +314,12 @@ public class TimesheetService {
         workspaceId, currentMemberId);
   }
 
-  public List<Timesheet> getTimesheetsByMember(UUID workspaceMemberId) {
-    return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
-  }
 
   public List<Timesheet> getTimesheetsByMemberAndStatus(UUID workspaceMemberId, String status) {
     return timesheetRepository.findByWorkspaceMemberIdAndStatus(workspaceMemberId, status);
   }
 
+  //gets a single timesheet by it's id
   @Transactional(readOnly = true)
   public Timesheet getTimesheetById(UUID id) {
 
