@@ -30,6 +30,7 @@ public class TimesheetController {
   private final SecurityUtils securityUtils;
 
   // getting all the timesheets for a logged in user
+  // think viewing my own timesheets
   @GetMapping("/me")
   public ResponseEntity<List<TimesheetResponse>> getMyTimesheets() {
 
@@ -44,6 +45,7 @@ public class TimesheetController {
   }
 
   // getting the timesheet by status
+  // think viewing my own timesheets
   @GetMapping("/me/status/{status}")
   public ResponseEntity<List<TimesheetResponse>> getMyTimesheetsByStatus(
       @PathVariable String status) {
@@ -56,7 +58,7 @@ public class TimesheetController {
     return ResponseEntity.ok(responses);
   }
 
-  // getting a single timesheet
+  // getting a single timesheet, think my own or others
   @GetMapping("/{id}")
   public ResponseEntity<TimesheetResponse> getTimesheetById(@PathVariable UUID id) {
     Timesheet timesheet = timesheetService.getTimesheetById(id);
@@ -103,6 +105,7 @@ public class TimesheetController {
   /*
   - managers and admins
   - to get all the timesheets in a workspace, besides DRAFTS
+  - think viewing other peoples timesheets
   */
   @GetMapping("/workspace")
   public ResponseEntity<List<TimesheetResponse>> getWorkspaceTimesheets() {
@@ -117,9 +120,10 @@ public class TimesheetController {
   }
 
   /*
-  Get all SUBMITTED timesheets in the current user's workspace.
-  This is the manager's "pending approvals" queue.
-  Includes both first-time submissions and resubmissions after rejection.
+  - managers and admins
+  - gets all the submitted timesheets in the users workspace
+  - the first-time submitted and the resubmitted both can be her
+  - think viewing other peoples timesheets
    */
   @GetMapping("/workspace/pending")
   public ResponseEntity<List<TimesheetResponse>> getPendingWorkspaceTimesheets() {
@@ -132,6 +136,8 @@ public class TimesheetController {
     return ResponseEntity.ok(responses);
   }
 
+  // viewing the timesheets by the status in that workspace
+  // think viewing other peoples timesheets by the status
   @GetMapping("/workspace/status/{status}")
   public ResponseEntity<List<TimesheetResponse>> getWorkspaceTimesheetsByStatus(
       @PathVariable String status) {

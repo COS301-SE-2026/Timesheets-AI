@@ -4,11 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.domain.WorkspaceMember;
@@ -27,7 +25,7 @@ public class TimesheetService {
   private final SecurityUtils securityUtils;
   private final WorkspaceMemberRepository workspaceMemberRepository;
 
-  //creates a new draft timesheet for the current user
+  // creates a new draft timesheet for the current user
   @Transactional
   public Timesheet createTimesheet(TimesheetRequest request) {
 
@@ -74,36 +72,111 @@ public class TimesheetService {
   }
 
   /*
+  - gets a single timesheet by it's id
+  - this can be used when a dev, manager or admin wants to view their timesheet details
+  - when an admin or manager want to view the details of someone elses timesheet in their workspace
+  */
+  @Transactional(readOnly = true)
+  public Timesheet getTimesheetById(UUID id) {
+
+    Timesheet timesheet =
+        timesheetRepository
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Timesheet not found"));
+
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+    UUID timesheetOwnerId = timesheet.getWorkspaceMemberId();
+
+    // a regular user should only be able to see their own timesheets
+    if (!securityUtils.isManager() && !securityUtils.isAdmin()) {
+      if (!timesheetOwnerId.equals(currentMemberId)) {
+        throw new RuntimeException("You can only view your own timesheets");
+      }
+      return timesheet;
+    }
+
+    // to check that the timesheet is in the managers or admins workspace
+    WorkspaceMember owner =
+        workspaceMemberRepository
+            .findById(timesheetOwnerId)
+            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+
+    if (!owner.getWorkspaceId().equals(workspaceId)) {
+      throw new RuntimeException("Timesheet not found in your workspace");
+    }
+
+    // admins and managers can view any timesheet in their workspace
+    return timesheet;
+  }
+
+  /*
   - this will get all the timesheets for a specific member
   - used for dev, manager or admin to view their own timesheets
   - OR also, manager and admin can see timesheets of any member in workspace
   */
+  @Transactional
   public List<Timesheet> getTimesheetsByMember(UUID workspaceMemberId) {
 
-      UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
-      UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
 
-    //devs should only be able to see their own timesheets
+    // devs should only be able to see their own timesheets
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-        if (!workspaceMemberId.equals(currentMemberId)) {
-            throw new RuntimeException("You can only view your own timesheets");
-        }
-        return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
+      if (!workspaceMemberId.equals(currentMemberId)) {
+        throw new RuntimeException("You can only view your own timesheets");
+      }
+      return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
     }
-    
-    //checking that the requested member exists in the workspace
-    WorkspaceMember member = workspaceMemberRepository.findById(workspaceMemberId).orElseThrow(() -> new RuntimeException("Workspace member not found"));
-    
+
+    // checking that the requested member exists in the workspace
+    WorkspaceMember member =
+        workspaceMemberRepository
+            .findById(workspaceMemberId)
+            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+
     if (!member.getWorkspaceId().equals(workspaceId)) {
-        throw new RuntimeException("Cannot view timesheets from another workspace");
+      throw new RuntimeException("Cannot view timesheets from another workspace");
     }
-    
-    //managers are allowed to view any members timesheets from the workspace
+
+    // managers are allowed to view any members timesheets from the workspace
     return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
-    
   }
 
-  //submits a timesheet so it can be approved
+  /*
+  - gets all the timesheets for a specific member, filtered by the status
+  - used for dev, manager and admin to view their own timesheets
+  - OR also, manager and admin can see the timesheets of any member in their workspace
+  */
+  @Transactional
+  public List<Timesheet> getTimesheetsByMemberAndStatus(UUID workspaceMemberId, String status) {
+
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    // a regular user should only be able to see their own timesheets
+    if (!securityUtils.isManager() && !securityUtils.isAdmin()) {
+      if (!workspaceMemberId.equals(currentMemberId)) {
+        throw new RuntimeException("You can only view your own timesheets");
+      }
+      return timesheetRepository.findByWorkspaceMemberIdAndStatus(workspaceMemberId, status);
+    }
+
+    // to check that the timesheet is in the managers or admins workspace
+    WorkspaceMember owner =
+        workspaceMemberRepository
+            .findById(workspaceMemberId)
+            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+
+    // the timesheet should only exist in the current workspace
+    if (!owner.getWorkspaceId().equals(workspaceId)) {
+      throw new RuntimeException("Timesheet not found in your workspace");
+    }
+
+    return timesheetRepository.findByWorkspaceMemberIdAndStatus(workspaceMemberId, status);
+  }
+
+  // submits a timesheet so it can be approved
   @Transactional
   public Timesheet submitTimesheet(UUID timesheetId) {
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
@@ -149,7 +222,7 @@ public class TimesheetService {
     return timesheetRepository.save(timesheet);
   }
 
-  //approves a submitted timesheet
+  // approves a submitted timesheet
   @Transactional
   public Timesheet approveTimesheet(UUID timesheetId, UUID reviewerId) {
 
@@ -196,7 +269,7 @@ public class TimesheetService {
     return timesheetRepository.save(timesheet);
   }
 
-  //rejects a submitted timesheet
+  // rejects a submitted timesheet
   @Transactional
   public Timesheet rejectTimesheet(UUID timesheetId, UUID reviewerId, String reason) {
 
@@ -272,7 +345,7 @@ public class TimesheetService {
   }
 
   // this will get the users timesheets by the status
-  //admins see all, managers see all besides their own
+  // admins see all, managers see all besides their own
   @Transactional
   public List<Timesheet> getWorkspaceTimesheetsByStatus(String status) {
 
@@ -297,12 +370,12 @@ public class TimesheetService {
   @Transactional
   public List<Timesheet> getPendingWorkspaceTimesheets() {
 
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
       throw new RuntimeException("Only Admins and Managers can view pending timesheets");
     }
-
-    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
-    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     // admins will see all that have been submitted
     if (securityUtils.isAdmin()) {
@@ -312,50 +385,6 @@ public class TimesheetService {
     // managers will see all that the other submitted, excluding theirs
     return timesheetRepository.findPendingByWorkspaceIdExcludingMember(
         workspaceId, currentMemberId);
-  }
-
-
-  public List<Timesheet> getTimesheetsByMemberAndStatus(UUID workspaceMemberId, String status) {
-    return timesheetRepository.findByWorkspaceMemberIdAndStatus(workspaceMemberId, status);
-  }
-
-  /*
-  - gets a single timesheet by it's id
-  - this can be used when a dev, manager or admin wants to view their timesheet details
-  - when an admin or manager want to view the details of someone elses timesheet in their workspace
-  */
-  @Transactional(readOnly = true)
-  public Timesheet getTimesheetById(UUID id) {
-
-    Timesheet timesheet =
-        timesheetRepository
-            .findById(id)
-            .orElseThrow(() -> new RuntimeException("Timesheet not found"));
-
-    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
-    UUID timesheetOwnerId = timesheet.getWorkspaceMemberId();
-
-    // a regular user should only be able to see their own timesheets
-    if (!securityUtils.isManager() && !securityUtils.isAdmin()) {
-      if (!timesheetOwnerId.equals(currentMemberId)) {
-        throw new RuntimeException("You can only view your own timesheets");
-      }
-      return timesheet;
-    }
-
-    // to check that the timesheet is in the managers or admins workspace
-    WorkspaceMember owner =
-        workspaceMemberRepository
-            .findById(timesheetOwnerId)
-            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
-
-    if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new RuntimeException("Timesheet not found in your workspace");
-    }
-
-    //admins and managers can view any timesheet in their workspace
-    return timesheet;
   }
 
   // !helper functions
