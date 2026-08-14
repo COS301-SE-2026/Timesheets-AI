@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.dto.request.TimesheetRequest;
@@ -192,6 +194,27 @@ public class TimesheetService {
     // managers will see other peoples timesheets but not their own
     return timesheetRepository.findByWorkspaceIdExcludingDraftAndMember(
         workspaceId, currentMemberId);
+  }
+
+  //this will get the users timesheets by the status
+  @Transactional
+  public List<Timesheet> getWorkspaceTimesheetsByStatus(String status)
+  {
+
+    if(!securityUtils.isAdmin() && !securityUtils.isManager()){
+      throw new RuntimeException("Only managers and admins can view workspace timesheets");
+    }
+
+      UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+      UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+      //admins will see all timesheets for all users in that workspace
+      if(securityUtils.isAdmin()){
+        return timesheetRepository.findByWorkspaceIdAndStatus(workspaceId, status);
+      }
+
+      //managers will see only other peoples timesheets but they will not see their own
+      return timesheetRepository.findByWorkspaceIdAndStatusExcludingMember(workspaceId, status, currentMemberId)
   }
 
   // will get all the timesheets that have been submitted and waiting approval
