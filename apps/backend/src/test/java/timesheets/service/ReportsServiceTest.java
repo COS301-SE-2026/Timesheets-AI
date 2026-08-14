@@ -162,7 +162,7 @@
 // order
 //     // based on the week start date, confirming that the service correctly orders the weeks
 //     // in the breakdown to show the earliest week first
-//
+
 // assertThat(report.getByWeek().get(0).getWeek()).isLessThan(report.getByWeek().get(1).getWeek());
 //   }
 

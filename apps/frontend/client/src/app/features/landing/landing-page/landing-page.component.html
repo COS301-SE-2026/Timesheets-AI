@@ -1,0 +1,140 @@
+<!--
+Author: Cleopatra Kwenda
+Date: 2026-07-30
+Purpose: will display our desired wireframe of 
+the Landing page.
+Related Requirements: N/A
+-->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap');
+</style>
+
+<div class="landing-container">
+
+    <!-- HEADER AREA -->
+    <header class="navbar">
+        <!-- LOGO AREA -->
+        <a 
+            class="brand brand--hero" 
+            routerLink="/"
+            aria-label="Momently home">
+
+            <img 
+                class="brand-logo"
+                [src]="brandLogo"
+                alt="Momently logo"/>
+
+            <span class="brand-copy">
+                <span class="brand-name">
+                    <span class="brand-name__accent">
+                        m</span>omently
+                </span>
+
+                <span class="brand-tagline">
+                    Every moment counts
+                </span>
+            </span>
+        </a>
+
+        <!-- AUTH BUTTON( LOG-IN / SIGN-UP) -->
+        <div class="auth-buttons">
+            <a routerLink="/login" class="btn-login">
+                Login
+            </a>
+            <a routerLink="/signup" class="btn-signup">
+                Signup
+            </a>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="badge-tag">
+                <i class="fa-solid fa-wand-magic-sparkles"> </i> AI-POWERED TIME ANALYTICS
+            </div>
+
+            <h1 class="hero-title">
+                Time tracking <br />
+                that drives <br />
+                <span class="highlight">
+                    productivity.
+                </span>
+            </h1>
+
+            <p class="hero-description">
+                Momently helps development teams track time effortlessly, gain 
+                intelligent insight, and deliver more impact.
+            </p>
+        </div>
+
+        <!-- SREENSHOT OF OUR PRETTIEST PAGE -->
+        <div class="hero-preview">
+            <div class="hero-glow"></div>
+
+            <div class="image-wrapper">
+                <img 
+                    src="/assets/images/dashboard-preview.png"
+                    alt="Momently App Screenshot"
+                    class="preview-img"/>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES GRID AREA -->
+    <section class="features-section">
+        <div class="features-grid">
+            @for (item of features; track item.title) {
+                <div 
+            
+                    class="features-card"
+                    [style.background]="item.bgColor">
+
+                    <div 
+                        class="features-icon"
+                        [style.background-color]="item.bgColor"
+                        [style.color]="item.iconColor">
+
+                        <i [class]="item.icon"></i>
+
+                    </div>
+
+                <h3>
+                    {{ item.title }}
+                </h3>
+                <p>
+                    {{ item.description}}
+                </p>
+            </div>
+            }
+        </div>
+    </section>
+
+    <!-- CLIENT NAMES AND LOGOS -->
+    <section class="logos-section">
+        <p class="trust-text">
+            Trusted by development teams that value every moment
+        </p>
+
+        <div class="logos-container">
+            <img 
+                src="/assets/images/momentum.png"
+                alt="momentum"
+            />
+            <img 
+                src="/assets/images/gaurdrisk.png"
+                alt="gardrisk"
+            />
+            <img 
+                src="/assets/images/multiply-logo.png"
+                alt="multiply"
+            />
+            <img 
+                src="/assets/images/er24-logo.png"
+                alt="er24"
+            />
+            
+        </div>
+    </section>
+</div>

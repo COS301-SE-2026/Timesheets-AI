@@ -1,6 +1,14 @@
+/**
+ * Author: Lerato Sibanda
+ * Date: 2026-05-17
+ * Purpose: Handles new user registration with form validation.
+ * Related Requirement: -
+ */
+
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink, Router} from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-signup',
   imports: [ReactiveFormsModule, RouterLink],
@@ -14,6 +22,7 @@ export class SignupComponent {
 
   private readonly router = inject(Router);
 
+  private readonly authService = inject(AuthService);
   /* Toast state */
   protected toastMessage = '';
   protected showToast = false;
@@ -26,6 +35,13 @@ export class SignupComponent {
 
   // Tracks whether form has been submitted (used for validation display)
   protected submitted = false;
+  
+  //show loading
+  protected loading = false;
+
+  //Sends an error message
+  protected errorMessage = '';
+  
 
   // Reactive signup form definition
   protected readonly signupForm = this.formBuilder.nonNullable.group({
@@ -37,7 +53,12 @@ export class SignupComponent {
       [
         Validators.required,
         Validators.minLength(8),
-        Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d).+$/)
+        // Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d).+$/)
+        // REGEX need to match backend exactly
+        Validators.pattern(
+            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\S+$).{8,20}$/
+
+        )
       ]
     ],
     acceptedTerms: [false, Validators.requiredTrue]
@@ -57,10 +78,26 @@ export class SignupComponent {
       return;
     }
 
-    /* Simulate API call for Demo 1 — navigate to log-time on success */
-    setTimeout(() => {
-      this.router.navigate(['/log-time']);
-    }, 800);
+    this.loading = true;
+    this.errorMessage = '';
+
+    const {name, surname, email, password } = this.signupForm.getRawValue();
+    this.authService
+    .register({firstName:name, lastName: surname, email, password})
+    .subscribe({
+      next: () => {
+        this.loading = false;
+        //no token comes back here, they still need to verify email then log in
+
+        this.router.navigate(['/login'], {
+          queryParams: {registered: 'true'}
+        });
+      },
+      error: err => {
+        this.loading = false;
+        this.errorMessage = err.message;
+      }
+    });
   }
 
   protected get showNameError(): boolean {
@@ -106,6 +143,7 @@ export class SignupComponent {
   }
 
   // Returns appropriate email validation error message
+  //TODO: add a template with a momentum.co.za maybe? 
   protected get emailErrorMessage(): string {
     const control = this.signupForm.controls.email;
 
@@ -134,6 +172,9 @@ export class SignupComponent {
     }
     if (control.hasError('minlength') || control.hasError('pattern')) {
       return 'Password must be at least 8 characters long with a mix of letters and numbers.';
+    }
+    if (control.hasError('pattern')){
+      return 'Needs an uppercase letter, lowercase letter, number, and special character.'
     }
 
     return '';

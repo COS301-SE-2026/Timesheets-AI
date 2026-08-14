@@ -5,21 +5,23 @@ name: Frontend Pipeline
 on:
     push:
         branches: [main, dev]
-        # paths:
-        #     - 'apps/frontend/**' 
+
     pull_request:
         branches: [main, dev]
-        # paths: 
-        #     - 'apps/frontend/**'
+       
 
 jobs:
     # this is only for frontend check only and provide job access to the code in the repo 
     # ubuntu latest - Github will uses linux machine - better and minimize build minutes
     frontend-check:
         runs-on: ubuntu-latest
+
+        permissions:
+          contents: read 
+
         steps:
             # Note here: check if we use checkout@sha - that was in lecture slides not v4 (could be more secure)
-            - uses: actions/checkout@v4 
+            - uses: actions/checkout@1e31de5234b9f8995739874a8ce0492dc87873e2
             
             # Logic Gate: This is used to determine if the files changed are in Backend
             # dorny repo is used in this logic gate - this is using SHA instead of versions for security suggested by SonarQube 
@@ -45,20 +47,84 @@ jobs:
                         - 'apps/frontend/**'
                         - '.github/workflows/frontend-ci.yml'
 
+#===================== BUILD stage ================================
 
             # Only runs if frontend filter is true on the first run or retry step 
             - name: Set up Node.js
               if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65
               with:
                 node-version: '22' # current node.js version - recommeded 
                 # uses yarn NOT npm to store downloaded dependencies, dependency-path: means rebuild cache only if yarn.lock changes
                 cache: 'yarn'
-                cache-dependency-path: apps/frontend/client/yarn.lock 
+                cache-dependency-path: yarn.lock 
 
-            - name: Install & Test (Yarn)
+            - name: Install Dependencies 
               if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
+              run: yarn install --frozen-lockfile 
+
+#===================== PLAN stage ================================
+
+            # this checks for code quality and help to detect for potential bugs 
+            # - name: Run ESlint
+            #   working-directory: apps/frontend/client
+            #   run: yarn lint 
+
+#===================== TEST stage ================================
+
+            # runs frontend unit tests using Jest 
+            - name: Run Jest tests
+              if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
+              working-directory: apps/frontend/client
+              run: yarn test --watch=false
+
+#==================== Login to AWS  ===========================================================
+            - name: Configure AWS Credentials
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              uses: aws-actions/configure-aws-credentials@d0834ad3a60a024346910e522a81b0002bd37fea
+              with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: ${{ secrets.AWS_REGION }}
+
+#==================== Login to AWS ECR  ===========================================================
+            - name: Login to AWS ECR
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              id: login-to-ecr
+              uses: aws-actions/amazon-ecr-login@33f92af657bba1882ab79d8621debd2f6769a0c9
+
+#===================== RELEASE stage ================================
+
+            # ensure that the Angular builds successfully 
+            - name: Build Angular
+              if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
+              run: docker build -f apps/frontend/Dockerfile -t momently-frontend:${{ github.sha }} .
+
+#====================== SECURITY scan ================================
+            - name: Scan Docker Image
+              if: github.event_name == 'push' && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25
+              with:
+                image-ref: momently-frontend:${{ github.sha }}
+                format: table
+                exit-code: 1
+                ignore-unfixed: true
+                severity: CRITICAL
+
+#====================== Tag Image ====================================
+
+        # docker tag is giving same image another name 
+        # latest - give us the newest version and aws ec2 instance will run this to get latest version 
+            - name: Tag Docker Image
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
               run: |
-                cd apps/frontend/client
-                yarn install --frozen-lockfile 
-                yarn test --watch=false
+                docker tag momently-frontend:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:latest
+                docker tag momently-frontend:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:${{ github.sha }}
+
+#====================== Push to ECR ======================
+
+            - name: Push Docker Image
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              run: |
+                docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:latest
+                docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:${{ github.sha }}

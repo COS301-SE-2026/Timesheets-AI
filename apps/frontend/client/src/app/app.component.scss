@@ -24,3 +24,16 @@ app-sidebar {
   overflow: auto;
   background: #fff;
 }
+
+.page-content--fullscreen {
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  > * {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+}

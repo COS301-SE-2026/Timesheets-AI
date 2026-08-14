@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import timesheets.domain.*;
+import timesheets.domain.EmailVerificationToken;
+import timesheets.domain.User;
+import timesheets.domain.UserIdentityProvider;
+import timesheets.domain.UserMfa;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.GoogleAuthRequest;
 import timesheets.dto.request.RegisterRequest;
@@ -23,7 +26,12 @@ import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.enums.UserStatus;
-import timesheets.repository.*;
+import timesheets.repository.EmailVerificationTokenRepository;
+import timesheets.repository.UserIdentityProviderRepository;
+import timesheets.repository.UserMfaRepository;
+import timesheets.repository.UserRepository;
+import timesheets.repository.WorkspaceMemberRepository;
+import timesheets.security.SecurityUtils;
 import timesheets.util.TotpUtils;
 
 // import timesheets.dto.request.ForgotPasswordRequest;
@@ -51,8 +59,10 @@ public class AuthService {
   private final TotpUtils totpUtils;
   private final EmailVerificationTokenRepository emailVerificationTokenRepository;
 
-  // private final TokenBlacklistService tokenBlacklistService;
+  private final TokenBlacklistService tokenBlacklistService;
   private final JwtService jwtService;
+  private final SecurityUtils securityUtils;
+  private final TimerService timerService;
 
   // private final OtpService otpService;
   // private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -101,13 +111,23 @@ public class AuthService {
       // send verification email
       emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), token);
 
+      // return RegisterResponse.builder()
+      //     .id(user.getId().toString())
+      //     .email(user.getEmail())
+      //     .firstName(user.getFirstName())
+      //     .lastName(user.getLastName())
+      //     .createdAt(user.getCreatedAt())
+      //     .message("Verification email sent. Please check your inbox.")
+      //     .build();
+
+      // DEMO 2
       return RegisterResponse.builder()
           .id(user.getId().toString())
           .email(user.getEmail())
           .firstName(user.getFirstName())
           .lastName(user.getLastName())
           .createdAt(user.getCreatedAt())
-          .message("Verification email sent. Please check your inbox.")
+          .message("Account created successfully.")
           .build();
     }
 
@@ -172,8 +192,11 @@ public class AuthService {
         userRepository
             .findById(verificationToken.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("user not found"));
+
     user.setEmailVerified(true);
+
     userRepository.save(user);
+    // userRepository.saveAndFlush(user);
 
     return new MessageResponse("Email verified successfully", "/dashboard");
   }
@@ -238,9 +261,10 @@ public class AuthService {
     user.setLockedUntil(null);
     userRepository.save(user);
 
-    if (!Boolean.TRUE.equals(user.getEmailVerified())) {
-      throw new IllegalStateException("please verify your email before logging in");
-    }
+    // TODO
+    // if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+    //   throw new IllegalStateException("please verify your email before logging in");
+    // }
 
     // check if MFA is enabled
     boolean mfaEnabled =
@@ -304,14 +328,22 @@ public class AuthService {
   // return new MessageResponse("Password reset successfully", "/login");
   // }
 
-  // public void logout(String token) {
-  // // extract token from bearer string if needed
-  // if (token.startsWith("Bearer ")) {
-  // token = token.substring(7);
-  // }
+  @Transactional
+  public void logout(String token) {
+    // extract token from bearer string if needed
+    if (token != null && token.startsWith("Bearer ")) {
+      token = token.substring(7);
+    }
 
-  // tokenBlacklistService.blacklistToken(token);
-  // }
+    tokenBlacklistService.blacklistToken(token);
+
+    try {
+      UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+      timerService.pauseTimerForLogout(workspaceMemberId);
+    } catch (Exception e) {
+      // should add an error log or something
+    }
+  }
 
   @Transactional
   public AuthResponse googleAuth(GoogleAuthRequest request) {

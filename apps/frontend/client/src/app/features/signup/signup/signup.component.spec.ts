@@ -1,237 +1,469 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+/*
+Covers the sign up request, verifies payload sent to /api/auth/register, the shape of the response on success
+and that a token gets store, it doesnt return one, the user still has to verify(although we dont actually have a verification system) their email and login separately.
+also covers errors, both when the backend sends a message and when it doesnt.
+
+the HttpTestingController intercepts the request instead of hitting the actual backend, and the router is provided since AuthService injects its at the class level  for logout()
+*/
+
+import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
+import {
+  AuthService,
+  RegisterRequest,
+  RegisterResponse,
+} from '../../../core/services/auth.service';
 import { SignupComponent } from './signup.component';
-import { RouterTestingModule } from '@angular/router/testing';
+import { FormGroup } from '@angular/forms';
 
+interface SignupComponentInternals {
+  signupForm: FormGroup;
+  brandLogo: string;
+  showPassword: boolean;
+  submitted: boolean;
+  loading: boolean;
+  errorMessage: string;
+  showNameError: boolean;
+  nameErrorMessage: string;
+  showSurnameError: boolean;
+  surnameErrorMessage: string;
+  showEmailError: boolean;
+  emailErrorMessage: string;
+  showPasswordError: boolean;
+  passwordErrorMessage: string;
+  showTermsError: boolean;
+  termsErrorMessage: string;
+  togglePasswordVisibility(): void;
+  createAccount(): void;
+}
+
+describe('AuthService - register', () => {
+  let service: AuthService;
+  let httpMock: HttpTestingController;
+
+  const validPayload: RegisterRequest = {
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john@momentum.co.za',
+    password: 'Password1!!!!',
+  };
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        //router isn't actually used by register(), but AuthService injects it
+        //at the class level (for logout), so it still needs to be provided
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
+    });
+
+    service = TestBed.inject(AuthService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    //make sure every test flushed its request, catches accidental double calls too
+    httpMock.verify();
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('should POST the signup payload to /api/auth/register', () => {
+    service.register(validPayload).subscribe();
+
+    /* matching on url.endsWith rather than a hardcoded full path so this
+    doesn't break if environment.apiUrl changes between env */
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(validPayload);
+
+    req.flush({
+      id: '00000000-0000-0000-0003-000000000001',
+      email: validPayload.email,
+      firstName: validPayload.firstName,
+      lastName: validPayload.lastName,
+      createdAt: '2026-07-21T09:00:00.000Z',
+      message:
+        'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
+    } satisfies RegisterResponse);
+  });
+
+  it('should return the created user on success', () => {
+    let result: RegisterResponse | undefined;
+
+    service.register(validPayload).subscribe((res) => (result = res));
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    req.flush({
+      id: '00000000-0000-0000-0003-000000000001',
+      email: validPayload.email,
+      firstName: validPayload.firstName,
+      lastName: validPayload.lastName,
+      createdAt: '2026-07-21T09:00:00.000Z',
+      message:
+        'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
+    } satisfies RegisterResponse);
+
+    expect(result?.email).toBe(validPayload.email);
+    expect(result?.message).toContain('Registered successfully');
+  });
+
+  it('should not store an auth token after registering', () => {
+    //register doesn't return a token (user has to verify + log in separately),
+    //so unlike login(), there should be nothing written to localStorage here
+    service.register(validPayload).subscribe();
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    req.flush({
+      id: '00000000-0000-0000-0003-000000000001',
+      email: validPayload.email,
+      firstName: validPayload.firstName,
+      lastName: validPayload.lastName,
+      createdAt: '2026-07-21T09:00:00.000Z',
+      message:
+        'Registered successfully, please check your email to verify your account.', //in actual sense this is emai;_verified is set to true in backend so we can move forward
+    } satisfies RegisterResponse);
+
+    expect(localStorage.getItem('auth_token')).toBeNull();
+  });
+
+  it('should surface the backend message when email is already taken', () => {
+    let error: Error | undefined;
+
+    service.register(validPayload).subscribe({
+      error: (err) => (error = err),
+    });
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    req.flush(
+      { message: 'An account with this email already exists.' },
+      { status: 409, statusText: 'Conflict' },
+    );
+
+    expect(error?.message).toBe('An account with this email already exists.');
+  });
+
+  it('should fall back to a generic message when the backend sends no message', () => {
+    //handleError() has a fallback string for exactly this case, worth locking down
+    let error: Error | undefined;
+
+    service.register(validPayload).subscribe({
+      error: (err) => (error = err),
+    });
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    req.flush(null, { status: 500, statusText: 'Internal Server Error' });
+
+    expect(error?.message).toBe('Something went wrong, try again in a bit.');
+  });
+});
+
+/*
+Covers SignupComponent itself: form validation display (name/surname/email/password/terms),
+password visibility toggle, and the part the old spec never actually checked that
+createAccount() calls AuthService.register() with the right payload and reacts correctly
+to both the success and error paths (loading state, navigation, errorMessage)
+
+Unlike the AuthService describe above, this one needs a real fixture since we're
+rendering the component and asserting on both its class state and its template output
+*/
 describe('SignupComponent', () => {
-
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
-  let componentInstance: any;
+  let componentInstance: SignupComponentInternals;
+  let httpMock: HttpTestingController;
+  let router: Router;
 
-  // Runs before each test case
+  const validFormValue = {
+    name: 'John',
+    surname: 'Doe',
+    email: 'john@company.com',
+    password: 'Password1!!!',
+    acceptedTerms: true,
+  };
+
   beforeEach(async () => {
-
-    // Configure the testing module with the standalone SignupComponent
     await TestBed.configureTestingModule({
-      imports: [SignupComponent, RouterTestingModule]
-    })
-      .compileComponents();
+      imports: [SignupComponent],
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
+    }).compileComponents();
 
-    // Create the component instance
     fixture = TestBed.createComponent(SignupComponent);
-
     component = fixture.componentInstance;
-
-    componentInstance = component as any;
+    componentInstance = component as unknown as SignupComponentInternals;
+    httpMock = TestBed.inject(HttpTestingController);
+    router = TestBed.inject(Router);
 
     fixture.detectChanges();
   });
 
-  // Test that the component is created successfully
+  afterEach(() => {
+    httpMock.verify();
+  });
+
+  //Test that the component is created successfully
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // Test that the signup form starts with default invalid values
+  //Test that the signup form starts with default invalid values
   it('should initialise the signup form as invalid', () => {
     expect(componentInstance.signupForm.invalid).toBe(true);
-    expect(componentInstance.signupForm.controls.name.value).toBe('');
-    expect(componentInstance.signupForm.controls.surname.value).toBe('');
-    expect(componentInstance.signupForm.controls.email.value).toBe('');
-    expect(componentInstance.signupForm.controls.password.value).toBe('');
-    expect(componentInstance.signupForm.controls.acceptedTerms.value).toBe(false);
+    expect(componentInstance.signupForm.controls['name'].value).toBe('');
+    expect(componentInstance.signupForm.controls['surname'].value).toBe('');
+    expect(componentInstance.signupForm.controls['email'].value).toBe('');
+    expect(componentInstance.signupForm.controls['password'].value).toBe('');
+    expect(componentInstance.signupForm.controls['acceptedTerms'].value).toBe(
+      false,
+    );
   });
 
-  // Test that the correct logo asset path is used
+  //Test that the correct logo asset path is used
   it('should use the Momently logo asset', () => {
     expect(componentInstance.brandLogo).toBe('/assets/momently.png');
   });
 
   // Test password visibility toggle functionality
   it('should toggle password visibility', () => {
-
     expect(componentInstance.showPassword).toBe(false);
 
     componentInstance.togglePasswordVisibility();
-
     expect(componentInstance.showPassword).toBe(true);
 
     componentInstance.togglePasswordVisibility();
-
     expect(componentInstance.showPassword).toBe(false);
   });
 
-  // Test validation errors when submitting an empty form
+  //Test validation errors when submitting an empty form
   it('should show required errors after an invalid submit', () => {
-
     componentInstance.createAccount();
-
     fixture.detectChanges();
 
-    // Verify name validation errors
+    //createAccount() returns early on an invalid form, so there should be
+    //no outgoing request to assert on here, just the validation state
     expect(componentInstance.showNameError).toBe(true);
     expect(componentInstance.nameErrorMessage).toBe('Name is required.');
 
-    // Verify surname validation errors
     expect(componentInstance.showSurnameError).toBe(true);
     expect(componentInstance.surnameErrorMessage).toBe('Surname is required.');
 
-    // Verify email validation errors
     expect(componentInstance.showEmailError).toBe(true);
     expect(componentInstance.emailErrorMessage).toBe('Work email is required.');
 
-    // Verify password validation errors
     expect(componentInstance.showPasswordError).toBe(true);
-    expect(componentInstance.passwordErrorMessage).toBe('Password is required.');
+    expect(componentInstance.passwordErrorMessage).toBe(
+      'Password is required.',
+    );
 
-    // Verify terms checkbox validation errors
     expect(componentInstance.showTermsError).toBe(true);
-    expect(componentInstance.termsErrorMessage).toBe('You must accept the Terms of Service and Privacy Policy.');
+    expect(componentInstance.termsErrorMessage).toBe(
+      'You must accept the Terms of Service and Privacy Policy.',
+    );
   });
 
-  // Test name validation rules
+  //Test name validation rules
   it('should validate name minimum length', () => {
-
-    // Set a name that is too short
-    componentInstance.signupForm.controls.name.setValue('J');
-    componentInstance.signupForm.controls.name.markAsTouched();
+    componentInstance.signupForm.controls['name'].setValue('J');
+    componentInstance.signupForm.controls['name'].markAsTouched();
 
     expect(componentInstance.showNameError).toBe(true);
-    expect(componentInstance.nameErrorMessage).toBe('Name must be at least 2 characters.');
+    expect(componentInstance.nameErrorMessage).toBe(
+      'Name must be at least 2 characters.',
+    );
   });
 
-  // Test that valid names do not show errors
+  //Test that valid names do not show errors
   it('should return an empty name error message when name is valid', () => {
-
-    // Set a valid name
-    componentInstance.signupForm.controls.name.setValue('John');
-    componentInstance.signupForm.controls.name.markAsTouched();
+    componentInstance.signupForm.controls['name'].setValue('John');
+    componentInstance.signupForm.controls['name'].markAsTouched();
 
     expect(componentInstance.showNameError).toBe(false);
     expect(componentInstance.nameErrorMessage).toBe('');
   });
 
-  // Test surname validation rules
+  //Test surname validation rules
   it('should validate surname minimum length', () => {
-
-    // Set a surname that is too short
-    componentInstance.signupForm.controls.surname.setValue('D');
-    componentInstance.signupForm.controls.surname.markAsTouched();
+    componentInstance.signupForm.controls['surname'].setValue('D');
+    componentInstance.signupForm.controls['surname'].markAsTouched();
 
     expect(componentInstance.showSurnameError).toBe(true);
-    expect(componentInstance.surnameErrorMessage).toBe('Surname must be at least 2 characters.');
+    expect(componentInstance.surnameErrorMessage).toBe(
+      'Surname must be at least 2 characters.',
+    );
   });
 
-  // Test that valid surnames do not show errors
+  //Test that valid surnames do not show errors
   it('should return an empty surname error message when surname is valid', () => {
-
-    // Set a valid surname
-    componentInstance.signupForm.controls.surname.setValue('Doe');
-    componentInstance.signupForm.controls.surname.markAsTouched();
+    componentInstance.signupForm.controls['surname'].setValue('Doe');
+    componentInstance.signupForm.controls['surname'].markAsTouched();
 
     expect(componentInstance.showSurnameError).toBe(false);
     expect(componentInstance.surnameErrorMessage).toBe('');
   });
 
-  // Test that terms error disappears once terms are accepted
+  //Test that terms error disappears once terms are accepted
   it('should return an empty terms error message when terms are accepted', () => {
-
-    // Simulate checking the terms checkbox
-    componentInstance.signupForm.controls.acceptedTerms.setValue(true);
-    componentInstance.signupForm.controls.acceptedTerms.markAsTouched();
+    componentInstance.signupForm.controls['acceptedTerms'].setValue(true);
+    componentInstance.signupForm.controls['acceptedTerms'].markAsTouched();
 
     expect(componentInstance.showTermsError).toBe(false);
     expect(componentInstance.termsErrorMessage).toBe('');
   });
 
-  // Test email validation for incorrect email formats
+  //Test email validation for incorrect email formats
   it('should validate email format', () => {
-
-    // Set an invalid email value
-    componentInstance.signupForm.controls.email.setValue('invalid-email');
-    componentInstance.signupForm.controls.email.markAsTouched();
+    componentInstance.signupForm.controls['email'].setValue('invalid-email');
+    componentInstance.signupForm.controls['email'].markAsTouched();
 
     expect(componentInstance.showEmailError).toBe(true);
-    expect(componentInstance.emailErrorMessage).toBe('Enter a valid email address.');
+    expect(componentInstance.emailErrorMessage).toBe(
+      'Enter a valid email address.',
+    );
   });
 
-  // Test that valid emails do not show errors
+  //Test that valid emails do not show errors
   it('should return an empty email error message when email is valid', () => {
-
-    // Set a valid email value
-    componentInstance.signupForm.controls.email.setValue('john@company.com');
-    componentInstance.signupForm.controls.email.markAsTouched();
+    componentInstance.signupForm.controls['email'].setValue('john@company.com');
+    componentInstance.signupForm.controls['email'].markAsTouched();
 
     expect(componentInstance.showEmailError).toBe(false);
     expect(componentInstance.emailErrorMessage).toBe('');
   });
 
-  // Test password validation rules
+  //Test password validation rules
   it('should validate password length and content requirements', () => {
-
-    // Set a password without numbers
-    componentInstance.signupForm.controls.password.setValue('password');
-    componentInstance.signupForm.controls.password.markAsTouched();
+    componentInstance.signupForm.controls['password'].setValue('password');
+    componentInstance.signupForm.controls['password'].markAsTouched();
 
     expect(componentInstance.showPasswordError).toBe(true);
     expect(componentInstance.passwordErrorMessage).toBe(
-      'Password must be at least 8 characters long with a mix of letters and numbers.'
+      'Password must be at least 8 characters long with a mix of letters and numbers.',
     );
   });
 
-  // Test that valid passwords do not show errors
+  //Test that valid passwords do not show errors
   it('should return an empty password error message when password is valid', () => {
-
-    // Set a valid password
-    componentInstance.signupForm.controls.password.setValue('Password1');
-    componentInstance.signupForm.controls.password.markAsTouched();
+    componentInstance.signupForm.controls['password'].setValue('Password1!!!');
+    componentInstance.signupForm.controls['password'].markAsTouched();
 
     expect(componentInstance.showPasswordError).toBe(false);
     expect(componentInstance.passwordErrorMessage).toBe('');
   });
 
-  /* Test successful form submission with valid data */
-it('should submit when the form is valid', () => {
-
-    /* Fill the form with valid values */
-    componentInstance.signupForm.setValue({
-      name: 'John',
-      surname: 'Doe',
-      email: 'john@company.com',
-      password: 'Password1',
-      acceptedTerms: true
-    });
-
-    /* Verify form is valid before submitting */
+  /* Test that a valid form actually sends the right payload to the backend
+     the old version of this test only checked `submitted`, which gets set
+     to true on line 1 of createAccount() regardless of form validity, so it
+     never proved the valid-form path did anything. */
+  it('should call register with the mapped payload when the form is valid', () => {
+    componentInstance.signupForm.setValue(validFormValue);
     expect(componentInstance.signupForm.valid).toBe(true);
 
-    /* Call createAccount and verify submitted flag is set */
     componentInstance.createAccount();
 
     expect(componentInstance.submitted).toBe(true);
+    expect(componentInstance.loading).toBe(true);
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    expect(req.request.method).toBe('POST');
+    // firstName/lastName here, not name/surname createAccount() renames them before sending
+    expect(req.request.body).toEqual({
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@company.com',
+      password: 'Password1!!!',
+    });
+
+    req.flush({
+      id: '00000000-0000-0000-0003-000000000002',
+      email: 'john@company.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      createdAt: '2026-07-21T09:00:00.000Z',
+      message:
+        'Registered successfully, please check your email to verify your account.',
+    } satisfies RegisterResponse);
+  });
+
+  // Test that a successful signup stops loading and redirects to /login?registered=true
+  it('should navigate to login with registered=true on successful signup', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    componentInstance.signupForm.setValue(validFormValue);
+    componentInstance.createAccount();
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    req.flush({
+      id: '00000000-0000-0000-0003-000000000002',
+      email: 'john@company.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      createdAt: '2026-07-21T09:00:00.000Z',
+      message:
+        'Registered successfully, please check your email to verify your account.',
+    } satisfies RegisterResponse);
+
+    expect(componentInstance.loading).toBe(false);
+    expect(navigateSpy).toHaveBeenCalledWith(['/login'], {
+      queryParams: { registered: 'true' },
+    });
+  });
+
+  // Test that a failed signup surfaces the backend's error message instead of navigating
+  it('should show an error message and stop loading when signup fails', () => {
+    const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    componentInstance.signupForm.setValue(validFormValue);
+    componentInstance.createAccount();
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/api/auth/register'));
+    req.flush(
+      { message: 'An account with this email already exists.' },
+      { status: 409, statusText: 'Conflict' },
+    );
+
+    expect(componentInstance.loading).toBe(false);
+    expect(componentInstance.errorMessage).toBe(
+      'An account with this email already exists.',
+    );
+    expect(navigateSpy).not.toHaveBeenCalled();
   });
 
   // Test that important UI content renders correctly
   it('should render key signup page content', () => {
-
-    // Access the rendered HTML
     const compiled = fixture.nativeElement as HTMLElement;
 
-    // Verify hero section text
-    expect(compiled.querySelector('.hero-title')?.textContent).toContain('Start Your');
-    expect(compiled.querySelector('.hero-title')?.textContent).toContain('AI Productivity');
-
-    // Verify form heading text
-    expect(compiled.querySelector('#signup-title')?.textContent).toContain('Create your account');
-
-    // Verify name and surname fields render
-    expect(compiled.querySelector('label[for="signup-name"]')?.textContent).toContain('Name');
-    expect(compiled.querySelector('label[for="signup-surname"]')?.textContent).toContain('Surname');
-
-    // Verify submit button text
-    expect(compiled.querySelector('.submit-button')?.textContent).toContain('Create Account');
-
-    // Verify both social login buttons render
+    expect(compiled.querySelector('.hero-title')?.textContent).toContain(
+      'Start Your',
+    );
+    expect(compiled.querySelector('.hero-title')?.textContent).toContain(
+      'AI Productivity',
+    );
+    expect(compiled.querySelector('#signup-title')?.textContent).toContain(
+      'Create your account',
+    );
+    expect(
+      compiled.querySelector('label[for="signup-name"]')?.textContent,
+    ).toContain('Name');
+    expect(
+      compiled.querySelector('label[for="signup-surname"]')?.textContent,
+    ).toContain('Surname');
+    expect(compiled.querySelector('.submit-button')?.textContent).toContain(
+      'Create Account',
+    );
     expect(compiled.querySelectorAll('.social-button').length).toBe(2);
   });
 });

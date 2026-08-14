@@ -1,0 +1,17 @@
+apiVersion: 1
+# the standard version for Grafana provide configs 
+
+# declare database connections
+# code: https://blog.esc.sh/prometheus-grafana/
+
+datasources:
+  - name: Prometheus
+    type: prometheus # database plugin to load 
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true # this will create dashboard using the database
+    editable: true
+
+# use default credentials
+# name: admin
+# password: Gxiie@cXxZFPHe8
