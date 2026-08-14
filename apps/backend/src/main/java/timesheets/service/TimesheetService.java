@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.dto.request.TimesheetRequest;
@@ -169,18 +171,30 @@ public class TimesheetService {
   }
 
   /*
-   - managers and admins can see all timesheets that are approved, rejected and submitted
+   - admins can see all timesheets that are approved, rejected and submitted
+   - managers only see other peoples timesheets that are approved, rejected and submitted
    - gets all the timesheets in a workspace
   */
   @Transactional
   public List<Timesheet> getWorkspaceTimesheets() {
+
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
       throw new RuntimeException("Only Admins and Managers can view other peoples timesheets");
     }
 
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
-    return timesheetRepository.findByWorkspaceIdExcludingDraft(workspaceId);
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    //we want admins to be able to view all the timesheets, including their own
+    //but I also have protections in place to prevent self-approval and rejection
+    if (securityUtils.isAdmin()) {
+      return timesheetRepository.findByWorkspaceIdExcludingDraft(workspaceId);
+    }
+
+    //managers will see other peoples timesheets but not their own
+    return timesheetRepository.findByWorkspaceIdExcludingDraftAndMember(workspaceId, currentMemberId);
   }
+
 
   public List<Timesheet> getTimesheetsByMember(UUID workspaceMemberId) {
     return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
