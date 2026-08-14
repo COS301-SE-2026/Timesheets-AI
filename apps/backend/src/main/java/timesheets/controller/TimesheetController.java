@@ -115,4 +115,20 @@ public class TimesheetController {
 
     return ResponseEntity.ok(responses);
   }
+
+  /*
+  Get all SUBMITTED timesheets in the current user's workspace.
+  This is the manager's "pending approvals" queue.
+  Includes both first-time submissions and resubmissions after rejection.
+   */
+  @GetMapping("/workspace/pending")
+  public ResponseEntity<List<TimesheetResponse>> getPendingWorkspaceTimesheets() {
+
+    List<Timesheet> timesheets = timesheetService.getPendingWorkspaceTimesheets();
+
+    List<TimesheetResponse> responses =
+        timesheets.stream().map(TimesheetResponse::from).collect(Collectors.toList());
+
+    return ResponseEntity.ok(responses);
+  }
 }

@@ -148,7 +148,7 @@ public class TimerService {
       pauseTimerInternal(workspaceMemberId);
       return true;
     } catch (IllegalStateException e) {
-      // when no active timer is founf so that is fine, there is nothing to pause
+      // when no active timer is found so that is fine, there is nothing to pause
       return false;
     }
   }

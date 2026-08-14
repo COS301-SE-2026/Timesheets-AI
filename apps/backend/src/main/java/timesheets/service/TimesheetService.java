@@ -4,11 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.dto.request.TimesheetRequest;
@@ -185,16 +183,37 @@ public class TimesheetService {
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
-    //we want admins to be able to view all the timesheets, including their own
-    //but I also have protections in place to prevent self-approval and rejection
+    // we want admins to be able to view all the timesheets, including their own
+    // but I also have protections in place to prevent self-approval and rejection
     if (securityUtils.isAdmin()) {
       return timesheetRepository.findByWorkspaceIdExcludingDraft(workspaceId);
     }
 
-    //managers will see other peoples timesheets but not their own
-    return timesheetRepository.findByWorkspaceIdExcludingDraftAndMember(workspaceId, currentMemberId);
+    // managers will see other peoples timesheets but not their own
+    return timesheetRepository.findByWorkspaceIdExcludingDraftAndMember(
+        workspaceId, currentMemberId);
   }
 
+  // will get all the timesheets that have been submitted and waiting approval
+  @Transactional
+  public List<Timesheet> getPendingWorkspaceTimesheets() {
+
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      throw new RuntimeException("Only Admins and Managers can view pending timesheets");
+    }
+
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    // admins will see all that have been submitted
+    if (securityUtils.isAdmin()) {
+      return timesheetRepository.findPendingByWorkspaceId(workspaceId);
+    }
+
+    // managers will see all that the other submitted, excluding theirs
+    return timesheetRepository.findPendingByWorkspaceIdExcludingMember(
+        workspaceId, currentMemberId);
+  }
 
   public List<Timesheet> getTimesheetsByMember(UUID workspaceMemberId) {
     return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
