@@ -85,7 +85,7 @@
             },
             "development": {
               "buildTarget": "client:build:development",
-              "proxyConfig": "proxy.conf.json"
+              "proxyConfig": "proxy.conf.local.json"
             }
           },
           "defaultConfiguration": "development"
