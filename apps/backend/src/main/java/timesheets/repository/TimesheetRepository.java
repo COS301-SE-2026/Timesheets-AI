@@ -25,6 +25,7 @@ public interface TimesheetRepository extends JpaRepository<Timesheet, UUID> {
   // find timesheets by member and status
   List<Timesheet> findByWorkspaceMemberIdAndStatus(UUID workspaceMemberId, String status);
 
+  // ! manager queries
   /*
     MANAGER
     - this will get all the timesheets in a specific workspace
@@ -43,7 +44,49 @@ public interface TimesheetRepository extends JpaRepository<Timesheet, UUID> {
   List<Timesheet> findByWorkspaceIdExcludingDraft(@Param("workspaceId") UUID workspaceId);
 
   /*
-    MANAGER
+  MANAGER
+  - gets all the timsheets in the workspace that are not drafts
+  - managers will not be able to see their own timesheets in the workspace
+   */
+
+  @Query(
+      "SELECT timesheet FROM Timesheet timesheet "
+          + "JOIN WorkspaceMember workspaceMember ON timesheet.workspaceMemberId = workspaceMember.id "
+          + "WHERE workspaceMember.workspaceId = :workspaceId "
+          + "AND timesheet.status != 'DRAFT' "
+          + "AND timesheet.workspaceMemberId != :currentMemberId "
+          + "ORDER BY timesheet.createdAt DESC")
+  List<Timesheet> findByWorkspaceIdExcludingDraftAndMember(
+      @Param("workspaceId") UUID workspaceId, @Param("currentMemberId") UUID currentMemberId);
+
+  /*
+  MANAGER
+  - this will get all the timesheets in a specific workspace by that status
+  - managers should not be able to see their own timesheets in the workspace
+  - will help with the filtering
+   */
+  @Query(
+      "SELECT timesheet FROM Timesheet timesheet "
+          + "JOIN WorkspaceMember workspaceMember ON timesheet.workspaceMemberId = workspaceMember.id "
+          + "WHERE workspaceMember.workspaceId = :workspaceId "
+          + "AND timesheet.status = :status "
+          + "AND timesheet.workspaceMemberId != :currentMemberId "
+          + "ORDER BY timesheet.createdAt DESC")
+  List<Timesheet> findByWorkspaceIdAndStatusExcludingMember(
+      @Param("workspaceId") UUID workspaceId,
+      @Param("status") String status,
+      @Param("currentMemberId") UUID currentMemberId);
+
+  // MANGER: this will just give all the submitted timesheets, those submitted and resubmitted
+  // managers should not be able to see their own timesheets
+  default List<Timesheet> findPendingByWorkspaceIdExcludingMember(
+      UUID workspaceId, UUID currentMemberId) {
+    return findByWorkspaceIdAndStatusExcludingMember(workspaceId, "SUBMITTED", currentMemberId);
+  }
+
+  // ! admin queries
+  /*
+    ADMIN
     - this will get all the timesheets in a specific workspace by that status
     - will help with the filtering
   */
@@ -56,7 +99,7 @@ public interface TimesheetRepository extends JpaRepository<Timesheet, UUID> {
   List<Timesheet> findByWorkspaceIdAndStatus(
       @Param("workspaceId") UUID workspaceId, @Param("status") String status);
 
-  // MANAGER: this will just give all the submitted timesheets, those submitted and resubmitted
+  // ADMIN: this will just give all the submitted timesheets, those submitted and resubmitted
   default List<Timesheet> findPendingByWorkspaceId(UUID workspaceId) {
     return findByWorkspaceIdAndStatus(workspaceId, "SUBMITTED");
   }
