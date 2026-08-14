@@ -23,7 +23,10 @@ public class TimeEntryResponse {
   private UUID taskId;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
-  private Integer durationSeconds;
+
+  // this is actually durationSeconds but the frontend is already using this name and it's going to
+  // cause issues
+  private Integer durationMinutes;
   private String entryType;
   private String description;
   private Boolean isDeleted;
@@ -40,7 +43,7 @@ public class TimeEntryResponse {
         .taskId(entry.getTaskId())
         .startTime(entry.getStartTime())
         .endTime(entry.getEndTime())
-        .durationSeconds(entry.getDurationSeconds())
+        .durationMinutes(entry.getDurationSeconds())
         .entryType(entry.getEntryType())
         .description(entry.getDescription())
         .isDeleted(entry.getIsDeleted())
@@ -48,4 +51,8 @@ public class TimeEntryResponse {
         .updatedAt(entry.getUpdatedAt())
         .build();
   }
+
+  // this is actually durationSeconds but the frontend is already using this name and it's going to
+  // cause issues
+
 }
