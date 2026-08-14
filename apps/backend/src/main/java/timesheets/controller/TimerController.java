@@ -1,12 +1,12 @@
 package timesheets.controller;
 
+import exception.ConflictException;
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,21 +15,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import exception.ConflictException;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import timesheets.domain.Project;
 import timesheets.domain.Task;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.TimerSession;
-import timesheets.domain.Timesheet;
 import timesheets.dto.request.StartTimerRequest;
 import timesheets.dto.response.ActiveTimerResponse;
 import timesheets.dto.response.CreatedTimeEntryResponse;
 import timesheets.dto.response.ErrorResponse;
 import timesheets.dto.response.StopTimerResponse;
-import timesheets.dto.response.TimesheetResponse;
 import timesheets.repository.ProjectRepository;
 import timesheets.repository.TaskRepository;
 import timesheets.security.SecurityUtils;
