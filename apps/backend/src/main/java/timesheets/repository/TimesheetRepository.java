@@ -55,4 +55,9 @@ public interface TimesheetRepository extends JpaRepository<Timesheet, UUID> {
           + "ORDER BY timesheet.createdAt DESC")
   List<Timesheet> findByWorkspaceIdAndStatus(
       @Param("workspaceId") UUID workspaceId, @Param("status") String status);
+
+  // MANAGER: this will just give all the submitted timesheets, those submitted and resubmitted
+  default List<Timesheet> findPendingByWorkspaceId(UUID workspaceId) {
+    return findByWorkspaceIdAndStatus(workspaceId, "SUBMITTED");
+  }
 }
