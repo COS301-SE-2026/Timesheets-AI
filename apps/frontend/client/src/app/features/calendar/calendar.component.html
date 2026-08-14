@@ -25,7 +25,7 @@ Related Requirements: N/A
             <i class="fa-brands fa-microdoft outlook-iccon"></i>
             <div class="status">
                 <strong> Outlook connected</strong>
-                <small> Last synced 3 minutes ago</small>
+                <small> Last synced {{ lastSyncedTime() }} ago</small>
             </div>
 
             <button class="btn-sync">
@@ -42,10 +42,14 @@ Related Requirements: N/A
             </button>
 
             <div class="btn-group">
-                <button class="btn-icon">
+                <button 
+                    class="btn-icon"
+                    (click)="navigateDate(-1)">
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
-                <button class="btn-icon">
+                <button 
+                    class="btn-icon"
+                    (click)="navigateDate(1)">
                     <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
