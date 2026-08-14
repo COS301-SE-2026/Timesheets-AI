@@ -6,7 +6,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import timesheets.domain.Timesheet;
 import timesheets.dto.request.RejectRequest;
 import timesheets.dto.response.TimeEntryResponse;
@@ -31,6 +36,7 @@ public class TimesheetController {
     UUID memberId = securityUtils.getDefaultWorkspaceMemberId();
 
     List<Timesheet> timesheets = timesheetService.getTimesheetsByMember(memberId);
+
     List<TimesheetResponse> responses =
         timesheets.stream().map(TimesheetResponse::from).collect(Collectors.toList());
 
@@ -43,8 +49,10 @@ public class TimesheetController {
       @PathVariable String status) {
     UUID memberId = securityUtils.getDefaultWorkspaceMemberId();
     List<Timesheet> timesheets = timesheetService.getTimesheetsByMemberAndStatus(memberId, status);
+
     List<TimesheetResponse> responses =
         timesheets.stream().map(TimesheetResponse::from).collect(Collectors.toList());
+
     return ResponseEntity.ok(responses);
   }
 
@@ -59,6 +67,7 @@ public class TimesheetController {
   @GetMapping("/{id}/entries")
   public ResponseEntity<List<TimeEntryResponse>> getTimesheetEntries(@PathVariable UUID id) {
     List<TimeEntryResponse> entries = timeEntryService.getEntriesByTimesheet(id);
+
     return ResponseEntity.ok(entries);
   }
 
@@ -66,6 +75,7 @@ public class TimesheetController {
   @PostMapping("/{id}/submit")
   public ResponseEntity<TimesheetResponse> submitTimesheet(@PathVariable UUID id) {
     Timesheet timesheet = timesheetService.submitTimesheet(id);
+
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
   }
 
@@ -88,5 +98,21 @@ public class TimesheetController {
     Timesheet timesheet = timesheetService.rejectTimesheet(id, reviewerId, request.getReason());
 
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
+  }
+
+  /*
+  - managers and admins
+  - to get all the timesheets in a workspace, besides DRAFTS
+  */
+  @GetMapping("/workspace")
+  public ResponseEntity<List<TimesheetResponse>> getWorkspaceTimesheets() {
+    List<Timesheet> timesheets = timesheetService.getWorkspaceTimesheets();
+
+    // converts the timesheets into a response and puts them in a list, so certain things are not
+    // exposed
+    List<TimesheetResponse> responses =
+        timesheets.stream().map(TimesheetResponse::from).collect(Collectors.toList());
+
+    return ResponseEntity.ok(responses);
   }
 }

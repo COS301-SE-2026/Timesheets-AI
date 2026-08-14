@@ -168,6 +168,20 @@ public class TimesheetService {
     return timesheetRepository.save(timesheet);
   }
 
+  /*
+   - managers and admins can see all timesheets that are approved, rejected and submitted
+   - gets all the timesheets in a workspace
+  */
+  @Transactional
+  public List<Timesheet> getWorkspaceTimesheets() {
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      throw new RuntimeException("Only Admins and Managers can view other peoples timesheets");
+    }
+
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+    return timesheetRepository.findByWorkspaceIdExcludingDraft(workspaceId);
+  }
+
   public List<Timesheet> getTimesheetsByMember(UUID workspaceMemberId) {
     return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
   }
