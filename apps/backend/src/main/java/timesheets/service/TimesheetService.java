@@ -73,6 +73,7 @@ public class TimesheetService {
   @Transactional
   public Timesheet submitTimesheet(UUID timesheetId) {
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
 
     Timesheet timesheet =
         timesheetRepository
@@ -81,6 +82,17 @@ public class TimesheetService {
 
     if (!timesheet.getWorkspaceMemberId().equals(currentMemberId)) {
       throw new RuntimeException("You can only submit your own timesheets");
+    }
+
+    // making sure that the timesheet belongs to this current workspace
+    // it could be the case where they have the timesheet id and try to access it
+    WorkspaceMember owner =
+        workspaceMemberRepository
+            .findById(currentMemberId)
+            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+
+    if (!owner.getWorkspaceId().equals(workspaceId)) {
+      throw new RuntimeException("Timesheet is not in your workspace");
     }
 
     if (!"DRAFT".equals(timesheet.getStatus())) {
@@ -106,6 +118,8 @@ public class TimesheetService {
   @Transactional
   public Timesheet approveTimesheet(UUID timesheetId, UUID reviewerId) {
 
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+
     // the user should be an admin or a manager to approve
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
       throw new RuntimeException("Only Admins and Managers can approve timesheets");
@@ -115,6 +129,17 @@ public class TimesheetService {
         timesheetRepository
             .findById(timesheetId)
             .orElseThrow(() -> new RuntimeException("Timesheet not found"));
+
+    // making sure that the timesheet belongs to this current workspace
+    // it could be the case where they have the timesheet id and try to access it
+    WorkspaceMember owner =
+        workspaceMemberRepository
+            .findById(timesheet.getWorkspaceMemberId())
+            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+
+    if (!owner.getWorkspaceId().equals(workspaceId)) {
+      throw new RuntimeException("Timesheet is not in your workspace");
+    }
 
     // to prevent self-approval
     if (timesheet.getWorkspaceMemberId().equals(reviewerId)) {
@@ -139,6 +164,8 @@ public class TimesheetService {
   @Transactional
   public Timesheet rejectTimesheet(UUID timesheetId, UUID reviewerId, String reason) {
 
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+
     // the user must be admin or manager to reject
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
       throw new RuntimeException("Only Admins and Managers can reject timesheets");
@@ -148,6 +175,17 @@ public class TimesheetService {
         timesheetRepository
             .findById(timesheetId)
             .orElseThrow(() -> new RuntimeException("Timesheet not found"));
+
+    // making sure that the timesheet belongs to this current workspace
+    // it could be the case where they have the timesheet id and try to access it
+    WorkspaceMember owner =
+        workspaceMemberRepository
+            .findById(timesheet.getWorkspaceMemberId())
+            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+
+    if (!owner.getWorkspaceId().equals(workspaceId)) {
+      throw new RuntimeException("Timesheet is not in your workspace");
+    }
 
     // to prevent self-rejection
     if (timesheet.getWorkspaceMemberId().equals(reviewerId)) {
