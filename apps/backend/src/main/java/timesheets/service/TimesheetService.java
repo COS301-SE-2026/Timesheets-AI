@@ -4,9 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import exception.ResourceNotFoundException;
+import exception.UnauthorizedException;
+import lombok.RequiredArgsConstructor;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.domain.WorkspaceMember;
@@ -82,7 +86,7 @@ public class TimesheetService {
     Timesheet timesheet =
         timesheetRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Timesheet not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Timesheet not found with id: " + id));
 
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
@@ -91,7 +95,7 @@ public class TimesheetService {
     // a regular user should only be able to see their own timesheets
     if (!securityUtils.isManager() && !securityUtils.isAdmin()) {
       if (!timesheetOwnerId.equals(currentMemberId)) {
-        throw new RuntimeException("You can only view your own timesheets");
+        throw new UnauthorizedException("You can only view your own timesheets");
       }
       return timesheet;
     }
@@ -100,10 +104,10 @@ public class TimesheetService {
     WorkspaceMember owner =
         workspaceMemberRepository
             .findById(timesheetOwnerId)
-            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new RuntimeException("Timesheet not found in your workspace");
+      throw new UnauthorizedException("Timesheet not found in your workspace");
     }
 
     // admins and managers can view any timesheet in their workspace
