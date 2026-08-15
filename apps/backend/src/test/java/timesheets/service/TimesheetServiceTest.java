@@ -8,6 +8,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
+import exception.UnauthorizedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,9 +25,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import timesheets.domain.Timesheet;
+import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.TimesheetRequest;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.repository.TimesheetRepository;
+import timesheets.repository.WorkspaceMemberRepository;
 import timesheets.security.SecurityUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +39,7 @@ class TimesheetServiceTest {
   @Mock private TimesheetRepository timesheetRepository;
   @Mock private TimeEntryRepository timeEntryRepository;
   @Mock private SecurityUtils securityUtils;
+  @Mock private WorkspaceMemberRepository workspaceMemberRepository;
 
   @InjectMocks private TimesheetService timesheetService;
 
@@ -42,13 +48,22 @@ class TimesheetServiceTest {
   private LocalDate periodStart;
   private LocalDate periodEnd;
   private Timesheet timesheet;
+  private UUID workspaceId;
+  private WorkspaceMember workspaceMember;
+  private UUID userId;
 
   @BeforeEach
   void setUp() {
     workspaceMemberId = UUID.randomUUID();
     timesheetId = UUID.randomUUID();
+    workspaceId = UUID.randomUUID();
     periodStart = LocalDate.of(2026, 7, 13); // Monday
     periodEnd = LocalDate.of(2026, 7, 19); // Sunday
+
+    workspaceMember = new WorkspaceMember();
+    workspaceMember.setId(workspaceMemberId);
+    workspaceMember.setWorkspaceId(workspaceId);
+    workspaceMember.setUserId(userId);
 
     timesheet = new Timesheet();
     timesheet.setId(timesheetId);
@@ -186,6 +201,12 @@ class TimesheetServiceTest {
     @DisplayName("returns timesheet when it exists")
     void getTimesheetByIdExists() {
 
+      // mocking a dev who owns the timesheet
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
       // ARRANGE: a timesheet exists in the database, so looks for this timesheet in theDB
       when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
 
@@ -210,8 +231,8 @@ class TimesheetServiceTest {
 
       // ACT & ASSERT: it throws an exception, and a clear message
       assertThatThrownBy(() -> timesheetService.getTimesheetById(timesheetId))
-          .isInstanceOf(RuntimeException.class)
-          .hasMessage("Timesheet not found");
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessageContaining("Timesheet not found with id:");
 
       // checking that the repository got called, and that the DB did not skip it
       verify(timesheetRepository, times(1)).findById(timesheetId);
@@ -225,6 +246,11 @@ class TimesheetServiceTest {
     @Test
     @DisplayName("returns list of timesheets for a member")
     void getTimesheetsByMemberTimesheetList() {
+
+      // mocking a developer who owns the timesheet
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
 
       // this will simulate what a DB returns, a list of timesheets
       List<Timesheet> expectedTimesheets = List.of(timesheet);
@@ -252,6 +278,11 @@ class TimesheetServiceTest {
     @Test
     @DisplayName("empty list returned when the user has not timesheets")
     void getTimesheetsByMemberEmptyList() {
+
+      // mocking a dev who owns the timesheet
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
 
       // because you know nulls give unexpected results, so we need empty lists not null things
 
@@ -316,6 +347,12 @@ class TimesheetServiceTest {
     @DisplayName("submits a draft timesheet successfully")
     void submitTimesheet() {
 
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
+
+      when(workspaceMemberRepository.findById(workspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+
       // ARRANGE
       // should return the test user
       when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
@@ -359,9 +396,18 @@ class TimesheetServiceTest {
       when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(differentUser);
       when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
 
+      // mocking the workspace member for another user
+      WorkspaceMember differentMember = new WorkspaceMember();
+      differentMember.setId(differentUser);
+      differentMember.setWorkspaceId(workspaceId);
+      when(workspaceMemberRepository.findById(differentUser))
+          .thenReturn(Optional.of(differentMember));
+
+      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+
       // ACT and ASSERT
       assertThatThrownBy(() -> timesheetService.submitTimesheet(timesheetId))
-          .isInstanceOf(RuntimeException.class)
+          .isInstanceOf(UnauthorizedException.class)
           .hasMessage("You can only submit your own timesheets");
 
       verify(timesheetRepository, times(1)).findById(timesheetId);
@@ -376,6 +422,11 @@ class TimesheetServiceTest {
       // ARRANGE: mocking a timesheet that is already submitted
       timesheet.setStatus("SUBMITTED");
       when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
+
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
+      when(workspaceMemberRepository.findById(workspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+
       when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
 
       /*
@@ -385,7 +436,7 @@ class TimesheetServiceTest {
       - the timesheet did not get saved
        */
       assertThatThrownBy(() -> timesheetService.submitTimesheet(timesheetId))
-          .isInstanceOf(RuntimeException.class)
+          .isInstanceOf(StateConflictException.class)
           .hasMessage("Timesheet has already been submitted");
 
       verify(timesheetRepository, times(1)).findById(timesheetId);
@@ -394,7 +445,7 @@ class TimesheetServiceTest {
 
     @Test
     @DisplayName("throws exception when timesheet does not exist")
-    void submitTimesheet_notFound_throwsException() {
+    void submitTimesheetNotFound() {
 
       // ARRANGE: when someone tries to submit a timesheet with an invalid ID
       when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
@@ -402,8 +453,8 @@ class TimesheetServiceTest {
 
       // ACT and ASSERT: an exception should be thrown
       assertThatThrownBy(() -> timesheetService.submitTimesheet(timesheetId))
-          .isInstanceOf(RuntimeException.class)
-          .hasMessage("Timesheet not found");
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessageContaining("Timesheet not found with id: ");
 
       verify(timesheetRepository, times(1)).findById(timesheetId);
       verify(timesheetRepository, never())
@@ -428,9 +479,13 @@ class TimesheetServiceTest {
       timesheet.setIsLocked(true);
 
       when(securityUtils.isManager()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
+      when(workspaceMemberRepository.findById(workspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
 
       // basically returning a mock timesheet, as if the actual repository was called
       when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
+
       when(timesheetRepository.save(any(Timesheet.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -473,7 +528,7 @@ class TimesheetServiceTest {
       // ACT and ASSERT
       assertThatThrownBy(
               () -> timesheetService.rejectTimesheet(timesheetId, reviewerId, rejectionReason))
-          .isInstanceOf(RuntimeException.class)
+          .isInstanceOf(UnauthorizedException.class)
           .hasMessage("Only Admins and Managers can reject timesheets");
 
       verify(timesheetRepository, never()).findById(any());
@@ -496,12 +551,15 @@ class TimesheetServiceTest {
       timesheet.setStatus("SUBMITTED");
 
       when(securityUtils.isAdmin()).thenReturn(true);
+      when(workspaceMemberRepository.findById(workspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+
       when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
 
       // ACT and ASSERT
       assertThatThrownBy(
               () -> timesheetService.rejectTimesheet(timesheetId, reviewerId, rejectionReason))
-          .isInstanceOf(RuntimeException.class)
+          .isInstanceOf(StateConflictException.class)
           .hasMessage("You cannot reject your own timesheet");
 
       // need to make sure that the repo is only called once and that that is not saved, because it
@@ -527,6 +585,10 @@ class TimesheetServiceTest {
       timesheet.setIsLocked(true);
 
       when(securityUtils.isManager()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
+
+      when(workspaceMemberRepository.findById(workspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
 
       // basically returning a mock timesheet, as if the actual repository was called
       when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
@@ -564,11 +626,16 @@ class TimesheetServiceTest {
       timesheet.setStatus("SUBMITTED");
 
       when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
+
+      when(workspaceMemberRepository.findById(workspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+
       when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
 
       // ACT and ASSERT
       assertThatThrownBy(() -> timesheetService.approveTimesheet(timesheetId, reviewerId))
-          .isInstanceOf(RuntimeException.class)
+          .isInstanceOf(StateConflictException.class)
           .hasMessage("You cannot approve your own timesheet");
 
       // making sure that it did not get saved
