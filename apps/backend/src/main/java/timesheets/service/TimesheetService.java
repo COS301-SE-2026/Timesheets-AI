@@ -128,7 +128,7 @@ public class TimesheetService {
     // devs should only be able to see their own timesheets
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
       if (!workspaceMemberId.equals(currentMemberId)) {
-        throw new RuntimeException("You can only view your own timesheets");
+        throw new UnauthorizedException("You can only view your own timesheets");
       }
       return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
     }
@@ -137,10 +137,10 @@ public class TimesheetService {
     WorkspaceMember member =
         workspaceMemberRepository
             .findById(workspaceMemberId)
-            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     if (!member.getWorkspaceId().equals(workspaceId)) {
-      throw new RuntimeException("Cannot view timesheets from another workspace");
+      throw new UnauthorizedException("Cannot view timesheets from another workspace");
     }
 
     // managers are allowed to view any members timesheets from the workspace
@@ -161,7 +161,7 @@ public class TimesheetService {
     // a regular user should only be able to see their own timesheets
     if (!securityUtils.isManager() && !securityUtils.isAdmin()) {
       if (!workspaceMemberId.equals(currentMemberId)) {
-        throw new RuntimeException("You can only view your own timesheets");
+        throw new UnauthorizedException("You can only view your own timesheets");
       }
       return timesheetRepository.findByWorkspaceMemberIdAndStatus(workspaceMemberId, status);
     }
@@ -170,11 +170,11 @@ public class TimesheetService {
     WorkspaceMember owner =
         workspaceMemberRepository
             .findById(workspaceMemberId)
-            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     // the timesheet should only exist in the current workspace
     if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new RuntimeException("Timesheet not found in your workspace");
+      throw new UnauthorizedException("Timesheet not found in your workspace");
     }
 
     return timesheetRepository.findByWorkspaceMemberIdAndStatus(workspaceMemberId, status);
@@ -189,10 +189,10 @@ public class TimesheetService {
     Timesheet timesheet =
         timesheetRepository
             .findById(timesheetId)
-            .orElseThrow(() -> new RuntimeException("Timesheet not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
 
     if (!timesheet.getWorkspaceMemberId().equals(currentMemberId)) {
-      throw new RuntimeException("You can only submit your own timesheets");
+      throw new UnauthorizedException("You can only submit your own timesheets");
     }
 
     // making sure that the timesheet belongs to this current workspace
@@ -200,14 +200,14 @@ public class TimesheetService {
     WorkspaceMember owner =
         workspaceMemberRepository
             .findById(currentMemberId)
-            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new RuntimeException("Timesheet is not in your workspace");
+      throw new UnauthorizedException("Timesheet is not in your workspace");
     }
 
     if (!"DRAFT".equals(timesheet.getStatus())) {
-      throw new RuntimeException("Timesheet has already been submitted");
+      throw new StateConflictException("Timesheet has already been submitted");
     }
 
     timesheet.setIsLocked(true);
@@ -234,23 +234,23 @@ public class TimesheetService {
 
     // the user should be an admin or a manager to approve
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new RuntimeException("Only Admins and Managers can approve timesheets");
+      throw new UnauthorizedException("Only Admins and Managers can approve timesheets");
     }
 
     Timesheet timesheet =
         timesheetRepository
             .findById(timesheetId)
-            .orElseThrow(() -> new RuntimeException("Timesheet not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
 
     // making sure that the timesheet belongs to this current workspace
     // it could be the case where they have the timesheet id and try to access it
     WorkspaceMember owner =
         workspaceMemberRepository
             .findById(timesheet.getWorkspaceMemberId())
-            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new RuntimeException("Timesheet is not in your workspace");
+      throw new UnauthorizedException("Timesheet is not in your workspace");
     }
 
     // to prevent self-approval
@@ -287,17 +287,17 @@ public class TimesheetService {
     Timesheet timesheet =
         timesheetRepository
             .findById(timesheetId)
-            .orElseThrow(() -> new RuntimeException("Timesheet not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
 
     // making sure that the timesheet belongs to this current workspace
     // it could be the case where they have the timesheet id and try to access it
     WorkspaceMember owner =
         workspaceMemberRepository
             .findById(timesheet.getWorkspaceMemberId())
-            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new RuntimeException("Timesheet is not in your workspace");
+      throw new UnauthorizedException("Timesheet is not in your workspace");
     }
 
     // to prevent self-rejection
