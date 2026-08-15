@@ -421,6 +421,33 @@ export class TimesheetsComponent {
   });
   }
 
+  private loadMemberDirectory( projects: ProjectResponse[],): Observable<unknown> {
+    const managed = projects.filter(
+      (p) => p.myRole === 'MANAGER' || p.myRole === 'ADMIN',
+    );
+    const targets = managed.length > 0 ? managed : projects;
+    if (targets.length === 0) return of(null);
+
+    return forkJoin(
+      targets.map((p) =>
+      this.projectService.getProjectDetail(p.id).pipe(
+        catchError(() => of(null)),
+      ),),
+    ).pipe(
+      tap((details) => {
+        const map = new Map(this.memberById());
+        for(const detail of details) {
+          if(!detail) continue;
+          for (const member of detail.members) {
+            map.set(member.workspaceMemberId, this.toMemberInfo(member));
+          }
+        }
+        this.memberById.set(map);
+      }),
+    );
+  }
+
+
   private loadEntriesForWeek(timesheetId: string): void {
     this.timesheetService.getEntriesForTimesheet(timesheetId).subscribe({
       next: (entries) => {
