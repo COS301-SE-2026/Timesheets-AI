@@ -486,11 +486,14 @@ export class TimesheetsComponent {
           this.allTimesheets.update((list) =>
             list.map((week) => {
               if (week.summary.id !== timesheetId) return week;
-              const { tasks, dailyTotals, grandTotal } = this.buildTaskRows(
-                entries,
-                week.days,
-              );
-              return { ...week, tasks, dailyTotals, grandTotal };
+             const built = this.buildTaskRows(entries, week.days);
+             return {
+              ...week,
+              tasks: built.tasks,
+              dailyTotals: built.dailyTotals,
+              grandTotal: built.grandTotal,
+              grandTotalShort: built.grandTotalShort,
+             };
             }),
           );
         });
@@ -508,7 +511,7 @@ export class TimesheetsComponent {
       new Set(
         entries
         .map((e) => e.taskId)
-        .filter((id): id is string => !!id&& !knownIds.has(id)),
+        .filter((id): id is string => !!id && !knownIds.has(id)),
       ),
     );
 
@@ -517,19 +520,12 @@ export class TimesheetsComponent {
     }
     return forkJoin(
       missingIds.map((id) =>
-        this.taskService.getTaskById(id).pipe(
-          catchError((err) => {
-            console.error(
-            `[TimesheetsComponent] getTaskById failed for missing task ${id}: will display as "Unknown task"`, err,
-          );
-          return of(null); 
-        }),
-        ),
+       this.taskService.getTaskById(id).pipe(catchError(() => of(null))),
       ),
     ).pipe(
       tap((results) => {
         const resolved = results.filter((t): t is TaskResponse => !!t);
-        if(resolved.length > 0){
+        if (resolved.length > 0){
           this.rawTasks.update((list) => [...list, ...resolved]);
         }
       }),
@@ -539,12 +535,17 @@ export class TimesheetsComponent {
   private buildTaskRows(
     entries: TimeEntryResponse[],
     days: Day[],
-  ): { tasks: TaskRow[]; dailyTotals: string[]; grandTotal: string } {
+  ): {
+    tasks: TaskRow[];
+    dailyTotals: string[];
+    dailyTotalsShort: string[];
+    grandTotal: string;
+    grandTotalShort: string;
+  } {
     const tasksById = new Map(this.rawTasks().map((t) => [t.id, t]));
     const projectById = new Map(this.rawProjects().map((p) => [p.id, p.name]));
     const secondsByGroup = new Map<string, number[]>();
     const dayTotals = new Array(days.length).fill(0);
-    console.log('[TimesheetsComponent] buildTaskRows received', entries.length, 'entries');
     
     const NO_TASK_KEY = '__no_task__';
    
@@ -552,14 +553,9 @@ export class TimesheetsComponent {
       const dayIndex = days.findIndex(
         (d) => d.dateStr === entry.startTime.slice(0, 10),
       );
-      if (dayIndex == -1){
-        console.log('[TimesheetsComponent] skipping entry, no matching day:', {
-          entryStartTime: entry.startTime,
-          expectedDates: days.map(d => d.dateStr),
-        });
-        continue;
-      }
-      const groupKey = entry.taskId? entry.taskId: `${NO_TASK_KEY}:${entry.projectId}`;
+      if (dayIndex === -1) continue;
+
+      const groupKey = entry.taskId ? entry.taskId : `${NO_TASK_KEY}:${entry.projectId}`;
 
       const seconds = entry.durationMinutes;
       if (!secondsByGroup.has(groupKey)) {
@@ -571,12 +567,12 @@ export class TimesheetsComponent {
     const tasks = Array.from(secondsByGroup.entries()).map(
       ([groupKey, secondsPerDay]) => {
         const isNoTask = groupKey.startsWith(`${NO_TASK_KEY}:`);
-        const totalSecondsForGroup = secondsPerDay.reduce((a, b) => a + b, 0);
+        const totalSeconds = secondsPerDay.reduce((a, b) => a + b, 0);
         const style =
-            TASK_STYLE_PALETTE[hashTaskId(groupKey) % TASK_STYLE_PALETTE.length];
+            TASK_STYLE_PALETTE[hashId(groupKey) % TASK_STYLE_PALETTE.length];
 
         if(isNoTask){
-          const projectId = groupKey.slice(NO_TASK_KEY.length+1);
+          const projectId = groupKey.slice(NO_TASK_KEY.length + 1);
           return {
             id: groupKey,
             title: 'No task',
