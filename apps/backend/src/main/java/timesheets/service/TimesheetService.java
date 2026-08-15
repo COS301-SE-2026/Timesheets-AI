@@ -1,16 +1,15 @@
 package timesheets.service;
 
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
+import exception.UnauthorizedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import exception.ResourceNotFoundException;
-import exception.UnauthorizedException;
-import lombok.RequiredArgsConstructor;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.domain.WorkspaceMember;
@@ -189,7 +188,8 @@ public class TimesheetService {
     Timesheet timesheet =
         timesheetRepository
             .findById(timesheetId)
-            .orElseThrow(() -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
 
     if (!timesheet.getWorkspaceMemberId().equals(currentMemberId)) {
       throw new UnauthorizedException("You can only submit your own timesheets");
@@ -240,7 +240,8 @@ public class TimesheetService {
     Timesheet timesheet =
         timesheetRepository
             .findById(timesheetId)
-            .orElseThrow(() -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
 
     // making sure that the timesheet belongs to this current workspace
     // it could be the case where they have the timesheet id and try to access it
@@ -255,11 +256,11 @@ public class TimesheetService {
 
     // to prevent self-approval
     if (timesheet.getWorkspaceMemberId().equals(reviewerId)) {
-      throw new RuntimeException("You cannot approve your own timesheet");
+      throw new StateConflictException("You cannot approve your own timesheet");
     }
 
     if (!"SUBMITTED".equals(timesheet.getStatus())) {
-      throw new RuntimeException("Only submitted timesheets can be approved");
+      throw new StateConflictException("Only submitted timesheets can be approved");
     }
 
     timesheet.setIsLocked(true);
@@ -281,13 +282,14 @@ public class TimesheetService {
 
     // the user must be admin or manager to reject
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new RuntimeException("Only Admins and Managers can reject timesheets");
+      throw new UnauthorizedException("Only Admins and Managers can reject timesheets");
     }
 
     Timesheet timesheet =
         timesheetRepository
             .findById(timesheetId)
-            .orElseThrow(() -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
 
     // making sure that the timesheet belongs to this current workspace
     // it could be the case where they have the timesheet id and try to access it
@@ -302,11 +304,11 @@ public class TimesheetService {
 
     // to prevent self-rejection
     if (timesheet.getWorkspaceMemberId().equals(reviewerId)) {
-      throw new RuntimeException("You cannot reject your own timesheet");
+      throw new StateConflictException("You cannot reject your own timesheet");
     }
 
     if (!"SUBMITTED".equals(timesheet.getStatus())) {
-      throw new RuntimeException("Only submitted timesheets can be rejected");
+      throw new StateConflictException("Only submitted timesheets can be rejected");
     }
 
     timesheet.setIsLocked(false);
@@ -327,11 +329,11 @@ public class TimesheetService {
    - managers only see other peoples timesheets that are approved, rejected and submitted
    - gets all the timesheets in a workspace
   */
-  @Transactional
+  @Transactional(readOnly = true)
   public List<Timesheet> getWorkspaceTimesheets() {
 
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new RuntimeException("Only Admins and Managers can view other peoples timesheets");
+      throw new UnauthorizedException("Only Admins and Managers can view other peoples timesheets");
     }
 
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
@@ -350,11 +352,11 @@ public class TimesheetService {
 
   // this will get the users timesheets by the status
   // admins see all, managers see all besides their own
-  @Transactional
+  @Transactional(readOnly = true)
   public List<Timesheet> getWorkspaceTimesheetsByStatus(String status) {
 
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new RuntimeException("Only managers and admins can view workspace timesheets");
+      throw new UnauthorizedException("Only managers and admins can view workspace timesheets");
     }
 
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
@@ -371,14 +373,14 @@ public class TimesheetService {
   }
 
   // will get all the timesheets that have been submitted and waiting approval
-  @Transactional
+  @Transactional(readOnly = true)
   public List<Timesheet> getPendingWorkspaceTimesheets() {
 
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new RuntimeException("Only Admins and Managers can view pending timesheets");
+      throw new UnauthorizedException("Only Admins and Managers can view pending timesheets");
     }
 
     // admins will see all that have been submitted
