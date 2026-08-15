@@ -447,6 +447,36 @@ export class TimesheetsComponent {
     );
   }
 
+  private toMemberInfo(member: ProjectMemberInfo): MemberInfo{
+    const name = `${member.firstName} ${member.lastName}`.trim() || member.email;
+    return {
+      name,
+      role: member.role,
+      initials: this.initalsFrom(name),
+      avatarColor: AVATAR_COLORS[hashId(member.workspaceMemberId) % AVATAR_COLORS.length],
+    };
+  }
+
+  private toReviewRow(ts: TimesheetResponse, entries: TimeEntryResponse[],): ReviewRow {
+    const summary = this.toSummary(ts);
+    const days = this.buildWeekDays(summary.periodStart);
+    const built = this.buildTaskRows(entries, days);
+    const member = this.memberById().get(ts.workspaceMemberId);
+
+    return {
+      summary,
+      employeeName: member?.name ?? 'Team Member',
+      employeeRole: member?.role ?? 'DEVELOPER',
+      initials: member?.initials ?? '??',
+      avatarColor: member?.avatarColor ?? AVATAR_COLORS[0],
+      totalHours: built.grandTotalShort,
+      days,
+      tasks: built.tasks,
+      dailyTotals: built.dailyTotalsShort,
+      grandTotalShort: built.grandTotalShort,
+    };
+  }
+  
 
   private loadEntriesForWeek(timesheetId: string): void {
     this.timesheetService.getEntriesForTimesheet(timesheetId).subscribe({
