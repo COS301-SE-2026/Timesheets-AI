@@ -67,7 +67,7 @@ interface TimesheetWeekView {
   tasks: TaskRow[];
   dailyTotals: string[];
   grandTotal: string;
-  grandTptalShort: string;
+  grandTotalShort: string;
 }
 
 interface TaskRow {
@@ -129,7 +129,6 @@ function hashTaskId(id: string): number {
   styleUrl: './timesheets.component.scss',
 })
 export class TimesheetsComponent {
-  private readonly timeEntryService = inject(TimeEntryService);
   private readonly timesheetService = inject(TimesheetService);
   private readonly projectService = inject(ProjectService);
   private readonly taskService = inject(TaskService);
@@ -273,12 +272,12 @@ export class TimesheetsComponent {
     this.loadTimesheets();
   }
 
-  // INTEGRATION: Replcae body with:
-  // this.uiState.set('loading');
-  // this.timesheetService.getMyTimesheets(this.selectedFilter()).subscribe
-  // Then for the selected id, GET /api/timesheets/{id}/entries and map entries intp task rows (resolve project/task name via project & task APIs)
-
-
+  setPageTab(tab: PageTab): void {
+    this.pageTab.set(tab);
+    if (tab === 'review' && this.isManager()) {
+      this.loadReviewQueue();
+    }
+  }
 
   loadTimesheets(): void {
     this.uiState.set('loading');
@@ -310,6 +309,7 @@ export class TimesheetsComponent {
             tasks: [],
             dailyTotals: [],
             grandTotal: '0hr 0m',
+            grandTotalShort: '0.0h',
           })),
         );
 
@@ -338,6 +338,87 @@ export class TimesheetsComponent {
         this.errorMessage.set('Failed to load timesheets. Please try again');
       },
     });
+  }
+
+  loadReviewQueue(): void {
+    if(!this.isManager()) return;
+
+    this.reviewUiState.set('loading');
+    this.errorMessage.set(null);
+
+    const filter = this.reviewFilter();
+    const timesheets$ = filter === 'ALL'
+    ? this.timesheetService.getReviewTimesheets()
+    : this.timesheetService.getReviewTimesheets(filter);
+
+    forkJoin({
+      timesheets: timesheets$.pipe(catchError(() => of([] as TimesheetResponse[]))),
+      projects: this.projectService.getProjects(),
+      tasks: this.taskService.getMyTasks(),
+    })
+    .pipe(switchMap(({ timesheets, projects, tasks }) => {
+      this.rawProjects.set(projects);
+      this.rawTasks.set(tasks);
+      return this.loadMemberDirectory(projects).pipe(
+        map(() => timesheets),
+      );
+    }),
+    switchMap((timesheets:  TimesheetResponse[]) => {
+      const filtered = timesheets.filter((ts: TimesheetResponse) => {
+        const me = this.authService.currentUser();
+        if (!me) return true;
+        const  member = this.memberById().get(ts.workspaceMemberId);
+        if(!member) return true;
+        const myName = `${me.firstName} ${me.lastName}`.trim();
+        return member.name !== myName;
+      });
+
+      if(filtered.length === 0) {
+        return of([] as ReviewRow[]);
+      }
+
+      return forkJoin(
+        filtered.map((ts) => 
+          this.timesheetService.getEntriesForTimesheet(ts.id).pipe(
+            catchError(() => of([] as TimeEntryResponse[])),
+            switchMap((entries) =>
+              this.resolveMissingTasks(entries).pipe(
+                map(() => this.toReviewRow(ts, entries)),
+              ),
+          ),
+      ),
+    ),
+  );
+    }),
+  )
+  .subscribe({
+    next: (rows) => {
+      const sorted = [...rows].sort((a,b) => 
+      (b.summary.submittedAt ?? '').localeCompare(
+        a.summary.submittedAt ?? '',
+      ),);
+      this.reviewRows.set(sorted);
+
+      if(!this.reviewWeekKey() && sorted.length > 0) {
+        const todayStr = this.toIsoDate(new Date());
+        const current = sorted.find(
+          (r) => 
+            r.summary.periodStart <= todayStr &&
+          r.summary.periodEnd >= todayStr,
+        );
+        this.reviewWeekKey.set(
+          (current ?? sorted[0]).summary.periodStart,
+        );
+      }
+          this.reviewUiState.set(sorted.length === 0 ? 'empty' : 'idle');
+      },
+      error: () => {
+        this.reviewUiState.set('error');
+          this.errorMessage.set(
+            'Failed to load timesheets for review. Please try again.',
+          );
+      },
+  });
   }
 
   private loadEntriesForWeek(timesheetId: string): void {
