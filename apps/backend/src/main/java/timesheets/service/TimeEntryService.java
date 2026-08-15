@@ -84,6 +84,7 @@ public class TimeEntryService {
 
   // can get a time entry using the id
   public TimeEntry getTimeEntryById(UUID id) {
+
     return timeEntryRepository.findById(id).orElseThrow(() -> new TimeEntryNotFoundException(id));
   }
 
