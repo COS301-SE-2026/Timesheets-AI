@@ -1,5 +1,6 @@
 package timesheets.config;
 
+import exception.AuthException;
 import exception.ConflictException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
@@ -25,11 +26,23 @@ public class GlobalExceptionHandler {
   */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<MessageResponse> handleValidation(MethodArgumentNotValidException ex) {
+
     String message =
         ex.getBindingResult().getFieldErrors().stream()
             .map(e -> e.getField() + ": " + e.getDefaultMessage())
             .collect(Collectors.joining(", "));
     return ResponseEntity.badRequest().body(new MessageResponse(message));
+  }
+
+  // this will handle the authentication error code
+  @ExceptionHandler(AuthException.class)
+  public ResponseEntity<ErrorResponse> handleAuthException(AuthException e) {
+
+    // this will map the auth code to a valid HTTP code
+    HttpStatus status = mapErrorCodeToHttpStatus(e.getErrorCode());
+
+    return ResponseEntity.status(status)
+        .body(new ErrorResponse(status.value(), status.getReasonPhrase(), e.getMessage()));
   }
 
   /*
@@ -41,6 +54,7 @@ public class GlobalExceptionHandler {
   // this will be for handling unauthorised access attempts
   @ExceptionHandler(UnauthorizedException.class)
   public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException e) {
+
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
         .body(new ErrorResponse(403, "Forbidden", e.getMessage()));
   }
@@ -49,6 +63,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(TimeEntryAccessDeniedException.class)
   public ResponseEntity<ErrorResponse> handleTimeEntryAccessDenied(
       TimeEntryAccessDeniedException e) {
+
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
         .body(new ErrorResponse(403, "Forbidden", e.getMessage()));
   }
@@ -57,6 +72,7 @@ public class GlobalExceptionHandler {
   // handles when time entries are not found
   @ExceptionHandler(TimeEntryNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleTimeEntryNotFound(TimeEntryNotFoundException e) {
+
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(new ErrorResponse(404, "Not Found", e.getMessage()));
   }
@@ -64,6 +80,7 @@ public class GlobalExceptionHandler {
   // generic when resources are not found
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException e) {
+
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(new ErrorResponse(404, "Not Found", e.getMessage()));
   }
@@ -72,6 +89,7 @@ public class GlobalExceptionHandler {
   // this will be for the state conflicts
   @ExceptionHandler(StateConflictException.class)
   public ResponseEntity<ErrorResponse> handleStateConflict(StateConflictException e) {
+
     return ResponseEntity.status(HttpStatus.CONFLICT)
         .body(new ErrorResponse(409, "Conflict", e.getMessage()));
   }
@@ -79,6 +97,7 @@ public class GlobalExceptionHandler {
   // to handle when there is conflict with the timer
   @ExceptionHandler(ConflictException.class)
   public ResponseEntity<ErrorResponse> handleConflict(ConflictException e) {
+
     return ResponseEntity.status(HttpStatus.CONFLICT)
         .body(ErrorResponse.conflict(e.getUserMessage(), e.getActiveTimerId()));
   }
@@ -88,8 +107,31 @@ public class GlobalExceptionHandler {
   // moving forward
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleGenericException(Exception e) {
-    // Log the exception here
+
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(new ErrorResponse(500, "Internal Server Error", "An unexpected error occurred"));
+  }
+
+  // ! mapping the AuthException error codes to the HTTP codes
+
+  private HttpStatus mapErrorCodeToHttpStatus(AuthException.ErrorCode errorCode) {
+    switch (errorCode) {
+      case INVALID_CREDENTIALS:
+        return HttpStatus.UNAUTHORIZED;
+      case ACCOUNT_LOCKED:
+        return HttpStatus.LOCKED; // this will be 423
+      case SSO_USER:
+      case ACCOUNT_NOT_CONFIGURED:
+        return HttpStatus.FORBIDDEN;
+      case EMAIL_EXISTS:
+        return HttpStatus.CONFLICT;
+      case EMAIL_DOMAIN:
+      case TOKEN_NOT_FOUND:
+      case TOKEN_EXPIRED:
+      case TOKEN_USED:
+      case USER_NOT_FOUND:
+      default:
+        return HttpStatus.BAD_REQUEST;
+    }
   }
 }
