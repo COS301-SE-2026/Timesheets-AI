@@ -394,14 +394,7 @@ class TimesheetServiceTest {
       */
       UUID differentUser = UUID.randomUUID();
       when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(differentUser);
-      when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
-
-      // mocking the workspace member for another user
-      WorkspaceMember differentMember = new WorkspaceMember();
-      differentMember.setId(differentUser);
-      differentMember.setWorkspaceId(workspaceId);
-      when(workspaceMemberRepository.findById(differentUser))
-          .thenReturn(Optional.of(differentMember));
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
 
       when(timesheetRepository.findById(timesheetId)).thenReturn(Optional.of(timesheet));
 
@@ -413,6 +406,8 @@ class TimesheetServiceTest {
       verify(timesheetRepository, times(1)).findById(timesheetId);
       // making sure that nothing got saved, because it should not be saved
       verify(timesheetRepository, never()).save(any());
+
+      verify(workspaceMemberRepository, never()).findById(any());
     }
 
     @Test
@@ -550,7 +545,9 @@ class TimesheetServiceTest {
 
       timesheet.setStatus("SUBMITTED");
 
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
       when(securityUtils.isAdmin()).thenReturn(true);
+
       when(workspaceMemberRepository.findById(workspaceMemberId))
           .thenReturn(Optional.of(workspaceMember));
 
