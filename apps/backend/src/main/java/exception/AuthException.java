@@ -18,7 +18,7 @@ public class AuthException extends RuntimeException {
 
   public enum ErrorCode {
     INVALID_CREDENTIALS("Invalid credentials"),
-    ACCOUNT_LOCKED("Account locked. Please try again in 30 minutes"),
+    ACCOUNT_LOCKED("Account locked. Please try again in %d minutes"),
 
     SSO_USER("This account uses Google SSO. Please sign in with Google."),
     EMAIL_EXISTS("Email already exists. Please login or use a different email."),
