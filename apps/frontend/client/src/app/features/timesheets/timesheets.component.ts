@@ -582,30 +582,41 @@ export class TimesheetsComponent {
             loggedHours: secondsPerDay.map((s) =>
               s > 0 ? this.formatDuration(s) : '-',
             ),
-            total: this.formatDuration(totalSecondsForGroup),
-        };
-      }
+            total: this.formatDuration(totalSeconds),
+            totalShort: this.formatHoursShort(totalSeconds),
+          };
+        }
+            
 
-      const taskId = groupKey;
-      const task = tasksById.get(taskId);
-      return {
-        id: taskId,
-        title: task?.title ?? 'Unknown task',
-        project: projectById.get(task?.projectId ?? '') ?? 'Unknown project',
-        iconClass: style.iconClass,
-        colorCode: style.colorCode,
-        loggedHours: secondsPerDay.map((s) =>
+        const task = tasksById.get(groupKey);
+        return {
+          id: groupKey,
+          title: task?.title ?? 'Unkown task',
+          project: projectById.get(task?.projectId ?? '') ?? 'Unknown Project',
+          iconClass: style.iconClass,
+          colorCode: style.colorCode,
+          loggedHours: secondsPerDay.map((s) =>
           s > 0 ? this.formatDuration(s) : '-',
         ),
-        total: this.formatDuration(totalSecondsForGroup),
-      };
-    },
+        loggedHoursShort: secondsPerDay.map((s) =>
+        s > 0 ? this.formatHoursShorts(s) : '-',
+            ),
+            total: this.formatDuration(totalSeconds),
+            totalShort: this.formatHoursShort(totalSeconds),
+                };
+              },
     );
+
+    const grand = dayTotals.reduce((a,b) => a + b, 0);
 
     return {
       tasks,
       dailyTotals: dayTotals.map((s) => (s > 0 ? this.formatDuration(s) : '-')),
-      grandTotal: this.formatDuration(dayTotals.reduce((a, b) => a + b, 0)),
+      dailyTotalsShort: dayTotals.map((s) =>
+       s > 0 ? this.formatHoursShort(s) : '-',
+      ),
+      grandTotal: this.formatDuration(grand),
+      grandTotalShort: this.formatHoursShort(grand, true),
     };
   }
 
@@ -613,6 +624,7 @@ export class TimesheetsComponent {
     const start = new Date(ts.periodStart);
     return {
       id: ts.id,
+      workspaceMemberId: ts.workspaceMemberId,
       status: ts.status,
       isLocked: ts.isLocked,
       periodStart: ts.periodStart,
@@ -651,6 +663,7 @@ export class TimesheetsComponent {
           month: 'short',
           day: 'numeric',
         }),
+        shortLabel: date.toLocaleDateString('en-US', { weekday: 'short'}).toUpperCase(),
         dateStr,
         isToday: dateStr === todayStr,
       };
@@ -669,17 +682,34 @@ export class TimesheetsComponent {
     const hours = Math.floor(totalSeconds / 3600);
     const mins = Math.floor((totalSeconds % 3600) / 60);
     const seconds = Math.floor(totalSeconds % 60);
-    if(hours > 0) return seconds > 0 ? `${hours}hr ${mins}m ${seconds}s` : `${hours}hr ${mins}m`;
-    if(mins > 0) return seconds > 0 ? `${mins}m ${seconds}s`: `${mins}m`;
+    if (hours > 0)
+      return seconds > 0
+        ? `${hours}hr ${mins}m ${seconds}s` : `${hours}hr ${mins}m`;
+    if (mins > 0) return seconds > 0 ? `${mins}m ${seconds}s` : `${mins}m`;
     return `${seconds}s`;
-  }
+   } 
+
+   private formatHoursShort( totalSeconds: number, withUnit = false): string {
+    if (totalSeconds <= 0) return withUnit ? '0.0h' : '0.0';
+    const hours = (totalSeconds / 3600).toFixed(1);
+    return withUnit ? `${hours}h` : hours;
+   }
+
+   private initialsForm(name: stirng): string {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '??';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+   }
 
   onFilterChange(filter: StatusFilter): void {
     this.selectedFilter.set(filter);
-    // INTEGRATION: GET /api/timesheets/me/status/{status} when filter !== ALL
-    //              GET /api/timesheets/me when filter === ALL
-
     this.loadTimesheets();
+  }
+
+  onReviewFilterChange(filter: ReviewStatusFilter): void {
+    this.reviewFilter.set(filter);
+    this.loadReviewQueue();
   }
 
   onWeekChange(timesheetId: string): void {
