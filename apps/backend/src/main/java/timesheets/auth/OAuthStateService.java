@@ -32,10 +32,12 @@ OAuthStateService will:
 
 package timesheets.integration.auth;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import io.jsonwebtoken.security.Keys;
-
+import java.util.Date;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -45,9 +47,27 @@ public class OAuthStateService {
   @Value("${app.jwt.secret}")
   private String secret;
 
-  // signing key 
+  // signing key
   // create the key used to sign and verify the OAuth state
   private Key getSigningKey() {
-    return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8))
+    return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
   }
+
+  // temporary state sent to Google 
+  // shows that workspace member started this particular OAuth operation 
+  public String generateState(UUID workspaceMemberId, String provider) {
+    return Jwts.builder()
+        // add workspace member 
+        .claim("workspaceMemberId", workspaceMemberId.toString())
+        // add provider 
+        .claim("provider", provider)
+        .issuedAt(new Date())
+        // expiration time of 10 minutes 
+        .expiration(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+        // sign the state so it creates a cryptographic key from app.jwt.secret 
+        // any changes will make the signature invalid
+        .signWith(getSigningKey())
+        .compact();
+  }
+
 }
