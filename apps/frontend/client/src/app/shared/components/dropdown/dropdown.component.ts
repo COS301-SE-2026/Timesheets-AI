@@ -32,6 +32,4 @@ export class DropdownComponent {
     this.selectedOption.set(option);
     this.isOpen.set(false);
   }
-
-  
 }
