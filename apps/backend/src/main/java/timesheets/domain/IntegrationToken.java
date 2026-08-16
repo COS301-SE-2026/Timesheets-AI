@@ -25,13 +25,20 @@ public class IntegrationToken {
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
-    @CreationTimestamp 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp()
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
 
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now(); 
+    }
 }
