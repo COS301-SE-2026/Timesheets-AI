@@ -72,7 +72,6 @@ public class OAuthStateService {
   }
 
   public OAuthState verifyState(String state) {
-
     Claims claims =
         Jwts.parser()
             .verifyWith((javax.crypto.SecretKey) getSigningKey())
