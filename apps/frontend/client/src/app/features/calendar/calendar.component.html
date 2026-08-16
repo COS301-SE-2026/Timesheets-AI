@@ -92,7 +92,39 @@ Related Requirements: N/A
             <!-- tab switchers -->
             @switch (activeView()){
                 <!-- month view -->
-                <div class="month-grid-view"></div>
+                @case('month'){
+                    <div class="month-grid-view">
+                        <div class="grid-header">
+                            @for(gay of weekdays; track day){
+                                <div> {{ day }}</div>
+                            }
+                        </div>
+
+                        <div class="month-cells">
+                            @for (cell of monthGrid(); track cell.date.toISOString()){
+                                <div
+                                    class="cell"
+                                    [class.muted]="!cell.isCurrentMonth"
+                                    [class.active-day]="cell.isToday"
+                                    (click)="selectDate(cell.date)">
+                                    {{ cell.dayNumber }} 
+                                    
+                                    @if (cell.events.length >0){
+                                        <span
+                                            class="badge"
+                                            [ngClass]="cell.events[0].category">
+                                            <i class="fa-solid fa-circle"></i>
+
+                                            {{ cell.events.length }} {{ cell.events.length ===1 ? 'event':'events'}}
+                                        </span>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        
+                    </div>
+                }
             }
         </div>
     </div>
