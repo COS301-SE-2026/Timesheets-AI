@@ -1,10 +1,10 @@
-// this will authorise, exhange authorization code and refresh access token
+// this will authorise, exchange authorization code and refresh access token
 // endpoint to introduce is GET /api/integrations/google/calendar/authorize
 // frontend calls it when user click Connect Google Calender
 // backend sends the user to Google's authorization page
 // After Googe grants permission, Google redirects back to backend
 // Google returns an authorization code
-// Spring Boot will exhage code for access and refresh tokens
+// Spring Boot will exchange code for access and refresh tokens
 // link: https://developers.google.com/identity/protocols/oauth2/web-server
 
 package timesheets.integration.auth;
