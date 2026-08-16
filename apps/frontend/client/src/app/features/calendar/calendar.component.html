@@ -141,6 +141,40 @@ Related Requirements: N/A
                 }
 
                 <!-- DAY VIEW AREA -->
+                @case ('day'){
+                    <div class="day-time-grid">
+                        <div class="timeline">
+                            @for(hour of hours; track hour){
+                                <div class="time-row">
+                                    <span class="time-label">{{ hour <10 ? '0' + hour: hour }}:00 </span>
+
+                                        <div class="slot-line"></div>
+                                </div>
+                            }
+
+                            <!-- event cards area -->
+                            @for (event of selectedDayEvents(); track event.id){
+                                <div 
+                                    class="event-block"
+                                    [ngClass]="event.category"
+                                    [style.top.px]="event.topOffset"
+                                    [style.height.px]="event.height"
+                                    (click)="selectEvent(event)">
+                                    <div class="event-header">
+                                        <strong>{{ event.title }}</strong>
+                                        <i class="fa-regular fa-calendar-check"></i>
+                                    </div>
+
+                                    <p>
+                                        {{ event.startTime | date: 'HH:mm' }}- {{ event.endTime | date: 'HH:mm' }}
+                                    </p>
+                                </div>
+                            }
+
+                            
+                        </div>
+                    </div>
+                }
             }
         </div>
     </div>
