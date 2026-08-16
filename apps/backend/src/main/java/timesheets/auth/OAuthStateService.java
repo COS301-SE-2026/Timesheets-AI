@@ -32,6 +32,7 @@ OAuthStateService will:
 
 package timesheets.integration.auth;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -53,21 +54,35 @@ public class OAuthStateService {
     return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
   }
 
-  // temporary state sent to Google 
-  // shows that workspace member started this particular OAuth operation 
+  // temporary state sent to Google
+  // shows that workspace member started this particular OAuth operation
   public String generateState(UUID workspaceMemberId, String provider) {
     return Jwts.builder()
-        // add workspace member 
+        // add workspace member
         .claim("workspaceMemberId", workspaceMemberId.toString())
-        // add provider 
+        // add provider
         .claim("provider", provider)
         .issuedAt(new Date())
-        // expiration time of 10 minutes 
+        // expiration time of 10 minutes
         .expiration(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-        // sign the state so it creates a cryptographic key from app.jwt.secret 
+        // sign the state so it creates a cryptographic key from app.jwt.secret
         // any changes will make the signature invalid
         .signWith(getSigningKey())
         .compact();
   }
 
+  public OAuthState verifyState(String state) {
+
+    Claims claims =
+        Jwts.parser()
+            .verifyWith((javax.crypto.SecretKey) getSigningKey())
+            .build()
+            .parseSignedClaims(state)
+            .getPayload();
+
+    UUID workspaceMemberId = UUID.fromString(claims.get("workspaceMemberId", String.class));
+    String provider = claims.get("provider", String.class);
+    // has workspacememberid and provider 
+    return new OAuthState(workspaceMemberId, provider);
+  }
 }
