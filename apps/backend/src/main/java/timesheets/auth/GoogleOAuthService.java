@@ -9,7 +9,7 @@
 
 package timesheets.integration.auth;
 
-import java.util.UUID; 
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +29,11 @@ public class GoogleOAuthService {
   @Value("${app.google.redirect-uri}")
   private String redirectUri;
 
-  // need to generate a stronger and not easy to guess random value 
-  // Cleo need to store in user's session and this will be sent to Google and then after we compare to ensure that the sent UUID matches what Google returns
+  // need to generate a stronger and not easy to guess random value
+  // Cleo need to store in user's session and this will be sent to Google and then after we compare
+  // to ensure that the sent UUID matches what Google returns
 
-  public String generateState(){
+  public String generateState() {
     return UUID.randomUUID().toString();
   }
 
@@ -44,7 +45,7 @@ public class GoogleOAuthService {
       access_type=offline - obtain the refresh token
   */
 
- // this is url where the users will be sent to Google Permission screen 
+  // this is url where the users will be sent to Google Permission screen
   public String buildAuthorizationUrl(String state) {
     return GOOGLE_AUTHORIZATION_URL
         + "?client_id="
