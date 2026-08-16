@@ -1,6 +1,7 @@
 package timesheets.service;
 
 import exception.TimeEntryAccessDeniedException;
+import exception.TimeEntryLockedException;
 import exception.TimeEntryNotFoundException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -95,7 +96,7 @@ public class TimeEntryService {
     TimeEntry entry = getTimeEntryById(id);
 
     if (Boolean.TRUE.equals(entry.getIsLocked())) {
-      throw new RuntimeException("Cannot delete a locked time entry");
+      throw new TimeEntryLockedException("Cannot delete a locked time entry");
     }
 
     if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
@@ -118,7 +119,7 @@ public class TimeEntryService {
     TimeEntry entry = getTimeEntryById(id);
 
     if (Boolean.TRUE.equals(entry.getIsLocked())) {
-      throw new RuntimeException("Cannot edit a locked time entry");
+      throw new TimeEntryLockedException("Cannot edit a locked time entry");
     }
 
     if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
