@@ -9,5 +9,5 @@ import timesheets.domain.IntegrationToken;
 @Repository
 public interface IntegrationTokenRepository extends JpaRepository<IntegrationToken, UUID> {
   Optional<IntegrationToken> findByWorkspaceMemberIdAndProvider(
-      UUID workspaceMemeberId, String provider);
+      UUID workspaceMemberId, String provider);
 }
