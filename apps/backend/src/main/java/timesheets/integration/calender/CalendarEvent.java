@@ -1,15 +1,15 @@
-package timesheets.integration.calender;
+package timesheets.integration.calendar;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-// CalenderAdapter uses CalenderEvent
+// CalendarAdapter uses CalendarEvent
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CalenderEvent {
+public class CalendarEvent {
   private String title;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
