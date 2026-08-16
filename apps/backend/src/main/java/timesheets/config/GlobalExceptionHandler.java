@@ -5,6 +5,7 @@ import exception.ConflictException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
 import exception.TimeEntryAccessDeniedException;
+import exception.TimeEntryLockedException;
 import exception.TimeEntryNotFoundException;
 import exception.UnauthorizedException;
 import java.util.stream.Collectors;
@@ -100,6 +101,14 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity.status(HttpStatus.CONFLICT)
         .body(ErrorResponse.conflict(e.getUserMessage(), e.getActiveTimerId()));
+  }
+
+  // this will handle when a locked time entry is tried to be changed
+  @ExceptionHandler(TimeEntryLockedException.class)
+  public ResponseEntity<ErrorResponse> handleTimeEntryLocked(TimeEntryLockedException e) {
+
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+        .body(new ErrorResponse(409, "Conflict", e.getMessage()));
   }
 
   // ! 500 - Internal Server Error
