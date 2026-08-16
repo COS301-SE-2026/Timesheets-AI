@@ -9,6 +9,7 @@
 
 package timesheets.integration.auth;
 
+import java.util.UUID; 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,13 @@ public class GoogleOAuthService {
 
   @Value("${app.google.redirect-uri}")
   private String redirectUri;
+
+  // need to generate a stronger and not easy to guess random value 
+  // Cleo need to store in user's session and this will be sent to Google and then after we compare to ensure that the sent UUID matches what Google returns
+
+  public String generateState(){
+    return UUID.randomUUID().toString();
+  }
 
   /* client id identifies our application to Google
       redirect_uri tells google where to send user after authorization
