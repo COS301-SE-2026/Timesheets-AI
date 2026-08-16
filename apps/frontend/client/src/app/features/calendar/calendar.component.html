@@ -171,10 +171,19 @@ Related Requirements: N/A
                                 </div>
                             }
 
-                            
+                            @if (isToday(selectedDate)){
+                                <div 
+                                    class="current-time-line"
+                                    [style.top.px]="currentTimeTopOffset()">
+                                    <span class="time-badge">{{ currentTime() | date: 'HH:mm'}}</span>
+                                </div>
+                            }
                         </div>
                     </div>
                 }
+
+                <!-- WEK VIEW AREA -->
+                 
             }
         </div>
     </div>
