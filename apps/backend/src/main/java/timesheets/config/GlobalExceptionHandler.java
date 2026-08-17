@@ -1,13 +1,11 @@
 package timesheets.config;
 
+import exception.AccessDeniedException;
 import exception.AuthException;
+import exception.BadRequestException;
 import exception.ConflictException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
-import exception.TimeEntryAccessDeniedException;
-import exception.TimeEntryLockedException;
-import exception.TimeEntryNotFoundException;
-import exception.UnauthorizedException;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +33,15 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest().body(new MessageResponse(message));
   }
 
+  // this will handle validation failures, and invalid inputs
+  @ExceptionHandler(BadRequestException.class)
+  public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException e) {
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(new ErrorResponse(400, "Bad Request", e.getMessage()));
+  }
+
+  // ! 401- Unauthorized
   // this will handle the authentication error code
   @ExceptionHandler(AuthException.class)
   public ResponseEntity<ErrorResponse> handleAuthException(AuthException e) {
@@ -52,32 +59,14 @@ public class GlobalExceptionHandler {
   - if the user is user is authenticated but they do not have access to that thing
   - for example: dev trying to approve a timesheet or a dev trying to create a project
   */
-  // this will be for handling unauthorised access attempts
-  @ExceptionHandler(UnauthorizedException.class)
-  public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException e) {
-
-    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-        .body(new ErrorResponse(403, "Forbidden", e.getMessage()));
-  }
-
-  // handling access attempts on time entries
-  @ExceptionHandler(TimeEntryAccessDeniedException.class)
-  public ResponseEntity<ErrorResponse> handleTimeEntryAccessDenied(
-      TimeEntryAccessDeniedException e) {
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException e) {
 
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
         .body(new ErrorResponse(403, "Forbidden", e.getMessage()));
   }
 
   // ! 404 - Not Found, for cases where the resources are not found
-  // handles when time entries are not found
-  @ExceptionHandler(TimeEntryNotFoundException.class)
-  public ResponseEntity<ErrorResponse> handleTimeEntryNotFound(TimeEntryNotFoundException e) {
-
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(new ErrorResponse(404, "Not Found", e.getMessage()));
-  }
-
   // generic when resources are not found
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException e) {
@@ -101,14 +90,6 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity.status(HttpStatus.CONFLICT)
         .body(ErrorResponse.conflict(e.getUserMessage(), e.getActiveTimerId()));
-  }
-
-  // this will handle when a locked time entry is tried to be changed
-  @ExceptionHandler(TimeEntryLockedException.class)
-  public ResponseEntity<ErrorResponse> handleTimeEntryLocked(TimeEntryLockedException e) {
-
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-        .body(new ErrorResponse(409, "Conflict", e.getMessage()));
   }
 
   // ! 500 - Internal Server Error
