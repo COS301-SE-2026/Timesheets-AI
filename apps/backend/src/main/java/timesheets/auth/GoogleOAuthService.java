@@ -9,7 +9,6 @@
 
 package timesheets.integration.auth;
 
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -50,4 +49,14 @@ public class GoogleOAuthService {
         + "&state="
         + state;
   }
+
+  /*
+    GoogleOAuthService asks for state from OAuthStateService
+    OAuthStateService creates signed state
+    GoogleOAuthService builds Google URL 
+
+    **GoogleOAuthService should not know how OAuth state is generated** 
+  */
+
+ 
 }
