@@ -39,11 +39,15 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class OAuthStateService {
+
+  private final OAuthStateService oauthStateService;
 
   @Value("${app.jwt.secret}")
   private String secret;
@@ -81,7 +85,7 @@ public class OAuthStateService {
 
     UUID workspaceMemberId = UUID.fromString(claims.get("workspaceMemberId", String.class));
     String provider = claims.get("provider", String.class);
-    // has workspacememberid and provider 
+    // has workspacememberid and provider
     return new OAuthState(workspaceMemberId, provider);
   }
 }

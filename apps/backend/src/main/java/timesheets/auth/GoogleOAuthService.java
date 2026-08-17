@@ -53,10 +53,9 @@ public class GoogleOAuthService {
   /*
     GoogleOAuthService asks for state from OAuthStateService
     OAuthStateService creates signed state
-    GoogleOAuthService builds Google URL 
+    GoogleOAuthService builds Google URL
 
-    **GoogleOAuthService should not know how OAuth state is generated** 
+    **GoogleOAuthService should not know how OAuth state is generated**
   */
 
- 
 }
