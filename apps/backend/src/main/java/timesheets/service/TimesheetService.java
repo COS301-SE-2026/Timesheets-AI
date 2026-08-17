@@ -1,8 +1,9 @@
 package timesheets.service;
 
+import exception.AccessDeniedException;
+import exception.BadRequestException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
-import exception.UnauthorizedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +34,14 @@ public class TimesheetService {
   public Timesheet createTimesheet(TimesheetRequest request) {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    if (request.getPeriodStart() == null || request.getPeriodEnd() == null) {
+      throw new BadRequestException("Period start and end dates are required");
+    }
+
+    if (request.getPeriodStart().isAfter(request.getPeriodEnd())) {
+      throw new BadRequestException("Period start must be before period end");
+    }
 
     Timesheet timesheet = new Timesheet();
     timesheet.setWorkspaceMemberId(workspaceMemberId);
@@ -94,7 +103,7 @@ public class TimesheetService {
     // a regular user should only be able to see their own timesheets
     if (!securityUtils.isManager() && !securityUtils.isAdmin()) {
       if (!timesheetOwnerId.equals(currentMemberId)) {
-        throw new UnauthorizedException("You can only view your own timesheets");
+        throw new AccessDeniedException("You can only view your own timesheets");
       }
       return timesheet;
     }
@@ -106,7 +115,7 @@ public class TimesheetService {
             .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new UnauthorizedException("Timesheet not found in your workspace");
+      throw new AccessDeniedException("Timesheet not found in your workspace");
     }
 
     // admins and managers can view any timesheet in their workspace
@@ -127,7 +136,7 @@ public class TimesheetService {
     // devs should only be able to see their own timesheets
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
       if (!workspaceMemberId.equals(currentMemberId)) {
-        throw new UnauthorizedException("You can only view your own timesheets");
+        throw new AccessDeniedException("You can only view your own timesheets");
       }
       return timesheetRepository.findByWorkspaceMemberId(workspaceMemberId);
     }
@@ -139,7 +148,7 @@ public class TimesheetService {
             .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     if (!member.getWorkspaceId().equals(workspaceId)) {
-      throw new UnauthorizedException("Cannot view timesheets from another workspace");
+      throw new AccessDeniedException("Cannot view timesheets from another workspace");
     }
 
     // managers are allowed to view any members timesheets from the workspace
@@ -160,7 +169,7 @@ public class TimesheetService {
     // a regular user should only be able to see their own timesheets
     if (!securityUtils.isManager() && !securityUtils.isAdmin()) {
       if (!workspaceMemberId.equals(currentMemberId)) {
-        throw new UnauthorizedException("You can only view your own timesheets");
+        throw new AccessDeniedException("You can only view your own timesheets");
       }
       return timesheetRepository.findByWorkspaceMemberIdAndStatus(workspaceMemberId, status);
     }
@@ -173,7 +182,7 @@ public class TimesheetService {
 
     // the timesheet should only exist in the current workspace
     if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new UnauthorizedException("Timesheet not found in your workspace");
+      throw new AccessDeniedException("Timesheet not found in your workspace");
     }
 
     return timesheetRepository.findByWorkspaceMemberIdAndStatus(workspaceMemberId, status);
@@ -192,7 +201,7 @@ public class TimesheetService {
                 () -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
 
     if (!timesheet.getWorkspaceMemberId().equals(currentMemberId)) {
-      throw new UnauthorizedException("You can only submit your own timesheets");
+      throw new AccessDeniedException("You can only submit your own timesheets");
     }
 
     // making sure that the timesheet belongs to this current workspace
@@ -203,7 +212,7 @@ public class TimesheetService {
             .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new UnauthorizedException("Timesheet is not in your workspace");
+      throw new AccessDeniedException("Timesheet is not in your workspace");
     }
 
     if (!"DRAFT".equals(timesheet.getStatus())) {
@@ -234,7 +243,7 @@ public class TimesheetService {
 
     // the user should be an admin or a manager to approve
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new UnauthorizedException("Only Admins and Managers can approve timesheets");
+      throw new AccessDeniedException("Only Admins and Managers can approve timesheets");
     }
 
     Timesheet timesheet =
@@ -251,7 +260,7 @@ public class TimesheetService {
             .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new UnauthorizedException("Timesheet is not in your workspace");
+      throw new AccessDeniedException("Timesheet is not in your workspace");
     }
 
     // to prevent self-approval
@@ -282,7 +291,7 @@ public class TimesheetService {
 
     // the user must be admin or manager to reject
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new UnauthorizedException("Only Admins and Managers can reject timesheets");
+      throw new AccessDeniedException("Only Admins and Managers can reject timesheets");
     }
 
     Timesheet timesheet =
@@ -299,7 +308,7 @@ public class TimesheetService {
             .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     if (!owner.getWorkspaceId().equals(workspaceId)) {
-      throw new UnauthorizedException("Timesheet is not in your workspace");
+      throw new AccessDeniedException("Timesheet is not in your workspace");
     }
 
     // to prevent self-rejection
@@ -333,7 +342,7 @@ public class TimesheetService {
   public List<Timesheet> getWorkspaceTimesheets() {
 
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new UnauthorizedException("Only Admins and Managers can view other peoples timesheets");
+      throw new AccessDeniedException("Only Admins and Managers can view other peoples timesheets");
     }
 
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
@@ -356,7 +365,7 @@ public class TimesheetService {
   public List<Timesheet> getWorkspaceTimesheetsByStatus(String status) {
 
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new UnauthorizedException("Only managers and admins can view workspace timesheets");
+      throw new AccessDeniedException("Only managers and admins can view workspace timesheets");
     }
 
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
@@ -380,7 +389,7 @@ public class TimesheetService {
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new UnauthorizedException("Only Admins and Managers can view pending timesheets");
+      throw new AccessDeniedException("Only Admins and Managers can view pending timesheets");
     }
 
     // admins will see all that have been submitted

@@ -8,9 +8,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import exception.AccessDeniedException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
-import exception.UnauthorizedException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -400,7 +400,7 @@ class TimesheetServiceTest {
 
       // ACT and ASSERT
       assertThatThrownBy(() -> timesheetService.submitTimesheet(timesheetId))
-          .isInstanceOf(UnauthorizedException.class)
+          .isInstanceOf(AccessDeniedException.class)
           .hasMessage("You can only submit your own timesheets");
 
       verify(timesheetRepository, times(1)).findById(timesheetId);
@@ -523,7 +523,7 @@ class TimesheetServiceTest {
       // ACT and ASSERT
       assertThatThrownBy(
               () -> timesheetService.rejectTimesheet(timesheetId, reviewerId, rejectionReason))
-          .isInstanceOf(UnauthorizedException.class)
+          .isInstanceOf(AccessDeniedException.class)
           .hasMessage("Only Admins and Managers can reject timesheets");
 
       verify(timesheetRepository, never()).findById(any());
