@@ -1,5 +1,9 @@
 package timesheets.service;
 
+import exception.AccessDeniedException;
+import exception.BadRequestException;
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +37,7 @@ public class LeaveRequestService {
     // to see if the workspace member exists
     workspaceMemberRepository
         .findById(workspaceMemberId)
-        .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     // to see if there is an overlap
     boolean hasOverlap =
@@ -41,7 +45,7 @@ public class LeaveRequestService {
             workspaceMemberId, request.getEndDate(), request.getStartDate());
 
     if (hasOverlap) {
-      throw new RuntimeException(
+      throw new StateConflictException(
           "You already have an approved leave that overlaps with these dates");
     }
 
@@ -69,23 +73,23 @@ public class LeaveRequestService {
     LeaveRequest leaveRequest =
         leaveRequestRepository
             .findById(requestId)
-            .orElseThrow(() -> new RuntimeException("Leave request not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Leave request not found"));
 
     // making sure that only pending requests can be updated
     if (!"PENDING".equals(leaveRequest.getStatus())) {
-      throw new RuntimeException("Only pending leave requests can be updated");
+      throw new StateConflictException("Only pending leave requests can be updated");
     }
 
     // only the requester should be able to update the request
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
     if (!leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
-      throw new RuntimeException("You can only update your own leave requests");
+      throw new AccessDeniedException("You can only update your own leave requests");
     }
 
     // check if both dates are provided
     if (request.getStartDate() != null && request.getEndDate() != null) {
       if (request.getEndDate().isBefore(request.getStartDate())) {
-        throw new RuntimeException("End date cannot be before start date");
+        throw new BadRequestException("End date cannot be before start date");
       }
     }
 
@@ -145,14 +149,14 @@ public class LeaveRequestService {
     LeaveRequest leaveRequest =
         leaveRequestRepository
             .findById(requestId)
-            .orElseThrow(() -> new RuntimeException("Leave request not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Leave request not found"));
 
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     // devs should only view their own leave request
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
       if (!leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
-        throw new RuntimeException("You don't have access to this leave request");
+        throw new AccessDeniedException("You don't have access to this leave request");
       }
       return buildLeaveRequestResponse(leaveRequest);
     }
@@ -165,7 +169,7 @@ public class LeaveRequestService {
               .anyMatch(leaveReq -> leaveReq.getId().equals(requestId));
 
       if (!hasAccess) {
-        throw new RuntimeException("You don't have access to this leave request");
+        throw new AccessDeniedException("You don't have access to this leave request");
       }
       return buildLeaveRequestResponse(leaveRequest);
     }
@@ -247,21 +251,21 @@ public class LeaveRequestService {
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new RuntimeException("Only Admins and Managers can approve leave requests");
+      throw new AccessDeniedException("Only Admins and Managers can approve leave requests");
     }
 
     LeaveRequest leaveRequest =
         leaveRequestRepository
             .findById(requestId)
-            .orElseThrow(() -> new RuntimeException("Leave request not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Leave request not found"));
 
     if (!"PENDING".equals(leaveRequest.getStatus())) {
-      throw new RuntimeException("Leave request is not pending approval");
+      throw new StateConflictException("Leave request is not pending approval");
     }
 
     // cannot approve their own requests
     if (leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
-      throw new RuntimeException("You cannot approve your own leave request");
+      throw new StateConflictException("You cannot approve your own leave request");
     }
 
     // for managers verify that the request is in their workspace
@@ -272,7 +276,7 @@ public class LeaveRequestService {
           leaveRequestRepository.findByWorkspaceId(workspaceId).stream()
               .anyMatch(leaveReq -> leaveReq.getId().equals(requestId));
       if (!hasAccess) {
-        throw new RuntimeException("You can only approve requests from your workspace");
+        throw new AccessDeniedException("You can only approve requests from your workspace");
       }
     }
 
@@ -292,21 +296,21 @@ public class LeaveRequestService {
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
-      throw new RuntimeException("Only Admins and Managers can reject leave requests");
+      throw new AccessDeniedException("Only Admins and Managers can reject leave requests");
     }
 
     LeaveRequest leaveRequest =
         leaveRequestRepository
             .findById(requestId)
-            .orElseThrow(() -> new RuntimeException("Leave request not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Leave request not found"));
 
     if (!"PENDING".equals(leaveRequest.getStatus())) {
-      throw new RuntimeException("Leave request is not pending approval");
+      throw new StateConflictException("Leave request is not pending approval");
     }
 
     // cannot approve their own requests
     if (leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
-      throw new RuntimeException("You cannot reject your own leave request");
+      throw new StateConflictException("You cannot reject your own leave request");
     }
 
     // for managers verify that the request is in their workspace
@@ -317,7 +321,7 @@ public class LeaveRequestService {
           leaveRequestRepository.findByWorkspaceId(workspaceId).stream()
               .anyMatch(leaveReq -> leaveReq.getId().equals(requestId));
       if (!hasAccess) {
-        throw new RuntimeException("You can only reject requests from your workspace");
+        throw new AccessDeniedException("You can only reject requests from your workspace");
       }
     }
 
@@ -337,16 +341,16 @@ public class LeaveRequestService {
     LeaveRequest leaveRequest =
         leaveRequestRepository
             .findById(requestId)
-            .orElseThrow(() -> new RuntimeException("Leave request not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Leave request not found"));
 
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     if (!leaveRequest.getWorkspaceMemberId().equals(currentMemberId)) {
-      throw new RuntimeException("Only the requester can cancel their own leave request");
+      throw new AccessDeniedException("Only the requester can cancel their own leave request");
     }
 
     if (!"PENDING".equals(leaveRequest.getStatus())) {
-      throw new RuntimeException("Only pending leave requests can be cancelled");
+      throw new StateConflictException("Only pending leave requests can be cancelled");
     }
 
     leaveRequest.setStatus("CANCELLED");
