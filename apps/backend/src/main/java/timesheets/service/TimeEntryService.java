@@ -1,8 +1,8 @@
 package timesheets.service;
 
-import exception.TimeEntryAccessDeniedException;
-import exception.TimeEntryLockedException;
-import exception.TimeEntryNotFoundException;
+import exception.AccessDeniedException;
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -86,7 +86,9 @@ public class TimeEntryService {
   // can get a time entry using the id
   public TimeEntry getTimeEntryById(UUID id) {
 
-    return timeEntryRepository.findById(id).orElseThrow(() -> new TimeEntryNotFoundException(id));
+    return timeEntryRepository
+        .findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Time entry not found with id: " + id));
   }
 
   @Transactional
@@ -96,11 +98,11 @@ public class TimeEntryService {
     TimeEntry entry = getTimeEntryById(id);
 
     if (Boolean.TRUE.equals(entry.getIsLocked())) {
-      throw new TimeEntryLockedException("Cannot delete a locked time entry");
+      throw new StateConflictException("Cannot delete a locked time entry");
     }
 
     if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
-      throw new TimeEntryAccessDeniedException("You can only delete your own time entries");
+      throw new StateConflictException("You can only delete your own time entries");
     }
 
     // remember we are only doing soft deletes
@@ -119,11 +121,11 @@ public class TimeEntryService {
     TimeEntry entry = getTimeEntryById(id);
 
     if (Boolean.TRUE.equals(entry.getIsLocked())) {
-      throw new TimeEntryLockedException("Cannot edit a locked time entry");
+      throw new StateConflictException("Cannot edit a locked time entry");
     }
 
     if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
-      throw new TimeEntryAccessDeniedException("You can only edit your own time entries");
+      throw new AccessDeniedException("You can only edit your own time entries");
     }
 
     entry.setProjectId(request.getProjectId());
