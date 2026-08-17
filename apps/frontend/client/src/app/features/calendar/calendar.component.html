@@ -183,7 +183,49 @@ Related Requirements: N/A
                 }
 
                 <!-- WEK VIEW AREA -->
-                 
+                @case ('week'){
+                    <div class="week-time-grid">
+                        <div class="week-header-row">
+                            <div class="time-col-header">GMT+2</div>
+
+                            @for(day of the weekDays(); track day.toISOString()){
+                                <div 
+                                    class="day-col-header"
+                                    [class.active]="isSameDay(day, selectedDate())"
+                                    (click)="selectDate(day)">
+                                    @if (isSameDay(day, selectedDate())){
+                                        <span class="active-pill">
+                                            {{ day | date:'d' }}
+                                        </span>
+                                    }
+                                    {{ day | date:'EEE d MMM' | uppercase }}
+                                </div>
+                            }
+                        </div>
+
+                        <div class="week-body">
+                            <div class="time-labels">
+                                @for (day of weekDays(); track day.toISOString()){
+                                    <div
+                                        class="week-column"
+                                        [class.active-col]="isSameDay(day, selectedDate())">
+                                        @for (event of getEventsForDate(day); track event.id){
+                                            <div
+                                                class="week-event"
+                                                [ngClass]="event.category"
+                                                [style.top.px]="event.topOffset"
+                                                (click)="selectEvent(event)">
+                                                {{ event.title }}
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                
             }
         </div>
     </div>
