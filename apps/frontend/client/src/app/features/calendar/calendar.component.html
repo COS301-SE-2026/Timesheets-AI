@@ -105,5 +105,29 @@ Related Requirements: N/A
         </div>
     </section>
 
-    
+    <!-- POP UP OF THE CLICKED EVENT  -->
+    @if(selectedEvent(); as event){
+        <div class="event-details">
+            <button 
+                class="close-button"
+                (click)="closeEventDetails()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h2>
+                {{ event.title}}
+            </h2>
+
+            <div class="event-time">
+                <i class="fa-regular fa-clock"></i>
+                <span>
+                    {{ event.start | date:'EEE, d MMM yyyy'}}
+                    <br>
+                    {{ event.start | date:'HH:mm'}}- {{ event.end | date:'HH:mm'}}
+                </span>
+            </div>
+
+            
+        </div>
+    }
 </div>
