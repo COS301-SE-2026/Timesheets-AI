@@ -16,6 +16,6 @@ public class AvailableUserResponse {
   private String lastName;
   private String email;
 
-  //this will help us quickly identify when someone is in the workspace
+  // this will help us quickly identify when someone is in the workspace
   private Boolean isInWorkspace;
 }

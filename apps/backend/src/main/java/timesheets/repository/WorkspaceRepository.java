@@ -18,9 +18,9 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, UUID> {
   - preventing something like "tech" vs "Tech" */
   Optional<Workspace> findByNameIgnoreCase(String name);
 
-  //finding the workspaces for a specified user
+  // finding the workspaces for a specified user
   List<Workspace> findByOwnerUserId(UUID ownerUserId);
 
-  //seeing if the workspace with a specific name exists
+  // seeing if the workspace with a specific name exists
   boolean existsByNameIgnoreCase(String name);
 }

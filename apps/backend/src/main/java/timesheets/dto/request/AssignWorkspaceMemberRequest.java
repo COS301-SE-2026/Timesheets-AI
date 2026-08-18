@@ -6,10 +6,11 @@ import lombok.Data;
 import timesheets.enums.WorkspaceRole;
 
 @Data
-public class AssignMemberRequest {
+public class AssignWorkspaceMemberRequest {
   @NotNull(message = "Workspace member ID is required")
-  private UUID workspaceMemberId;
+  private UUID userId;
 
+  // an admin can assign other admins, or managers or just a dev
   @NotNull(message = "Role is required")
-  private WorkspaceRole role; // MANAGER or DEVELOPER
+  private WorkspaceRole role;
 }
