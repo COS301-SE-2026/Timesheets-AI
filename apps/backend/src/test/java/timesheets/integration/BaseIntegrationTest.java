@@ -6,8 +6,10 @@
    - Start PostgreSQL using Testcontainers
    - Start the Spring Boot application
    -  Run Flyway miggrations
-   - Now, using RestAssured is better for integration test: https://stackoverflow.com/questions/52051570/whats-the-difference-between-mockmvc-restassured-and-testresttemplate?rq=1
-   - Include Helper functions such as login methods, it call POST /api/auth/login and extracts the JWT and return it
+   - Now, using RestAssured is better for integration test:
+https://stackoverflow.com/questions/52051570/whats-the-difference-between-mockmvc-restassured-and-testresttemplate?rq=1
+   - Include Helper functions such as login methods, it call POST /api/auth/login and extracts
+the JWT and return it
 */
 
 package timesheets.integration;
@@ -93,5 +95,8 @@ public abstract class BaseIntegrationTest {
 }
 
 /*
-JUnit starts -> Testcontainers starts a PostgreSQL Docker container -> PostgreSQL creates the database -> Spring Boot starts the application -> DynamicPropertySource give Spring databse URL, username, password -> Spring connects to PostgreSQL container -> Spring starts on a corect port -> BeforeEach method tells RestAssured to use random port
+JUnit starts -> Testcontainers starts a PostgreSQL Docker container -> PostgreSQL creates the
+database -> Spring Boot starts the application -> DynamicPropertySource give Spring databse URL,
+username, password -> Spring connects to PostgreSQL container -> Spring starts on a corect port
+-> BeforeEach method tells RestAssured to use random port
 */
