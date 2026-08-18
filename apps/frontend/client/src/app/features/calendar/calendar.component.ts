@@ -39,6 +39,21 @@ export class CalendarComponent {
   };
 
   ngOnInit(): void{
-    
+    this.loadEvents();
   }
+
+  loadEvents(): void{
+    this.calendarService.getEvents(this.provider, '', '').subscribe(events=>
+    {
+      const api= this.calendarComponent?.getApi();
+      if(api){
+        api.removeAllEventSources();
+        api.addEventSource(events);
+      }else{
+        this.calendarOptions.events= events;
+      }
+    });
+  }
+
+  
 }
