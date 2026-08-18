@@ -127,7 +127,30 @@ Related Requirements: N/A
                 </span>
             </div>
 
-            
+            @if( event.location){
+                <div class="event-info">
+                    <i class="fa-solid fa-location-dot"></i>
+                    {{ event.location}}
+                </div>
+            }
+
+            @if (event.organizer?.name){
+                <div class="event-info">
+                    <i class="fa-solid fa-user"></i>
+                    {{ event.organizer?.name}}
+                </div>
+            }
+
+            @if (event.description){
+                <p class="event-description">
+                    {{ event.description}}
+                </p>
+            }
+
+            <div class="event-readonly">
+                <i class="fa-solid fa-lock"></i>
+                Read-only event
+            </div>
         </div>
     }
 </div>
