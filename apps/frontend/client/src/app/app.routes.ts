@@ -83,6 +83,12 @@ export const routes: Routes = [
       import('./features/leave-requests/leave-requests.component')
         .then(m => m.LeaveRequestsComponent)
   },
+  {
+    path: 'calendar',
+    loadComponent: () =>
+      import('./features/calendar/calendar.component')
+        .then(m => m.CalendarComponent)
+  },
 
   /* 404 fallback */
   {
