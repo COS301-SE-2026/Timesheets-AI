@@ -1,5 +1,7 @@
 package timesheets.service;
 
+import exception.AccessDeniedException;
+import exception.ResourceNotFoundException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -104,7 +106,8 @@ public class ProjectService {
       for (UUID managerId : request.getManagerIds()) {
         workspaceMemberRepository
             .findById(managerId)
-            .orElseThrow(() -> new RuntimeException("Workspace member not found: " + managerId));
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Workspace member not found: " + managerId));
 
         ProjectMember member = new ProjectMember();
         member.setProjectId(savedProject.getId());
@@ -125,11 +128,12 @@ public class ProjectService {
     Project project =
         projectRepository
             .findById(projectId)
-            .orElseThrow(() -> new RuntimeException("Project not found"));
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Project not found with id: " + projectId));
 
     // to verify if the user has access to the project
     if (!userHasAccessToProject(projectId, workspaceMemberId)) {
-      throw new RuntimeException("No access to this project");
+      throw new AccessDeniedException("No access to this project");
     }
 
     // finds all the members assigned to this project
@@ -204,13 +208,20 @@ public class ProjectService {
               WorkspaceMember member =
                   workspaceMemberRepository
                       .findById(projectMembership.getWorkspaceMemberId())
-                      .orElseThrow(() -> new RuntimeException("Member not found"));
+                      .orElseThrow(
+                          () ->
+                              new ResourceNotFoundException(
+                                  "Workspace member not found with id: "
+                                      + projectMembership.getWorkspaceMemberId()));
 
               // gets the user details
               User user =
                   userRepository
                       .findById(member.getUserId())
-                      .orElseThrow(() -> new RuntimeException("User not found"));
+                      .orElseThrow(
+                          () ->
+                              new ResourceNotFoundException(
+                                  "User not found with id: " + member.getUserId()));
 
               // calculate the hours logged for the project
               BigDecimal hoursLogged =
