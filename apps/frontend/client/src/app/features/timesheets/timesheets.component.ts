@@ -8,15 +8,11 @@
  * Patched: Zamokuhle Zwane, 03/08/2026
  * i fixed errors with the total duration and daily totals, they were showing up as 0hr 0m even when there were entries
  * I fixed the logic to calculate the totals correctly
- * Patched: Lerato Sibanda, 12/08.2026 - manager review Timesheets tab + modal
+ * Patched: Lerato Sibanda, 18/08/2026 - manager review Timesheets tab + modal
  */
 
 import { Component, computed, inject, signal } from '@angular/core';
 import {
-//   TimeEntryService,
-//   TimeEntryResponse,
-// } from '../../core/services/time-entry.service';
-// import {
   TimesheetService,
   TimesheetResponse,
 } from '../../core/services/timesheet.service';
@@ -111,8 +107,16 @@ const TASK_STYLE_PALETTE: { iconClass: string; colorCode: string }[] = [
   { iconClass: 'fa-solid fa-gear', colorCode: '#6BA5E7' },
 ];
 
+const AVATAR_COLORS = [
+  '#0F4C91',
+  '#2A9D8F',
+  '#E07830',
+  '#7C8CF8',
+  '#C45C8A',
+];
+
 //tiny string hash, good enough for picking a stable palette index
-function hashTaskId(id: string): number {
+function hashId(id: string): number {
   let hash = 0;
   for (let i = 0; i < id.length; i++) {
     hash = (hash << 5) - hash + id.codePointAt(i)!;
@@ -266,7 +270,7 @@ export class TimesheetsComponent {
     return s.isLocked || s.status === 'SUBMITTED' || s.status === 'APPROVED';
   });
 
-  readonly rejectedReasonCount = computed(() => this.rejectReason().length);
+  readonly rejectReasonCount = computed(() => this.rejectReason().length);
 
   constructor() {
     this.loadTimesheets();
@@ -452,7 +456,7 @@ export class TimesheetsComponent {
     return {
       name,
       role: member.role,
-      initials: this.initalsFrom(name),
+      initials: this.initialsFrom(name),
       avatarColor: AVATAR_COLORS[hashId(member.workspaceMemberId) % AVATAR_COLORS.length],
     };
   }
@@ -582,6 +586,9 @@ export class TimesheetsComponent {
             loggedHours: secondsPerDay.map((s) =>
               s > 0 ? this.formatDuration(s) : '-',
             ),
+             loggedHoursShort: secondsPerDay.map((s) =>
+              s > 0 ? this.formatHoursShort(s) : '-',
+            ),
             total: this.formatDuration(totalSeconds),
             totalShort: this.formatHoursShort(totalSeconds),
           };
@@ -591,15 +598,15 @@ export class TimesheetsComponent {
         const task = tasksById.get(groupKey);
         return {
           id: groupKey,
-          title: task?.title ?? 'Unkown task',
-          project: projectById.get(task?.projectId ?? '') ?? 'Unknown Project',
+          title: task?.title ?? 'Unknown task',
+          project: projectById.get(task?.projectId ?? '') ?? 'Unknown project',
           iconClass: style.iconClass,
           colorCode: style.colorCode,
           loggedHours: secondsPerDay.map((s) =>
           s > 0 ? this.formatDuration(s) : '-',
         ),
         loggedHoursShort: secondsPerDay.map((s) =>
-        s > 0 ? this.formatHoursShorts(s) : '-',
+        s > 0 ? this.formatHoursShort(s) : '-',
             ),
             total: this.formatDuration(totalSeconds),
             totalShort: this.formatHoursShort(totalSeconds),
@@ -613,6 +620,7 @@ export class TimesheetsComponent {
       tasks,
       dailyTotals: dayTotals.map((s) => (s > 0 ? this.formatDuration(s) : '-')),
       dailyTotalsShort: dayTotals.map((s) =>
+      
        s > 0 ? this.formatHoursShort(s) : '-',
       ),
       grandTotal: this.formatDuration(grand),
@@ -695,7 +703,7 @@ export class TimesheetsComponent {
     return withUnit ? `${hours}h` : hours;
    }
 
-   private initialsForm(name: string): string {
+   private initialsFrom(name: string): string {
     const parts = name.trim().split(/\s+/).filter(Boolean);
     if (parts.length === 0) return '??';
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
@@ -731,7 +739,7 @@ export class TimesheetsComponent {
   formatDateTime(value: string | null): string {
 
     if (!value) return '-';
-    return new Date(value).toLocaleString('en-ZA', {
+    return new Date(value).toLocaleDateString('en-ZA', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -743,7 +751,7 @@ export class TimesheetsComponent {
 
   formatDate(value: string | null): string {
       if (!value) return '-';
-    return new Date(value).toLocaleString('en-ZA', {
+    return new Date(value).toLocaleDateString('en-ZA', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -836,25 +844,13 @@ closeReviewModal(): void {
     });
   }
 
-  openRejectDialog(): void {
-    if (!this.canApproveOrReject()) {
-      return;
-    }
-    this.rejectReason.set('');
-    this.showRejectReason.set(true);
-    this.showRejectDialog.set(true);
-  }
-
-  closeRejectDialog(): void {
-    this.showRejectDialog.set(false);
-    this.rejectReason.set('');
-  }
-
-  // INTEGRATION POST /api/timesheets/{id} reject with body {reason}
-
-  enableRejectReason(): void {
+    enableRejectReason(): void {
     if (!this.canApproveOrReject()) return;
     this.showRejectReason.set(true);
+  }
+
+  openRejectDialog(): void {
+    this.enableRejectReason();
   }
 
   onConfirmReject(): void {
@@ -864,7 +860,7 @@ closeReviewModal(): void {
       return;
     }
     this.actionPending.set(true);
-    // INTEGRATIOON: this.timesheetService.reject(s.id, reasons).subscribe({...})
+
     this.timesheetService.rejectTimesheet(target.summary.id, reason).subscribe({
       next: (updated) => {
         this.patchReviewRow(target.summary.id, updated);
