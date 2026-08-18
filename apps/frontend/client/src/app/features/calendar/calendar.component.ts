@@ -55,5 +55,10 @@ export class CalendarComponent {
     });
   }
 
+  changeView(view: CalendarView): void{
+    this.activeView= view;
+    this.calendarComponent.getApi().changeView(view);
+  }
+
   
 }
