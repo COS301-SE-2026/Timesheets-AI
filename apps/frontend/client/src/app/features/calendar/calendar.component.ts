@@ -1,12 +1,11 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, inject, viewChild, signal, OnInit} from '@angular/core';
+import { Component, inject, signal, OnInit, ViewChild} from '@angular/core';
 import { FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular';
-import { CalenderOptions, EventClickArg } from '@fullcalendar/core';
-import { dayGridPlugin} from '@fullcalendar/daygrid';
-import { timeGridPlugin} from '@fullcalendar/timegrid';
+import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
+import  dayGridPlugin from '@fullcalendar/angular/daygrid';
+import timeGridPlugin from '@fullcalendar/angular/timegrid';
 import { CalendarProvider, AppEvent } from './calendar.model';
 import { CalendarService } from './calendar.services';
-import { error } from 'node:console';
 export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 @Component({
   selector: 'app-calendar',
@@ -26,7 +25,7 @@ export class CalendarComponent implements OnInit {
   isSyncing= signal<boolean>(false);
   selectedEvent= signal<AppEvent | null>(null);
 
-  calendarOptions: CalenderOptions={
+  calendarOptions: CalendarOptions={
     plugins:[
       dayGridPlugin,
       timeGridPlugin
@@ -46,7 +45,7 @@ export class CalendarComponent implements OnInit {
   }
 
   loadEvents(): void{
-    this.calendarService.getEvents(this.provider, '', '').subscribe(events=>
+    this.calendarService.getEvents(this.provider(), '', '').subscribe(events=>
     {
       const api= this.calendarComponent?.getApi();
       if(api){
@@ -59,7 +58,7 @@ export class CalendarComponent implements OnInit {
   }
 
   changeView(view: CalendarView): void{
-    this.activeView= view;
+    this.activeView.set(view);
     this.calendarComponent.getApi().changeView(view);
   }
 
