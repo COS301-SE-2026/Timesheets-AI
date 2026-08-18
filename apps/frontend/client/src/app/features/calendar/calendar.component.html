@@ -31,4 +31,32 @@ Related Requirements: N/A
             {{ isSyncing()? 'Syncing...': 'Sync now' }}
         </button>
     </header>
+
+    <!-- CALENDAER NAVIGATION TOOLS  -->
+    <section class="calendar-card">
+        <div class="calendar-toolbar">
+            <div class="date-navigation">
+                <button
+                    class="today-button"
+                    (click)="navigate('today')">
+                    Today
+                </button>
+
+                <button
+                    class="icon-button"
+                    (click)="navigate('prev')">
+                    <i class="fa-solid fa-chevron-left">
+
+                    </i>
+                </button>
+                <button
+                    class="icon-button"
+                    (click)="navigate('next')">
+                    <i class="fa-solid fa-chevron-right">
+                        
+                    </i>
+                </button>
+            </div>
+        </div>
+    </section>
 </div>
