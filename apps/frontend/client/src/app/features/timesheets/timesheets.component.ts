@@ -892,7 +892,26 @@ closeReviewModal(): void {
     }, 4000);
   }
 
-  // Local mock mutation - remove when API responses update state
+  private patchReviewRow(id: string, updated: TimesheetResponse) : void {
+    this.reviewRows.update((list) => 
+    list.map((row) => {
+      if (row.summary.id !== id) return row;
+      return {
+        ...row,
+        summary: {
+          ...row.summary,
+          status: updated.status,
+          isLocked: updated.isLocked,
+          submittedAt: updated.submittedAt,
+          approvedAt: updated.approvedAt,
+          rejectedAt: updated.rejectedAt,
+          rejectionReason: updated.rejectionReason,
+          updatedAt: updated.updatedAt
+        },
+      };
+    }),
+  );
+  }
 
   private patchLocalStatus(
     id: string,
