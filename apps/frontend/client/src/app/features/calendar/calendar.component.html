@@ -57,6 +57,29 @@ Related Requirements: N/A
                     </i>
                 </button>
             </div>
+
+            <!-- TAB SWITCH AREA -->
+            <div class="view-switcher">
+                <button
+                    [class.active]="activeView()=== 'dayGridMonth"
+                    (click)="changeView('dayGridMonth')">
+                    Month
+                </button>
+
+                <button
+                    [class.active]="activeView()=== 'timeGridWeek"
+                    (click)="changeView('timeGridWeek')">
+                    Week
+                </button>
+
+                <button
+                    [class.active]="activeView()=== 'timeGridDay"
+                    (click)="changeView('timeGridDay')">
+                    Day
+                </button>
+            </div>
         </div>
+
+        
     </section>
 </div>
