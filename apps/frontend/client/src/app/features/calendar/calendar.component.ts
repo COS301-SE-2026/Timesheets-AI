@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, viewChild } from '@angular/core';
 import { FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular';
 import { CalenderOptions } from '@fullcalendar/core';
 import { dayGridPlugin} from '@fullcalendar/daygrid';
 import { timeGridPlugin} from '@fullcalendar/timegrid';
+import { CalendarProvider } from './calendar.model';
+import { CalendarService } from './calendar.services';
+import { plugins } from 'chart.js';
 
 @Component({
   selector: 'app-calendar',
@@ -14,5 +17,28 @@ import { timeGridPlugin} from '@fullcalendar/timegrid';
 })
 
 export class CalendarComponent {
+  @viewChild('calendar')calendarComponent!: FullCalendarComponent;
 
+  private calendarService= inject(CalendarService);
+
+  activeView: CalendarView= 'dayGridMonth';
+  provider: CalendarProvider= 'outlook';
+
+  calendarOptions: CalenderOptions={
+    plugins:[
+      dayGridPlugin,
+      timeGridPlugin
+    ],
+
+    initialView: 'dayGridMonth',
+    headerToolbar: false,
+    height: 'auto',
+    editable: false,
+    selectable: false,
+    events: []
+  };
+
+  ngOnInit(): void{
+    
+  }
 }
