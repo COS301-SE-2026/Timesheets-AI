@@ -60,5 +60,13 @@ export class CalendarComponent {
     this.calendarComponent.getApi().changeView(view);
   }
 
+  navigate(direction: 'prev' | 'next' | 'today'):void{
+    const calander= this.calendarComponent.getApi();
+
+    if(direction=== 'prev') calander.prev();
+    if(direction=== 'next') calander.next();
+    if(direction=== 'today') calander.today();
+  }
+
   
 }
