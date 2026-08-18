@@ -19,6 +19,16 @@ Related Requirements: N/A
             </p>
         </div>
 
-        
+        <!-- SYNCING AREA -->
+        <button 
+            class="sync-button"
+            (click)="syncCalendar"
+            [disabled]="isSyncing()">
+            <i 
+                class="fa-solid fa-rotate"
+                [class.fa-spin]="isSyncing()">
+            </i>
+            {{ isSyncing()? 'Syncing...': 'Sync now' }}
+        </button>
     </header>
 </div>
