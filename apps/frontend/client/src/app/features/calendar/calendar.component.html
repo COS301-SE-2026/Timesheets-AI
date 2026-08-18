@@ -88,6 +88,22 @@ Related Requirements: N/A
             </full-calendar>
         </div>
 
-        
+        <!-- THE READ ONLY CARD AREA -->
+        <div class="read-only-banner">
+            <i class="fa-solid fa-lock"></i>
+
+            <div>
+                <strong>
+                    This is a read-only calendar
+                </strong>
+                <p>
+                    Events are imported from
+                    {{ provider( === 'outlook'? 'Outlook': 'Google Calendar')}}.
+                    To make changes, use your calendar provider.
+                </p>
+            </div>
+        </div>
     </section>
+
+    
 </div>
