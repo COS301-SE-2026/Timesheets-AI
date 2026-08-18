@@ -111,11 +111,9 @@ public class TaskService {
   public TaskResponse createTask(CreateTaskRequest request, UUID workspaceMemberId) {
     UUID projectId = request.getProjectId();
 
-    // to verify that the user has access to create tasks on the project
-    if (!isProjectManager(projectId, workspaceMemberId)
-        && !securityUtils.isAdmin()
-        && !securityUtils.isManager()) {
-      throw new RuntimeException("You don't have permission to create tasks on this project");
+    // to verify that the user has access to that project
+    if (!userHasAccessToProject(projectId, workspaceMemberId)) {
+      throw new RuntimeException("You don't have access to this project");
     }
 
     // to verify that the project exists and is not archived
@@ -126,6 +124,19 @@ public class TaskService {
 
     if ("ARCHIVED".equals(project.getStatus())) {
       throw new RuntimeException("Cannot create tasks on an archived project");
+    }
+
+    // checking if the user can assign tasks to others
+    boolean isTaskAssigner =
+        isProjectManager(projectId, workspaceMemberId)
+            || securityUtils.isAdmin()
+            || securityUtils.isManager();
+
+    // developers should not be able to create tasks and assign them to others
+    if (!isTaskAssigner
+        && request.getAssignedWorkspaceMemberId() != null
+        && !request.getAssignedWorkspaceMemberId().equals(workspaceMemberId)) {
+      throw new RuntimeException("Developers can only create tasks assigned to themselves");
     }
 
     // this checks if there is a valid parent task and if that parent task is part of the same
@@ -149,7 +160,13 @@ public class TaskService {
     task.setJiraTicketKey(request.getJiraTicketKey());
     task.setParentTaskId(request.getParentTaskId());
     task.setEstimatedHours(request.getEstimatedHours());
-    task.setAssignedWorkspaceMemberId(request.getAssignedWorkspaceMemberId());
+
+    if (request.getAssignedWorkspaceMemberId() != null) {
+      task.setAssignedWorkspaceMemberId(request.getAssignedWorkspaceMemberId());
+    } else {
+      task.setAssignedWorkspaceMemberId(workspaceMemberId);
+    }
+
     task.setDueDate(request.getDueDate());
     task.setPriority(request.getPriority() != null ? request.getPriority() : "MEDIUM");
     task.setStatus(request.getStatus() != null ? request.getStatus() : "TODO");
