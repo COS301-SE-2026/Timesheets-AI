@@ -20,39 +20,28 @@
         <h1 class="page-header-title">Timesheets</h1>
         <p class="page-header-subtitles">View and manage your timesheets.</p>
       </div>
+    
+  
+  
+  <div class="page-header-actions">
+    <label class="week-picker" for="week-picker">
+      <span class="week-picker-name">Week</span>
+      <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+      <select id="week-picker" class="week-picker-select"
+      [ngModel]="selectedTimesheetId()"
+      (ngModelChange)="onWeekChange($event)"
+      [disabled]="uiState() === 'loading' || filteredTimesheets().length === 0">
+      @fir (week of filteredTimesheets(); track week.summary.id) {
+        <option [value]="week.summary.id">
+          Week {{ week.summary.weekNumber }} · {{ week.summary.periodLabel }}
+        </option>
+      }  
+    </select>
+    <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
+    </label>
+  </div>
     </header>
-  }
 
-    <div class="page-header-actions" >
-
-      <!-- INTEGRATION: Oprions come from GET /api/timesheets/me (or status filter), changing selection should load GET /api/timesheets/{id} + /entries -->
-
-      <!-- Week picker -->
-       <label class="week-picker" for="week-picker">
-        <span class="week-picker-name">Week</span>
-        <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
-        <select 
-          id="week-picker"
-          class="week-picker-select"
-          [ngModel]="selectedTimesheetId()"
-          (ngModelChange)="onWeekChange($event)"
-          [disabled]="uiState() === 'loading' || filteredTimesheets().length === 0">
-          @for (week of filteredTimesheets(); track week.summary.id) {
-            <option [value]="week.summary.id">
-              Week {{ week.summary.weekNumber }} . {{ week.summary.periodLabel }}
-            </option>
-          }
-        </select>
-        <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
-
-       </label>
-
-    </div>
-  </header>
-
-  <!-- Status filters : Integrate GET /api/timesheets/me/status/{status}
-   UI focuses on weekly detail status chips
-    -->
 
     <div class="status-filters" role="tablist" aria-label="Filter timesheets by status">
       @for (filter of statusFilters; track filter) {
