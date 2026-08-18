@@ -1914,6 +1914,30 @@
   dependencies:
     "@fortawesome/fontawesome-common-types" "7.3.1"
 
+"@fullcalendar/angular@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@fullcalendar/angular/-/angular-7.0.2.tgz#ea9a844a80bbdd05c56c0cad4a4bdd2ee7a30d05"
+  integrity sha512-OUjUbJCtdJbwSvDOzK+YD+n+nFMh9RPfg5ggcAMyiMkc0wywS+E5rBeEG5OiqFTi7GGyj7W0SnkhNyl4E5SbGw==
+  dependencies:
+    tslib "^2.3.0"
+
+"@fullcalendar/core@^7.0.2":
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/@fullcalendar/core/-/core-7.0.2.tgz#4f848a88af197ac2625af4e97aab385466c1fc56"
+  integrity sha512-EkhE1wkPttp5kKNmUNLsMwl8nUuQmLdj30SPKagOEWMJUE4AHETAu/F/SbYoRq+nksm2GWPe9cQs1kbQP2H9pA==
+
+"@fullcalendar/daygrid@^6.1.21", "@fullcalendar/daygrid@~6.1.21":
+  version "6.1.21"
+  resolved "https://registry.yarnpkg.com/@fullcalendar/daygrid/-/daygrid-6.1.21.tgz#70eef7af5951b35a5f0380b15e32e5389ae029bc"
+  integrity sha512-QYb1y40RGYLlOxKpYWg8O+7njEnKnFG8Tt7qjnubJGR35s1phQg67E+81y2TyAbbm59p2JFOCXGDk9t6KDujIA==
+
+"@fullcalendar/timegrid@^6.1.21":
+  version "6.1.21"
+  resolved "https://registry.yarnpkg.com/@fullcalendar/timegrid/-/timegrid-6.1.21.tgz#62e8462f2c5f9bf1c8c4f4e1d9880f09cd8b4524"
+  integrity sha512-2DnShx/jallGmb8QCkr6pAOu/zuPhJrP7+uTrAtSnbqsX7GF3lTxqSeNGkTQwsgF5g/ia8udhQ+JNYaE+TN1cQ==
+  dependencies:
+    "@fullcalendar/daygrid" "~6.1.21"
+
 "@humanfs/core@^0.19.2":
   version "0.19.2"
   resolved "https://registry.yarnpkg.com/@humanfs/core/-/core-0.19.2.tgz#a8272ca03b2acf492670222b2320b6c421bfde60"
