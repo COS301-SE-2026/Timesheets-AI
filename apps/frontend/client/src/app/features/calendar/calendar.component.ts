@@ -68,5 +68,8 @@ export class CalendarComponent {
     if(direction=== 'today') calander.today();
   }
 
-  
+  changeProvider(provider: CalendarProvider): void{
+    this.provider= provider;
+    this.loadEvents();
+  }
 }
