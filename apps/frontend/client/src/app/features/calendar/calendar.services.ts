@@ -5,7 +5,7 @@
 // Related Requirements: N/A
 
 import { Injectable, inject } from "@angular/core";
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { of, Observable } from "rxjs";
 import { delay } from "rxjs/operators";
 import{
@@ -28,6 +28,7 @@ export class CalendarService{
             title: 'Daily StandUp (Outlook)',
             start: '2026-08-18T09:00:00',
             end: '2026-08-18T09:30:00',
+            provider: 'outlook',
             category: 'purple'
         },
         {
@@ -35,13 +36,16 @@ export class CalendarService{
             title: 'Sprint Planning',
             start: '2026-08-18T11:00:00',
             end: '2026-08-18T12:30:00',
-            category: 'blue'
+            provider: 'outlook',
+            category: 'blue',
+            location: 'Boardroom A'
         },
         {
             id: '3',
             title: 'Architecture Discussion',
             start: '2026-08-18T14:00:00',
             end: '2026-08-18T15:00:00',
+            provider: 'outlook',
             category: 'green'
         },
     ];
@@ -52,15 +56,25 @@ export class CalendarService{
             title: 'Client Meeting (Google Meet)',
             start: '2026-08-18T10:00:00',
             end: '2026-08-18T11:00:00',
-            category: 'orange'
+            category: 'orange',
+            provider: 'google'
         },
         {
             id: '102',
             title: 'UX Design Discussion',
             start: '2026-08-18T13:00:00',
             end: '2026-08-18T14:00:00',
-            category: 'purple'
+            provider: 'google' 
         },
 
     ];
+
+    getEvents(
+        provider: CalendarProvider,
+        start: string,
+        end: string
+    ): Observable<AppEvent[]>{
+        const selectedEvents= provider === 'outlook'? this.mockOutlookEvents: this.mockGoogleEvents;
+        return of( selectedEvents).pipe(delay(200));
+    }
 }
