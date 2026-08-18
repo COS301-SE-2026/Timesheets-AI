@@ -14,6 +14,7 @@ export interface AppEvent {
     description?: string;
     location?: string;
     provider: CalendarProvider;
+    category?: 'purple' | 'blue' | 'green' | 'orange' | string;
 
     organizer?:{
         name?: string;

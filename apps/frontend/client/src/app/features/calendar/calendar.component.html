@@ -22,7 +22,7 @@ Related Requirements: N/A
         <!-- SYNCING AREA -->
         <button 
             class="sync-button"
-            (click)="syncCalendar"
+            (click)="syncCalendar()"
             [disabled]="isSyncing()">
             <i 
                 class="fa-solid fa-rotate"
@@ -61,19 +61,19 @@ Related Requirements: N/A
             <!-- TAB SWITCH AREA -->
             <div class="view-switcher">
                 <button
-                    [class.active]="activeView()=== 'dayGridMonth"
+                    [class.active]="activeView()=== 'dayGridMonth'"
                     (click)="changeView('dayGridMonth')">
                     Month
                 </button>
 
                 <button
-                    [class.active]="activeView()=== 'timeGridWeek"
+                    [class.active]="activeView()=== 'timeGridWeek'"
                     (click)="changeView('timeGridWeek')">
                     Week
                 </button>
 
                 <button
-                    [class.active]="activeView()=== 'timeGridDay"
+                    [class.active]="activeView()=== 'timeGridDay'"
                     (click)="changeView('timeGridDay')">
                     Day
                 </button>
@@ -98,7 +98,7 @@ Related Requirements: N/A
                 </strong>
                 <p>
                     Events are imported from
-                    {{ provider( === 'outlook'? 'Outlook': 'Google Calendar')}}.
+                    {{ provider() === 'outlook'? 'Outlook': 'Google Calendar'}}.
                     To make changes, use your calendar provider.
                 </p>
             </div>

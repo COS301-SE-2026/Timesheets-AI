@@ -1,7 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, signal, OnInit, ViewChild} from '@angular/core';
-import { FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular';
-import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
+import { EventClickInfo, FullCalendarComponent, FullCalendarModule, CalendarOptions} from '@fullcalendar/angular';
 import  dayGridPlugin from '@fullcalendar/angular/daygrid';
 import timeGridPlugin from '@fullcalendar/angular/timegrid';
 import { CalendarProvider, AppEvent } from './calendar.model';
@@ -37,7 +36,7 @@ export class CalendarComponent implements OnInit {
     editable: false,
     selectable: false,
     events: [],
-    eventClick: (info: EventClickArg)=> this.handleEventClick(info)
+    eventClick: (info: EventClickInfo)=> this.handleEventClick(info)
   };
 
   ngOnInit(): void{
@@ -86,7 +85,7 @@ export class CalendarComponent implements OnInit {
     });
   }
 
-  handleEventClick(info: EventClickArg): void{
+  handleEventClick(info: EventClickInfo): void{
     const rawProps= info.event.extendedProps;
 
     this.selectedEvent.set({
