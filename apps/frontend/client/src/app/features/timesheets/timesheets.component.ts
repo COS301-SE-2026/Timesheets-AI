@@ -695,7 +695,7 @@ export class TimesheetsComponent {
     return withUnit ? `${hours}h` : hours;
    }
 
-   private initialsForm(name: stirng): string {
+   private initialsForm(name: string): string {
     const parts = name.trim().split(/\s+/).filter(Boolean);
     if (parts.length === 0) return '??';
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
@@ -717,7 +717,11 @@ export class TimesheetsComponent {
     this.loadEntriesForWeek(timesheetId);
   }
 
-  statusLabel(status: StatusFilter | TimesheetStatus): string {
+  onReviewWeekChange(weekKey: string) : void {
+    this.reviewWeekKey.set(weekKey);
+  }
+
+  statusLabel(status: StatusFilter | TimesheetStatus | ReviewStatusFilter): string {
     if (status === 'ALL') {
       return 'ALL';
     }
@@ -725,11 +729,9 @@ export class TimesheetsComponent {
   }
 
   formatDateTime(value: string | null): string {
-    if (!value) {
-      return '-';
-    }
-    const date = new Date(value);
-    return date.toLocaleString('en-ZA', {
+
+    if (!value) return '-';
+    return new Date(value).toLocaleString('en-ZA', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -740,11 +742,8 @@ export class TimesheetsComponent {
   }
 
   formatDate(value: string | null): string {
-    if (!value) {
-      return '-';
-    }
-    const date = new Date(value);
-    return date.toLocaleDateString('en-ZA', {
+      if (!value) return '-';
+    return new Date(value).toLocaleString('en-ZA', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -754,14 +753,6 @@ export class TimesheetsComponent {
   displayHours(value: string | null): string {
     return value ?? '-';
   }
-
-  // INTEGRATION: Navigate to task/entry detail or open a side panel listiing entries for this task withing the selected timesheet period.
-
-  onViewTask(task: TaskRow): void {
-    this.showToast(`View entries for "${task.title}" (wire up navigation).`);
-  }
-
-  // INTEGRATION: Conftim, then POST /api/timesheets/{id}/submit
 
   openSubmitDialog(): void {
     if (!this.canSubmit() || this.actionPending()) {
@@ -786,14 +777,12 @@ export class TimesheetsComponent {
     }
     this.actionPending.set(true);
 
-    // INTEGRATION replace this mock update with: this.timesheetsService.submit(s.id).subscribe({...})
-
-    this.actionPending.set(true);
     this.timesheetService.submitTimesheet(s.id).subscribe({
       next: (updated) => {
         this.patchLocalStatus(s.id, updated.status, {
           submittedAt: updated.submittedAt,
           isLocked: updated.isLocked,
+          rejectionReason: null,
         });
 
         this.actionPending.set(false);
@@ -811,7 +800,20 @@ export class TimesheetsComponent {
     this.showSubmitSuccessDialog.set(false);
   }
 
-  // INTEGRATION: Confirm then POST /api/timesheets/{id}/approve
+openReviewModal(row: ReviewRow) : void {
+  this.reviewTarget.set(row);
+  this.rejectReason.set('');
+  this.showRejectReason.set(false);
+  this.showReviewModal.set(true);
+}
+
+closeReviewModal(): void {
+  if (this.actionPending()) return;
+  this.showReviewModal.set(false);
+  this.reviewTarget.set(null);
+  this.rejectReason.set('');
+  this.showRejectReason.set(false);
+}
 
   onApproveTimesheet(): void {
     const s = this.summary();
