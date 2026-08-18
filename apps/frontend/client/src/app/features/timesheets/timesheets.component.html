@@ -1,11 +1,27 @@
 <div class="timesheets-page">
 
   <!-- Page header -->
-   <header class="page-header">
-    <div class="page-header-titles">
-      <h1 class="page-header-title"> Timesheets </h1>
-      <p class="page-header-subtitles"> View and manage your timesheets.</p>
+  @if (isManager()) {
+    <div class="status-filters page-tabs" role="tablist" aria-label="Timesheet views">
+      <button type="button" role="tab" class="status-filters-chip"
+      [class.is-active]="pageTab() === 'mine'"
+      [attr.aria-selected]="pageTab() === 'mine'"
+      (click)="setPageTab('mine')"> Timesheets</button>
+      <button type="button" role="tab" class="status-filters-chip"
+      [class.is-active]="pageTab() === 'review'"
+      [attr.aria-selected]="pageTab() === 'review'"
+      (click)="setPageTab('review')"> Review Timesheets</button>
     </div>
+  }
+
+  @if (pageTab() === 'mine' || !isManager()) {
+    <header class="page-header">
+      <div class="page-header-titles">
+        <h1 class="page-header-title">Timesheets</h1>
+        <p class="page-header-subtitles">View and manage your timesheets.</p>
+      </div>
+    </header>
+  }
 
     <div class="page-header-actions" >
 
