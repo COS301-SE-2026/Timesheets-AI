@@ -816,24 +816,18 @@ closeReviewModal(): void {
 }
 
   onApproveTimesheet(): void {
-    const s = this.summary();
-    if (!s || !this.canApproveOrReject()) {
-      return;
-    }
-    const confirmed = window.confirm('Approve this timesheet?');
-    if (!confirmed) {
-      return;
-    }
+    
+    const target = this.reviewTarget();
+    if (!target || !this.canApproveOrReject() || this.actionPending()) return;
+
     this.actionPending.set(true);
-    // INTEGRATION: this.timesheetService.approve(s.id).subscribe({...})
-    this.timesheetService.approveTimesheet(s.id).subscribe({
+
+    this.timesheetService.approveTimesheet(target.summary.id).subscribe({
       next: (updated) => {
-        this.patchLocalStatus(s.id, updated.status, {
-          approvedAt: updated.approvedAt,
-          isLocked: updated.isLocked,
-        });
+        this.patchReviewRow(target.summary.id, updated);
         this.actionPending.set(false);
-        this.showToast('Timesheet Approved');
+        this.closeReviewModal();
+        this.showToast('Timesheet approved');
       },
       error: () => {
         this.actionPending.set(false);
@@ -847,6 +841,7 @@ closeReviewModal(): void {
       return;
     }
     this.rejectReason.set('');
+    this.showRejectReason.set(true);
     this.showRejectDialog.set(true);
   }
 
@@ -857,23 +852,24 @@ closeReviewModal(): void {
 
   // INTEGRATION POST /api/timesheets/{id} reject with body {reason}
 
+  enableRejectReason(): void {
+    if (!this.canApproveOrReject()) return;
+    this.showRejectReason.set(true);
+  }
+
   onConfirmReject(): void {
-    const s = this.summary();
+    const target = this.reviewTarget();
     const reason = this.rejectReason().trim();
-    if (!s || !reason) {
+    if (!target || !reason || this.actionPending()) {
       return;
     }
     this.actionPending.set(true);
     // INTEGRATIOON: this.timesheetService.reject(s.id, reasons).subscribe({...})
-    this.timesheetService.rejectTimesheet(s.id, reason).subscribe({
+    this.timesheetService.rejectTimesheet(target.summary.id, reason).subscribe({
       next: (updated) => {
-        this.patchLocalStatus(s.id, updated.status, {
-          rejectedAt: updated.rejectedAt,
-          rejectionReason: updated.rejectionReason,
-          isLocked: updated.isLocked,
-        });
+        this.patchReviewRow(target.summary.id, updated);
         this.actionPending.set(false);
-        this.closeRejectDialog();
+        this.closeReviewModal();
         this.showToast('Timesheet Rejected.');
       },
       error: () => {
