@@ -102,6 +102,11 @@
   margin-top: 2px;
 }
 
+.status-badge[data-status='SUBMITTED'] {
+  background: tokens.$color-status-pending-bg;
+  color: tokens.$color-status-pending-text;
+}
+
 .status-badge[data-status='APPROVED'] {
   background: tokens.$color-status-approved-bg;
   color: tokens.$color-status-approved-text;
