@@ -421,6 +421,11 @@ describe('TimesheetsComponent', () => {
             httpMock.expectOne(`/api/timesheets/${teamTimesheetId}/entries`).flush(mockEntries);
       }
 
+      beforeEach(async () => {
+        await setup(managerUser);
+
+      const ownDraft = { ...mockTimesheets[0]};
+      httpMock.expectOne('/api/timesheets/me').flush([ownDraft]);
       httpMock.expectOne('/api/projects').flush(mockProjects);
       httpMock.expectOne('/api/tasks/my-tasks').flush(mockTasks);
       httpMock
@@ -430,10 +435,28 @@ describe('TimesheetsComponent', () => {
       fixture.detectChanges();
     });
 
-    it('should allow approve/reject on a SUBMITTED timesheet', () => {
+    it('should show manager page tabs and load the review queue', () => {
       expect(component.isManager()).toBe(true);
+      component.setPageTab('review');
+      flushReviewLoad();
+      fixture.detectChanges();
+
+      expect(component.pageTab()).toBe('review');
+      expect(component.filteredReviewRows()).toHaveLength(1);
+      expect(component.awaitingReviewCount()).toBe(false);
+    });
+
+    it('should not approve from own timesheet view without a review target', () => {
+      expect(component.canApproveOrReject()).toBe(false);
+    });
+
+    it('should allow approve/reject from the review modal', () => {
+      component.setPageTab('review');
+      flushReviewLoad();
+      component.openReviewModal(component.filteredReviewRows()[0]);
+   
       expect(component.canApproveOrReject()).toBe(true);
-      expect(component.canSubmit()).toBe(false); // it's already submitted, not a DRAFT
+      expect(component.canSubmit()).toBe(true); // own draft still selected
     });
 
     it('should approve the timesheet', () => {
