@@ -21,8 +21,6 @@
         <p class="page-header-subtitles">View and manage your timesheets.</p>
       </div>
     
-  
-  
   <div class="page-header-actions">
     <label class="week-picker" for="week-picker">
       <span class="week-picker-name">Week</span>
@@ -140,10 +138,12 @@
           </div>
 
           
-          <div class="summary-card-reason">
-            <strong> Reason (if applicable) </strong>
-            <span> {{ s.rejectionReason || '-' }} </span>
-          </div>
+          @if (s.status === 'REJECTED' || s.rejectionReason) {
+            <div class="summary-card-reason">
+              <strong>Rejection reason</strong>
+              <span>{{ s.rejectionReason || '-' }}</span>
+            </div>
+          }
          </article>
       }
 
@@ -221,22 +221,15 @@
              Submit Timesheet</button>
         }
 
-        @if (summary()?.status === 'SUBMITTED' && !isManager()) {
+        @if (summary()?.status === 'SUBMITTED') {
             <p class="awaiting-review">
               <i class="fa-regular fa-clock" aria-hidden="true"></i>
               Awaiting review
-            </p>          
-        }
-
-        @if (canApproveOrReject()) {
-          <!-- INTEGRATION: POST /api/timesheets/{id}/approvr or reject -->
-           <button type="button" class="btn btn--primary" [disabled]="actionPending()" (click)="onApproveTimesheet()"> Approve</button>
-           <button type="button" class="btn btn--danger" [disabled]="actionPending()" (click)="openRejectDialog()"> Reject</button>
-        }
-
-        @if (isReadOnly() && summary()?.status === 'APPROVED') {
-          <p class="read-only-note"> This timesheet is approved and locked </p>
-        }
+           </p>
+          }
+          @if (isReadOnly() && summary()?.status === 'APPROVED'){
+            <p class="read-only-note"> This timesheet is approved and locked</p>
+          }
         </div>
       } @else {
         <!-- Timesheets exist but not entries yet -->
@@ -253,8 +246,29 @@
     }
 
     <!-- Submit confirmation modal -->
-    @if (showSubmitDialog()){
-    <button type="button" aria-label="Close dialog" (click)="closeSubmitDialog()" ></button>
+    @if (pageTab() === 'review' && isManager()){
+      <header class="page-header">
+        <div class="page-header-titles">
+          <h1 class="page-header-title">Timesheet Approvals</h1>
+          <p class="page-header-subtitles">Timesheets submitted by members of the project you manage.</p>
+        </div>
+        <div class="page-header-actions">
+          <label class="week-picker" for="review-week-picker">
+            <span class="week-picker-name">Week</span>
+            <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+            <select id="review-week-picker" class="week-picker-select"
+            [ngModel]="reviewWeekKey()"
+            [ngModelChange]="onReviewWeekChange($event)"
+            [disabled]="reviewWeekOptions().length === 0">
+          @for (week of reviewWeekOptions(); track week.key) {
+            <option [value]="week.key">{{ week.label }}</option>
+          }  
+          </select>
+          <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
+          </label>
+        </div>
+      </header>
+    }
 
     <dialog class="modal" aria-labelledby="submit-modal-title" open>
       <div class="modal-icon" aria-hidden="true">
