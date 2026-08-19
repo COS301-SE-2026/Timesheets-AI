@@ -48,8 +48,6 @@ Related Requirements: N/A
                 {{ isSyncing()? 'Syncing...': ('Sync' + (provider()=== 'outlook'? 'Outlook': 'Google') +' now') }}
             </button>
         </div>
-
-        
     </header>
 
     <!-- CALENDAER NAVIGATION TOOLS  -->
@@ -62,20 +60,24 @@ Related Requirements: N/A
                     Today
                 </button>
 
-                <button
-                    class="icon-button"
-                    (click)="navigate('prev')">
-                    <i class="fa-solid fa-chevron-left">
+                <div class="nav-arrows">
+                    <button
+                        class="icon-button"
+                        (click)="navigate('prev')"
+                        aria-label="Previous">
+                        <i class="fa-solid fa-chevron-left">
 
-                    </i>
-                </button>
-                <button
-                    class="icon-button"
-                    (click)="navigate('next')">
-                    <i class="fa-solid fa-chevron-right">
-                        
-                    </i>
-                </button>
+                        </i>
+                    </button>
+                    <button
+                        class="icon-button"
+                        (click)="navigate('next')"
+                        aria-label="Next">
+                        <i class="fa-solid fa-chevron-right">
+                            
+                        </i>
+                    </button>
+                </div>
             </div>
 
             <!-- TAB SWITCH AREA -->
@@ -108,21 +110,38 @@ Related Requirements: N/A
             </full-calendar>
         </div>
 
-        <!-- THE READ ONLY CARD AREA -->
-        <div class="read-only-banner">
-            <i class="fa-solid fa-lock"></i>
+        <!-- THE READ ONLY CARD AREA + LEGEND OF THE COLOURS SYMBOLISM -->
+        <div class="calendar-legend">
+            <div class="legend-items">
+                <span class="legend-item">
+                    <span class="legend-dot blue"></span>
+                    Meetings
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot green"></span>
+                    Work
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot amber"></span>
+                    Calls
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot red"></span>
+                    Deadlines
+                </span>
+            </div>
 
-            <div>
-                <strong>
+
+            <div class="legend-readonly">
+                <i class="fa-solid fa-lock"></i>
                     This is a read-only calendar
-                </strong>
-                <p>
                     Events are imported from
                     {{ provider() === 'outlook'? 'Outlook': 'Google Calendar'}}.
                     To make changes, use your calendar provider.
-                </p>
+            
             </div>
         </div>
+        
     </section>
 
     <!-- POP UP OF THE CLICKED EVENT  -->
