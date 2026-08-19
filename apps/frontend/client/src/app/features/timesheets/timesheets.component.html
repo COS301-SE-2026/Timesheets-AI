@@ -309,8 +309,50 @@
         <p>Submitted timesheets from your team will appear here.</p>
       </div>
     }@ else {
-      
+      <section class="entry-table-wrapper review-table-wrapper" aria-label="Timesheets awaiting review">
+        <table class="entry-table review-table">
+          <thead>
+            <tr>
+              <th class="col-employee">Employee</th>
+              <th>Period</th>
+              <th>Total hours</th>
+              <th>Submitted on</th>
+              <th>Status</th>
+              <th class="col-action">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of filteredReviewRows(); track row.summary.id) {
+              <tr>
+                <td class="col-employee">
+                  <div class="employee-cell">
+                    <span class="avatar" [style.background-color]="row.avatarColor">{{ row.initials }}</span>
+                    <div class="task-cell-text">
+                      <strong class="task-cell-title">{{ row.employeeName }}</strong>
+                      <span class="task-cell-meta">{{ row.employeeRole }} </span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ row.summary.periodLabe }}</td>
+                <td class="col-total">{{ row.totalHours }}</td>
+                <td>{{ formatDateTime(row.summary.submittedAt) }} </td>
+                <td>
+                  <span class="status-badge" [attr.data-status]="row.summary.status">
+                    {{ row.summary.status }}
+                  </span>
+                </td>
+                <td class="col-action">
+                  <button type="button" class="link-action" (click)="openReviewModal(row)">
+                    View <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
     }
+  }
 
       <h2 id="submit-modal-title"> Submit timesheet</h2>
       <p>This timesheet will be sent for approval and cannot be edited while under review.</p>
