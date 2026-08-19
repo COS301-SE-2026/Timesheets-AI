@@ -317,9 +317,9 @@ describe('TimesheetsComponent', () => {
       expect(component.isManager()).toBe(false);
     });
 
-    it('should not open the reject dialog when the user cannot approve/reject', () => {
+    it('should not open the reject reason when the user cannot approve/reject', () => {
       component.openRejectDialog();
-      expect(component.showRejectDialog()).toBe(false);
+      expect(component.showRejectReason()).toBe(false);
     });
 
     it('should dismiss the toast automatically after 4 seconds', () => {
@@ -347,18 +347,27 @@ describe('TimesheetsComponent', () => {
   });
 
   describe('as a manager', () => {
-    beforeEach(async () => {
-      await setup(managerUser);
+    const teamTimesheetId = 'timesheet-team';
+    const teamMemberId = 'member-dev-1';
 
-      // manager view lands on a SUBMITTED timesheet so approve/reject show up
-      const submittedTimesheet = {
-        ...mockTimesheets[0],
+      const submittedTeamTimesheet = {
+        id: teamTimesheetId,
+        workspaceMemberId: teamMemberId,
+        periodStart: today(),
+        periodEnd: today(),
         status: 'SUBMITTED' as const,
         submittedAt: today(),
+        approvedAt: null,
+        approvedByWorkspaceMemberId: null,
+        rejectedAt: null,
+        rejectReason: null,
         isLocked: true,
-      };
+        lockedAt: today(),
+        createdAt: today(),
+        updatedAt: today(),
+      },
 
-      httpMock.expectOne('/api/timesheets/me').flush([submittedTimesheet]);
+      
       httpMock.expectOne('/api/projects').flush(mockProjects);
       httpMock.expectOne('/api/tasks/my-tasks').flush(mockTasks);
       httpMock
