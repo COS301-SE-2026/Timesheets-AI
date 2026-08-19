@@ -270,10 +270,26 @@
       </header>
     }
 
-    <dialog class="modal" aria-labelledby="submit-modal-title" open>
-      <div class="modal-icon" aria-hidden="true">
-        <i class="fa-regular fa-paper-plane"></i>
+    <article class="awaiting-card" aria-label="Awaiting review">
+      <span class="awaiting-card-icon" aria-hidden="true">
+        <i class="fa-regular fa-clock"></i>
+      </span>
+      <div>
+        <span class="awaiting-card-label">Awaiting review</span>
+        <strong class="awaiting-card-value">{{ awaitingReviewCount() }}</strong>
       </div>
+    </article>
+
+    <div class="status-filters" role="tablist" aria-label="Filter review queue">
+      @for (filter of reviewStatusFilters; track filter) {
+        <button type="button" role="tab" class="status-filters-chip"
+        [class.is-active]="reviewFilter() === filter"
+        [attr.aria-selected]="reviewFilter() === filter"
+        (click)="onReviewFilterChange(filter)">
+      {{ filter === 'ALL' ? 'All' : statusLabel(filter) }}  
+      </button>
+      }
+    </div>
 
       <h2 id="submit-modal-title"> Submit timesheet</h2>
       <p>This timesheet will be sent for approval and cannot be edited while under review.</p>
