@@ -367,7 +367,60 @@ describe('TimesheetsComponent', () => {
         updatedAt: today(),
       },
 
-      
+      function flushReviewLoad(): void {
+        httpMock
+          .expectOne('/api/timesheets?status=SUBMITTED')
+          .flush([submittedTeamTimesheet]);
+        httpMock.expectOne('api/projects').flush([
+          {...mockProjects[0], myRole: 'MANAGER'},
+          {...mockProjects[1], myRole: 'MANAGER'},
+        ]);
+        httpMock.expectOne('api/tasks/my-tasks').flush(mockTasks);
+        httpMock
+          .expectOne(`/api/projects/${projectOneId}`)
+          .flush({
+            id: projectOneId,
+            name: 'Mobile App Development',
+            description: null,
+            status: 'ACTIVE',
+            budgetHours: null,
+            hourlyRate: null,
+            budgetCost: null,
+            totalCost: null,
+            members: [
+              {
+                workspaceMemberId: teamMemberId,
+                fiestName: 'John',
+                lastName: 'Doe',
+                email : 'john@example.com',
+                role: 'DEVELOPER',
+                hoursLogged: 34,
+                joinedAt: today(),
+              },
+            ],
+            hoursLogged: 34,
+            progressPercentage: 0,
+            createdAt: today(),
+            updatedAt: today(),
+          });
+          httpMock.expectOne(`/api/projects/${projectTwoId}`)
+            .flush({
+              id: projectTwoId,
+              name: 'Backend API',
+              description: null,
+              status: 'ACTIVE',
+              budgetHours: null,
+              budgetCost: null,
+              totalCost: null,
+              members: [],
+              hoursLogged: 0,
+              progressPercentage: 0,
+              createdAt: today(),
+              updatedAt: today(),
+            });
+            httpMock.expectOne(`/api/timesheets/${teamTimesheetId}/entries`).flush(mockEntries);
+      }
+
       httpMock.expectOne('/api/projects').flush(mockProjects);
       httpMock.expectOne('/api/tasks/my-tasks').flush(mockTasks);
       httpMock
