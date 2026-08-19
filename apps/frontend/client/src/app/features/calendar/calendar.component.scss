@@ -13,15 +13,27 @@ $calendar-primary-surface: var(--color-primary-surface);
 $calendar-border: var(--color-border);
 $calendar-pill-bg: var(--color-gray-light);
 
+// CATEGORY COLOURS
+$calendar-blue-bg: $calendar-primary-surface;
+$calendar-blue-text: $calendar-primary;
+$calendar-blue-border: var(--color-primary-tint, #b0d5ff);
+$calendar-green-bg: var(--color-semantic-green, #eaf9f1);
+$calendar-green-text: var(--color-semantic-green-text, #107c41);
+$calendar-amber-bg: var(--color-semantic-amber, #fef6e6);
+$calendar-amber-text: var(--color-semantic-amber-text, #b25900);
+$calendar-red-bg: var(--color-semantic-red, #fde8e8);
+$calendar-red-text: var(--color-semantic-red-text, #d70015);
+
 // CALENDAR PAGE
 .calendar-page{
     color: $calendar-text-body;
     max-width: 1280px;
     margin: 0 auto;
-    padding: 24px;
+    padding: 32px 24px;
     display: flex;
     flex-direction: column;
     gap: 24px;
+    -webkit-font-smoothing: antialiased;
 }
 
 // HEADER AREA
