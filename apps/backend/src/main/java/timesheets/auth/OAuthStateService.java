@@ -39,6 +39,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.UUID;
+import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -84,6 +85,21 @@ public class OAuthStateService {
     UUID workspaceMemberId = UUID.fromString(claims.get("workspaceMemberId", String.class));
     String provider = claims.get("provider", String.class);
     // has workspacememberid and provider
+    return new OAuthState(workspaceMemberId, provider);
+  }
+
+  // MUST DO: validate that the provided state is the same as returned state by Google
+  public OAuthState validateState(String state) {
+    Claims claims =
+        Jwts.parser()
+            .verifyWith((SecretKey) getSigningKey())
+            .build()
+            .parseSignedClaims(state)
+            .getPayload();
+
+    UUID workspaceMemberId = UUID.fromString(claims.get("workspaceMemberId", String.class));
+    String provider = claims.get("provider", String.class);
+
     return new OAuthState(workspaceMemberId, provider);
   }
 }
