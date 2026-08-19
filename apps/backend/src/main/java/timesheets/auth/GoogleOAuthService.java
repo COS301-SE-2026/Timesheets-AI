@@ -12,6 +12,8 @@ package timesheets.integration.auth;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @Service
 public class GoogleOAuthService {
@@ -63,4 +65,29 @@ public class GoogleOAuthService {
 
   // sending POST HTTP request to Google OAuth APIwith payload liek code, client_id, client_secret
   private final RestClient restClient = RestClient.create();
+
+  /* 
+    For exchange tokens part: OAuth and Web Apps
+    HTTP Form Data and HTTP Headers in Spring application
+    OAuth 2.0 Token Requests: when GoogleAuthService make a POST request to Google 
+    to exchange your authorization code for access tokens. 
+    Google expects the data to be formatted as a HTTP Form esp for Google OAuth 20, which what we are using 
+  */
+
+ public GoogleTokenResponse exchangeCodeforToken (String code){
+
+    // use this because I want to ensure that hte order of keys and values is preserved 
+    // it is way cleaner and it automatically creates the list 
+    MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+
+    // this was the string Google provided with the redirect URL  when  sending user back to our callback endpoint
+    formData.add("code", code);
+    // our application identifier
+    formData.add("client_id", clientId);
+    // callback URL in the console 
+    formData.add("redirect_uri", redirectUri);
+    // to tell Google which OAuth fk=low we are running ;
+    formData.add("grant_type", "authorization_code")
+
+ }
 }
