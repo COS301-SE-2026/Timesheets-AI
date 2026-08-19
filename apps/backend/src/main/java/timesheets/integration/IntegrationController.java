@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import timesheets.integration.auth.GoogleOAuthService;
 import timesheets.integration.auth.OAuthStateService;
 import timesheets.security.SecurityUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/integrations")
@@ -26,4 +27,20 @@ public class IntegrationController {
     String authorizationUrl = googleOAuthService.buildAuthorizationUrl(state);
     return ResponseEntity.ok(authorizationUrl);
   }
+
+  /* callback endpoint
+  Where: Google sent the result 
+   this is when we:
+    - receive code (code is temp authorization token)
+    - validate state  (what we earlier generated)
+    - exhange code tokens 
+    This is to ensure that the OAuth flow belongs to correct workspace member 
+  */
+
+    @GetMapping("/google/calender/callback")
+    public ResponseEntity<String> googleCalenderCallBack(@RequestParam String code, @RequestParam String state){
+      // TODO 
+      return ResponseEntity.ok("Activated callback");
+    }
+  
 }
