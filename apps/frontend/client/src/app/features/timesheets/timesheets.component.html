@@ -29,7 +29,7 @@
       [ngModel]="selectedTimesheetId()"
       (ngModelChange)="onWeekChange($event)"
       [disabled]="uiState() === 'loading' || filteredTimesheets().length === 0">
-      @fir (week of filteredTimesheets(); track week.summary.id) {
+      @for (week of filteredTimesheets(); track week.summary.id) {
         <option [value]="week.summary.id">
           Week {{ week.summary.weekNumber }} · {{ week.summary.periodLabel }}
         </option>
@@ -244,6 +244,7 @@
          </section>
       }
     }
+  }
 
     <!-- Submit confirmation modal -->
     @if (pageTab() === 'review' && isManager()){
@@ -258,7 +259,7 @@
             <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
             <select id="review-week-picker" class="week-picker-select"
             [ngModel]="reviewWeekKey()"
-            [ngModelChange]="onReviewWeekChange($event)"
+            (ngModelChange)="onReviewWeekChange($event)"
             [disabled]="reviewWeekOptions().length === 0">
           @for (week of reviewWeekOptions(); track week.key) {
             <option [value]="week.key">{{ week.label }}</option>
@@ -268,7 +269,7 @@
           </label>
         </div>
       </header>
-    }
+    
 
     <article class="awaiting-card" aria-label="Awaiting review">
       <span class="awaiting-card-icon" aria-hidden="true">
@@ -286,7 +287,7 @@
         [class.is-active]="reviewFilter() === filter"
         [attr.aria-selected]="reviewFilter() === filter"
         (click)="onReviewFilterChange(filter)">
-      {{ filter === 'ALL' ? 'All' : statusLabel(filter) }}  
+      {{ filter === 'ALL' ? 'All' : statusLabel(filter) }}
       </button>
       }
     </div>
@@ -333,7 +334,7 @@
                     </div>
                   </div>
                 </td>
-                <td>{{ row.summary.periodLabe }}</td>
+                <td>{{ row.summary.periodLabel }}</td>
                 <td class="col-total">{{ row.totalHours }}</td>
                 <td>{{ formatDateTime(row.summary.submittedAt) }} </td>
                 <td>
@@ -415,7 +416,7 @@
             <div class="summary-meta-card">
               <i class="fa-regular fa-calendar summary-meta-icon" aria-hidden="true"></i>
               <dt>Submitted On</dt>
-              <dd>{{ fromatDateTime(target.summary.submittedAt) }}</dd>
+              <dd>{{ formatDateTime(target.summary.submittedAt) }}</dd>
             </div>
             <div class="summary-meta-card">
               <i class="fa-regular fa-clock summary-meta-icon" aria-hidden="true"></i>
@@ -440,16 +441,15 @@
                 <tr>
                   <td class="col-task">
                     <div class="task-cell-text">
-                      <strong class="tast-cell-title">{{ task.title }}</strong>
+                      <strong class="task-cell-title">{{ task.title }}</strong>
                       <span class="task-cell-meta">{{ task.project }}</span>
                     </div>
                   </td>
                   @for (hours of task.loggedHoursShort; track $index) {
-                    <td class="cole-day [class.is-empty]=hours === '-'">{{ hours }}</td>
+                    <td class="col-day" [class.is-empty]="hours === '-'">{{ hours }}</td>
                   }
                     <td class="col-total">{{ task.totalShort }}</td>
                 </tr>
-                </td>
               }
              </tbody>
              <tfoot>
@@ -465,7 +465,7 @@
           </div>
 
           @if (showRejectReason()) {
-            <label class="reject-filed" for="reject-reason">
+            <label class="reject-field" for="reject-reason">
               <span class="reject-field-label">Reject reason</span>
               <textarea id="reject-reason" class="reject-textarea" rows="4"
               maxlength="500"
@@ -486,11 +486,11 @@
                 Confirm reject</button>
               } @else {
                 <button type="button" class="btn btn--danger-solid"
-                [disabled]="actionPending().trim() || actionPending()"
-                (click)="onConfirmReject()">
+                [disabled]="actionPending()" (click)="enableRejectReason()">
                 <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                Reject
                 </button>
-              } @else {
+              }
                 <button type="button" class="btn btn--success"
                 [disabled]="actionPending()" (click)="onApproveTimesheet()">
                 <i class="fa-solid fa-check" aria-hidden="true"></i>
@@ -501,7 +501,6 @@
         </dialog>  
        }
       }
-  
 
    <!-- Success toast -->
 
