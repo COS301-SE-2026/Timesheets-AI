@@ -608,6 +608,43 @@
   line-height: 1;
 }
 
+.employee-cell {
+  display: flex;
+  align-items: center;
+  gap: tokens.$space-3;
+  text-align: left;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height:40px;
+  border-radius: 50%;
+  color: tokens.$color-text-inverse;
+  font-size: 12px;
+  font-weight: tokens.$font-weight-bold;
+  flex-shrink: 0;
+}
+
+.link-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: tokens.$color-text-link;
+  font: inherit;
+  font-weight: tokens.$font-weight-medium;
+  cursor: pointer;
+  padding: 0;
+}
+
+.link-action i {
+  font-size: 10px;
+}
+
 .awaiting-review, .read-only-note {
   display: inline-flex;
   align-items: center;
