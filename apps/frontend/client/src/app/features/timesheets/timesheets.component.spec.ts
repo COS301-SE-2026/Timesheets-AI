@@ -53,8 +53,8 @@ describe('TimesheetsComponent', () => {
     {
       id: currentTimesheetId,
       workspaceMemberId: 'member-1',
-      periodStart: today(),
-      periodEnd: today(),
+      periodStart: startOfWeek(),
+      periodEnd: endOfWeek(),
       status: 'DRAFT' as const,
       submittedAt: null,
       approvedAt: null,
@@ -124,6 +124,24 @@ describe('TimesheetsComponent', () => {
   };
 
   const managerUser: AuthUser = { ...developerUser, roles: ['MANAGER'] };
+
+  function startOfWeek(): string {
+    const d = new Date();
+    const day = d.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+
+    d.setDate(d.getDate() + diff);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function endOfWeek(): string {
+     const d = new Date();
+    const day = d.getDay();
+    const diff = day === 0 ? 0 : 7 - day;
+
+    d.setDate(d.getDate() + diff);
+    return d.toISOString().slice(0, 10);
+  }
 
   //this flushes the 3 requestss forkJoin fires from loadTimesheets()
   function flushInitialLoad(entries: typeof mockEntries = mockEntries): void {
@@ -443,7 +461,7 @@ describe('TimesheetsComponent', () => {
 
       expect(component.pageTab()).toBe('review');
       expect(component.filteredReviewRows()).toHaveLength(1);
-      expect(component.awaitingReviewCount()).toBe(false);
+      expect(component.awaitingReviewCount()).toBe(1);
     });
 
     it('should not approve from own timesheet view without a review target', () => {
