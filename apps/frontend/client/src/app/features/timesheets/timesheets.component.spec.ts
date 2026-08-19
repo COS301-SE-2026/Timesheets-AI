@@ -459,80 +459,76 @@ describe('TimesheetsComponent', () => {
       expect(component.canSubmit()).toBe(true); // own draft still selected
     });
 
-    it('should approve the timesheet', () => {
-      jest.spyOn(window, 'confirm').mockReturnValue(true);
-
+    it('should approve the timesheet from the review modal', () => {
+      component.setPageTab('review');
+      flushReviewLoad();
+      component.openReviewModal(component.filteredReviewRows()[0]);
       component.onApproveTimesheet();
 
       const req = httpMock.expectOne(
-        `/api/timesheets/${currentTimesheetId}/approve`,
+        `/api/timesheets/${teamTimesheetId}/approve`,
       );
       expect(req.request.method).toBe('POST');
 
       req.flush({
-        ...mockTimesheets[0],
+        ...submittedTeamTimesheet,
         status: 'APPROVED',
         approvedAt: today(),
         isLocked: true,
       });
 
-      expect(component.summary()?.status).toBe('APPROVED');
+      expect(component.awaitingReviewCount()).toBe(0);
+      expect(component.showReviewModal()).toBe(false);
       expect(component.toastMessage()).toBe('Timesheet Approved');
     });
 
-    it('should not call the backend if the approval confirm is cancelled', () => {
-      jest.spyOn(window, 'confirm').mockReturnValue(false);
-
-      component.onApproveTimesheet();
-
-      // confirm() returned false, onApproveTimesheet should bail before the
-      // HTTP call, verified by afterEach's httpMock.verify()
-      expect(component.actionPending()).toBe(false);
-    });
-
-    it('should open the reject dialog and require a non-empty reason', () => {
-      component.openRejectDialog();
-      expect(component.showRejectDialog()).toBe(true);
-
-      component.onConfirmReject(); // no reason set yet
-      // should bail silently, no HTTP call, verified by afterEach
-      expect(component.showRejectDialog()).toBe(true);
+    it('should require a rejection reason before confirming reject', () => {
+      component.setPageTab('review');
+      flushReviewLoad();
+      component.openReviewModal(component.filteredReviewRows()[0]);
+      component.enableRejectReason();
+      expect(component.showRejectReason()).toBe(true);
+      component.onConfirmReject(); 
+      expect(component.showReviewModal()).toBe(true);
     });
 
     it('should reject the timesheet with a reason', () => {
-      component.openRejectDialog();
+      component.setPageTab('review');
+      flushReviewLoad();
+      component.openReviewModal(component.filteredReviewRows()[0]);
+      component.enableRejectReason();
       component.rejectReason.set('Missing hours for Tuesday');
       component.onConfirmReject();
 
       const req = httpMock.expectOne(
-        `/api/timesheets/${currentTimesheetId}/reject`,
+        `/api/timesheets/${teamTimesheetId}/reject`,
       );
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({ reason: 'Missing hours for Tuesday' });
 
       req.flush({
-        ...mockTimesheets[0],
+        ...submittedTeamTimesheet,
         status: 'REJECTED',
         rejectedAt: today(),
         rejectionReason: 'Missing hours for Tuesday',
         isLocked: false,
       });
 
-      expect(component.summary()?.status).toBe('REJECTED');
-      expect(component.summary()?.rejectionReason).toBe(
-        'Missing hours for Tuesday',
-      );
-      expect(component.showRejectDialog()).toBe(false);
-      expect(component.toastMessage()).toBe('Timesheet Rejected.');
+     expect(component.awaitingReviewCount()).toBe(0);
+     expect(component.showReviewModal()).toBe(false);
+     expect(component.toastMessage()).toBe('Timesheet rejected');
     });
 
     it('should surface an error if reject fails', () => {
-      component.openRejectDialog();
+      component.setPageTab('review');
+      flushReviewLoad();
+      component.openReviewModal(component.filteredReviewRows()[0]);
+      component.enableRejectReason();
       component.rejectReason.set('Missing hours');
       component.onConfirmReject();
 
       const req = httpMock.expectOne(
-        `/api/timesheets/${currentTimesheetId}/reject`,
+        `/api/timesheets/${teamTimesheetId}/reject`,
       );
       req.error(new ProgressEvent('network error'));
 
