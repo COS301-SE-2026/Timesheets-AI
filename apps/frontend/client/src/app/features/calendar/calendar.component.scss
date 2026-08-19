@@ -99,17 +99,27 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
         align-items: center;
         gap: 8px;
         padding: 8px 16px;
-        color: $calendar-primary;
-        background: $calendar-primary-surface;
-        border: 1px solid var(--color-primary-tint);
+        color: #ffffff;
+        background: $calendar-primary;
+        border: none;
         border-radius: 999px;
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s ease;
+        white-space: nowrap;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+        i{
+            font-size: 12px;
+        }
 
         &:hover:not(:disabled){
-            background: var(--color-primary-tint);
+            background: $calendar-primary-hover;
+            transform: scale(1.02);
+        }
+
+        &:active:not(:disabled){
+            transform: scale(0.98);
         }
 
         &:disabled{
