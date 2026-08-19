@@ -139,7 +139,7 @@ $calendar-pill-bg: var(--color-gray-light);
             cursor: pointer;
             transition: all 0.2s ease;
 
-            &:active{
+            &.active{
                 background: $calendar-card-bg;
                 color: $calendar-primary;
                 font-weight: 600;
@@ -148,5 +148,78 @@ $calendar-pill-bg: var(--color-gray-light);
         }
     }
 
-    
+    // FULL CALENDAR STYLING
+    .calendar-container{
+        ::ng-deep .fc{
+            font-family: inherit;
+            --fc-border-color: var(--color-border);
+            --fc-today-bg-color: transparent;
+
+            .fc-col-header-cell{
+                padding: 10px 0;
+                color: $calendar-text-muted;
+                font-size: 12px;
+                font-weight: 600;
+                border-bottom: 1px solid $calendar-border;
+            }
+
+            .fc-daygrid-day-number{
+                padding: 7px 8px;
+                color: $calendar-text-body;
+                font-size: 13px;
+                font-weight: 500;
+            }
+
+            .fc-day-today .fc-daygrid-day-number{
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 24px;
+                height: 24px;
+                padding: 0;
+                background: $calendar-primary;
+                color: var(--color-white);
+                border-radius: 50%;
+            }
+
+            .fc-event{
+                padding: 3px 8px;
+                background: $calendar-primary;
+                border: 1px solid var(--color-primary-tint);
+                border-radius: 6px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.1s ease;
+
+                &:hover{
+                    transform: translateY(-1px);
+                }
+            }
+
+            // CATEGORY COLOURS
+            .fc-event-purple{
+                background: var(--color-semantic-purple);
+                color: var(--color-semantic-purple-text);
+                border-color: var(--color-semantic-purple-text);
+            }
+            .fc-event-green{
+                background: var(--color-semantic-green);
+                color: var(--color-semantic-green-text);
+                border-color: var(--color-semantic-green-text);
+            }
+
+            .fc-event-amber{
+                background: var(--color-semantic-amber);
+                color: var(--color-semantic-amber-text);
+                border-color: var(--color-semantic-amber-text);
+            }
+            .fc-event-red{
+                background: var(--color-semantic-red);
+                color: var(--color-semantic-red-text);
+                border-color: var(--color-semantic-red-text);
+            }
+        }
+    }
+
 }
