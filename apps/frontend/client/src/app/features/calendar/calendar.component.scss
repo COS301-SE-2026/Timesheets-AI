@@ -68,3 +68,58 @@ $calendar-pill-bg: var(--color-gray-light);
         }
     }
 }
+
+// TOOLS AND NAV BUTTONS STYLING
+.calendar-card{
+    background: $calendar-card-bg;
+    border: 1px solid $calendar-card-bg;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 6px 20px rgba(15, 76, 145, 0.05);
+
+    .calendar-toolbar{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .date-navigation{
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        button{
+            border: 1px solid $calendar-border;
+            background: $calendar-card-bg;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+
+            &:hover{
+                background: $calendar-primary-surface;
+                border-color: var(--color-primary-tint);
+            }
+        }
+
+        .today-button{
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: $calendar-text-body;
+        }
+
+        .icon-button{
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $calendar-text-body;
+        }
+    }
+
+    
+}
