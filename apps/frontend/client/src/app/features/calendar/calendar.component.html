@@ -19,17 +19,37 @@ Related Requirements: N/A
             </p>
         </div>
 
-        <!-- SYNCING AREA -->
-        <button 
-            class="sync-button"
-            (click)="syncCalendar()"
-            [disabled]="isSyncing()">
-            <i 
-                class="fa-solid fa-rotate"
-                [class.fa-spin]="isSyncing()">
-            </i>
-            {{ isSyncing()? 'Syncing...': 'Sync now' }}
-        </button>
+        <!-- CONNECTION PILL -->
+        <div class="header-actions">
+            @if (isConnected()){
+                <div class="connection-status">
+                    <span class="status-dot">
+                    </span>
+                    <span>
+                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }} connected
+                    </span>
+                    @if(lastSyncedLabel()){
+                        <span class="sync-meta">
+                            &middot; {{ lastSyncedLabel() }}
+                        </span>
+                    }
+                </div>
+            }
+
+            <!-- SYNCING AREA -->
+            <button 
+                class="sync-button"
+                (click)="syncCalendar()"
+                [disabled]="isSyncing()">
+                <i 
+                    class="fa-solid fa-rotate"
+                    [class.fa-spin]="isSyncing()">
+                </i>
+                {{ isSyncing()? 'Syncing...': 'Sync now' }}
+            </button>
+        </div>
+
+        
     </header>
 
     <!-- CALENDAER NAVIGATION TOOLS  -->
