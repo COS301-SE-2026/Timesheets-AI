@@ -16,8 +16,7 @@ import lombok.NoArgsConstructor;
 
 // this is the entity that will be stored in the database for email verification tokens.
 @Entity // this annotation tells Spring Boot that this class is an entity that should be
-// stored in
-// the database
+// stored in the DB
 @Table(name = "email_verification_tokens")
 @Data
 @Builder
