@@ -132,43 +132,51 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
 // TOOLS AND NAV BUTTONS STYLING
 .calendar-card{
     background: $calendar-card-bg;
-    border: 1px solid $calendar-card-bg;
-    border-radius: 16px;
-    padding: 20px;
+    border: 1px solid $calendar-border;
+    border-radius: 120px;
+    padding: 24px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
     box-shadow: 0 6px 20px rgba(15, 76, 145, 0.05);
 
     .calendar-toolbar{
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
     }
 
     .date-navigation{
         display: flex;
         align-items: center;
-        gap: 6px;
-
-        button{
-            border: 1px solid $calendar-border;
-            background: $calendar-card-bg;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-
-            &:hover{
-                background: $calendar-primary-surface;
-                border-color: var(--color-primary-tint);
-            }
-        }
+        gap: 10px;
 
         .today-button{
-            padding: 7px 14px;
+            padding: 7px 18px;
             font-size: 13px;
             font-weight: 600;
             color: $calendar-text-title;
+            border: 1px solid $calendar-border;
+            background: $calendar-card-bg;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover{
+                background: $calendar-pill-bg;
+            }
+        }
+
+        // GROUPING THE LEFT RIGHT BUTTON
+        .nav-arrows{
+            display: flex;
+            align-items: center;
+            border: 1px solid $calendar-border;
+            border-radius: 999px;
+            overflow: hidden;
+            background: $calendar-card-bg;
         }
 
         .icon-button{
@@ -178,6 +186,22 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
             align-items: center;
             justify-content: center;
             color: $calendar-text-title;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: background 0.15s ease;
+
+            i{
+                font-size: 12px;
+            }
+
+            &:hover{
+                background: $calendar-pill-bg;
+            }
+
+            &:first-child{
+                border-right: 1px solid $calendar-border ;
+            }
         }
     }
 
