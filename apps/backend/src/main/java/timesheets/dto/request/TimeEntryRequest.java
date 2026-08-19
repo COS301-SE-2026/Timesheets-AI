@@ -26,8 +26,6 @@ public class TimeEntryRequest {
   @Positive(message = "Duration must be positive")
   private Integer durationSeconds;
 
-  // this is set during the creation and cannot be changed
   private String entryType;
-
   private String description;
 }
