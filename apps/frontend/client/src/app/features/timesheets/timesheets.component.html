@@ -291,6 +291,27 @@
       }
     </div>
 
+    @if(reviewUiState() === 'loading') {
+      <output class="state-panel state-panel--loading">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Loading timesheets for review...</p>
+      </output>
+    } @else if (reviewUiState() === 'error') {
+      <div class="state-panel state-panel--error" role="alert">
+        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+        <p>{{ errorMessage() || 'Something went wrong.' }}</p>
+        <button type="button" class="btn btn--secondary" (click)="loadReviewQueue()"> Try again</button>
+      </div>
+    } @else if (filteredReviewRows().length === 0) {
+      <div class="state-panel state-panel--empty">
+        <i class="fa-regular fa-clipboard" aria-hidden="true"></i>
+        <h2>No timesheets to review</h2>
+        <p>Submitted timesheets from your team will appear here.</p>
+      </div>
+    }@ else {
+      
+    }
+
       <h2 id="submit-modal-title"> Submit timesheet</h2>
       <p>This timesheet will be sent for approval and cannot be edited while under review.</p>
 
