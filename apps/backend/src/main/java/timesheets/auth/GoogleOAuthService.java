@@ -11,6 +11,7 @@ package timesheets.integration.auth;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 @Service
 public class GoogleOAuthService {
@@ -18,6 +19,8 @@ public class GoogleOAuthService {
   // GOOGLE's primary OAUTH 2.0 endpoint used to authencitate users and request authorization
   private static final String GOOGLE_AUTHORIZATION_URL =
       "https://accounts.google.com/o/oauth2/v2/auth";
+
+  private static final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 
   @Value("${app.google.client-id}")
   private String clientId;
@@ -58,4 +61,6 @@ public class GoogleOAuthService {
     **GoogleOAuthService should not know how OAuth state is generated**
   */
 
+  // sending POST HTTP request to Google OAuth APIwith payload liek code, client_id, client_secret
+  private final RestClient restClient = RestClient.create();
 }
