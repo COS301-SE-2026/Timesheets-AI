@@ -47,8 +47,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OAuthStateService {
 
-  private final OAuthStateService oauthStateService;
-
   @Value("${app.jwt.secret}")
   private String secret;
 
