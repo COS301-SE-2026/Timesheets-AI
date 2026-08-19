@@ -566,6 +566,48 @@
   filter: brightness(0.95)
 }
 
+.page-tabs {
+  margin-bottom: tokens.$space-2;
+}
+
+.awaiting-card {
+  display: flex;
+  align-items: center;
+  gap: tokens.$space-4;
+  padding: tokens.$space-4 tokens.$space-6;
+  background: tokens.$color-white;
+  border: 1px solid tokens.$color-border;
+  border-radius: tokens.$radius-card;
+  box-shadow: 0 10px 28px rgba(15, 76, 145, 0.1);
+}
+
+.awaiting-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: tokens.$radius-button;
+  background: tokens.$color-primary-surface;
+  color: tokens.$color-primary;
+  font-size: 20px;
+}
+
+.awaiting-card-label {
+  display: block;
+  font-size: 13px;
+  color: tokens.$color-text-muted;
+}
+
+.awaiting-card-value {
+  display: block;
+  margin-top: 2px;
+  font-size: 28px;
+  font-family: var(--font-heading);
+  color: tokens.$color-text-body;
+  line-height: 1;
+}
+
 .awaiting-review, .read-only-note {
   display: inline-flex;
   align-items: center;
