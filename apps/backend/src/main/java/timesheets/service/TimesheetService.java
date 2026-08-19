@@ -76,14 +76,12 @@ public class TimesheetService {
             .findById(timesheetId)
             .orElseThrow(() -> new RuntimeException("Timesheet not found"));
 
-    // only the owner should be able to submit their timesheet
     if (!timesheet.getWorkspaceMemberId().equals(currentMemberId)) {
       throw new RuntimeException("You can only submit your own timesheets");
     }
 
-    // only draft and rejected timesheets can be submitted
-    if (!"DRAFT".equals(timesheet.getStatus()) && !"REJECTED".equals(timesheet.getStatus())) {
-      throw new RuntimeException("Only draft or rejected timesheets can be submitted");
+    if (!"DRAFT".equals(timesheet.getStatus())) {
+      throw new RuntimeException("Timesheet has already been submitted");
     }
 
     timesheet.setIsLocked(true);
