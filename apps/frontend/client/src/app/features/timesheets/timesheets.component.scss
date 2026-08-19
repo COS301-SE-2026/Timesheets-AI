@@ -689,6 +689,60 @@
   cursor: pointer;
 }
 
+.review-meta {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: tokens.$space-4;
+}
+
+.review-total {
+  font-weight: tokens.$font-weight-bold !important;
+  color: tokens.$color-text-body !important;
+}
+
+.review-modal-table {
+  margin-bottom: tokens.$space-4;
+  box-shadow: none;
+}
+
+.reject-field {
+  display: flex;
+  flex-direction: column;
+  gap: tokens.$space-2;
+  margin-bottom: tokens.$space-4;
+}
+
+.reject-field-label {
+  font-size: 11px;
+  font-family: var(--font-heading);
+  font-weight: tokens.$font-weight-bold;
+  color: tokens.$color-text-primary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reject-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: tokens.$space-3;
+  border: 1px solid tokens.$color-input-border;
+  border-radius: tokens.$radius-card;
+  font: inherit;
+  resize: vertical;
+  min-height: 96px;
+}
+
+.reject-textarea:focus {
+ outline: none;
+ border-color: tokens.$color-primary-hover;
+ box-shadow: 0 0 0 3px tokens.$color-primary-surface;
+}
+
+.reject-count {
+  align-self: flex-end;
+  font-size: 12px;
+  color: tokens.$color-text-muted;
+}
+
 .awaiting-review, .read-only-note {
   display: inline-flex;
   align-items: center;
