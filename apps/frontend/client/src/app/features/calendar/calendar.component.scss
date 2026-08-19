@@ -108,7 +108,7 @@ $calendar-pill-bg: var(--color-gray-light);
             padding: 7px 14px;
             font-size: 13px;
             font-weight: 600;
-            color: $calendar-text-body;
+            color: $calendar-text-title;
         }
 
         .icon-button{
@@ -117,7 +117,34 @@ $calendar-pill-bg: var(--color-gray-light);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: $calendar-text-body;
+            color: $calendar-text-title;
+        }
+    }
+
+    // THE TAB SWITCHER
+    .view-switcher{
+        display: flex;
+        padding: 3px;
+        background: $calendar-pill-bg;
+        border: 1px solid $calendar-border;
+
+        button{
+            padding: 6px 14px;
+            border: none;
+            border-radius: 7px;
+            background: transparent;
+            color: $calendar-text-muted;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:active{
+                background: $calendar-card-bg;
+                color: $calendar-primary;
+                font-weight: 600;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            }
         }
     }
 
