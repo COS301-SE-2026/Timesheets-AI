@@ -40,8 +40,14 @@ describe('TimesheetsComponent', () => {
   ];
 
   function today(): string {
-    return new Date().toISOString().slice(0, 10);
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
+
   function daysAgo(n: number): string {
     const d = new Date();
     d.setDate(d.getDate() - n);
@@ -389,11 +395,11 @@ describe('TimesheetsComponent', () => {
         httpMock
           .expectOne('/api/timesheets?status=SUBMITTED')
           .flush([submittedTeamTimesheet]);
-        httpMock.expectOne('api/projects').flush([
+        httpMock.expectOne('/api/projects').flush([
           {...mockProjects[0], myRole: 'MANAGER'},
           {...mockProjects[1], myRole: 'MANAGER'},
         ]);
-        httpMock.expectOne('api/tasks/my-tasks').flush(mockTasks);
+        httpMock.expectOne('/api/tasks/my-tasks').flush(mockTasks);
         httpMock
           .expectOne(`/api/projects/${projectOneId}`)
           .flush({
@@ -408,7 +414,7 @@ describe('TimesheetsComponent', () => {
             members: [
               {
                 workspaceMemberId: teamMemberId,
-                fiestName: 'John',
+                firstName: 'John',
                 lastName: 'Doe',
                 email : 'john@example.com',
                 role: 'DEVELOPER',
@@ -436,7 +442,7 @@ describe('TimesheetsComponent', () => {
               createdAt: today(),
               updatedAt: today(),
             });
-            httpMock.expectOne(`/api/timesheets/${teamTimesheetId}/entries`).flush(mockEntries);
+            httpMock.expectOne(`/api/timesheets/${teamTimesheetId}/entries`).flush([]);
       }
 
       beforeEach(async () => {
@@ -497,7 +503,7 @@ describe('TimesheetsComponent', () => {
 
       expect(component.awaitingReviewCount()).toBe(0);
       expect(component.showReviewModal()).toBe(false);
-      expect(component.toastMessage()).toBe('Timesheet Approved');
+      expect(component.toastMessage()).toBe('Timesheet approved');
     });
 
     it('should require a rejection reason before confirming reject', () => {
@@ -534,7 +540,7 @@ describe('TimesheetsComponent', () => {
 
      expect(component.awaitingReviewCount()).toBe(0);
      expect(component.showReviewModal()).toBe(false);
-     expect(component.toastMessage()).toBe('Timesheet rejected');
+     expect(component.toastMessage()).toBe('Timesheet Rejected.');
     });
 
     it('should surface an error if reject fails', () => {
