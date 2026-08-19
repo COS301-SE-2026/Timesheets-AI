@@ -546,6 +546,26 @@
   filter: brightness(0.96);
 }
 
+.btn--danger-solid {
+  background: #c62828;
+  border-color: #c62828;
+  color: tokens.$color-text-inverse;
+}
+
+.btn-danger-solid:hover:not(:disabled){
+  filter: brightness(0.95)
+}
+
+.btn--success {
+  background: #2e7d32;
+  border-color: #2e7d32;
+  color: tokens.$color-text-inverse;
+}
+
+.btn--success:hover:not(:disabled) {
+  filter: brightness(0.95)
+}
+
 .awaiting-review, .read-only-note {
   display: inline-flex;
   align-items: center;
