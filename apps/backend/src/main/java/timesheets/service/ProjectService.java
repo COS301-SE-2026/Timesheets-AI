@@ -82,6 +82,11 @@ public class ProjectService {
   @Transactional
   public ProjectResponse createProject(
       CreateProjectRequest request, UUID createdByWorkspaceMemberId) {
+
+    if (!securityUtils.isAdmin()) {
+      throw new AccessDeniedException("Only Admins can create projects");
+    }
+
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
 
     // to build the project from the request
@@ -189,6 +194,31 @@ public class ProjectService {
     Project updatedProject = projectRepository.save(project);
 
     return buildProjectResponse(updatedProject, workspaceMemberId, true);
+  }
+
+  // this is for archiving a project
+  @Transactional
+  public void archiveProject(UUID projectId, UUID workspaceMemberId) {
+
+    // only admins should be able to archive projects
+    if (!securityUtils.isAdmin()) {
+      throw new AccessDeniedException("Only Admins can archive projects");
+    }
+
+    Project project =
+        projectRepository
+            .findById(projectId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Project not found with id: " + projectId));
+
+    // we cannot archive already archived projects
+    if ("ARCHIVED".equals(project.getStatus())) {
+      throw new StateConflictException("Project is already archived");
+    }
+
+    project.setStatus("ARCHIVED");
+    project.setUpdatedAt(LocalDateTime.now());
+    projectRepository.save(project);
   }
 
   // gets detailed information about a project

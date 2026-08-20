@@ -77,18 +77,26 @@ public class ProjectController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
+  // this will be used to update a project
   @PatchMapping("/{projectId}")
   public ResponseEntity<ProjectResponse> patchProject(
       @PathVariable UUID projectId, @RequestBody UpdateProjectRequest request) {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
-    if (!projectService.canManageProject(projectId, workspaceMemberId)) {
-      throw new RuntimeException("Only Admins and Managers can update projects");
-    }
-
     ProjectResponse response = projectService.updateProject(projectId, request, workspaceMemberId);
     return ResponseEntity.ok(response);
+  }
+
+  // this should archive a project
+  @PatchMapping("/{projectId}/archive")
+  public ResponseEntity<Void> archiveProject(@PathVariable UUID projectId) {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    projectService.archiveProject(projectId, workspaceMemberId);
+
+    return ResponseEntity.ok().build();
   }
 
   // this will be to assign a workspace member to a project
