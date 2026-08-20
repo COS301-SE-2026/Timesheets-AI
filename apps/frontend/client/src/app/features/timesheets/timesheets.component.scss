@@ -668,7 +668,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: tokens.$space-4;
-  margin-bottom: rokens.$space-4;
+  margin-bottom: tokens.$space-4;
 }
 
 .review-modal-name {
@@ -683,7 +683,7 @@
   width: 36px;
   height: 36px;
   border: 1px solid tokens.$color-border;
-  border-radius: tokens.$radius-bottom;
+  border-radius: tokens.$radius-button;
   background: tokens.$color-white;
   color: tokens.$color-text-muted;
   cursor: pointer;
