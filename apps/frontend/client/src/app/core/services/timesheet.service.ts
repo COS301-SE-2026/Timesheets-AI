@@ -78,11 +78,35 @@ export class TimesheetService {
       .pipe(catchError(this.handleError('submitTimesheet')));
   }
 
+// all non-draft timesheets in the workspace
+getWorkspaceTimesheets(): Observable<TimesheetResponse[]> {
+  return this.http
+  .get<TimesheetResponse[]>(`${this.baseUrl}/workspace`)
+  .pipe(catchError(this.handleError('gerWorkspaceTimesheets')));
+}
+
   // Manager/admin: submitted timesheets awaiting approval
   getPendingWorkspaceTimesheets(): Observable<TimesheetResponse[]> {
     return this.http
     .get<TimesheetResponse[]>(`${this.baseUrl}/workspace/pending`)
     .pipe(catchError(this.handleError('getPendingWorkspaceTimesheets')));
+  }
+
+  // Manager/admin: workspace timesheets filtered by status
+  getWorkspaceTimesheetByStatus(status: string): Observable<TimesheetResponse[]> {
+    return this.http
+    .get<TimesheetResponse[]>(`${this.baseUrl}/workspace/status/${status}`)
+    .pipe(catchError(this.handleError('getWorkspaceTimesheetByStatus')));
+  }
+
+  getReviewTimesheets(filter: 'ALL' | 'SUBMITTED' | 'APPROVED' | 'REJECTED'): Observable<TimesheetResponse[]> {
+    if (filter === 'ALL') {
+      return this.getWorkspaceTimesheets();
+    }
+    if( filter === 'SUBMITTED') {
+      return this.getPendingWorkspaceTimesheets();
+    }
+    return this.getWorkspaceTimesheetByStatus(filter);
   }
   
   //a post request for managaer approvals screen, not used on this page yet
