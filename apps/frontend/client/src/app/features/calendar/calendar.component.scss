@@ -385,6 +385,136 @@ $calendar-red-text: #dc2626;
 }
 
 // THE POP-UP MODALS DESIGN
-.modal{
+.modal-backdrop{
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.25);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+}
+
+.event-details-modal{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    overflow: hidden;
+
+    .close-button{
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        color: $calendar-text-muted;
+        font-size: 20px;
+        cursor: pointer;
+
+        &:hover{
+            background: $calendar-pill-bg;
+        }
+    }
+
+    .modal-body{
+        padding: 24px 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .modal-title-row{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .modal-dot{
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+
+            &.meetings{
+                color: $calendar-blue-text;
+            }
+            &.work{
+                color: $calendar-green-text;
+            }
+            &.calls{
+                color: $calendar-amber-text;
+            }
+            &.deadlines{
+                color: $calendar-red-text;
+            }
+        }
+
+        h2{
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }   
+    }
+
+    .category-badge-row{
+        .category-badge{
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+
+            &.meetings{
+                background: $calendar-blue-bg;
+                color: $calendar-blue-text;
+            }
+            &.work{
+                background: $calendar-green-bg;
+                color: $calendar-green-text;
+            }
+            &.calls{
+                background: $calendar-amber-bg;
+                color: $calendar-amber-text;
+            }
+            &.deadlines{
+                background: $calendar-red-bg;
+                color: $calendar-red-text;
+            }
+        }
+    }
+
+    .info-list{
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 8px;
+
+        .info-item{
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: $calendar-text-body;
+
+            i{
+                font-size: 16px;
+                color: $calendar-text-muted;
+                width: 18px;
+            }
+
+            &.align-start{
+                align-items: flex-start;
+            }
+
+            .role-muted{
+                color: $calendar-text-muted;
+            }
+        }
+    }
 
 }
