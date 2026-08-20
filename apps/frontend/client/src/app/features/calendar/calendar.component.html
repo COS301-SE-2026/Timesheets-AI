@@ -151,50 +151,98 @@ Related Requirements: N/A
 
     <!-- POP UP OF THE CLICKED EVENT  -->
     @if(selectedEvent(); as event){
-        <div class="event-details">
+        <div 
+            class="modal-backdrop"
+            (click)="closeEventDetails()">
+        </div>
+
+        <div 
+            class="event-details-card"
+            role="dialog"
+            aria-modal="true">
             <button 
                 class="close-button"
-                (click)="closeEventDetails()">
+                (click)="closeEventDetails()"
+                aria-label="Close Modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <h2>
-                {{ event.title}}
-            </h2>
-
-            <div class="event-time">
-                <i class="fa-regular fa-clock"></i>
-                <span>
-                    {{ event.start | date:'EEE, d MMM yyyy'}}
-                    <br>
-                    {{ event.start | date:'HH:mm'}}- {{ event.end | date:'HH:mm'}}
-                </span>
-            </div>
-
-            @if( event.location){
-                <div class="event-info">
-                    <i class="fa-solid fa-location-dot"></i>
-                    {{ event.location}}
+            <div class="modal-body">
+                <div class="title-row">
+                    @if(event.category){
+                        <span
+                            class="category-dot"
+                            [ngClass]="event.category"></span>
+                    }
+                    <h2>
+                        {{ event.title}}
+                    </h2>
                 </div>
-            }
 
-            @if (event.organizer?.name){
-                <div class="event-info">
-                    <i class="fa-solid fa-user"></i>
-                    {{ event.organizer?.name}}
+                @if (event.categoryLabel || event.category){
+                    <div class="badge-row">
+                        <span 
+                            class="category-badge"
+                            [ngClass]="event.category">
+                            {{ event.categoryLabel || event.category }}
+                        </span>
+                    </div>
+                }
+
+                <!-- IN DEPTH DETAILS INFO -->
+                <div class="info-list">
+                    <!-- DATE -->
+                    <div class="info-item">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span>
+                            {{ event.start | date:'EEE, d MMM yyyy'}}
+                        </span>
+                    </div>
+
+                    <!-- TIME -->
+                    <div class="info-item">
+                        <i class="fa-regular fa-clock"></i>
+                        <span>
+                            {{ event.start | date:'HH:mm'}}
+                            @if(event.end){
+                                - {{ event.end | date:'HH:mm'}}
+                            }
+                        </span>
+                    </div>
+
                 </div>
-            }
 
-            @if (event.description){
-                <p class="event-description">
-                    {{ event.description}}
-                </p>
-            }
+                @if( event.location){
+                    <div class="info-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span> 
+                            {{ event.location}}
+                        </span>
+                    </div>
+                }
 
-            <div class="event-readonly">
-                <i class="fa-solid fa-lock"></i>
-                Read-only event
-            </div>
+                @if (event.organizer?.name || event.organizer){
+                    <div class="info-item">
+                        <i class="fa-solid fa-user"></i>
+                        <span>
+                            <strong>
+                                {{ event.organizer?.name || event.organizer}}
+                            </strong>
+                            <span class="muted-text">(Organizer)</span>
+                        </span>
+                    </div>
+                }
+
+                @if (event.description){
+                    <div class="info-item align-start">
+                        <i class="fa-solid fa-align-left"></i>
+                        <p class="event-description">
+                            {{ event.description}}
+                        </p> 
+                    </div>
+                }
+                
+            </div>    
         </div>
     }
 </div>
