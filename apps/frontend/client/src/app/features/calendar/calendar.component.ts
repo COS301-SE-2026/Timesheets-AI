@@ -1,8 +1,8 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, signal, OnInit, ViewChild} from '@angular/core';
 import { EventClickInfo, FullCalendarComponent, FullCalendarModule, CalendarOptions} from '@fullcalendar/angular';
-import  dayGridPlugin from '@fullcalendar/angular/daygrid';
-import timeGridPlugin from '@fullcalendar/angular/timegrid';
+import  dayGridPlugin from 'fullcalendar/daygrid';
+import timeGridPlugin from 'fullcalendar/timegrid';
 import { CalendarProvider, AppEvent } from './calendar.model';
 import { CalendarService } from './calendar.services';
 export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
