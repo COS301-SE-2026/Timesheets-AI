@@ -389,7 +389,7 @@ describe('TimesheetsComponent', () => {
         lockedAt: today(),
         createdAt: today(),
         updatedAt: today(),
-      },
+      };
 
       function flushReviewLoad(): void {
         httpMock
