@@ -250,7 +250,7 @@ public class ProjectService {
         .build();
   }
 
-  //this is about deleting members from a project
+  // this is about deleting members from a project
   @Transactional
   public void removeMemberFromProject(UUID projectId, UUID workspaceMemberId) {
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
