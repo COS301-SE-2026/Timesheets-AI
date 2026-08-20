@@ -3,6 +3,10 @@
  * Date: 2026-05-15
  * Purpose: Handles user authentication through login form with validation
  * Related Requirement: -
+ * 
+ * Fixes:
+ * Nyasha : - fixed the Google OAuth popup not showing the account selector
+ *          - added cancel_on_tap_outside: false to the Google SDK initialization. 
  */
 
 import {
@@ -24,6 +28,9 @@ import {
 import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
 
+
+
+
 //while doing lint fixes, i had to change the type from any
 interface GoogleIdentityServices {
   accounts: {
@@ -31,6 +38,7 @@ interface GoogleIdentityServices {
       initialize(config: {
         client_id: string;
         callback: (response: { credential: string }) => void;
+        cancel_on_tap_outside?: boolean;
       }): void;
       renderButton(
         parent: HTMLElement,
@@ -41,6 +49,7 @@ interface GoogleIdentityServices {
   };
 }
 declare const google: GoogleIdentityServices;
+
 
 @Component({
   selector: 'app-login',
@@ -107,6 +116,7 @@ export class LoginComponent implements AfterViewInit {
       client_id: environment.googleClientId,
       callback: (response: { credential: string }) =>
         this.handleGoogleCredential(response.credential),
+      cancel_on_tap_outside: false,
     });
 
     google.accounts.id.renderButton(this.googleBtn.nativeElement, {
