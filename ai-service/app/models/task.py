@@ -4,6 +4,7 @@ It matches momently_schema.sql that Nyasha(Backend enginner) shared, not creatin
 Author: Zamokuhle Zwane
 Date: 12/07/2026
 """
+
 import uuid
 from datetime import date, datetime
 
@@ -28,4 +29,3 @@ class Task(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime)
     updated_at: Mapped[datetime] = mapped_column(DateTime)
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
-

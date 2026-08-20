@@ -1,7 +1,7 @@
 """
 This handles the request and response shapes for the productivity
-score endpoint, once again it replicates the existing db 
-Please review my draft documentation once again. 
+score endpoint, once again it replicates the existing db
+Please review my draft documentation once again.
 Author: Zamokuhle Zwane
 Date: 12/07/2026
 """

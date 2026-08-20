@@ -16,20 +16,20 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
 
-#During review, please double check the mapping with Nyasha's schema. I'll link it to the PR for reference.
+# During review, please double check the mapping with Nyasha's schema. I'll link it to the PR for reference.
 class AIInsight(Base):
     __tablename__ = "ai_insights"
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True,default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     workspace_member_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("workspace_members.id"), nullable = True
-        )
+        UUID(as_uuid=True), ForeignKey("workspace_members.id"), nullable=True
+    )
     project_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("projects.id"), nullable = True
-        )
+        UUID(as_uuid=True), ForeignKey("projects.id"), nullable=True
+    )
     time_entry_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("time_entries.id"), nullable = True
-        )
+        UUID(as_uuid=True), ForeignKey("time_entries.id"), nullable=True
+    )
     insight_type: Mapped[str] = mapped_column(String(30))
     score: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
     confidence: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
