@@ -3,29 +3,31 @@
 // Purpose: have the calendar have the apple style 
 // to it
 
+@use 'sass:color';
+
 $calendar-card-bg: var(--color-white);
-$calendar-text-title: var(--color-text-primary);
-$calendar-text-body: var(--color-text-body);
-$calendar-text-muted: var(--color-text-muted);
-$calendar-primary: var(--color-primary);
-$calendar-primary-hover: var(--color-primary-hover);
+$calendar-text-title: #0f172a;
+$calendar-text-body: #1e293b;
+$calendar-text-muted: #64748b;
+$calendar-primary: #0071e3;
+$calendar-primary-hover: #0077ed;
 $calendar-primary-surface: var(--color-primary-surface);
-$calendar-border: var(--color-border);
-$calendar-pill-bg: var(--color-gray-light);
+$calendar-border: #e2e8f0;
+$calendar-pill-bg: #f1f5f9;
 
 // CATEGORY COLOURS
-$calendar-blue-bg: $calendar-primary-surface;
-$calendar-blue-text: $calendar-primary;
-$calendar-blue-border: var(--color-primary-tint, #b0d5ff);
-$calendar-green-bg: var(--color-semantic-green, #eaf9f1);
-$calendar-green-text: var(--color-semantic-green-text, #107c41);
-$calendar-amber-bg: var(--color-semantic-amber, #fef6e6);
-$calendar-amber-text: var(--color-semantic-amber-text, #b25900);
-$calendar-red-bg: var(--color-semantic-red, #fde8e8);
-$calendar-red-text: var(--color-semantic-red-text, #d70015);
+$calendar-blue-bg: #ebf3fe;
+$calendar-blue-text: #2563eb;
+$calendar-green-bg:  #eaf8f0;
+$calendar-green-text:  #16a34a;
+$calendar-amber-bg:  #fef3e6;
+$calendar-amber-text: #d97706;
+$calendar-red-bg:  #fde8e8;
+$calendar-red-text: #dc2626;
 
 // CALENDAR PAGE
 .calendar-page{
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text","Helvetica Neue", sans-serif;
     color: $calendar-text-body;
     max-width: 1280px;
     margin: 0 auto;
@@ -33,7 +35,6 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
     display: flex;
     flex-direction: column;
     gap: 24px;
-    -webkit-font-smoothing: antialiased;
 }
 
 // HEADER AREA
@@ -41,27 +42,25 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
 
     h1{
-        margin: 0 0 4px;
+        margin: 0 ;
         font-size: 28px;
         font-weight: 700;
         letter-spacing: -0.5px;
-        color: $calendar-text-title;
     }
 
     p{
-        margin: 0;
+        margin: 4px 0 0;
         color: $calendar-text-muted;
         font-size: 14px;
-        font-weight: 400;
     }
 
     // THE CONNECTION PILL AND SYNCING AREA
     .header-actions{
         display: flex;
+        flex-direction: column;
+        -webkit-font-smoothing: antialiased;
         align-items: center;
         gap: 12px;
     }
@@ -76,21 +75,16 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
         border-radius: 999px;
         font-size: 13px;
         font-weight: 500;
-        color: $calendar-text-body;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-        white-space: nowrap;
 
         .status-dot{
             width: 8px;
             height: 8px;
             border-radius: 50%;
             background: $calendar-green-text;
-            flex-shrink: 0;
         }
 
         .sync-meta{
             color: $calendar-text-muted;
-            font-weight: 400;
         }
     }
 
@@ -106,26 +100,24 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        white-space: nowrap;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: background 0.2s;
 
-        i{
-            font-size: 12px;
-        }
+        // i{
+        //     font-size: 12px;
+        // }
 
-        &:hover:not(:disabled){
+        &:hover{
             background: $calendar-primary-hover;
-            transform: scale(1.02);
         }
 
-        &:active:not(:disabled){
-            transform: scale(0.98);
-        }
+        // &:active:not(:disabled){
+        //     transform: scale(0.98);
+        // }
 
-        &:disabled{
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+        // &:disabled{
+        //     opacity: 0.6;
+        //     cursor: not-allowed;
+        // }
     }
 }
 
@@ -138,14 +130,18 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
     display: flex;
     flex-direction: column;
     gap: 20px;
-    box-shadow: 0 6px 20px rgba(15, 76, 145, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
 
     .calendar-toolbar{
         display: flex;
         justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
-        gap: 12px;
+
+        .calendar-title{
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
     }
 
     .date-navigation{
@@ -157,12 +153,10 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
             padding: 7px 18px;
             font-size: 13px;
             font-weight: 600;
-            color: $calendar-text-title;
             border: 1px solid $calendar-border;
-            background: $calendar-card-bg;
+            background: #ffffff;
             border-radius: 999px;
             cursor: pointer;
-            transition: all 0.2s ease;
 
             &:hover{
                 background: $calendar-pill-bg;
@@ -172,28 +166,17 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
         // GROUPING THE LEFT RIGHT BUTTON
         .nav-arrows{
             display: flex;
-            align-items: center;
             border: 1px solid $calendar-border;
             border-radius: 999px;
             overflow: hidden;
-            background: $calendar-card-bg;
         }
 
         .icon-button{
-            width: 32px;
+            width: 36px;
             height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: $calendar-text-title;
             border: none;
             background: transparent;
             cursor: pointer;
-            transition: background 0.15s ease;
-
-            i{
-                font-size: 12px;
-            }
 
             &:hover{
                 background: $calendar-pill-bg;
@@ -210,7 +193,6 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
         display: flex;
         padding: 3px;
         background: $calendar-pill-bg;
-        border: 1px solid rgba(0, 0, 0, 0.04);
         border-radius: 10px;
 
         button{
@@ -222,13 +204,11 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
 
             &.active{
-                background: $calendar-card-bg;
-                color: $calendar-text-title;
+                background: $calendar-primary;
+                color: #ffffff;
                 font-weight: 600;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
             }
         }
     }
@@ -238,22 +218,20 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
         ::ng-deep .fc{
             font-family: inherit;
             --fc-border-color: #{$calendar-border};
-            --fc-today-bg-color: transparent;
 
-            .fc-toolbar-title{
-                font-size: 18px;
-                font-weight: 700;
-                color: $calendar-text-title;
+            .fc-scrollgrid{
+                border-radius: 12px;
+                border: 1px solid $calendar-border;
+                overflow: hidden;
             }
 
             .fc-col-header-cell{
                 padding: 12px 0;
                 color: $calendar-text-muted;
+                background-color: #f8fafc;
                 font-size: 12px;
                 font-weight: 600;
-                letter-spacing: 0.5px;
                 text-transform: uppercase;
-                border-bottom: 1px solid $calendar-border;
             }
 
             .fc-daygrid-day-number{
@@ -264,57 +242,149 @@ $calendar-red-text: var(--color-semantic-red-text, #d70015);
             }
 
             .fc-day-today .fc-daygrid-day-number{
-                display: flex;
+                display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 width: 24px;
                 height: 24px;
-                padding: 0;
-                margin: 4px 6px 0 0;
+                margin: 4px;
                 background: $calendar-primary;
                 color: var(--color-white);
-                border-radius: 50%;
                 font-weight: 600;
             }
 
-            .fc-event{
-                padding: 3px 8px;
-                background: $calendar-primary;
-                border: 1px solid var(--color-primary-tint);
-                border-radius: 6px;
+            .custom-event-pill{
+                display: flex;
+                align-items: center;
+                font-weight: 600;  
+                padding: 2px 6px;
                 font-size: 12px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: transform 0.1s ease;
+                font-weight: 500;
+                white-space: nowrap;
+                overflow: hidden;
 
-                &:hover{
-                    transform: translateY(-1px);
+                .event-dot{
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    flex-shrink: 0;
+
+                    &.meetings{
+                        background: $calendar-blue-text;
+                    }
+                    &.work{
+                        background: $calendar-green-text;
+                    }
+                    &.calls{
+                        background: $calendar-amber-text;
+                    }
+                    &.deadlines{
+                        background: $calendar-red-text;
+                    }
+                }
+
+                .event-title{
+                    font-weight: 600;
+                }
+                .event-time{
+                    color: $calendar-text-muted;
+                    margin-left: 4px;
                 }
             }
 
-            // CATEGORY COLOURS
-            .fc-event-purple{
-                background: var(--color-semantic-purple);
-                color: var(--color-semantic-purple-text);
-                border-color: var(--color-semantic-purple-text);
-            }
-            .fc-event-green{
-                background: var(--color-semantic-green);
-                color: var(--color-semantic-green-text);
-                border-color: var(--color-semantic-green-text);
-            }
+            .fc-daygrid-event{
+                border: 1px solid var(--color-primary-tint);
+                border-radius: 6px;
+                margin: 2px 4px;                
 
-            .fc-event-amber{
-                background: var(--color-semantic-amber);
-                color: var(--color-semantic-amber-text);
-                border-color: var(--color-semantic-amber-text);
-            }
-            .fc-event-red{
-                background: var(--color-semantic-red);
-                color: var(--color-semantic-red-text);
-                border-color: var(--color-semantic-red-text);
+                .fc-event-meetings{
+                    background: $calendar-blue-bg;
+                    .custom-event-pill{
+                        color: $calendar-blue-text;
+                    }
+                }
+                .fc-event-work{
+                    background: $calendar-green-bg;
+                    .custom-event-pill{
+                        color: $calendar-green-text;
+                    }
+                }
+                .fc-event-calls{
+                    background: $calendar-amber-bg;
+                    .custom-event-pill{
+                        color: $calendar-amber-text;
+                    }
+                }
+                .fc-event-deadlines{
+                    background: $calendar-red-bg;
+                    .custom-event-pill{
+                        color: $calendar-red-text;
+                    }
+                }
+
+                .event-title{
+                    font-weight: 700;
+                    font-size: 13px;
+                }
+                .event-time{
+                    font-size: 11px;
+                    margin-top: 2px;
+                }
+
             }
         }
     }
+
+    // FOOTER AREA
+    .calendar-legend{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1px solid $calendar-border;
+        font-size: 13px;
+
+        .legend-items{
+            display: flex;
+            gap: 20px;
+        }
+
+        .legend-item{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .legend-dot{
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+
+            &.blue{
+                background: $calendar-blue-text;
+            }
+            &.green{
+                background: $calendar-green-text;
+            }
+            &.amber{
+                background: $calendar-amber-text;
+            }
+            &.red{
+                background: $calendar-red-text;
+            }
+        }
+
+        .legend-readonly{
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: $calendar-text-muted;
+        }
+    }
+
+}
+
+// THE POP-UP MODALS DESIGN
+.modal{
 
 }
