@@ -175,6 +175,10 @@ public class ProjectServiceTest {
       // simulates what the project returns from DB
       Project savedProject = createTestProject();
 
+      // specifying that the user is an admin
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.isManager()).thenReturn(false);
+
       when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
 
@@ -270,6 +274,10 @@ public class ProjectServiceTest {
       request.setBudgetCost(null);
 
       Project savedProject = createTestProject();
+
+      // specifying that the user is an admin
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.isManager()).thenReturn(false);
 
       when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
