@@ -14,6 +14,7 @@ export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
   styleUrl: './calendar.component.scss'
 })
 
+
 export class CalendarComponent implements OnInit {
   @ViewChild('calendar')calendarComponent!: FullCalendarComponent;
 
@@ -23,6 +24,10 @@ export class CalendarComponent implements OnInit {
   provider= signal<CalendarProvider>( 'outlook');
   isSyncing= signal<boolean>(false);
   selectedEvent= signal<AppEvent | null>(null);
+
+  // HEADER PILL STUFF
+  isConnected= signal<boolean>(false);
+  lastSyncedLabel= signal<string | null>(null);
 
   calendarOptions: CalendarOptions={
     plugins:[
@@ -36,9 +41,16 @@ export class CalendarComponent implements OnInit {
     editable: false,
     selectable: false,
     events: [],
-    eventClick: (info: EventClickInfo)=> this.handleEventClick(info)
+    eventClick: (info: EventClickInfo)=> this.handleEventClick(info),
+
+    // ADDING THE FC COLOURS
+    eventClass:(arg)=>{
+      const category= arg.event.extendedProps['category'];
+      return category && category !== 'blue'? `fc-event-${category}`: '';
+    }
   };
 
+  
   ngOnInit(): void{
     this.loadEvents();
   }
@@ -103,5 +115,27 @@ export class CalendarComponent implements OnInit {
 
   closeEventDetails(): void{
     this.selectedEvent.set(null);
+  }
+
+  private formatSyncedLabel(isoDate: string):string{
+    const synced=new Date(isoDate);
+    const diffMs= Date.now()- synced.getTime();
+    const diffMinutes= Math.round(diffMs/60000);
+    if(diffMinutes< 1){
+      return 'synced just now';
+    }
+
+    if(diffMinutes< 60){
+      return 'synced ${diffMinutes}m ago';
+    }
+
+    const diffHours= Math.round(diffMinutes/60);
+    if(diffHours< 24){
+      return 'synced ${diffHours}h ago';
+    }
+
+    const diffDays= Math.round(diffHours/24);
+    return 'synced ${diffDays}d ago';
+    
   }
 }
