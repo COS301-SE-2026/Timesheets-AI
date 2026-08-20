@@ -11,8 +11,4 @@ public class AssignProjectMemberRequest {
   private UUID workspaceMemberId;
 
   private Boolean isProjectManager = false; // a project manager or just a developer
-
-  // want this to be set from the path variable in the controller so that the URL and request body
-  // match
-  private UUID projectId;
 }

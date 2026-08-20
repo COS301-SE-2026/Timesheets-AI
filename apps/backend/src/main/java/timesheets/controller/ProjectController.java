@@ -99,6 +99,17 @@ public class ProjectController {
     return ResponseEntity.ok().build();
   }
 
+  // to delete a project
+  @DeleteMapping("/{projectId}")
+  public ResponseEntity<Void> deleteProject(@PathVariable UUID projectId) {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    projectService.deleteProject(projectId, workspaceMemberId);
+
+    return ResponseEntity.noContent().build();
+  }
+
   // this will be to assign a workspace member to a project
   @PostMapping("/{projectId}/members")
   public ResponseEntity<ProjectMemberResponse> assignMemberToProject(

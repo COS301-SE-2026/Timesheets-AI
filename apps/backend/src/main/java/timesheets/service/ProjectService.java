@@ -221,6 +221,31 @@ public class ProjectService {
     projectRepository.save(project);
   }
 
+  // this is for deleting a project
+  @Transactional
+  public void deleteProject(UUID projectId, UUID workspaceMemberId) {
+
+    if (!securityUtils.isAdmin()) {
+      throw new AccessDeniedException("Only Admins can delete projects");
+    }
+
+    Project project =
+        projectRepository
+            .findById(projectId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Project not found with id: " + projectId));
+
+    // projects that are already deleted cannot be deleted
+    if (Boolean.TRUE.equals(project.getIsDeleted())) {
+      throw new StateConflictException("Project is already deleted");
+    }
+
+    // keep in mind that we only do soft deletes
+    project.setIsDeleted(true);
+    project.setDeletedAt(LocalDateTime.now());
+    projectRepository.save(project);
+  }
+
   // gets detailed information about a project
   @Transactional
   public ProjectDetailResponse getProjectDetail(UUID projectId, UUID workspaceMemberId) {
