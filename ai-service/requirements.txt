@@ -20,3 +20,7 @@ pytest-cov==5.0.0
 
 # Linting
 ruff==0.4.7
+black==26.5.1
+
+#Ai API
+anthropic==0.28.0
