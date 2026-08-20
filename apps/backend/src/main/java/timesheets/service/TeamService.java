@@ -6,12 +6,14 @@ import exception.StateConflictException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.AssignWorkspaceMemberRequest;
+import timesheets.dto.response.AvailableUserResponse;
 import timesheets.dto.response.WorkspaceMemberResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
@@ -113,5 +115,45 @@ public class TeamService {
     }
 
     workspaceMemberRepository.delete(member); // deleting them
+  }
+
+  /*
+  - this returns all users with a flag, frontend can then use the flag to filter
+  - this should allow, the members not a part of the workspace to be retrieved
+  - since we want both to list users in the workspace and then also users that are to be added to that workspace
+  */
+  @Transactional(readOnly = true)
+  public List<AvailableUserResponse> getAvailableUsers(UUID workspaceId) {
+
+    // this should be only accessible to admins, we don't want managers or others being able to view
+    // this
+    if (!securityUtils.isAdmin()) {
+      throw new AccessDeniedException("Only Admins can view available users");
+    }
+
+    // checking if the workspace actually exists
+    if (!workspaceRepository.existsById(workspaceId)) {
+      throw new ResourceNotFoundException("Workspace not found");
+    }
+
+    List<User> allUsers = userRepository.findAll();
+    List<UUID> userIdsInWorkspace =
+        workspaceMemberRepository.findByWorkspaceId(workspaceId).stream()
+            .map(WorkspaceMember::getUserId)
+            .collect(Collectors.toList());
+
+    // all the users will be returned but they will have a flag, that indicates if they are a part
+    // of the workspace or not
+    return allUsers.stream()
+        .map(
+            user ->
+                AvailableUserResponse.builder()
+                    .userId(user.getId())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .email(user.getEmail())
+                    .isInWorkspace(userIdsInWorkspace.contains(user.getId()))
+                    .build())
+        .collect(Collectors.toList());
   }
 }
