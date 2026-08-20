@@ -12,7 +12,7 @@ from datetime import date
 from pydantic import BaseModel
 
 
-class ProductivityScoreRequest(BaseModel):
+class ProductivityScoreResponse(BaseModel):
     workspace_member_id: uuid.UUID
     period_start: date
     period_end: date
@@ -23,5 +23,5 @@ class ProductivityScoreRequest(BaseModel):
     recommendation: str | None
     insight_id: uuid.UUID | None
 
-    class Config:
-        from_attributes = True
+    #had a deprecated pydantic warning 
+    model_config = {"from_attributes": True}
