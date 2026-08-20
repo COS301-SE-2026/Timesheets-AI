@@ -215,7 +215,7 @@ public class TimesheetService {
       throw new AccessDeniedException("Timesheet is not in your workspace");
     }
 
-    if (!"DRAFT".equals(timesheet.getStatus())) {
+    if (!"DRAFT".equals(timesheet.getStatus()) && !"REJECTED".equals(timesheet.getStatus())) {
       throw new StateConflictException("Timesheet has already been submitted");
     }
 

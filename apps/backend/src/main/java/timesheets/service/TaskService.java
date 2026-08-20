@@ -116,9 +116,7 @@ public class TaskService {
     UUID projectId = request.getProjectId();
 
     // to verify that the user has access to create tasks on the project
-    if (!isProjectManager(projectId, workspaceMemberId)
-        && !securityUtils.isAdmin()
-        && !securityUtils.isManager()) {
+    if (!userHasAccessToProject(projectId, workspaceMemberId)) {
       throw new AccessDeniedException("You don't have permission to create tasks on this project");
     }
 
