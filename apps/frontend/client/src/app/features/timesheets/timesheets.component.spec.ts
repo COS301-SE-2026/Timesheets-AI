@@ -393,7 +393,7 @@ describe('TimesheetsComponent', () => {
 
       function flushReviewLoad(): void {
         httpMock
-          .expectOne('/api/timesheets?status=SUBMITTED')
+          .expectOne('/api/timesheets/workspace/pending')
           .flush([submittedTeamTimesheet]);
         httpMock.expectOne('/api/projects').flush([
           {...mockProjects[0], myRole: 'MANAGER'},

@@ -141,9 +141,6 @@ export class TimesheetsComponent {
   // Managers see Approve / Reject when status is submitted
 
   private readonly authService = inject(AuthService);
-  // readonly isManager = computed(
-  //   () => this.authService.currentUser()?.roles?.includes('MANAGER') ?? false,
-  // );
 
   readonly isManager = computed(() => {
     const roles = this.authService.currentUser()?.roles ?? [];
@@ -362,12 +359,10 @@ export class TimesheetsComponent {
     this.errorMessage.set(null);
 
     const filter = this.reviewFilter();
-    const timesheets$ = filter === 'ALL'
-    ? this.timesheetService.getReviewTimesheets()
-    : this.timesheetService.getReviewTimesheets(filter);
+   const timesheets$ = this.timesheetService.getReviewTimesheets(filter);
 
     forkJoin({
-      timesheets: timesheets$.pipe(catchError(() => of([] as TimesheetResponse[]))),
+      timesheets: timesheets$,
       projects: this.projectService.getProjects(),
       tasks: this.taskService.getMyTasks(),
     })
