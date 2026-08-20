@@ -19,6 +19,7 @@ import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.AssignProjectMemberRequest;
 import timesheets.dto.request.CreateProjectRequest;
+import timesheets.dto.request.UpdateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
 import timesheets.dto.response.ProjectMemberResponse;
 import timesheets.dto.response.ProjectResponse;
@@ -124,6 +125,70 @@ public class ProjectService {
 
     // made the show cost info true since only an admin or manager can create a project anyway
     return buildProjectResponse(savedProject, createdByWorkspaceMemberId, true);
+  }
+
+  /*
+  - ADMIN: Can update any project
+  - MANAGER: Can update any project in their workspace
+  - PROJECT MANAGER: Can update projects they manage
+  - DEVELOPER: Cannot update projects
+  */
+  @Transactional
+  public ProjectResponse updateProject(
+      UUID projectId, UpdateProjectRequest request, UUID workspaceMemberId) {
+
+    Project project =
+        projectRepository
+            .findById(projectId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Project not found with id: " + projectId));
+
+    boolean isAdmin = securityUtils.isAdmin();
+    boolean isManager = securityUtils.isManager();
+    boolean isProjectManager = isProjectManager(projectId, workspaceMemberId);
+
+    if (!isAdmin && !isManager && !isProjectManager) {
+      throw new AccessDeniedException(
+          "Only Admins, Managers, and Project Managers can update projects");
+    }
+
+    // if a project is archived then it cannot be updated
+    if ("ARCHIVED".equals(project.getStatus())) {
+      throw new StateConflictException("Cannot update an archived project");
+    }
+
+    // the provided details will be the one updated
+    if (request.getName() != null) {
+      project.setName(request.getName());
+    }
+
+    if (request.getDescription() != null) {
+      project.setDescription(request.getDescription());
+    }
+
+    if (request.getBudgetHours() != null) {
+      project.setBudgetHours(request.getBudgetHours());
+    }
+
+    if (request.getHourlyRate() != null) {
+      project.setHourlyRate(request.getHourlyRate());
+    }
+
+    if (request.getStartDate() != null) {
+      project.setStartDate(request.getStartDate());
+    }
+
+    if (request.getEndDate() != null) {
+      project.setEndDate(request.getEndDate());
+    }
+
+    if (request.getBudgetCost() != null) {
+      project.setBudgetCost(request.getBudgetCost());
+    }
+
+    Project updatedProject = projectRepository.save(project);
+
+    return buildProjectResponse(updatedProject, workspaceMemberId, true);
   }
 
   // gets detailed information about a project
