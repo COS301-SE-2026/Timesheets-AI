@@ -200,6 +200,7 @@ public class TimesheetService {
             .orElseThrow(
                 () -> new ResourceNotFoundException("Timesheet not found with id: " + timesheetId));
 
+    // only the owner should be able to submit their timesheet
     if (!timesheet.getWorkspaceMemberId().equals(currentMemberId)) {
       throw new AccessDeniedException("You can only submit your own timesheets");
     }
