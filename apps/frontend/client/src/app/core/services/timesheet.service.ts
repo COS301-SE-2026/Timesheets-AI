@@ -78,11 +78,11 @@ export class TimesheetService {
       .pipe(catchError(this.handleError('submitTimesheet')));
   }
 
-//  Manager/ admin : all non draft timesheets in the workspace
-getWorkspaceTimesheets(): Observable<TimesheetResponse[]>{
+  // Manager/admin: submitted timesheets awaiting approval
+  getPendingWorkspaceTimesheets(): Observable<TimesheetResponse[]> {
     return this.http
-    .get<TimesheetResponse[]>(`${this.baseUrl}/workspace`)
-    .pipe(catchError(this.handleError('getWorkspaceTimesheets')));
+    .get<TimesheetResponse[]>(`${this.baseUrl}/workspace/pending`)
+    .pipe(catchError(this.handleError('getPendingWorkspaceTimesheets')));
   }
   
   //a post request for managaer approvals screen, not used on this page yet
