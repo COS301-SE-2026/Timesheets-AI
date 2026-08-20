@@ -11,6 +11,7 @@ from datetime import date
 
 from pydantic import BaseModel
 
+
 class ProductivityScoreRequest(BaseModel):
     workspace_member_id: uuid.UUID
     period_start: date
