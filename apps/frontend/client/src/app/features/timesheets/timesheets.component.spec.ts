@@ -40,8 +40,14 @@ describe('TimesheetsComponent', () => {
   ];
 
   function today(): string {
-    return new Date().toISOString().slice(0, 10);
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
+
   function daysAgo(n: number): string {
     const d = new Date();
     d.setDate(d.getDate() - n);
@@ -53,8 +59,8 @@ describe('TimesheetsComponent', () => {
     {
       id: currentTimesheetId,
       workspaceMemberId: 'member-1',
-      periodStart: today(),
-      periodEnd: today(),
+      periodStart: startOfWeek(),
+      periodEnd: endOfWeek(),
       status: 'DRAFT' as const,
       submittedAt: null,
       approvedAt: null,
@@ -124,6 +130,24 @@ describe('TimesheetsComponent', () => {
   };
 
   const managerUser: AuthUser = { ...developerUser, roles: ['MANAGER'] };
+
+  function startOfWeek(): string {
+    const d = new Date();
+    const day = d.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+
+    d.setDate(d.getDate() + diff);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function endOfWeek(): string {
+     const d = new Date();
+    const day = d.getDay();
+    const diff = day === 0 ? 0 : 7 - day;
+
+    d.setDate(d.getDate() + diff);
+    return d.toISOString().slice(0, 10);
+  }
 
   //this flushes the 3 requestss forkJoin fires from loadTimesheets()
   function flushInitialLoad(entries: typeof mockEntries = mockEntries): void {
@@ -317,9 +341,9 @@ describe('TimesheetsComponent', () => {
       expect(component.isManager()).toBe(false);
     });
 
-    it('should not open the reject dialog when the user cannot approve/reject', () => {
+    it('should not open the reject reason when the user cannot approve/reject', () => {
       component.openRejectDialog();
-      expect(component.showRejectDialog()).toBe(false);
+      expect(component.showRejectReason()).toBe(false);
     });
 
     it('should dismiss the toast automatically after 4 seconds', () => {
@@ -347,18 +371,85 @@ describe('TimesheetsComponent', () => {
   });
 
   describe('as a manager', () => {
-    beforeEach(async () => {
-      await setup(managerUser);
+    const teamTimesheetId = 'timesheet-team';
+    const teamMemberId = 'member-dev-1';
 
-      // manager view lands on a SUBMITTED timesheet so approve/reject show up
-      const submittedTimesheet = {
-        ...mockTimesheets[0],
+      const submittedTeamTimesheet = {
+        id: teamTimesheetId,
+        workspaceMemberId: teamMemberId,
+        periodStart: today(),
+        periodEnd: today(),
         status: 'SUBMITTED' as const,
         submittedAt: today(),
+        approvedAt: null,
+        approvedByWorkspaceMemberId: null,
+        rejectedAt: null,
+        rejectReason: null,
         isLocked: true,
+        lockedAt: today(),
+        createdAt: today(),
+        updatedAt: today(),
       };
 
-      httpMock.expectOne('/api/timesheets/me').flush([submittedTimesheet]);
+      function flushReviewLoad(): void {
+        httpMock
+          .expectOne('/api/timesheets/workspace/pending')
+          .flush([submittedTeamTimesheet]);
+        httpMock.expectOne('/api/projects').flush([
+          {...mockProjects[0], myRole: 'MANAGER'},
+          {...mockProjects[1], myRole: 'MANAGER'},
+        ]);
+        httpMock.expectOne('/api/tasks/my-tasks').flush(mockTasks);
+        httpMock
+          .expectOne(`/api/projects/${projectOneId}`)
+          .flush({
+            id: projectOneId,
+            name: 'Mobile App Development',
+            description: null,
+            status: 'ACTIVE',
+            budgetHours: null,
+            hourlyRate: null,
+            budgetCost: null,
+            totalCost: null,
+            members: [
+              {
+                workspaceMemberId: teamMemberId,
+                firstName: 'John',
+                lastName: 'Doe',
+                email : 'john@example.com',
+                role: 'DEVELOPER',
+                hoursLogged: 34,
+                joinedAt: today(),
+              },
+            ],
+            hoursLogged: 34,
+            progressPercentage: 0,
+            createdAt: today(),
+            updatedAt: today(),
+          });
+          httpMock.expectOne(`/api/projects/${projectTwoId}`)
+            .flush({
+              id: projectTwoId,
+              name: 'Backend API',
+              description: null,
+              status: 'ACTIVE',
+              budgetHours: null,
+              budgetCost: null,
+              totalCost: null,
+              members: [],
+              hoursLogged: 0,
+              progressPercentage: 0,
+              createdAt: today(),
+              updatedAt: today(),
+            });
+            httpMock.expectOne(`/api/timesheets/${teamTimesheetId}/entries`).flush([]);
+      }
+
+      beforeEach(async () => {
+        await setup(managerUser);
+
+      const ownDraft = { ...mockTimesheets[0]};
+      httpMock.expectOne('/api/timesheets/me').flush([ownDraft]);
       httpMock.expectOne('/api/projects').flush(mockProjects);
       httpMock.expectOne('/api/tasks/my-tasks').flush(mockTasks);
       httpMock
@@ -368,86 +459,100 @@ describe('TimesheetsComponent', () => {
       fixture.detectChanges();
     });
 
-    it('should allow approve/reject on a SUBMITTED timesheet', () => {
+    it('should show manager page tabs and load the review queue', () => {
       expect(component.isManager()).toBe(true);
-      expect(component.canApproveOrReject()).toBe(true);
-      expect(component.canSubmit()).toBe(false); // it's already submitted, not a DRAFT
+      component.setPageTab('review');
+      flushReviewLoad();
+      fixture.detectChanges();
+
+      expect(component.pageTab()).toBe('review');
+      expect(component.filteredReviewRows()).toHaveLength(1);
+      expect(component.awaitingReviewCount()).toBe(1);
     });
 
-    it('should approve the timesheet', () => {
-      jest.spyOn(window, 'confirm').mockReturnValue(true);
+    it('should not approve from own timesheet view without a review target', () => {
+      expect(component.canApproveOrReject()).toBe(false);
+    });
 
+    it('should allow approve/reject from the review modal', () => {
+      component.setPageTab('review');
+      flushReviewLoad();
+      component.openReviewModal(component.filteredReviewRows()[0]);
+   
+      expect(component.canApproveOrReject()).toBe(true);
+      expect(component.canSubmit()).toBe(true); // own draft still selected
+    });
+
+    it('should approve the timesheet from the review modal', () => {
+      component.setPageTab('review');
+      flushReviewLoad();
+      component.openReviewModal(component.filteredReviewRows()[0]);
       component.onApproveTimesheet();
 
       const req = httpMock.expectOne(
-        `/api/timesheets/${currentTimesheetId}/approve`,
+        `/api/timesheets/${teamTimesheetId}/approve`,
       );
       expect(req.request.method).toBe('POST');
 
       req.flush({
-        ...mockTimesheets[0],
+        ...submittedTeamTimesheet,
         status: 'APPROVED',
         approvedAt: today(),
         isLocked: true,
       });
 
-      expect(component.summary()?.status).toBe('APPROVED');
-      expect(component.toastMessage()).toBe('Timesheet Approved');
+      expect(component.awaitingReviewCount()).toBe(0);
+      expect(component.showReviewModal()).toBe(false);
+      expect(component.toastMessage()).toBe('Timesheet approved');
     });
 
-    it('should not call the backend if the approval confirm is cancelled', () => {
-      jest.spyOn(window, 'confirm').mockReturnValue(false);
-
-      component.onApproveTimesheet();
-
-      // confirm() returned false, onApproveTimesheet should bail before the
-      // HTTP call, verified by afterEach's httpMock.verify()
-      expect(component.actionPending()).toBe(false);
-    });
-
-    it('should open the reject dialog and require a non-empty reason', () => {
-      component.openRejectDialog();
-      expect(component.showRejectDialog()).toBe(true);
-
-      component.onConfirmReject(); // no reason set yet
-      // should bail silently, no HTTP call, verified by afterEach
-      expect(component.showRejectDialog()).toBe(true);
+    it('should require a rejection reason before confirming reject', () => {
+      component.setPageTab('review');
+      flushReviewLoad();
+      component.openReviewModal(component.filteredReviewRows()[0]);
+      component.enableRejectReason();
+      expect(component.showRejectReason()).toBe(true);
+      component.onConfirmReject(); 
+      expect(component.showReviewModal()).toBe(true);
     });
 
     it('should reject the timesheet with a reason', () => {
-      component.openRejectDialog();
+      component.setPageTab('review');
+      flushReviewLoad();
+      component.openReviewModal(component.filteredReviewRows()[0]);
+      component.enableRejectReason();
       component.rejectReason.set('Missing hours for Tuesday');
       component.onConfirmReject();
 
       const req = httpMock.expectOne(
-        `/api/timesheets/${currentTimesheetId}/reject`,
+        `/api/timesheets/${teamTimesheetId}/reject`,
       );
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({ reason: 'Missing hours for Tuesday' });
 
       req.flush({
-        ...mockTimesheets[0],
+        ...submittedTeamTimesheet,
         status: 'REJECTED',
         rejectedAt: today(),
         rejectionReason: 'Missing hours for Tuesday',
         isLocked: false,
       });
 
-      expect(component.summary()?.status).toBe('REJECTED');
-      expect(component.summary()?.rejectionReason).toBe(
-        'Missing hours for Tuesday',
-      );
-      expect(component.showRejectDialog()).toBe(false);
-      expect(component.toastMessage()).toBe('Timesheet Rejected.');
+     expect(component.awaitingReviewCount()).toBe(0);
+     expect(component.showReviewModal()).toBe(false);
+     expect(component.toastMessage()).toBe('Timesheet Rejected.');
     });
 
     it('should surface an error if reject fails', () => {
-      component.openRejectDialog();
+      component.setPageTab('review');
+      flushReviewLoad();
+      component.openReviewModal(component.filteredReviewRows()[0]);
+      component.enableRejectReason();
       component.rejectReason.set('Missing hours');
       component.onConfirmReject();
 
       const req = httpMock.expectOne(
-        `/api/timesheets/${currentTimesheetId}/reject`,
+        `/api/timesheets/${teamTimesheetId}/reject`,
       );
       req.error(new ProgressEvent('network error'));
 
