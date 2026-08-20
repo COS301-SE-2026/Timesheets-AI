@@ -24,6 +24,7 @@ export class CalendarComponent implements OnInit {
   provider= signal<CalendarProvider>( 'outlook');
   isSyncing= signal<boolean>(false);
   selectedEvent= signal<AppEvent | null>(null);
+  currentDateTitle= signal<string>('');
 
   // HEADER PILL STUFF
   isConnected= signal<boolean>(false);
@@ -47,6 +48,10 @@ export class CalendarComponent implements OnInit {
     eventClass:(arg)=>{
       const category= arg.event.extendedProps['category'];
       return category && category !== 'blue'? `fc-event-${category}`: '';
+    },
+
+    datesSet:(dateInfo)=>{
+      this.currentDateTitle.set(dateInfo.view.title);
     }
   };
 
