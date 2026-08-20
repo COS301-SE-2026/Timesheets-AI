@@ -108,7 +108,10 @@ public class TimeEntryService {
     timeEntryRepository.save(entry);
   }
 
-  // this will allow a user to edit time entries as long as if they are not locked
+  /*
+  - this will allow a user to edit time entries as long as if they are not locked
+  - as per the client request both manual and timer, time entries are both editable
+  */
   @Transactional
   public TimeEntry updateTimeEntry(UUID id, TimeEntryRequest request) {
 
@@ -129,7 +132,6 @@ public class TimeEntryService {
     entry.setStartTime(request.getStartTime());
     entry.setEndTime(request.getEndTime());
     entry.setDurationSeconds(request.getDurationSeconds());
-    entry.setEntryType(request.getEntryType());
     entry.setDescription(request.getDescription());
 
     return timeEntryRepository.save(entry);
