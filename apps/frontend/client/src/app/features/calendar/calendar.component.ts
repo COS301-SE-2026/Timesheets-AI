@@ -3,8 +3,10 @@ import { Component, inject, signal, OnInit, ViewChild} from '@angular/core';
 import { EventClickInfo, FullCalendarComponent, FullCalendarModule, CalendarOptions} from '@fullcalendar/angular';
 import  dayGridPlugin from 'fullcalendar/daygrid';
 import timeGridPlugin from 'fullcalendar/timegrid';
+import interactionPlugin from 'fullcalendar/interaction';
 import { CalendarProvider, AppEvent } from './calendar.model';
 import { CalendarService } from './calendar.services';
+import { spawn } from 'node:child_process';
 export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 @Component({
   selector: 'app-calendar',
@@ -16,7 +18,8 @@ export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 
 
 export class CalendarComponent implements OnInit {
-  @ViewChild('calendar')calendarComponent!: FullCalendarComponent;
+  @ViewChild('calendar')
+  calendarComponent!: FullCalendarComponent;
 
   private calendarService= inject(CalendarService);
 
@@ -28,12 +31,13 @@ export class CalendarComponent implements OnInit {
 
   // HEADER PILL STUFF
   isConnected= signal<boolean>(false);
-  lastSyncedLabel= signal<string | null>(null);
+  lastSyncedLabel= signal<string | null>('synced just now');
 
   calendarOptions: CalendarOptions={
     plugins:[
       dayGridPlugin,
-      timeGridPlugin
+      timeGridPlugin,
+      interactionPlugin
     ],
 
     initialView: 'dayGridMonth',
@@ -45,10 +49,12 @@ export class CalendarComponent implements OnInit {
     eventClick: (info: EventClickInfo)=> this.handleEventClick(info),
 
     // ADDING THE FC COLOURS
-    eventClass:(arg)=>{
+    eventClassNames:(arg)=>{
       const category= arg.event.extendedProps['category'];
-      return category && category !== 'blue'? `fc-event-${category}`: '';
+      return category ? [`fc-event-${category}`]: [];
     },
+
+    eventContent:(arg: any)=> this.renderEventContent(arg),
 
     datesSet:(dateInfo)=>{
       this.currentDateTitle.set(dateInfo.view.title);
@@ -61,14 +67,28 @@ export class CalendarComponent implements OnInit {
   }
 
   loadEvents(): void{
-    this.calendarService.getEvents(this.provider(), '', '').subscribe(events=>
+    this.calendarService.getEvents(this.provider(), '', '').subscribe(
     {
-      const api= this.calendarComponent?.getApi();
-      if(api){
-        api.removeAllEventSources();
-        api.addEventSource(events);
-      }else{
-        this.calendarOptions.events= events;
+      next: (events)=>{
+        const api= this.calendarComponent?.getApi();
+        if(api){
+          api.removeAllEventSources();
+          api.addEventSource(events);
+        }else{
+          this.calendarOptions.events= events;
+        }
+
+        this.isConnected.set(true);
+
+        this.lastSyncedLabel.set(
+          this.formatSyncedLabel(
+            new Date().toISOString()
+          )
+        );
+      },
+
+      error:()=>{
+        this.isConnected.set(false);
       }
     });
   }
@@ -79,11 +99,11 @@ export class CalendarComponent implements OnInit {
   }
 
   navigate(direction: 'prev' | 'next' | 'today'):void{
-    const calander= this.calendarComponent.getApi();
+    const calandar= this.calendarComponent.getApi();
 
-    if(direction=== 'prev') calander.prev();
-    if(direction=== 'next') calander.next();
-    if(direction=== 'today') calander.today();
+    if(direction=== 'prev') calandar.prev();
+    if(direction=== 'next') calandar.next();
+    if(direction=== 'today') calandar.today();
   }
 
   syncCalendar(): void{
@@ -97,13 +117,24 @@ export class CalendarComponent implements OnInit {
           api.addEventSource(events);
         }
           this.isSyncing.set(false);
+          this.isConnected.set(true);
+
+          this.lastSyncedLabel.set(
+            this.formatSyncedLabel(
+              new Date().toISOString()
+            )
+          );
         },
-        error:()=> this.isSyncing.set(false)
+        error:()=> {
+          this.isSyncing.set(false);
+          this.isConnected.set(false);
+        }
     });
   }
 
   handleEventClick(info: EventClickInfo): void{
     const rawProps= info.event.extendedProps;
+    const categoryKey= rawProps['category'] || 'meetings';
 
     this.selectedEvent.set({
       id: info.event.id,
@@ -113,13 +144,52 @@ export class CalendarComponent implements OnInit {
       description: rawProps['description'],
       location: rawProps['location'],
       provider: this.provider(),
-      category: rawProps['category'],
+      category: categoryKey,
+      categoryLabel: rawProps['categoryLabel'] || this.getCategoryLabel(categoryKey),
       organizer: rawProps['organizer']
     });
   }
 
   closeEventDetails(): void{
     this.selectedEvent.set(null);
+  }
+
+  private renderEventContent(arg: any){
+    if(arg.view.type=== 'dayGridMonth'){
+      const category= arg.event.extendedProps['category'] || 'meetings';
+
+      return{
+        html:`
+          <div class="custom-event-pill">
+            <span class="event-dot ${category}">
+            </span>
+            <span class="event-title">
+              ${arg.event.title}
+            </span>
+
+            ${
+              arg.timeText ? `
+                <span class="event-title">
+                  ${arg.timeText}
+                </span>
+              `: ''
+            }
+          </div>`
+      };
+    }
+
+    return true;
+  }
+
+  private getCategoryLabel(category: string){
+    const labels: Record<string, string>={
+      meetings: 'Meeting',
+      work: 'Work',
+      calls: 'Call',
+      deadlines: 'Deadline'
+    };
+
+    return labels[category] || 'Event';
   }
 
   private formatSyncedLabel(isoDate: string):string{
@@ -131,16 +201,16 @@ export class CalendarComponent implements OnInit {
     }
 
     if(diffMinutes< 60){
-      return 'synced ${diffMinutes}m ago';
+      return `synced ${diffMinutes}m ago`;
     }
 
     const diffHours= Math.round(diffMinutes/60);
     if(diffHours< 24){
-      return 'synced ${diffHours}h ago';
+      return `synced ${diffHours}h ago`;
     }
 
     const diffDays= Math.round(diffHours/24);
-    return 'synced ${diffDays}d ago';
+    return `synced ${diffDays}d ago`;
     
   }
 }

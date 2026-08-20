@@ -5,14 +5,25 @@
 // Related Requirements: N/A
 
 import { Injectable, inject } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { of, Observable } from "rxjs";
-import { delay } from "rxjs/operators";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { Observable } from "rxjs";
 import{
     AppEvent,
     CalendarProvider
 }from './calendar.model';
 
+
+// BACKEND RESPONSES
+export interface CalendarStatus{
+    connected: boolean;
+    provider: string;
+    lastSyncedAt: string | null;
+}
+
+interface CalendarEventsResponse{
+    events: AppEvent[];
+    
+}
 @Injectable({
     providedIn: 'root'
 })
@@ -20,6 +31,7 @@ import{
 export class CalendarService{
     private http=inject(HttpClient);
     private readonly apiUrl= '/api/calendar';
+    private readonly googleCalendarApiUrl= '/api/integrations/google/calendar';
 
     // mocking data rn
     private readonly mockOutlookEvents: AppEvent[]=[
@@ -74,6 +86,21 @@ export class CalendarService{
         start: string,
         end: string
     ): Observable<AppEvent[]>{
+        let params= new HttpParams();
+
+        if (start){
+            params=params.set('start', start);
+        }
+        if (end){
+            params=params.set('end', end);
+        }
+
+        return this.http.get<CalendarEventsResponse>(
+            `${this.calendarApiUrl}/events`,
+            { params }
+        ).pipe(
+            mapResponse=> mapResponse.events
+        );
         const selectedEvents= provider === 'outlook'? this.mockOutlookEvents: this.mockGoogleEvents;
         return of( selectedEvents).pipe(delay(200));
     }
