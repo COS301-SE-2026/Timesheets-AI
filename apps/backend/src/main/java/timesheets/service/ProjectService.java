@@ -2,8 +2,10 @@ package timesheets.service;
 
 import exception.AccessDeniedException;
 import exception.ResourceNotFoundException;
+import exception.StateConflictException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -15,8 +17,10 @@ import timesheets.domain.ProjectMember;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
+import timesheets.dto.request.AssignProjectMemberRequest;
 import timesheets.dto.request.CreateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
+import timesheets.dto.response.ProjectMemberResponse;
 import timesheets.dto.response.ProjectResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
@@ -167,9 +171,87 @@ public class ProjectService {
         projectId, workspaceMemberId);
   }
 
+  /*
+  ADMIN: and admin can assign anyone to a project
+  MANAGER: manager can only assign those in their workspaces
+  PROJECT_MANAGERS: they can assign people to the projects
+  DEV: cannot assign anyone
+  */
+  @Transactional
+  public ProjectMemberResponse assignMemberToProject(AssignProjectMemberRequest request) {
+
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    Project project =
+        projectRepository
+            .findById(request.getProjectId())
+            .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+    WorkspaceMember member =
+        workspaceMemberRepository
+            .findById(request.getWorkspaceMemberId())
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
+
+    // to ensure that the user belongs to the same workspace as the project
+    if (!member.getWorkspaceId().equals(project.getWorkspaceId())) {
+      throw new AccessDeniedException("Member does not belong to the project's workspace");
+    }
+
+    // these are the only people who have access to assigning a member to a project
+    boolean isAdmin = securityUtils.isAdmin();
+    boolean isManager = securityUtils.isManager();
+
+    /*
+    - theoratically they can and should be able to
+    - but the UI right now prevents them because they cannot even see the members in the workspace
+    - the reason I say this is because someone can be a developer at a workspace level but a project manager
+    - so the UI prevents them from seeing the teams tab
+    - also look into: public List<AvailableUserResponse> getAvailableUsers(UUID workspaceId) in TeamService to see if you can make project mangers view all users
+    */
+    boolean isProjectManager = isProjectManager(project.getId(), currentMemberId);
+
+    if (!isAdmin && !isManager && !isProjectManager) {
+      throw new AccessDeniedException(
+          "Only Admins and Managers and Project Managers can assign members to projects");
+    }
+
+    // if a member is already assigned to a project then we cannot do that again
+    if (projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+        request.getProjectId(), request.getWorkspaceMemberId())) {
+      throw new StateConflictException("Member is already assigned to this project");
+    }
+
+    // creating that member
+    ProjectMember projectMember = new ProjectMember();
+    projectMember.setProjectId(request.getProjectId());
+    projectMember.setWorkspaceMemberId(request.getWorkspaceMemberId());
+    projectMember.setIsProjectManager(
+        request.getIsProjectManager() != null && request.getIsProjectManager());
+    projectMember.setIsActive(true);
+    projectMember.setCreatedAt(LocalDateTime.now());
+    projectMember.setUpdatedAt(LocalDateTime.now());
+
+    ProjectMember saved = projectMemberRepository.save(projectMember);
+
+    User user =
+        userRepository
+            .findById(member.getUserId())
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    return ProjectMemberResponse.builder()
+        .projectMemberId(saved.getId())
+        .workspaceMemberId(saved.getWorkspaceMemberId())
+        .userId(user.getId())
+        .firstName(user.getFirstName())
+        .lastName(user.getLastName())
+        .email(user.getEmail())
+        .isProjectManager(saved.getIsProjectManager())
+        .joinedAt(saved.getCreatedAt())
+        .build();
+  }
+
   // ! helper functions
   // determines a users role on a project
-  private WorkspaceRole getProjectRole(UUID projectId, UUID workspaceMemberId) {
+  private WorkspaceRole getProjectLevelRole(UUID projectId, UUID workspaceMemberId) {
     return projectMemberRepository
         .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
         .map(
@@ -178,6 +260,14 @@ public class ProjectService {
                     ? WorkspaceRole.MANAGER
                     : WorkspaceRole.DEVELOPER)
         .orElse(null);
+  }
+
+  // to determine if a user has management permissions for a specific project
+  private boolean isProjectManager(UUID projectId, UUID workspaceMemberId) {
+    return projectMemberRepository
+        .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
+        .map(pm -> Boolean.TRUE.equals(pm.getIsProjectManager()))
+        .orElse(false);
   }
 
   // calculates total project hours
@@ -287,7 +377,7 @@ public class ProjectService {
   // ! builder helper function
   private ProjectResponse buildProjectResponse(
       Project project, UUID workspaceMemberId, boolean showCostInfo) {
-    WorkspaceRole role = getProjectRole(project.getId(), workspaceMemberId);
+    WorkspaceRole role = getProjectLevelRole(project.getId(), workspaceMemberId);
 
     ProjectResponse.ProjectResponseBuilder builder =
         ProjectResponse.builder()

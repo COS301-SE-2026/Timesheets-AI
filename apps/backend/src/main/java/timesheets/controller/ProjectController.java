@@ -6,14 +6,16 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import timesheets.dto.request.AssignProjectMemberRequest;
 import timesheets.dto.request.CreateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
+import timesheets.dto.response.ProjectMemberResponse;
 import timesheets.dto.response.ProjectResponse;
 import timesheets.security.SecurityUtils;
 import timesheets.service.ProjectService;
@@ -68,6 +70,18 @@ public class ProjectController {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
     ProjectResponse response = projectService.createProject(request, workspaceMemberId);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
+
+  // this will be to assign a workspace member to a project
+  @PostMapping("/{projectId}/members")
+  public ResponseEntity<ProjectMemberResponse> assignMemberToProject(
+      @PathVariable UUID projectId, @Valid @RequestBody AssignProjectMemberRequest request) {
+
+    request.setProjectId(projectId);
+
+    ProjectMemberResponse response = projectService.assignMemberToProject(request);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
