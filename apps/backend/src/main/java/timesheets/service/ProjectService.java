@@ -181,6 +181,7 @@ public class ProjectService {
   public ProjectMemberResponse assignMemberToProject(AssignProjectMemberRequest request) {
 
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
     Project project =
         projectRepository
             .findById(request.getProjectId())
@@ -247,6 +248,36 @@ public class ProjectService {
         .isProjectManager(saved.getIsProjectManager())
         .joinedAt(saved.getCreatedAt())
         .build();
+  }
+
+  //this is about deleting members from a project
+  @Transactional
+  public void removeMemberFromProject(UUID projectId, UUID workspaceMemberId) {
+    UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    // need to see if the project actually exists
+    if (!projectRepository.existsById(projectId)) {
+      throw new ResourceNotFoundException("Project not found");
+    }
+
+    boolean isAdmin = securityUtils.isAdmin();
+    boolean isManager = securityUtils.isManager();
+    boolean isProjectManager = isProjectManager(projectId, currentMemberId);
+
+    if (!isAdmin && !isManager && !isProjectManager) {
+      throw new AccessDeniedException(
+          "Only Admins and Managers and Project Managers can remove members from projects");
+    }
+
+    ProjectMember projectMember =
+        projectMemberRepository
+            .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
+            .orElseThrow(() -> new ResourceNotFoundException("Member not found on this project"));
+
+    // this is soft deleting so that we keep track
+    projectMember.setIsActive(false);
+    projectMember.setUpdatedAt(LocalDateTime.now());
+    projectMemberRepository.save(projectMember);
   }
 
   // ! helper functions
