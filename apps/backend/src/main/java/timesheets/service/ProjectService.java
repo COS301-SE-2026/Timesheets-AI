@@ -17,7 +17,6 @@ import timesheets.domain.ProjectMember;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
-import timesheets.dto.request.AssignProjectMemberRequest;
 import timesheets.dto.request.CreateProjectRequest;
 import timesheets.dto.request.UpdateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
@@ -298,18 +297,19 @@ public class ProjectService {
   DEV: cannot assign anyone
   */
   @Transactional
-  public ProjectMemberResponse assignMemberToProject(AssignProjectMemberRequest request) {
+  public ProjectMemberResponse assignMemberToProject(
+      UUID projectId, UUID workspaceMemberId, Boolean isProjectManager) {
 
     UUID currentMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     Project project =
         projectRepository
-            .findById(request.getProjectId())
+            .findById(projectId)
             .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
     WorkspaceMember member =
         workspaceMemberRepository
-            .findById(request.getWorkspaceMemberId())
+            .findById(workspaceMemberId)
             .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
     // to ensure that the user belongs to the same workspace as the project
@@ -328,25 +328,24 @@ public class ProjectService {
     - so the UI prevents them from seeing the teams tab
     - also look into: public List<AvailableUserResponse> getAvailableUsers(UUID workspaceId) in TeamService to see if you can make project mangers view all users
     */
-    boolean isProjectManager = isProjectManager(project.getId(), currentMemberId);
+    boolean isProjectManagerRole = isProjectManager(projectId, currentMemberId);
 
-    if (!isAdmin && !isManager && !isProjectManager) {
+    if (!isAdmin && !isManager && !isProjectManagerRole) {
       throw new AccessDeniedException(
           "Only Admins and Managers and Project Managers can assign members to projects");
     }
 
     // if a member is already assigned to a project then we cannot do that again
     if (projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
-        request.getProjectId(), request.getWorkspaceMemberId())) {
+        projectId, workspaceMemberId)) {
       throw new StateConflictException("Member is already assigned to this project");
     }
 
     // creating that member
     ProjectMember projectMember = new ProjectMember();
-    projectMember.setProjectId(request.getProjectId());
-    projectMember.setWorkspaceMemberId(request.getWorkspaceMemberId());
-    projectMember.setIsProjectManager(
-        request.getIsProjectManager() != null && request.getIsProjectManager());
+    projectMember.setProjectId(projectId);
+    projectMember.setWorkspaceMemberId(workspaceMemberId);
+    projectMember.setIsProjectManager(isProjectManager != null && isProjectManager);
     projectMember.setIsActive(true);
     projectMember.setCreatedAt(LocalDateTime.now());
     projectMember.setUpdatedAt(LocalDateTime.now());

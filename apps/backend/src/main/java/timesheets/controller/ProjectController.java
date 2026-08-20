@@ -115,9 +115,9 @@ public class ProjectController {
   public ResponseEntity<ProjectMemberResponse> assignMemberToProject(
       @PathVariable UUID projectId, @Valid @RequestBody AssignProjectMemberRequest request) {
 
-    request.setProjectId(projectId);
-
-    ProjectMemberResponse response = projectService.assignMemberToProject(request);
+    ProjectMemberResponse response =
+        projectService.assignMemberToProject(
+            projectId, request.getWorkspaceMemberId(), request.getIsProjectManager());
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
