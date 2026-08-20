@@ -13,8 +13,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.productivity import router as productivity_router
 
-# adding logging here as well
+#adding logging here as well
 logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(
@@ -32,6 +33,8 @@ app.add_middleware(
 )
 
 app.include_router(health_router)
+#added a matching productivity router to the main app
+app.include_router(productivity_router)
 
 
 @app.get("/", include_in_schema=False)
