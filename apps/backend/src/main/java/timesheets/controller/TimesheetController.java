@@ -85,7 +85,7 @@ public class TimesheetController {
   @PostMapping("/{id}/approve")
   public ResponseEntity<TimesheetResponse> approveTimesheet(@PathVariable UUID id) {
 
-    UUID reviewerId = securityUtils.getCurrentUserId();
+    UUID reviewerId = securityUtils.getCurrentWorkspaceId();
     Timesheet timesheet = timesheetService.approveTimesheet(id, reviewerId);
 
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
@@ -96,7 +96,7 @@ public class TimesheetController {
   public ResponseEntity<TimesheetResponse> rejectTimesheet(
       @PathVariable UUID id, @Valid @RequestBody RejectRequest request) {
 
-    UUID reviewerId = securityUtils.getCurrentUserId();
+    UUID reviewerId = securityUtils.getCurrentWorkspaceId();
     Timesheet timesheet = timesheetService.rejectTimesheet(id, reviewerId, request.getReason());
 
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
