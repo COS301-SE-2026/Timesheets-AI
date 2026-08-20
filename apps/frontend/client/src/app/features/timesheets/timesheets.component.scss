@@ -149,7 +149,6 @@
 
 .status-filters-chip:focus-visible {
   outline: 3px solid rgba(37, 99, 235, 0.3);
-  outline: 2px;
 }
 
 .status-filters {
@@ -552,8 +551,8 @@
   color: tokens.$color-text-inverse;
 }
 
-.btn-danger-solid:hover:not(:disabled){
-  filter: brightness(0.95)
+.btn--danger-solid:hover:not(:disabled){
+  filter: brightness(0.95);
 }
 
 .btn--success {
@@ -563,7 +562,7 @@
 }
 
 .btn--success:hover:not(:disabled) {
-  filter: brightness(0.95)
+  filter: brightness(0.95);
 }
 
 .page-tabs {
@@ -655,9 +654,9 @@
   font-family: var(--font-body);
 }
 
-.modal-review {
+.modal--review {
   min-width: min(960px, calc(100vw - 32px));
-  max-height:  calc(100vw - 48px);
+  max-height:  calc(100vh - 48px);
   overflow: auto;
   text-align: left;
   padding: tokens.$space-6;
@@ -868,7 +867,7 @@
 }
 
 .state-panel--error i{
-  color: tokens.$color-status-overdue-dot;
+  color: tokens.$color-status-overdue-text;
 }
 
 .spinner {

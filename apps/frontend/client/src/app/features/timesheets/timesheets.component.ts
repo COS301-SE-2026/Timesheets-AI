@@ -141,9 +141,20 @@ export class TimesheetsComponent {
   // Managers see Approve / Reject when status is submitted
 
   private readonly authService = inject(AuthService);
-  readonly isManager = computed(
-    () => this.authService.currentUser()?.roles?.includes('MANAGER') ?? false,
-  );
+  // readonly isManager = computed(
+  //   () => this.authService.currentUser()?.roles?.includes('MANAGER') ?? false,
+  // );
+
+  readonly isManager = computed(() => {
+    const roles = this.authService.currentUser()?.roles ?? [];
+    return roles.some(
+      (role) =>
+        role === 'MANAGER' ||
+        role === 'ROLE_MANAGER' ||
+        role === 'ADMIN' ||
+        role === 'ROLE_ADMIN',
+    );
+  });
 
   //  INTEGRATION: Replace with GET /api/timesheets/me (or filtered status endpoints)
   readonly pageTab = signal<PageTab>('mine');
