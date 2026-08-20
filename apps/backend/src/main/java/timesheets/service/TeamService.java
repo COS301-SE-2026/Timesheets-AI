@@ -4,6 +4,7 @@ import exception.AccessDeniedException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.AssignWorkspaceMemberRequest;
 import timesheets.dto.response.WorkspaceMemberResponse;
+import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
 import timesheets.repository.UserRepository;
@@ -79,5 +81,37 @@ public class TeamService {
         .role(saved.getRole())
         .joinedAt(saved.getJoinedAt())
         .build();
+  }
+
+  // this will be about removing a user from the workspace
+  @Transactional
+  public void removeUserFromWorkspace(UUID workspaceMemberId) {
+
+    // only admins should have the rights to remove users from the workspace
+    if (!securityUtils.isAdmin()) {
+      throw new AccessDeniedException("Only Admins can remove users from workspaces");
+    }
+
+    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+    WorkspaceMember member =
+        workspaceMemberRepository
+            .findById(workspaceMemberId)
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
+
+    // checking that that user actually belongs to the workspace
+    if (!member.getWorkspaceId().equals(workspaceId)) {
+      throw new AccessDeniedException("Member does not belong to your workspace");
+    }
+
+    // I want to make sure that workspace admins do not go below 1 cause there should always be
+    // someone who has access to them
+    List<WorkspaceMember> admins =
+        workspaceMemberRepository.findAllByWorkspaceIdAndRole(workspaceId, WorkspaceRole.ADMIN);
+
+    if (admins.size() <= 1 && member.getRole() == WorkspaceRole.ADMIN) {
+      throw new StateConflictException("Cannot remove the last Admin from the workspace");
+    }
+
+    workspaceMemberRepository.delete(member); // deleting them
   }
 }

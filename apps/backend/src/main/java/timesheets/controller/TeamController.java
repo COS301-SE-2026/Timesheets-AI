@@ -1,9 +1,12 @@
 package timesheets.controller;
 
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +22,7 @@ public class TeamController {
 
   private final TeamService teamService;
 
-  // this will assign a user to the current workspace
+  // ADMIN: this will assign a user to the current workspace
   @PostMapping("/members")
   public ResponseEntity<WorkspaceMemberResponse> assignUserToWorkspace(
       @Valid @RequestBody AssignWorkspaceMemberRequest request) {
@@ -27,5 +30,14 @@ public class TeamController {
     WorkspaceMemberResponse response = teamService.assignUserToWorkspace(request);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
+
+  // ADMIN: this should delete a user from the workspace
+  @DeleteMapping("/members/{workspaceMemberId}")
+  public ResponseEntity<Void> removeUserFromWorkspace(@PathVariable UUID workspaceMemberId) {
+
+    teamService.removeUserFromWorkspace(workspaceMemberId);
+
+    return ResponseEntity.noContent().build();
   }
 }
