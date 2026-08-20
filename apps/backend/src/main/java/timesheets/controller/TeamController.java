@@ -50,6 +50,8 @@ public class TeamController {
   ADMIN: this will be to get all the users
   - then the users can filter based on the flag whether they want to list all the users, list the users in the workspace, or list those that are not in the workspace
   - frontend will be able to use this and then filter from there
+
+
   */
   @GetMapping("/members/available")
   public ResponseEntity<List<AvailableUserResponse>> getAvailableUsers() {

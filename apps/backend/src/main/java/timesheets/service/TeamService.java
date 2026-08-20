@@ -125,35 +125,62 @@ public class TeamService {
   @Transactional(readOnly = true)
   public List<AvailableUserResponse> getAvailableUsers(UUID workspaceId) {
 
-    // this should be only accessible to admins, we don't want managers or others being able to view
-    // this
-    if (!securityUtils.isAdmin()) {
-      throw new AccessDeniedException("Only Admins can view available users");
-    }
-
     // checking if the workspace actually exists
     if (!workspaceRepository.existsById(workspaceId)) {
       throw new ResourceNotFoundException("Workspace not found");
     }
 
-    List<User> allUsers = userRepository.findAll();
     List<UUID> userIdsInWorkspace =
         workspaceMemberRepository.findByWorkspaceId(workspaceId).stream()
             .map(WorkspaceMember::getUserId)
             .collect(Collectors.toList());
 
-    // all the users will be returned but they will have a flag, that indicates if they are a part
-    // of the workspace or not
-    return allUsers.stream()
-        .map(
-            user ->
-                AvailableUserResponse.builder()
-                    .userId(user.getId())
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
-                    .email(user.getEmail())
-                    .isInWorkspace(userIdsInWorkspace.contains(user.getId()))
-                    .build())
-        .collect(Collectors.toList());
+    List<User> usersInWorkspace = userRepository.findAllById(userIdsInWorkspace);
+
+    /*
+    ADMIN: all the users will be returned but they will have a flag, that indicates if they are a part of the workspace or not
+    - frontend can then use this flag to filter the users
+    */
+    if (securityUtils.isAdmin()) {
+      List<User> allUsers = userRepository.findAll();
+
+      return allUsers.stream()
+          .map(
+              user ->
+                  AvailableUserResponse.builder()
+                      .userId(user.getId())
+                      .firstName(user.getFirstName())
+                      .lastName(user.getLastName())
+                      .email(user.getEmail())
+                      .isInWorkspace(userIdsInWorkspace.contains(user.getId()))
+                      .build())
+          .collect(Collectors.toList());
+    }
+
+    /*
+    MANAGER:
+    - they should only see the list of the users in that workspace
+    - then with that list they can assign people and stuff
+    - the flag will always be true for managers
+     */
+    if (securityUtils.isManager()) {
+      return usersInWorkspace.stream()
+          .map(
+              user ->
+                  AvailableUserResponse.builder()
+                      .userId(user.getId())
+                      .firstName(user.getFirstName())
+                      .lastName(user.getLastName())
+                      .email(user.getEmail())
+                      .isInWorkspace(true)
+                      .build())
+          .collect(Collectors.toList());
+    }
+
+    /*
+    - devs should not be able to see workspace members like that
+    - devs should only see people they are in projects with
+    */
+    throw new AccessDeniedException("Only Admins and Managers can view workspace members");
   }
 }
