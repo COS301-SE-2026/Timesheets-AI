@@ -23,5 +23,5 @@ class ProductivityScoreResponse(BaseModel):
     recommendation: str | None
     insight_id: uuid.UUID | None
 
-    #had a deprecated pydantic warning 
+    # had a deprecated pydantic warning
     model_config = {"from_attributes": True}
