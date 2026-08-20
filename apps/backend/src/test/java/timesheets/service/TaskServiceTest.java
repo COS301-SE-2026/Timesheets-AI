@@ -80,8 +80,8 @@ class TaskServiceTest {
 
     user = new User();
     user.setId(userId);
-    user.setFirstName("John");
-    user.setLastName("Doe");
+    user.setFirstName("Enzokuhle");
+    user.setLastName("Khumalo");
   }
 
   @Nested
@@ -125,7 +125,7 @@ class TaskServiceTest {
       // it is a small thing but frontend really wants it
       assertThat(response.getProjectName()).isEqualTo("Test Project");
 
-      assertThat(response.getAssignedToName()).isEqualTo("John Doe");
+      assertThat(response.getAssignedToName()).isEqualTo("Enzokuhle Khumalo");
 
       // I want to confirm it checked access, fetched the tasks, and got the project details.
       verify(projectMemberRepository)
@@ -176,7 +176,7 @@ class TaskServiceTest {
       assertThat(result.getTitle()).isEqualTo("Test Task");
       assertThat(result.getDescription()).isEqualTo("Test Description");
       assertThat(result.getProjectName()).isEqualTo("Test Project");
-      assertThat(result.getAssignedToName()).isEqualTo("John Doe");
+      assertThat(result.getAssignedToName()).isEqualTo("Enzokuhle Khumalo");
       assertThat(result.getStatus()).isEqualTo("TODO");
       assertThat(result.getPriority()).isEqualTo("MEDIUM");
 
@@ -190,5 +190,50 @@ class TaskServiceTest {
       verify(workspaceMemberRepository, times(1)).findById(assignedWorkspaceMemberId);
       verify(userRepository, times(1)).findById(userId);
     }
+  }
+
+  @Nested
+  @DisplayName("Get My Tasks Tests")
+  class GetMyTasksTests {
+
+    @Test
+    @DisplayName("returns all tasks for the user")
+    void getMyTasks() {
+      /*
+      ARRANGE
+      - finds all the tasks assigned to the user
+      - fetches the prject name
+      - also get the name for display
+      */
+      when(taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId))
+          .thenReturn(List.of(task));
+
+      // the task also needs the project name and assigness full name
+      when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+      when(workspaceMemberRepository.findById(assignedWorkspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+      when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+      // ACT: call the actual function
+      List<TaskResponse> result = taskService.getMyTasks(workspaceMemberId);
+
+      assertThat(result).isNotNull();
+      assertThat(result).hasSize(1);
+      assertThat(result.get(0).getId()).isEqualTo(taskId);
+      assertThat(result.get(0).getProjectName())
+          .isEqualTo("Test Project"); // project name is attatched
+      assertThat(result.get(0).getAssignedToName())
+          .isEqualTo("Enzokuhle Khumalo"); // making sure the name is also ther
+
+      // ensuring that the repo was called correctly
+      verify(taskRepository, times(1))
+          .findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId);
+    }
+  }
+
+  @Nested
+  @DisplayName("Create Task Tests")
+  class CreateTaskTests {
+    // my tests
   }
 }

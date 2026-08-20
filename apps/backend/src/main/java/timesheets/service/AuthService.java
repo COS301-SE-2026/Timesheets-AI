@@ -15,7 +15,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import timesheets.domain.*;
+import timesheets.domain.EmailVerificationToken;
+import timesheets.domain.User;
+import timesheets.domain.UserIdentityProvider;
+import timesheets.domain.UserMfa;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.GoogleAuthRequest;
 import timesheets.dto.request.RegisterRequest;
@@ -23,7 +26,12 @@ import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.enums.UserStatus;
-import timesheets.repository.*;
+import timesheets.repository.EmailVerificationTokenRepository;
+import timesheets.repository.UserIdentityProviderRepository;
+import timesheets.repository.UserMfaRepository;
+import timesheets.repository.UserRepository;
+import timesheets.repository.WorkspaceMemberRepository;
+import timesheets.security.SecurityUtils;
 import timesheets.util.TotpUtils;
 
 // import timesheets.dto.request.ForgotPasswordRequest;
@@ -53,6 +61,8 @@ public class AuthService {
 
   private final TokenBlacklistService tokenBlacklistService;
   private final JwtService jwtService;
+  private final SecurityUtils securityUtils;
+  private final TimerService timerService;
 
   // private final OtpService otpService;
   // private final PasswordResetTokenRepository passwordResetTokenRepository;
@@ -321,11 +331,18 @@ public class AuthService {
   @Transactional
   public void logout(String token) {
     // extract token from bearer string if needed
-    if (token.startsWith("Bearer ")) {
+    if (token != null && token.startsWith("Bearer ")) {
       token = token.substring(7);
     }
 
     tokenBlacklistService.blacklistToken(token);
+
+    try {
+      UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+      timerService.pauseTimerForLogout(workspaceMemberId);
+    } catch (Exception e) {
+      // should add an error log or something
+    }
   }
 
   @Transactional
