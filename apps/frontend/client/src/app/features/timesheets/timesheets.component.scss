@@ -438,6 +438,10 @@
   border-left: 3px solid transparent;
 }
 
+.entry-table tbody tr.is-clickable {
+  cursor: pointer;
+}
+
 .entry-table tbody tr:hover {
   background: rgba(230, 241, 251, 0.35);
   border-left-color: tokens.$color-secondary;

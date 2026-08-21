@@ -48,7 +48,7 @@
         <button
           class="btn btn--primary"
           type="button"
-          [disabled]="timesheet.isLocked || timesheet.status !== 'DRAFT'"
+          [disabled]="!canSubmitTimesheet()"
           (click)="submitTimesheet()"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -59,6 +59,24 @@
       }
     </div>
   </header>
+
+  @if (currentTimesheet(); as timesheet) {
+    @if (timesheet.status === 'REJECTED') {
+      <section class="banner banner--danger" role="alert">
+        This timesheet was rejected {{ timesheet.rejectionReason ? ':' + timesheet.rejectionReason : '.' }}
+      </section>
+    }
+      @if (timesheet.status === 'APPROVED') {
+        <section class="banner banner--success">
+          Timesheet has been approved and is locked.
+        </section>
+      }
+      @if (timesheet.status === 'SUBMITTED') {
+        <section class="banner banner--success">
+          The timesheet is awaiting review.
+        </section>
+      }
+    }
 
   <!-- Conflict error banner, shown when a time overlap is detected -->
   @if (conflictMessage()) {
@@ -495,24 +513,22 @@
                 <td class="col-description">
                   <span>{{ entry.description }}</span>
                   <!-- Status notes shown below description -->
-                  @if (entry.status === "SUBMITTED") {
+                  @if ( currentTimesheet()?.status === "SUBMITTED") {
                     <em class="status-note">Awaiting review</em>
                   }
-                  @if (entry.status === "APPROVED") {
+                  @if ( currentTimesheet()?.status === "APPROVED") {
                     <em class="status-note status-note--approved">Approved</em>
                   }
                   <!-- Rejection reason shown for rejected entries -->
-                  @if (entry.status === "REJECTED") {
+                  @if (currentTimesheet()?.status === "REJECTED") {
                     <em class="status-note status-note--rejected">
-                      {{ entry.rejectionReason }}
+                      {{ currentTimesheet()?.rejectionReason }}
                     </em>
                   }
                 </td>
                 <td class="col-actions">
                   <!-- Edit button shown for draft and rejected entries -->
-                  @if (
-                    entry.status === "DRAFT" || entry.status === "REJECTED"
-                  ) {
+                  @if (canEditEntries()) {
                     <button
                       type="button"
                       class="icon-btn"

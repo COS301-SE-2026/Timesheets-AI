@@ -24,6 +24,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import {
   TimerService,
   ActiveTimerResponse,
@@ -118,6 +119,7 @@ interface Timesheet {
   periodEnd: string;
   status: TimeEntryStatus;
   isLocked: boolean;
+  rejectionReason?: string | null;
 }
 
 //minimal shape needed from ProjectResponse, matches GET /api/projects
@@ -149,6 +151,8 @@ export class LogtimeComponent implements OnDestroy {
   private readonly apiBaseUrl = '/api';
   private readonly timerService = inject(TimerService);
   private readonly timeEntryService = inject(TimeEntryService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly pendingTaskId: string | null = null;
 
   //I used Enzokuhle Khumalo's workspace_members.id (real seed data), because it didnt need mfa
   private readonly workspaceMemberId =
@@ -320,6 +324,17 @@ export class LogtimeComponent implements OnDestroy {
     return `Entries: ${this.formatDateLabel(from)} – ${this.formatDateLabel(to)}`;
   });
 
+  readonly canSubmitTimesheet = computed (() => {
+    const timesheet = this.currentTimesheet();
+    return (
+      !!timesheet &&
+      !timesheet.isLocked &&
+      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED')
+    );
+  });
+
+  readonly canEditEntries = computed(() => this.canSubmitTimesheet());
+
   //Native asynchronous timer allocation reference tracking context
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -328,6 +343,20 @@ export class LogtimeComponent implements OnDestroy {
     Cascade resets: clear task selection when project changes, but preserve
     an in-progress "create new task" entry so the user doesn't lose their typing.
     */
+
+    const query = this.route.snapshot.queryParamMap;
+    const from = query.get('from') ?? query.get('date');
+    const  to = query.get('to') ?? from;
+    this.pendingTaskId = query.get('taskId');
+    if(from) {
+      this.filterForm.controls.from.setValue(from, {emitEvent: false });
+      this.filterFrom.set(from);
+    }
+    if (to) {
+      this.filterForm.controls.to.setValue(to, { emitEvent: false });
+      this.filterTo.set(to);
+    }
+
     this.entryForm.controls.projectId.valueChanges.subscribe((projectId) => {
       this.entryForm.controls.taskId.setValue('');
       this.loadTasksForProject(projectId);
