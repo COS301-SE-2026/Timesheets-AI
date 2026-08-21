@@ -152,7 +152,7 @@ export class LogtimeComponent implements OnDestroy {
   private readonly timerService = inject(TimerService);
   private readonly timeEntryService = inject(TimeEntryService);
   private readonly route = inject(ActivatedRoute);
-  private pendingTaskId: string | null = null;
+  private readonly pendingTaskId: string | null = null;
 
   //I used Enzokuhle Khumalo's workspace_members.id (real seed data), because it didnt need mfa
   private readonly workspaceMemberId =

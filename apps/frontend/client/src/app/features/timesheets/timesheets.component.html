@@ -105,7 +105,10 @@
       </thead>
       <tbody>
         @for (week of filteredTimesheets(); track week.summary.id) {
-          <tr class="is-clickable" (click)="openLogTime(week.summary.periodStart, week.summary.periodEnd)">
+          <tr class="is-clickable" (click)="openLogTime(week.summary.periodStart, week.summary.periodEnd)"
+          (keydown.enter)="openLogTime(week.summary.periodStart, week.summary.periodEnd)"
+          (keydown.space)="openLogTime(week.summary.periodStart, week.summary.periodEnd)"
+          >
             <td>
               <strong>Week {{ week.summary.weekNumber }}</strong>
               <div class="task-cell-meta">{{ week.summary.periodLabel }}</div>
@@ -213,7 +216,9 @@
 
           <tbody>
             @for (task of tasks(); track task.id) {
-              <tr class="is-clickable" (click)="openSelectedWeek(undefined, task.id)">
+              <tr class="is-clickable" (click)="openSelectedWeek(undefined, task.id)"
+              (keydown.enter)="openSelectedWeek(undefined, task.id)"
+              (heydown.space)="openSelectedWeek(undefined, task.id)">
                 <td class="col-task">
                   <div class="task-cell">
                     <span class="task-cell-dot" [style.background-color]="task.colorCode" aria-hidden="true"></span>
@@ -228,7 +233,9 @@
 
                 @for (hours of task.loggedHours; track $index) {
                   <td class="col-day" [class.is-empty]="hours === '-'" [class.highlighted-today-column]="days()[$index].isToday"
-                   (click)="openSelectedWeek(days()[$index].dateStr, task.id); $event.stopPropagation()">
+                   (click)="openSelectedWeek(days()[$index].dateStr, task.id); $event.stopPropagation()"
+                   (keydown.enter)="openSelectedWeek(days()[$index].dateStr, task.id); $event.stopPropagation()"
+                   (keydown.space)="openSelectedWeek(days()[$index].dateStr, task.id); $event.stopPropagation()">
                     {{ displayHours(hours) }}
                   </td>
                 }
