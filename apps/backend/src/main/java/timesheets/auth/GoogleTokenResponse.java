@@ -1,4 +1,4 @@
-package timesheets.integration.auth;
+package timesheets.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

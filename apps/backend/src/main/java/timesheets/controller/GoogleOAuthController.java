@@ -1,8 +1,8 @@
-package timesheets.integration.controller;
+package timesheets.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
-import timesheets.integration.auth.GoogleOAuthService;
+import timesheets.auth.GoogleOAuthService;
 
 @RestController
 @RequiredArgsConstructor

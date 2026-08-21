@@ -30,7 +30,7 @@ OAuthStateService will:
     - the workspace member ID can be recovered
 */
 
-package timesheets.integration.auth;
+package timesheets.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
