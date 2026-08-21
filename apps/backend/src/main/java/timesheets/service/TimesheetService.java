@@ -224,6 +224,8 @@ public class TimesheetService {
     timesheet.setLockedAt(LocalDateTime.now());
     timesheet.setStatus("SUBMITTED");
     timesheet.setSubmittedAt(LocalDateTime.now());
+    timesheet.setRejectedAt(null);
+    timesheet.setRejectionReason(null);
 
     // all the time entries in the timesheet should be locked
     List<TimeEntry> entries = timeEntryRepository.findByTimesheetId(timesheetId);
