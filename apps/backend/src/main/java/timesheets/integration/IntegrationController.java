@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import timesheets.integration.auth.GoogleOAuthService;
-import timesheets.integration.auth.OAuthState;
-import timesheets.integration.auth.OAuthStateService;
+import timesheets.auth.GoogleOAuthService;
+import timesheets.auth.OAuthState;
+import timesheets.auth.OAuthStateService;
 import timesheets.security.SecurityUtils;
 
 @RestController

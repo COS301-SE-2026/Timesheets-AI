@@ -1,4 +1,4 @@
-package timesheets.integration.auth;
+package timesheets.auth;
 
 import java.util.UUID;
 import lombok.AllArgsConstructor;
