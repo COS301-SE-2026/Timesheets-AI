@@ -7,14 +7,13 @@
 // Spring Boot will exchange code for access and refresh tokens
 // link: https://developers.google.com/identity/protocols/oauth2/web-server
 
-package timesheets.integration.auth;
+package timesheets.auth;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
-import timesheets.auth.GoogleTokenResponse;
 
 @Service
 public class GoogleOAuthService {
@@ -89,10 +88,10 @@ public class GoogleOAuthService {
     // callback URL in the console
     formData.add("redirect_uri", redirectUri);
     // to tell Google which OAuth fk=low we are running ;
-    formData
-        .add("grant_type", "authorization_code")
+    formData.add("grant_type", "authorization_code");
 
-        // sending the details as payload to Google server using restClient
+    // sending the details as payload to Google server using restClient
+    return restClient
         .post()
         .uri(GOOGLE_TOKEN_URL)
         .header("Content-Type", "application/x-www-form-urlencoded")
