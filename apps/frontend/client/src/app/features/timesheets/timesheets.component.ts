@@ -24,7 +24,7 @@ import {
 import { TaskService, TaskResponse } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {forkJoin, Observable, of, catchError, tap, map, switchMap } from 'rxjs';
 import { TimeEntryResponse } from '../../core/services/time-entry.service';
 
@@ -136,6 +136,7 @@ export class TimesheetsComponent {
   private readonly timesheetService = inject(TimesheetService);
   private readonly projectService = inject(ProjectService);
   private readonly taskService = inject(TaskService);
+  private readonly router = inject(Router);
 
   // INTEGRATION : Set from auth/session
   // Managers see Approve / Reject when status is submitted
@@ -204,6 +205,7 @@ export class TimesheetsComponent {
     return list.filter((ts) => ts.summary.status === filter);
   });
 
+  readonly showAllList = computed(() => this.selectedFilter() === 'ALL');
 
   readonly filteredReviewRows = computed(() => {
     const filter = this.reviewFilter();
@@ -701,6 +703,18 @@ export class TimesheetsComponent {
     this.selectedFilter.set(filter);
     this.loadTimesheets();
   }
+
+  openLogTime( periodStart: string, periodEnd: string, date?: string, taskId?: string, ) {
+    const queryParams: Record<string, string> = {
+      from: date ?? periodStart,
+      to: date ?? periodEnd,
+    };
+    if (taskId && !taskId.startsWith('_no_task_')) {
+      queryParams[taskId] = taskId;
+    }
+    void this.router.navigate(['/log-time'], { queryParams });
+  }
+
 
   onReviewFilterChange(filter: ReviewStatusFilter): void {
     this.reviewFilter.set(filter);
