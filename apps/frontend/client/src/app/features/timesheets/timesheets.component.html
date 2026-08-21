@@ -22,6 +22,7 @@
       </div>
     
   <div class="page-header-actions">
+    @if (!showAllList()){
     <label class="week-picker" for="week-picker">
       <span class="week-picker-name">Week</span>
       <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
@@ -37,6 +38,7 @@
     </select>
     <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
     </label>
+  }
   </div>
     </header>
 
@@ -87,6 +89,52 @@
     </a>
   </div>
 }
+
+<!-- All timesheet list -->
+ @else if (showAllList()) {
+  <section class="entry-table-wrapper review-table-wrapper" aria-label="All timesheets">
+    <table class="entry-table review-table">
+      <thead>
+        <tr>
+          <th>Period</th>
+          <th>Status</th>
+          <th>Submitted</th>
+          <th>Note</th>
+          <th class="col-action">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (week of filteredTimesheets(); track week.summary.id) {
+          <tr class="is-clickable" (click)="openLogTime(week.summary.periodStart, week.summary.periodEnd)">
+            <td>
+              <strong>Week {{ week.summary.weekNumber }}</strong>
+              <div class="task-cell-meta">{{ week.summary.periodLabel }}</div>
+            </td>
+            <td>
+              <span class="status-badge" [attr.data-status]="week.summary.status">
+                {{ week.summary.status }}
+              </span>
+            </td>
+            <td>{{ formatDateTime(week.summary.submittedAt) }}</td>
+            <td>
+              @if (week.summary.status === 'REJECTED' && week.summary.rejectionReason) {
+                {{ week.summary.rejectionReason }}
+              } @else {
+                -
+              }
+            </td>
+            <td class="col-action">
+              <button type="button" class="link-action"
+              (click)="openLogTime(week.summary.periodStart, week.summary.periodEnd); $event.stopPropagation()">
+              Open <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>  
+            </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+ }
 
    <!-- Weekly detail -->
     @else {
@@ -165,7 +213,7 @@
 
           <tbody>
             @for (task of tasks(); track task.id) {
-              <tr>
+              <tr class="is-clickable" (click)="openSelectedWeek(undefined, task.id)">
                 <td class="col-task">
                   <div class="task-cell">
                     <span class="task-cell-dot" [style.background-color]="task.colorCode" aria-hidden="true"></span>
@@ -179,7 +227,8 @@
                 </td>
 
                 @for (hours of task.loggedHours; track $index) {
-                  <td class="col-day" [class.is-empty]="hours === '-'" [class.highlighted-today-column]="days()[$index].isToday">
+                  <td class="col-day" [class.is-empty]="hours === '-'" [class.highlighted-today-column]="days()[$index].isToday"
+                   (click)="openSelectedWeek(days()[$index].dateStr, task.id); $event.stopPropagation()">
                     {{ displayHours(hours) }}
                   </td>
                 }
