@@ -704,7 +704,7 @@ export class TimesheetsComponent {
     this.loadTimesheets();
   }
 
-  openLogTime( periodStart: string, periodEnd: string, date?: string, taskId?: string, ) {
+  openLogTime( periodStart: string, periodEnd: string, date?: string, taskId?: string,) : void  {
     const queryParams: Record<string, string> = {
       from: date ?? periodStart,
       to: date ?? periodEnd,
@@ -713,6 +713,12 @@ export class TimesheetsComponent {
       queryParams[taskId] = taskId;
     }
     void this.router.navigate(['/log-time'], { queryParams });
+  }
+
+  openSelectedWeek(date?: string, taskId?: string): void {
+    const s = this.summary();
+    if(!s) return;
+    this.openLogTime(s.periodStart, s.periodEnd, date, taskId);
   }
 
 
