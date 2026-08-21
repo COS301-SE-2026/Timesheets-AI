@@ -180,7 +180,6 @@ export class TimesheetsComponent {
   readonly selectedFilter = signal<StatusFilter>('ALL');
   readonly reviewFilter = signal<ReviewStatusFilter>('SUBMITTED');
   readonly selectedTimesheetId = signal<string>('');
-  readonly reviewWeekKey = signal<string>('');
   readonly uiState = signal<UiState>('idle');
   readonly reviewUiState = signal<UiState>('idle');
   readonly errorMessage = signal<string | null>(null);
@@ -205,30 +204,12 @@ export class TimesheetsComponent {
     return list.filter((ts) => ts.summary.status === filter);
   });
 
-  readonly reviewWeekOptions = computed(() => {
-    const keys = new Map<string, { key: string; label: string; start: string}>();
-    for (const row of this.reviewRows()) {
-      const key = row.summary.periodStart;
-      if (!keys.has(key)) {
-        keys.set(key, {
-          key, 
-          start: key,
-          label: `Week ${row.summary.weekNumber} · ${row.summary.periodLabel}`,
-        });
-      }
-    }
-    return Array.from(keys.values()).sort((a,b) => a.start.localeCompare(b.start));
-  });
-
 
   readonly filteredReviewRows = computed(() => {
     const filter = this.reviewFilter();
-    const weekKey = this.reviewWeekKey();
-    return this.reviewRows().filter((row) => {
-      const statusOk = filter === 'ALL' || row.summary.status === filter;
-      const weekOk = !weekKey || row.summary.periodStart === weekKey;
-      return statusOk && weekOk;
-    });
+   return this.reviewRows().filter(
+    (row) => filter === 'ALL' || row.summary.status === filter,
+   );
   });
 
   readonly awaitingReviewCount = computed(
@@ -409,18 +390,18 @@ export class TimesheetsComponent {
       ),);
       this.reviewRows.set(sorted);
 
-      if(!this.reviewWeekKey() && sorted.length > 0) {
-        const todayStr = this.toIsoDate(new Date());
-        const current = sorted.find(
-          (r) => 
-            r.summary.periodStart <= todayStr &&
-          r.summary.periodEnd >= todayStr,
-        );
-        this.reviewWeekKey.set(
-          (current ?? sorted[0]).summary.periodStart,
-        );
-      }
-          this.reviewUiState.set(sorted.length === 0 ? 'empty' : 'idle');
+      // if(!this.reviewWeekKey() && sorted.length > 0) {
+      //   const todayStr = this.toIsoDate(new Date());
+      //   const current = sorted.find(
+      //     (r) => 
+      //       r.summary.periodStart <= todayStr &&
+      //     r.summary.periodEnd >= todayStr,
+      //   );
+      //   this.reviewWeekKey.set(
+      //     (current ?? sorted[0]).summary.periodStart,
+      //   );
+      // }
+         this.reviewUiState.set(sorted.length === 0 ? 'empty' : 'idle');
       },
       error: () => {
         this.reviewUiState.set('error');
@@ -731,9 +712,9 @@ export class TimesheetsComponent {
     this.loadEntriesForWeek(timesheetId);
   }
 
-  onReviewWeekChange(weekKey: string) : void {
-    this.reviewWeekKey.set(weekKey);
-  }
+  // onReviewWeekChange(weekKey: string) : void {
+  //   this.reviewWeekKey.set(weekKey);
+  // }
 
   statusLabel(status: StatusFilter | TimesheetStatus | ReviewStatusFilter): string {
     if (status === 'ALL') {
