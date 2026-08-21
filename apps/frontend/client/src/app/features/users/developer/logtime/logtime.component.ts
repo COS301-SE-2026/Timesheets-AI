@@ -333,6 +333,8 @@ export class LogtimeComponent implements OnDestroy {
     );
   });
 
+  readonly canEditEntries = computed(() => this.canSubmitTimesheet());
+
   //Native asynchronous timer allocation reference tracking context
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
 
