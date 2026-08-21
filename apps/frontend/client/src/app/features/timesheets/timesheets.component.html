@@ -253,21 +253,7 @@
           <h1 class="page-header-title">Timesheet Approvals</h1>
           <p class="page-header-subtitles">Timesheets submitted by members of the project you manage.</p>
         </div>
-        <div class="page-header-actions">
-          <label class="week-picker" for="review-week-picker">
-            <span class="week-picker-name">Week</span>
-            <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
-            <select id="review-week-picker" class="week-picker-select"
-            [ngModel]="reviewWeekKey()"
-            (ngModelChange)="onReviewWeekChange($event)"
-            [disabled]="reviewWeekOptions().length === 0">
-          @for (week of reviewWeekOptions(); track week.key) {
-            <option [value]="week.key">{{ week.label }}</option>
-          }  
-          </select>
-          <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
-          </label>
-        </div>
+
       </header>
     
 
