@@ -225,7 +225,9 @@ public class TimesheetService {
     timesheet.setStatus("SUBMITTED");
     timesheet.setSubmittedAt(LocalDateTime.now());
     timesheet.setRejectedAt(null);
+    timesheet.setApprovedAt(null);
     timesheet.setRejectionReason(null);
+    timesheet.setApprovedByWorkspaceMemberId(null);
 
     // all the time entries in the timesheet should be locked
     List<TimeEntry> entries = timeEntryRepository.findByTimesheetId(timesheetId);
