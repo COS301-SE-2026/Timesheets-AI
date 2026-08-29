@@ -1,15 +1,20 @@
 """
 Momently AI Service
-FastAPI application — Demo 1 scaffold
+FastAPI application Demo 1 scaffold
 
 Endpoints:
   GET  /health         liveness probe
   GET  /docs           Swagger UI
-  POST /insights       placeholder — returns mock aggregation
+  POST /insights       plaeturns mock aggregation
+
+  Patched: 25 August 2026
+  added router imports
 """
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.burnout import router as burnout_router
 
 app = FastAPI(
     title="Momently AI Service",
@@ -25,6 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
     # will add the domain here!
 )
+app.include_router(burnout_router)
 
 
 @app.get("/health", tags=["Health"])
