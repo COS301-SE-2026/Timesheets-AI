@@ -9,10 +9,7 @@ the HttpTestingController intercepts the request instead of hitting the actual b
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import {HttpTestingController, provideHttpClientTesting, } from '@angular/common/http/testing';
 import {
   AuthService,
   RegisterRequest,
