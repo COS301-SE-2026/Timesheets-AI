@@ -44,6 +44,6 @@ def check_connection():
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
         return True
-    except Exception as e:
-        logger.error("Database connection error: %s", e)
+    except Exception:
+        logger.exception("Database connection error: %s", e)
         return False
