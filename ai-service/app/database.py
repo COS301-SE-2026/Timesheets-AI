@@ -45,5 +45,5 @@ def check_connection():
             connection.execute(text("SELECT 1"))
         return True
     except Exception:
-        logger.exception("Database connection error: %s", e)
+        logger.exception("Database connection error: %s")
         return False
