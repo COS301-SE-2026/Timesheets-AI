@@ -42,6 +42,7 @@ public class GoogleOAuthService {
   */
 
   // this is url where the users will be sent to Google Permission screen
+  // the url is not formatted according to the Google expected format 
   public String buildAuthorizationUrl(String state) {
     return GOOGLE_AUTHORIZATION_URL
         + "?client_id="
@@ -49,7 +50,7 @@ public class GoogleOAuthService {
         + "&redirect_uri="
         + redirectUri
         + "&response_type=code"
-        + "&scope=https://www.googleapis.com/calendar.events"
+        + "&scope=https://www.googleapis.com/auth/calendar.events"
         + "&access_type=offline"
         + "&state="
         + state;
