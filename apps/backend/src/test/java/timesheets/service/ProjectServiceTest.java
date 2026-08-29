@@ -2,6 +2,7 @@ package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -166,46 +167,113 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("create project successfully")
-    void createProject() {
+    @DisplayName("return workspace projects for manager")
+    void returnWorkspaceProjectsForManager() {
+      Project project = createTestProject();
+      List<Project> projects = List.of(project);
 
-      // ARRANGE: setup project creation request
-      CreateProjectRequest request = createValidCreateProjectRequest();
-
-      // simulates what the project returns from DB
-      Project savedProject = createTestProject();
-
-      // specifying that the user is an admin
-      when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.isManager()).thenReturn(false);
-
+      when(securityUtils.isManager()).thenReturn(true);
       when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
-      when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
+      when(projectRepository.findByWorkspaceIdAndIsDeletedFalse(testWorkspaceId))
+          .thenReturn(projects);
 
-      // determines the users role on a project
-      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
-              testProjectId, testWorkspaceMemberId))
-          .thenReturn(Optional.of(createTestProjectMember()));
+      List<ProjectResponse> responses =
+          projectService.getProjectsForUser(testWorkspaceMemberId, false, true);
 
-      /*
-      - ACT: Create project
-      - the service: sets the workspace ID
-      - creates a new project entity
-      - calculates the budget cost
-      - saves the project to DB
-      - assignes project managers
-      */
-      ProjectResponse response = projectService.createProject(request, testWorkspaceMemberId);
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(1);
+      assertThat(responses.get(0).getName()).isEqualTo(testProjectName);
+      assertThat(responses.get(0).getBudgetHours()).isEqualTo(testBudgetHours);
+      assertThat(responses.get(0).getHourlyRate()).isEqualTo(testHourlyRate);
+      assertThat(responses.get(0).getBudgetCost()).isEqualTo(testBudgetCost);
 
-      // ASSERT: Verify project was created
-      assertThat(response).isNotNull();
-      assertThat(response.getName()).isEqualTo(testProjectName);
-      assertThat(response.getBudgetHours()).isEqualTo(testBudgetHours);
-      assertThat(response.getHourlyRate()).isEqualTo(testHourlyRate);
-      assertThat(response.getBudgetCost()).isEqualTo(testBudgetCost);
-
-      verify(projectRepository).save(any(Project.class));
+      verify(projectRepository).findByWorkspaceIdAndIsDeletedFalse(testWorkspaceId);
     }
+
+    @Test
+    @DisplayName("return assigned projects for developer")
+    void returnAssignedProjectsForDeveloper() {
+      Project project = createTestProject();
+      List<Project> projects = List.of(project);
+      ProjectMember projectMember = createTestProjectMember();
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(projectMemberRepository.findByWorkspaceMemberId(testWorkspaceMemberId))
+          .thenReturn(List.of(projectMember));
+      when(projectRepository.findAllById(List.of(testProjectId))).thenReturn(projects);
+
+      List<ProjectResponse> responses =
+          projectService.getProjectsForUser(testWorkspaceMemberId, false, false);
+
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(1);
+      assertThat(responses.get(0).getName()).isEqualTo(testProjectName);
+
+      // developer should not see the cost info
+      assertThat(responses.get(0).getBudgetCost()).isNull();
+
+      verify(projectRepository).findAllById(List.of(testProjectId));
+    }
+
+    @Test
+    @DisplayName("return empty list when developer has no assigned projects")
+    void returnEmptyListWhenDeveloperHasNoProjects() {
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(projectMemberRepository.findByWorkspaceMemberId(testWorkspaceMemberId))
+          .thenReturn(List.of());
+
+      List<ProjectResponse> responses =
+          projectService.getProjectsForUser(testWorkspaceMemberId, false, false);
+
+      assertThat(responses).isNotNull();
+      assertThat(responses).isEmpty();
+
+      verify(projectRepository, never()).findAllById(any());
+    }
+  }
+
+  @Test
+  @DisplayName("create project successfully")
+  void createProject() {
+
+    // ARRANGE: setup project creation request
+    CreateProjectRequest request = createValidCreateProjectRequest();
+
+    // simulates what the project returns from DB
+    Project savedProject = createTestProject();
+
+    // specifying that the user is an admin
+    when(securityUtils.isAdmin()).thenReturn(true);
+    when(securityUtils.isManager()).thenReturn(false);
+
+    when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
+    when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
+
+    // determines the users role on a project
+    when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+            testProjectId, testWorkspaceMemberId))
+        .thenReturn(Optional.of(createTestProjectMember()));
+
+    /*
+    - ACT: Create project
+    - the service: sets the workspace ID
+    - creates a new project entity
+    - calculates the budget cost
+    - saves the project to DB
+    - assignes project managers
+    */
+    ProjectResponse response = projectService.createProject(request, testWorkspaceMemberId);
+
+    // ASSERT: Verify project was created
+    assertThat(response).isNotNull();
+    assertThat(response.getName()).isEqualTo(testProjectName);
+    assertThat(response.getBudgetHours()).isEqualTo(testBudgetHours);
+    assertThat(response.getHourlyRate()).isEqualTo(testHourlyRate);
+    assertThat(response.getBudgetCost()).isEqualTo(testBudgetCost);
+
+    verify(projectRepository).save(any(Project.class));
   }
 
   @Nested
