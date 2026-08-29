@@ -1,11 +1,14 @@
 package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import exception.AccessDeniedException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -234,46 +237,90 @@ public class ProjectServiceTest {
     }
   }
 
-  @Test
-  @DisplayName("create project successfully")
-  void createProject() {
+  @Nested
+  @DisplayName("Create Projects Tests")
+  class CreateProjectsTests {
 
-    // ARRANGE: setup project creation request
-    CreateProjectRequest request = createValidCreateProjectRequest();
+    @Test
+    @DisplayName("create project successfully")
+    void createProject() {
 
-    // simulates what the project returns from DB
-    Project savedProject = createTestProject();
+      // ARRANGE: setup project creation request
+      CreateProjectRequest request = createValidCreateProjectRequest();
 
-    // specifying that the user is an admin
-    when(securityUtils.isAdmin()).thenReturn(true);
-    when(securityUtils.isManager()).thenReturn(false);
+      // simulates what the project returns from DB
+      Project savedProject = createTestProject();
 
-    when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
-    when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
+      // specifying that the user is an admin
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.isManager()).thenReturn(false);
 
-    // determines the users role on a project
-    when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
-            testProjectId, testWorkspaceMemberId))
-        .thenReturn(Optional.of(createTestProjectMember()));
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
+      when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
 
-    /*
-    - ACT: Create project
-    - the service: sets the workspace ID
-    - creates a new project entity
-    - calculates the budget cost
-    - saves the project to DB
-    - assignes project managers
-    */
-    ProjectResponse response = projectService.createProject(request, testWorkspaceMemberId);
+      // determines the users role on a project
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestProjectMember()));
 
-    // ASSERT: Verify project was created
-    assertThat(response).isNotNull();
-    assertThat(response.getName()).isEqualTo(testProjectName);
-    assertThat(response.getBudgetHours()).isEqualTo(testBudgetHours);
-    assertThat(response.getHourlyRate()).isEqualTo(testHourlyRate);
-    assertThat(response.getBudgetCost()).isEqualTo(testBudgetCost);
+      /*
+      - ACT: Create project
+      - the service: sets the workspace ID
+      - creates a new project entity
+      - calculates the budget cost
+      - saves the project to DB
+      - assignes project managers
+      */
+      ProjectResponse response = projectService.createProject(request, testWorkspaceMemberId);
 
-    verify(projectRepository).save(any(Project.class));
+      // ASSERT: Verify project was created
+      assertThat(response).isNotNull();
+      assertThat(response.getName()).isEqualTo(testProjectName);
+      assertThat(response.getBudgetHours()).isEqualTo(testBudgetHours);
+      assertThat(response.getHourlyRate()).isEqualTo(testHourlyRate);
+      assertThat(response.getBudgetCost()).isEqualTo(testBudgetCost);
+
+      verify(projectRepository).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when non-admin tries to create project")
+    void throwExceptionWhenNonAdminCreatesProject() {
+      CreateProjectRequest request = createValidCreateProjectRequest();
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+
+      assertThatThrownBy(() -> projectService.createProject(request, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins can create projects");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("assign project managers when provided")
+    void assignProjectManagersWhenProvided() {
+
+      CreateProjectRequest request = createValidCreateProjectRequest();
+      request.setManagerIds(List.of(testWorkspaceMemberId));
+
+      Project savedProject = createTestProject();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
+      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestWorkspaceMember()));
+
+      when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestProjectMember()));
+
+      ProjectResponse response = projectService.createProject(request, testWorkspaceMemberId);
+
+      assertThat(response).isNotNull();
+      verify(projectMemberRepository, times(1)).save(any(ProjectMember.class));
+    }
   }
 
   @Nested
