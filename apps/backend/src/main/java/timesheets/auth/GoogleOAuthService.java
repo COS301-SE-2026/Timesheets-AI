@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder; 
 
 @Service
 public class GoogleOAuthService {
@@ -42,18 +43,17 @@ public class GoogleOAuthService {
   */
 
   // this is url where the users will be sent to Google Permission screen
-  // the url is not formatted according to the Google expected format 
   public String buildAuthorizationUrl(String state) {
-    return GOOGLE_AUTHORIZATION_URL
-        + "?client_id="
-        + clientId
-        + "&redirect_uri="
-        + redirectUri
-        + "&response_type=code"
-        + "&scope=https://www.googleapis.com/auth/calendar.events"
-        + "&access_type=offline"
-        + "&state="
-        + state;
+    return UriComponentsBuilder.fromHttpUrl("https://google.com")
+    .queryParam("client_id", clientId)
+    .queryParam("redirect_uri", redirectUri)
+    .queryParam("response_type", "code")
+    .queryParam("scope", "https://googleapis.com")
+    .queryParam("access_type", "offline")
+    .queryParam("prompt", "consent")
+    .queryParam("state", state)
+    .build()
+    .toUriString();
   }
 
   /*
