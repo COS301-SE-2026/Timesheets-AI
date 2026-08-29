@@ -1,5 +1,11 @@
 package timesheets.integration;
 
+// TODO:
+/*
+ * every integration need to:
+ * generate specific authorization URL 
+ * handle its specific token exchnage and identity 
+ */
 // every integration adapter MUST follow this contract
 
 public interface IntegrationAdapter {
