@@ -1,7 +1,7 @@
 package timesheets.config;
 
 import java.util.Arrays;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,14 +15,24 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import lombok.RequiredArgsConstructor;
-
 // this is where we set up our security configuration for the backend, using Spring Security
 // we define how users are authenticated and authorized to access different endpoints in our API
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+  @Value("${app.cors.allowed-origins:http://localhost:4200}")
+  private String[] allowedOrigins;
+
+  @Value("${app.cors.allowed-methods:GET,POST,PUT,DELETE,PATCH,OPTIONS}")
+  private String[] allowedMethods;
+
+  @Value("${app.cors.allowed-headers:*}")
+  private String[] allowedHeaders;
+
+  @Value("${app.cors.allow-credentials:true}")
+  private boolean allowCredentials;
 
   @Bean // this is how we encode passwords, using BCrypt which is a strong hashing
   // algorithm to
@@ -31,22 +41,16 @@ public class SecurityConfig {
     return new BCryptPasswordEncoder();
   }
 
-
-  
   /**
-	This method makes sure: 
-      1. CORS: Allows cross-origin requests from the Angular frontend
-      2. CSRF: Disabled because we use stateless JWT tokens
-      3. Session: Stateless (no server-side session storage)
-      4. Authorization: public endpoints are accessible, protect everything else
-      5. JWT Filter: Validates JWT tokens for authenticated requests
-      
-      The filter chain executes in this order:
-      1. CORS filter (handles preflight OPTIONS requests)
-      2. CSRF filter (disabled)
-      3. JWT Authentication Filter (validates token)
-      4. Authorization filter (checks permissions)
-**/
+   * This method makes sure: 1. CORS: Allows cross-origin requests from the Angular frontend 2.
+   * CSRF: Disabled because we use stateless JWT tokens 3. Session: Stateless (no server-side
+   * session storage) 4. Authorization: public endpoints are accessible, protect everything else 5.
+   * JWT Filter: Validates JWT tokens for authenticated requests
+   *
+   * <p>The filter chain executes in this order: 1. CORS filter (handles preflight OPTIONS requests)
+   * 2. CSRF filter (disabled) 3. JWT Authentication Filter (validates token) 4. Authorization
+   * filter (checks permissions)
+   */
   @Bean // this is where we configure the security filter chain, defining how HTTP
   // requests are
   // secured and which endpoints require authentication
@@ -86,7 +90,6 @@ public class SecurityConfig {
     return http.build();
   }
 
-
   /*
   CORS configuration for cross-origin requests.
   - Needing this since angular frontend runs on a different origin (http://localhost:4200) than the backend (http://localhost:8080)
@@ -102,19 +105,18 @@ public class SecurityConfig {
 
     CorsConfiguration configuration = new CorsConfiguration();
 
-    //from the angular frontend
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+    // from the angular frontend
+    configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
 
-    //the options is specifically for CORS preflight requests
-    configuration.setAllowedMethods(
-        Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+    // the options is specifically for CORS preflight requests
+    configuration.setAllowedMethods(Arrays.asList(allowedMethods));
 
-    configuration.setAllowedHeaders(Arrays.asList("*"));
-    configuration.setAllowCredentials(true);
+    configuration.setAllowedHeaders(Arrays.asList(allowedHeaders));
+    configuration.setAllowCredentials(allowCredentials);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-    //it is applied to all endpoints such that the CORS handling can occur across the entire API
+    // it is applied to all endpoints such that the CORS handling can occur across the entire API
     source.registerCorsConfiguration("/**", configuration);
     return source;
   }
