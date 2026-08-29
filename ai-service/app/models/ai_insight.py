@@ -4,6 +4,8 @@ It replicates the existing db ai_insights table, matching the momently_schema.sq
 shared by Nyasha (Backend engineer).
 Author: Zamokuhle Zwane
 Date: 12/07/2026
+
+Patch: added scop and narrative fields
 """
 
 import uuid
@@ -32,7 +34,9 @@ class AIInsight(Base):
     )
     insight_type: Mapped[str] = mapped_column(String(30))
     score: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
+    scope: Mapped[str] = mapped_column(String(10), default="USER")
     confidence: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     recommendation: Mapped[str | None] = mapped_column(Text, nullable=True)
+    narrative: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
