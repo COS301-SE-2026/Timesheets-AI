@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.util.UriComponentsBuilder; 
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class GoogleOAuthService {
@@ -44,16 +44,17 @@ public class GoogleOAuthService {
 
   // this is url where the users will be sent to Google Permission screen
   public String buildAuthorizationUrl(String state) {
-    return UriComponentsBuilder.fromHttpUrl("https://google.com")
-    .queryParam("client_id", clientId)
-    .queryParam("redirect_uri", redirectUri)
-    .queryParam("response_type", "code")
-    .queryParam("scope", "https://googleapis.com")
-    .queryParam("access_type", "offline")
-    .queryParam("prompt", "consent")
-    .queryParam("state", state)
-    .build()
-    .toUriString();
+    return UriComponentsBuilder.fromHttpUrl(GOOGLE_AUTHORIZATION_URL)
+        .queryParam("client_id", clientId)
+        .queryParam("redirect_uri", redirectUri)
+        .queryParam("response_type", "code")
+        .queryParam("scope", "https://www.googleapis.com/auth/calendar.events")
+        .queryParam("access_type", "offline")
+        .queryParam("prompt", "consent")
+        .queryParam("state", state)
+        .build()
+        .encode()
+        .toUriString();
   }
 
   /*
@@ -87,6 +88,7 @@ public class GoogleOAuthService {
     // our application identifier
     formData.add("client_id", clientId);
     // callback URL in the console
+    formData.add("client_secret", clientSecret);
     formData.add("redirect_uri", redirectUri);
     // to tell Google which OAuth fk=low we are running ;
     formData.add("grant_type", "authorization_code");
