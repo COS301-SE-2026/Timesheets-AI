@@ -9,6 +9,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import exception.AccessDeniedException;
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,6 +32,7 @@ import timesheets.domain.TimeEntry;
 import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateProjectRequest;
+import timesheets.dto.request.UpdateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
 import timesheets.dto.response.ProjectResponse;
 import timesheets.enums.WorkspaceRole;
@@ -98,6 +101,19 @@ public class ProjectServiceTest {
     return member;
   }
 
+  private Project createArchivedProject() {
+    Project project = createTestProject();
+    project.setStatus("ARCHIVED");
+    return project;
+  }
+
+  private Project createDeletedProject() {
+    Project project = createTestProject();
+    project.setIsDeleted(true);
+    project.setDeletedAt(LocalDateTime.now());
+    return project;
+  }
+
   private CreateProjectRequest createValidCreateProjectRequest() {
     CreateProjectRequest request = new CreateProjectRequest();
     request.setName(testProjectName);
@@ -107,6 +123,18 @@ public class ProjectServiceTest {
     request.setStartDate(LocalDate.now());
     request.setEndDate(LocalDate.now().plusMonths(1));
     request.setManagerIds(List.of());
+    return request;
+  }
+
+  private UpdateProjectRequest createValidUpdateProjectRequest() {
+    UpdateProjectRequest request = new UpdateProjectRequest();
+    request.setName("Updated Project Name");
+    request.setDescription("Updated Description");
+    request.setBudgetHours(BigDecimal.valueOf(200));
+    request.setHourlyRate(BigDecimal.valueOf(75));
+    request.setStartDate(LocalDate.now().plusDays(1));
+    request.setEndDate(LocalDate.now().plusMonths(2));
+    request.setBudgetCost(BigDecimal.valueOf(15000));
     return request;
   }
 
@@ -407,6 +435,84 @@ public class ProjectServiceTest {
       assertThat(response).isNotNull();
 
       verify(projectRepository).save(any(Project.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Update Project Tests")
+  class UpdateProjectTests {
+
+    @Test
+    @DisplayName("update project successfully as admin")
+    void updateProjectSuccessfully() {
+
+      Project project = createTestProject();
+      UpdateProjectRequest request = createValidUpdateProjectRequest();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(projectRepository.save(any(Project.class))).thenReturn(project);
+
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestProjectMember()));
+
+      ProjectResponse response =
+          projectService.updateProject(testProjectId, request, testWorkspaceMemberId);
+
+      assertThat(response).isNotNull();
+      assertThat(response.getName()).isEqualTo("Updated Project Name");
+
+      verify(projectRepository).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when developer tries to update project")
+    void throwExceptionWhenDeveloperUpdatesProject() {
+      UpdateProjectRequest request = createValidUpdateProjectRequest();
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(createTestProject()));
+
+      assertThatThrownBy(
+              () -> projectService.updateProject(testProjectId, request, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins, Managers, and Project Managers can update projects");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when updating archived project")
+    void throwExceptionWhenUpdatingArchivedProject() {
+      Project archivedProject = createArchivedProject();
+      UpdateProjectRequest request = createValidUpdateProjectRequest();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(archivedProject));
+
+      assertThatThrownBy(
+              () -> projectService.updateProject(testProjectId, request, testWorkspaceMemberId))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Cannot update an archived project");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when project not found")
+    void throwExceptionWhenProjectNotFound() {
+      UpdateProjectRequest request = createValidUpdateProjectRequest();
+
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(
+              () -> projectService.updateProject(testProjectId, request, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessageContaining("Project not found with id: " + testProjectId);
+
+      verify(projectRepository, never()).save(any(Project.class));
     }
   }
 }
