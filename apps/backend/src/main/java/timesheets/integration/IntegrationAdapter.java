@@ -11,4 +11,7 @@ package timesheets.integration;
 public interface IntegrationAdapter {
   // every adapter need to tell us which external provider do they represent?
   String getProvider();
+
+  // every vendor must execute their token and save it to the DB d
+  void exchangeAndsaveToken(UUID workspaceMemberId, String code);
 }
