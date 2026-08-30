@@ -353,6 +353,67 @@ public class ProjectServiceTest {
   }
 
   @Nested
+  @DisplayName("Delete Project Tests")
+  class DeleteProjectTests {
+    @Test
+    @DisplayName("delete project successfully")
+    void deleteProjectSuccessfully() {
+      Project project = createTestProject();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(projectRepository.save(any(Project.class))).thenReturn(project);
+
+      projectService.deleteProject(testProjectId, testWorkspaceMemberId);
+
+      assertThat(project.getIsDeleted()).isTrue();
+      assertThat(project.getDeletedAt()).isNotNull();
+      verify(projectRepository).save(project);
+    }
+
+    @Test
+    @DisplayName("throw exception when non-admin tries to delete project")
+    void throwExceptionWhenNonAdminDeletesProject() {
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+
+      assertThatThrownBy(() -> projectService.deleteProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins can delete projects");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when deleting already deleted project")
+    void throwExceptionWhenDeletingDeletedProject() {
+
+      Project deletedProject = createDeletedProject();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(deletedProject));
+
+      assertThatThrownBy(() -> projectService.deleteProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Project is already deleted");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when project not found for deletion")
+    void throwExceptionWhenProjectNotFoundForDelete() {
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> projectService.deleteProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessageContaining("Project not found with id: " + testProjectId);
+    }
+  }
+
+  @Nested
   @DisplayName("Get Project Detail Tests")
   class GetProjectDetailTests {
 
@@ -402,6 +463,37 @@ public class ProjectServiceTest {
       assertThat(response.getProgressPercentage()).isEqualByComparingTo(BigDecimal.valueOf(60.00));
 
       verify(projectRepository).findById(testProjectId);
+    }
+
+    @Test
+    @DisplayName("throw exception when user has no access to project")
+    void throwExceptionWhenUserHasNoAccessToProject() {
+
+      Project project = createTestProject();
+
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(false);
+
+      assertThatThrownBy(
+              () -> projectService.getProjectDetail(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("No access to this project");
+    }
+
+    @Test
+    @DisplayName("throw exception when project not found")
+    void throwExceptionWhenProjectNotFoundForDetail() {
+
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(
+              () -> projectService.getProjectDetail(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessageContaining("Project not found with id: " + testProjectId);
     }
   }
 
