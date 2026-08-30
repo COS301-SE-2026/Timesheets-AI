@@ -475,7 +475,7 @@ export class TimesheetsComponent {
     this.timesheetService.getEntriesForTimesheet(timesheetId).subscribe({
       next: (entries) => {
         // Exclude deleted records before resolving task or deriving visible rows for this timesheet
-        const activeEnries = entries.filter((entry) => !entry..isDeleted);
+        const activeEntries = entries.filter((entry) => !entry.isDeleted);
         //resolve any taskIds missing because it automatically says "Unknown tasks" silently
         this.resolveMissingTasks(activeEntries).subscribe(() => {
           this.allTimesheets.update((list) =>
