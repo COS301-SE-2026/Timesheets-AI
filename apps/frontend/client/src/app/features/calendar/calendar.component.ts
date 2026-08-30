@@ -1,9 +1,9 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, signal, OnInit, ViewChild} from '@angular/core';
 import {  EventClickArg, FullCalendarComponent, FullCalendarModule, CalendarOptions} from '@fullcalendar/angular';
-import  dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import  dayGridPlugin from '@fullcalendar/angular/daygrid';
+import timeGridPlugin from '@fullcalendar/angular/timegrid';
+import interactionPlugin from '@fullcalendar/angular/interaction';
 import { CalendarProvider, AppEvent } from './calendar.model';
 import { CalendarService } from './calendar.services';
 export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
@@ -53,9 +53,7 @@ export class CalendarComponent implements OnInit {
       return category ? [`fc-event-${category}`]: [];
     },
 
-    eventContent:(arg)=> {
-      this.renderEventContent(arg)
-    },
+    eventContent:(arg)=> this.renderEventContent(arg),
 
     datesSet:(dateInfo)=>{
       this.currentDateTitle.set(dateInfo.view.title);
@@ -100,11 +98,11 @@ export class CalendarComponent implements OnInit {
   }
 
   navigate(direction: 'prev' | 'next' | 'today'):void{
-    const calandar= this.calendarComponent.getApi();
+    const calendar= this.calendarComponent.getApi();
 
-    if(direction=== 'prev') calandar.prev();
-    if(direction=== 'next') calandar.next();
-    if(direction=== 'today') calandar.today();
+    if(direction=== 'prev') calendar.prev();
+    if(direction=== 'next') calendar.next();
+    if(direction=== 'today') calendar.today();
   }
 
   syncCalendar(): void{
@@ -133,7 +131,7 @@ export class CalendarComponent implements OnInit {
     });
   }
 
-  handleEventClick(info: EventClickInfo): void{
+  handleEventClick(info: EventClickArg): void{
     const rawProps= info.event.extendedProps;
     const categoryKey= rawProps['category'] || 'meetings';
 
@@ -170,7 +168,7 @@ export class CalendarComponent implements OnInit {
 
             ${
               arg.timeText ? `
-                <span class="event-title">
+                <span class="event-time">
                   ${arg.timeText}
                 </span>
               `: ''
