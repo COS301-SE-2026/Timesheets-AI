@@ -251,6 +251,7 @@ $calendar-red-text: #dc2626;
                 border-radius: 50px;
             }
 
+
             .custom-event-pill{
                 display: flex;
                 align-items: center;
@@ -287,6 +288,12 @@ $calendar-red-text: #dc2626;
                     color: $calendar-text-muted;
                     margin-left: 4px;
                 }
+            }
+
+            .fc-timegrid-slot-label-cushion{
+                font-family: 'Roboto Mono', monospace;
+                font-size: 12px;
+                font-weight: 200;
             }
 
             .fc-daygrid-event{

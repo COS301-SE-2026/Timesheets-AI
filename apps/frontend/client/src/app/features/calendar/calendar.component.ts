@@ -57,6 +57,15 @@ export class CalendarComponent implements OnInit {
     eventContent:(arg)=> this.renderEventContent(arg),
     dayHeaderContent:(arg)=> this.renderDayHeaderContent(arg),
 
+    slotLabelFormat:{
+      hour:'2-digit',
+      minute: '2-digit',
+      hour12: false
+    },
+
+    slotMinTime: '06:00:00',
+    slotMaxTime: '19:00:00',
+
     datesSet:(dateInfo)=>{
       this.currentDateTitle.set(dateInfo.view.title);
     }
