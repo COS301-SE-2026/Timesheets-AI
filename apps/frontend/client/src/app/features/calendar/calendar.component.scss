@@ -214,6 +214,7 @@ $calendar-red-text: #dc2626;
         ::ng-deep .fc{
             font-family: inherit;
             --fc-border-color: #{$calendar-border};
+            --fc-today-bg-color: transparent;
 
             .fc-scrollgrid{
                 border-radius: 12px;
