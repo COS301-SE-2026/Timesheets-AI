@@ -187,7 +187,7 @@ export class CalendarComponent implements OnInit {
       return true;
     }
 
-    const weekday=arg.date.toLocalDateString('en-US', {weekday: 'short'}).toUppercase();
+    const weekday=arg.date.toLocaleDateString('en-US', {weekday: 'short'}).toUpperCase();
     const dayNumber= arg.date.getDate();
 
     return{
