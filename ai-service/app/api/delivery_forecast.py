@@ -7,6 +7,7 @@ Date: 26/08/2026
 """
 
 import uuid
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -22,8 +23,8 @@ from app.services.delivery_forecast import (
 router = APIRouter(prefix="/insights/delivery-forecast", tags=["Delivery Forecast"])
 
 
-@router.post("/{task_id}/calculate", response_model=DeliveryForecastResponse)
-def calculate_and_save(task_id: uuid.UUID, db: Session = Depends(get_db)):
+@router.post("/{task_id}/calculate", response_model=DeliveryForecastResponse, response={404: {"description": "Task not found or deleted"}},)
+def calculate_and_save(task_id: uuid.UUID, db: Annotated[Session, Depends(get_db)]):
     result = calculate_delivery_forecast(db, task_id)
 
     if result["forecast_date"] is None and result["planned_date"] is None:
