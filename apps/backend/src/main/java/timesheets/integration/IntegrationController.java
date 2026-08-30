@@ -62,17 +62,30 @@ public class IntegrationController {
     // Exchange Google's authorization code for tokens
     GoogleTokenResponse tokenResponse = googleOAuthService.exchangeCodeforToken(code);
 
+    // calculate when access token expires
+    // why? Google access token is temporary 
+    // if it expires: use refresh token (this help the backend to get new access token w/o the user connecting back to Google Calendar)
+    // if not: use existing access token 
+    LocalDateTime expiresAt = LocalDateTIme.now().plusSeconds(tokenResponse.getExpiresIn());
+
     // using the Repository class, check if the workspace memer has already connected to Google
     // Calendar
     Optional<IntegrationToken> existingToken =
         integrationTokenRepository.findByWorkspaceMemberIdAndProvider(
             workspaceMemberId, "GOOGLE_CALENDAR");
 
-    // calculate when access token expires
-    // why? Google access token is temporary 
-    // if it expires: use refresh token (this help the backend to get new access token w/o the user connecting back to Google Calendar)
-    // if not: use existing access token 
-    LocalDateTime expiresAt = LocalDateTIme.now().plusSeconds(tokenResponse.getExpiresIn());
+    // checking if the member has integration token 
+    // yes: use existing one
+    // no: create one 
+    // for both cases: save the token information
+
+    IntegrationToken integrationToken;
+    if(existingToken.isEmpty()){
+      integrationToken = new IntegrationToken();
+    } else {
+      integrationToken = existingToken.get();
+    }
+
 
     return ResponseEntity.ok(
         "Google Calendar connected for the workspace member: "
