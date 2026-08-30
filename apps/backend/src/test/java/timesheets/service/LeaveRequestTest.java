@@ -456,4 +456,195 @@ public class LeaveRequestTest {
           .hasMessage("Leave request not found");
     }
   }
+
+  @Nested
+  @DisplayName("Reject Leave Request Tests")
+  class RejectLeaveRequestTests {
+
+    @Test
+    @DisplayName("reject leave request successfully")
+    void rejectLeaveRequestSuccessfully() {
+
+      // ARRANGE: setup the rejection
+      LeaveRequest pendingRequest = createTestLeaveRequest();
+      String rejectionReason = "Insufficient leave balance";
+
+      UUID adminMemberId = UUID.randomUUID();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(adminMemberId);
+      when(securityUtils.isAdmin()).thenReturn(true);
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(pendingRequest));
+      when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(pendingRequest);
+
+      // ACT: reject the leave request
+      LeaveRequestResponse response =
+          leaveRequestService.rejectLeaveRequest(testRequestId, rejectionReason);
+
+      // ASSERT: verify the rejection
+      assertThat(response).isNotNull();
+      assertThat(response.getStatus()).isEqualTo("REJECTED");
+      assertThat(response.getRejectionReason()).isEqualTo(rejectionReason);
+
+      verify(leaveRequestRepository).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when developer tries to reject")
+    void throwExceptionWhenDeveloperRejects() {
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
+      assertThatThrownBy(() -> leaveRequestService.rejectLeaveRequest(testRequestId, "Reason"))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins and Managers can reject leave requests");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when rejecting non-pending request")
+    void throwExceptionWhenRejectingNonPendingRequest() {
+
+      LeaveRequest approvedRequest = createApprovedLeaveRequest();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(approvedRequest));
+
+      assertThatThrownBy(() -> leaveRequestService.rejectLeaveRequest(testRequestId, "Reason"))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Leave request is not pending approval");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when rejecting own request")
+    void throwExceptionWhenRejectingOwnRequest() {
+
+      LeaveRequest ownRequest = createTestLeaveRequest();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(ownRequest));
+
+      assertThatThrownBy(() -> leaveRequestService.rejectLeaveRequest(testRequestId, "Reason"))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("You cannot reject your own leave request");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("manager can only reject requests from their workspace")
+    void managerCanOnlyRejectRequestsFromWorkspace() {
+
+      // ARRANGE: setup as manager with different workspace
+      LeaveRequest pendingRequest = createTestLeaveRequest();
+
+      UUID managerMemberId = UUID.randomUUID();
+      UUID differentWorkspaceId = UUID.randomUUID();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(managerMemberId);
+      when(securityUtils.isManager()).thenReturn(true);
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(differentWorkspaceId);
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(pendingRequest));
+      when(leaveRequestRepository.findByWorkspaceId(differentWorkspaceId)).thenReturn(List.of());
+
+      assertThatThrownBy(() -> leaveRequestService.rejectLeaveRequest(testRequestId, "Reason"))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("You can only reject requests from your workspace");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when leave request not found for rejection")
+    void throwExceptionWhenLeaveRequestNotFoundForRejection() {
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> leaveRequestService.rejectLeaveRequest(testRequestId, "Reason"))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("Leave request not found");
+    }
+  }
+
+  @Nested
+  @DisplayName("Cancel Leave Request Tests")
+  class CancelLeaveRequestTests {
+
+    @Test
+    @DisplayName("cancel leave request successfully")
+    void cancelLeaveRequestSuccessfully() {
+
+      // ARRANGE: setup the cancellation
+      LeaveRequest pendingRequest = createTestLeaveRequest();
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(pendingRequest));
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(pendingRequest);
+
+      // ACT: cancel the leave request
+      LeaveRequestResponse response =
+          leaveRequestService.cancelLeaveRequest(testRequestId, "Changed plans");
+
+      // ASSERT: verify the cancellation
+      assertThat(response).isNotNull();
+      assertThat(response.getStatus()).isEqualTo("CANCELLED");
+
+      verify(leaveRequestRepository).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when user tries to cancel someone else's request")
+    void throwExceptionWhenCancellingOthersRequest() {
+
+      LeaveRequest pendingRequest = createTestLeaveRequest();
+      UUID otherMemberId = UUID.randomUUID();
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(pendingRequest));
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(otherMemberId);
+
+      assertThatThrownBy(() -> leaveRequestService.cancelLeaveRequest(testRequestId, "Reason"))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only the requester can cancel their own leave request");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when cancelling non-pending request")
+    void throwExceptionWhenCancellingNonPendingRequest() {
+
+      LeaveRequest approvedRequest = createApprovedLeaveRequest();
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(approvedRequest));
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+
+      assertThatThrownBy(() -> leaveRequestService.cancelLeaveRequest(testRequestId, "Reason"))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Only pending leave requests can be cancelled");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when leave request not found for cancellation")
+    void throwExceptionWhenLeaveRequestNotFoundForCancellation() {
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> leaveRequestService.cancelLeaveRequest(testRequestId, "Reason"))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("Leave request not found");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+  }
 }
