@@ -1,5 +1,6 @@
 package timesheets.integration;
 
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import timesheets.auth.GoogleOAuthService;
 import timesheets.auth.GoogleTokenResponse;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
+import timesheets.domain.IntegrationToken;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.security.SecurityUtils;
 
@@ -55,10 +57,16 @@ public class IntegrationController {
     // this is the member who started the OAuth connection
     UUID workspaceMemberId = validatedState.getWorkspaceMemberId();
 
-    // get the Google code and exchange it for tokens (accessToken, refreshToken, expiresIn) and I will store these in the integrations_token table 
+    // get the Google code and exchange it for tokens (accessToken, refreshToken, expiresIn) and I
+    // will store these in the integrations_token table
     // Exchange Google's authorization code for tokens
     GoogleTokenResponse tokenResponse = googleOAuthService.exchangeCodeforToken(code);
 
+    // using the Repository class, check if the workspace memer has already connected to Google
+    // Calendar
+    Optional<IntegrationToken> existingToken =
+        integrationTokenRepository.findByWorkspaceMemberIdAndProvider(
+            workspaceMemberId, "GOOGLE_CALENDAR");
     return ResponseEntity.ok(
         "Google Calendar connected for the workspace member: "
             + validatedState.getWorkspaceMemberId());
