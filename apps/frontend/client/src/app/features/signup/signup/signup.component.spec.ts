@@ -18,6 +18,21 @@ import {
 import { SignupComponent } from './signup.component';
 import { FormGroup } from '@angular/forms';
 
+interface GoogleIdentityServicesStub{
+  accounts: {
+    id: {
+      initialize: jest.Mock;
+      renderButton: jest.Mock;
+      prompt: jest.Mock;
+    };
+  };
+}
+
+
+jest.mock('ng2-charts', () => ({
+  BaseChartDirective: jest.fn(),
+}));
+
 interface SignupComponentInternals {
   signupForm: FormGroup;
   brandLogo: string;
@@ -190,6 +205,16 @@ describe('SignupComponent', () => {
   };
 
   beforeEach(async () => {
+    (window as unknown as { google: GoogleIdentityServicesStub }).google = {
+      accounts: {
+        id: {
+          initialize: jest.fn(),
+          renderButton: jest.fn(),
+          prompt: jest.fn(),
+        },
+      },
+    };
+
     await TestBed.configureTestingModule({
       imports: [SignupComponent],
       providers: [
@@ -209,6 +234,7 @@ describe('SignupComponent', () => {
   });
 
   afterEach(() => {
+    delete (window as unknown as { google?: GoogleIdentityServicesStub }).google;
     httpMock.verify();
   });
 
