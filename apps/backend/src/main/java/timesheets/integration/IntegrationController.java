@@ -11,6 +11,7 @@ import timesheets.auth.GoogleOAuthService;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
 import timesheets.security.SecurityUtils;
+import timesheets.auth.GoogleTokenResponse;
 
 @RestController
 @RequestMapping("/api/integrations")
@@ -47,8 +48,12 @@ public class IntegrationController {
       @RequestParam String code, @RequestParam String state) {
 
     OAuthState validatedState = oauthStateService.validateState(state);
+
+    // Exchange Google's authorization code for tokens 
+    GoogleTokenResponse tokenResponse = googleOAuthSeervice.exchangeCodeforToken(code);
+
     return ResponseEntity.ok(
-        "State has been validated for the workspace member: "
+        "Google Calendar connected for the workspace member: "
             + validatedState.getWorkspaceMemberId());
   }
 }
