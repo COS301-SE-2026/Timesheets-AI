@@ -34,6 +34,7 @@ app.add_middleware(
 app.include_router(burnout_router)
 app.include_router(delivery_forecast_router)
 
+
 @app.get("/health", tags=["Health"])
 def health():
     return {"status": "ok", "service": "momently-ai"}
