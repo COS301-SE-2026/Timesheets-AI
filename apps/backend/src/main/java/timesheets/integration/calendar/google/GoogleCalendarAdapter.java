@@ -3,6 +3,7 @@ package timesheets.integration.calendar.google;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import timesheets.integration.calendar.CalendarAdapter;
 import timesheets.integration.calendar.CalendarEvent;
 
@@ -30,4 +31,7 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
 
   @Override
   public void deleteEvent(String externalEventId) {}
+
+  @Override
+  public void exchangeAndsaveToken(UUID workspaceMemberId, String code) {}
 }
