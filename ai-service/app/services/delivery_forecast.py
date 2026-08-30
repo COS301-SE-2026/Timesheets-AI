@@ -57,7 +57,7 @@ def calculate_delivery_forecast(db: Session, task_id: uuid.UUID) -> dict:
 
 def _get_recent_velocity(db: Session, workspace_member_id: uuid.UUID) -> float:
     since = datetime.now(timezone.utc) - timedelta(days=LOOKBACK_DAYS)
-    
+
     complete_tasks = (
         db.query(Task)
         .filter(
