@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import timesheets.auth.GoogleOAuthService;
+import timesheets.auth.GoogleTokenResponse;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
+import timesheets.repository.IntegrationTokenRepository;
 import timesheets.security.SecurityUtils;
-import timesheets.auth.GoogleTokenResponse;
 
 @RestController
 @RequestMapping("/api/integrations")
@@ -21,6 +22,7 @@ public class IntegrationController {
   private final OAuthStateService oauthStateService;
   private final GoogleOAuthService googleOAuthService;
   private final SecurityUtils securityUtils;
+  private final IntegrationTokenRepository integrationTokenRepository;
 
   @GetMapping("/google/calendar/connect")
   public ResponseEntity<String> connectGoogleCalender() {
@@ -49,8 +51,13 @@ public class IntegrationController {
 
     OAuthState validatedState = oauthStateService.validateState(state);
 
-    // Exchange Google's authorization code for tokens 
-    GoogleTokenResponse tokenResponse = googleOAuthSeervice.exchangeCodeforToken(code);
+    // Get the workspace member ID from the validated state
+    // this is the member who started the OAuth connection
+    UUID workspaceMemberId = validatedState.getWorkspaceMemberId();
+
+    // get the Google code and exchange it for tokens (accessToken, refreshToken, expiresIn) and I will store these in the integrations_token table 
+    // Exchange Google's authorization code for tokens
+    GoogleTokenResponse tokenResponse = googleOAuthService.exchangeCodeforToken(code);
 
     return ResponseEntity.ok(
         "Google Calendar connected for the workspace member: "

@@ -1,9 +1,9 @@
 package timesheets.auth;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +20,7 @@ public class GoogleTokenResponse {
   @JsonProperty("refresh_token")
   private String refreshToken;
 
-  // no need to convert because it is written the same as Google 
+  // no need to convert because it is written the same as Google
   private String scope;
 
   @JsonProperty("token_type")
