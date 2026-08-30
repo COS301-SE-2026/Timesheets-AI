@@ -34,6 +34,7 @@ import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateProjectRequest;
 import timesheets.dto.request.UpdateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
+import timesheets.dto.response.ProjectMemberResponse;
 import timesheets.dto.response.ProjectResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
@@ -513,6 +514,169 @@ public class ProjectServiceTest {
           .hasMessageContaining("Project not found with id: " + testProjectId);
 
       verify(projectRepository, never()).save(any(Project.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Remove Member From Project Tests")
+  class RemoveMemberFromProjectTests {
+
+    @Test
+    @DisplayName("remove member from project successfully")
+    void removeMemberFromProject() {
+
+      ProjectMember projectMember = createTestProjectMember();
+      projectMember.setIsActive(true);
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.existsById(testProjectId)).thenReturn(true);
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(projectMember));
+
+      projectService.removeMemberFromProject(testProjectId, testWorkspaceMemberId);
+
+      assertThat(projectMember.getIsActive()).isFalse();
+      assertThat(projectMember.getUpdatedAt()).isNotNull();
+
+      verify(projectMemberRepository).save(projectMember);
+    }
+
+    @Test
+    @DisplayName("throw exception when project not found")
+    void throwExceptionWhenProjectNotFoundForRemoval() {
+
+      when(projectRepository.existsById(testProjectId)).thenReturn(false);
+
+      assertThatThrownBy(
+              () -> projectService.removeMemberFromProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("Project not found");
+    }
+
+    @Test
+    @DisplayName("throw exception when unauthorized user tries to remove")
+    void throwExceptionWhenUnauthorizedUserRemoves() {
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.existsById(testProjectId)).thenReturn(true);
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestProjectMember())); // not a project manager
+
+      assertThatThrownBy(
+              () -> projectService.removeMemberFromProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage(
+              "Only Admins and Managers and Project Managers can remove members from projects");
+    }
+
+    @Test
+    @DisplayName("throw exception when member not found on project")
+    void throwExceptionWhenMemberNotFound() {
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.existsById(testProjectId)).thenReturn(true);
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.empty());
+
+      assertThatThrownBy(
+              () -> projectService.removeMemberFromProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("Member not found on this project");
+    }
+  }
+
+  @Nested
+  @DisplayName("Assign Member To Project Tests")
+  class AssignMemberToProjectTests {
+
+    @Test
+    @DisplayName("assign member to project successfully")
+    void assignMemberToProject() {
+
+      Project project = createTestProject();
+      WorkspaceMember workspaceMember = createTestWorkspaceMember();
+      User user = createTestUser();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+
+      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+      when(securityUtils.isAdmin()).thenReturn(true);
+
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(false);
+      when(projectMemberRepository.save(any(ProjectMember.class)))
+          .thenReturn(createTestProjectMember());
+      when(userRepository.findById(testUserId)).thenReturn(Optional.of(user));
+
+      ProjectMemberResponse response =
+          projectService.assignMemberToProject(testProjectId, testWorkspaceMemberId, false);
+
+      assertThat(response).isNotNull();
+      assertThat(response.getFirstName()).isEqualTo("Test");
+      assertThat(response.getLastName()).isEqualTo("User");
+      assertThat(response.getIsProjectManager()).isFalse();
+
+      verify(projectMemberRepository).save(any(ProjectMember.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when member already assigned to project")
+    void throwExceptionWhenMemberAlreadyAssigned() {
+
+      Project project = createTestProject();
+      WorkspaceMember workspaceMember = createTestWorkspaceMember();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(true);
+
+      assertThatThrownBy(
+              () ->
+                  projectService.assignMemberToProject(testProjectId, testWorkspaceMemberId, false))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Member is already assigned to this project");
+
+      verify(projectMemberRepository, never()).save(any(ProjectMember.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when member does not belong to project workspace")
+    void throwExceptionWhenMemberNotInWorkspace() {
+
+      Project project = createTestProject();
+      WorkspaceMember workspaceMember = createTestWorkspaceMember();
+      workspaceMember.setWorkspaceId(UUID.randomUUID()); // Different workspace
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+
+      assertThatThrownBy(
+              () ->
+                  projectService.assignMemberToProject(testProjectId, testWorkspaceMemberId, false))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Member does not belong to the project's workspace");
+
+      verify(projectMemberRepository, never()).save(any(ProjectMember.class));
     }
   }
 }
