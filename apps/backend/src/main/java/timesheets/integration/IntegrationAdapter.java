@@ -1,5 +1,7 @@
 package timesheets.integration;
 
+import java.util.UUID;
+
 // TODO:
 /*
  * every integration need to:
