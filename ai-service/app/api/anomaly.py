@@ -7,6 +7,7 @@ Date: 27/08/2026
 """
 
 import uuid
+from typing import Annotated
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -22,7 +23,7 @@ router = APIRouter(prefix="/insights/anomaly", tags=["Anomaly"])
 def detect_and_save(
     workspace_member_id: uuid.UUID,
     request: AnomalyDetectionRequest,
-    db: Session = Depends(get_db),
+    db: Annotated[Session, Depends(get_db)],
 ):
     anomalies = detect_anomalies(db, workspace_member_id, request.time_entry_ids)
     saved_insights = save_anomaly_insights(db, workspace_member_id, anomalies)
