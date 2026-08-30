@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, signal, OnInit, ViewChild} from '@angular/core';
-import {  EventClickArg, FullCalendarComponent, FullCalendarModule, CalendarOptions} from '@fullcalendar/angular';
+import {  EventClickInfo, FullCalendarComponent, FullCalendarModule, CalendarOptions} from '@fullcalendar/angular';
 import  dayGridPlugin from '@fullcalendar/angular/daygrid';
 import timeGridPlugin from '@fullcalendar/angular/timegrid';
 import interactionPlugin from '@fullcalendar/angular/interaction';
@@ -45,12 +45,12 @@ export class CalendarComponent implements OnInit {
     editable: false,
     selectable: false,
     events: [],
-    eventClick: (info: EventClickArg)=> this.handleEventClick(info),
+    eventClick: (info: EventClickInfo)=> this.handleEventClick(info),
 
     // ADDING THE FC COLOURS
-    eventClassName:(arg)=>{
+    eventClass:(arg)=>{
       const category= arg.event.extendedProps['category'];
-      return category ? [`fc-event-${category}`]: [];
+      return category ? `fc-event-${category}`: '';
     },
 
     eventContent:(arg)=> this.renderEventContent(arg),
@@ -131,7 +131,7 @@ export class CalendarComponent implements OnInit {
     });
   }
 
-  handleEventClick(info: EventClickArg): void{
+  handleEventClick(info: EventClickInfo): void{
     const rawProps= info.event.extendedProps;
     const categoryKey= rawProps['category'] || 'meetings';
 
