@@ -287,7 +287,7 @@ export class LogtimeComponent implements OnDestroy {
       const matchesFrom = !from || entryDate >= from;
       const matchesTo = !to || entryDate <= to;
 
-      return (!entry.isDisabled && matchesProject && matchesStatus && matchesFrom && matchesTo);
+      return (!entry.isDeleted && matchesProject && matchesStatus && matchesFrom && matchesTo);
     });
   });
 
@@ -328,22 +328,20 @@ export class LogtimeComponent implements OnDestroy {
   readonly canEditEntries = computed (() => {
     const timesheet = this.currentTimesheet();
     return (
-      !timesheet &&
+      !!timesheet &&
       (!timesheet.isLocked &&
       (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED'))
     );
-  });
+  }); 
 
-  readonly canEditEntries = computed(() => this.canSubmitTimesheet());
-  const timesheet = this.currentTimesheet();
+    readonly canSubmitTimesheet = computed (() => {
+    const timesheet = this.currentTimesheet();
     return (
-      !timesheet || 
-      (! timesheet.isLocked && 
-        (timesheet.status === 'DRAFT' || timesheet.status ===)
-      )
-    )
-
-  readonly canEditEntries = computed(() => this.canSubmitTimesheet());
+      !!timesheet &&
+      (!timesheet.isLocked &&
+      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED'))
+    );
+  }); 
 
   //Native asynchronous timer allocation reference tracking context
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
@@ -474,9 +472,9 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   openTimerPanel(): void {
-    if (!this.canditEntries()) {
+    if (!this.canEditEntries()) {
       if (!this.canEditEntries()) {
-        this.conflictMesage.set('This timesheet has been submitted and cannot be edited.');
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
         return;
       }
     }
@@ -494,7 +492,7 @@ export class LogtimeComponent implements OnDestroy {
    */
   saveEntry(): void {
   if (!this.canEditEntries()) {
-        this.conflictMesage.set('This timesheet has been submitted and cannot be edited.');
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
         return;
       }
     this.updateDuration();
@@ -890,7 +888,7 @@ export class LogtimeComponent implements OnDestroy {
 
   editEntry(entry: TimeEntry): void {
     if (!this.canEditEntries()) {
-        this.conflictMesage.set('This timesheet has been submitted and cannot be edited.');
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
         return;
       }
     this.openMenuEntryId.set(null);
@@ -968,7 +966,7 @@ export class LogtimeComponent implements OnDestroy {
 
   deleteEntry(entry: TimeEntry): void {
     if (!this.canEditEntries()) {
-        this.conflictMesage.set('This timesheet has been submitted and cannot be edited.');
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
         return;
       }
     const deleted = () => {

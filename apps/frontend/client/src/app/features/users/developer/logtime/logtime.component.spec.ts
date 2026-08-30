@@ -56,7 +56,7 @@ describe('LogtimeComponent', () => {
       endTime: `${today()}T11:00:00`,
       durationMinutes: 7200, // 2 hours, in seconds
       description: 'Existing entry for overlap testing.',
-      status: undefined,
+      status: 'DRAFT' as const,
       isDeleted: false,
     },
   ];
