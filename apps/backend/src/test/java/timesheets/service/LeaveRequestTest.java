@@ -14,6 +14,7 @@ import exception.StateConflictException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -121,6 +122,13 @@ public class LeaveRequestTest {
     request.setAttachments("[\"attachment1.pdf\"]");
 
     return request;
+  }
+
+  private WorkspaceMember createTestAdminWorkspaceMember() {
+    WorkspaceMember member = createTestWorkspaceMember();
+    member.setRole(WorkspaceRole.ADMIN);
+
+    return member;
   }
 
   @Nested
@@ -329,6 +337,123 @@ public class LeaveRequestTest {
       assertThat(response.getReason()).isEqualTo(testReason);
 
       verify(leaveRequestRepository).save(any(LeaveRequest.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Approve Leave Request Tests")
+  class ApproveLeaveRequestTests {
+
+    @Test
+    @DisplayName("approve leave request successfully")
+    void approveLeaveRequestSuccessfully() {
+
+      // ARRANGE: setup the approval
+      LeaveRequest pendingRequest = createTestLeaveRequest();
+      WorkspaceMember adminMember = createTestAdminWorkspaceMember();
+
+      UUID adminMemberId = UUID.randomUUID();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(adminMemberId);
+      when(securityUtils.isAdmin()).thenReturn(true);
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(pendingRequest));
+      when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(pendingRequest);
+
+      // ACT: approve the leave request
+      LeaveRequestResponse response = leaveRequestService.approveLeaveRequest(testRequestId);
+
+      // ASSERT: verify the approval
+      assertThat(response).isNotNull();
+      assertThat(response.getStatus()).isEqualTo("APPROVED");
+      assertThat(response.getApprovedByName()).isNotNull();
+
+      verify(leaveRequestRepository).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when developer tries to approve")
+    void throwExceptionWhenDeveloperApproves() {
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
+      assertThatThrownBy(() -> leaveRequestService.approveLeaveRequest(testRequestId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins and Managers can approve leave requests");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when approving non-pending request")
+    void throwExceptionWhenApprovingNonPendingRequest() {
+
+      LeaveRequest approvedRequest = createApprovedLeaveRequest();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(approvedRequest));
+
+      assertThatThrownBy(() -> leaveRequestService.approveLeaveRequest(testRequestId))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Leave request is not pending approval");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when approving own request")
+    void throwExceptionWhenApprovingOwnRequest() {
+
+      LeaveRequest ownRequest = createTestLeaveRequest();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(ownRequest));
+
+      assertThatThrownBy(() -> leaveRequestService.approveLeaveRequest(testRequestId))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("You cannot approve your own leave request");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("manager can only approve requests from their workspace")
+    void managerCanOnlyApproveRequestsFromWorkspace() {
+
+      // ARRANGE: setup as manager with different workspace
+      LeaveRequest pendingRequest = createTestLeaveRequest();
+
+      UUID differentWorkspaceId = UUID.randomUUID();
+      UUID managerMemberId = UUID.randomUUID();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(managerMemberId);
+      when(securityUtils.isManager()).thenReturn(true);
+      when(securityUtils.isAdmin()).thenReturn(false);
+
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(differentWorkspaceId);
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(pendingRequest));
+      when(leaveRequestRepository.findByWorkspaceId(differentWorkspaceId))
+          .thenReturn(List.of()); // no requests in this workspace
+
+      assertThatThrownBy(() -> leaveRequestService.approveLeaveRequest(testRequestId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("You can only approve requests from your workspace");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when leave request not found for approval")
+    void throwExceptionWhenLeaveRequestNotFoundForApproval() {
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> leaveRequestService.approveLeaveRequest(testRequestId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("Leave request not found");
     }
   }
 }
