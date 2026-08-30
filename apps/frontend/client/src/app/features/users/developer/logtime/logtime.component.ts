@@ -74,6 +74,7 @@ interface TimeEntry {
   createdAt?: string;
   updatedAt?: string;
   rejectionReason?: string;
+  isDeleted?: boolean;
 }
 
 /*
@@ -152,7 +153,7 @@ export class LogtimeComponent implements OnDestroy {
   private readonly timerService = inject(TimerService);
   private readonly timeEntryService = inject(TimeEntryService);
   private readonly route = inject(ActivatedRoute);
-  private readonly pendingTaskId: string | null = null;
+  private  pendingTaskId: string | null = null;
 
   //I used Enzokuhle Khumalo's workspace_members.id (real seed data), because it didnt need mfa
   private readonly workspaceMemberId =
@@ -286,7 +287,7 @@ export class LogtimeComponent implements OnDestroy {
       const matchesFrom = !from || entryDate >= from;
       const matchesTo = !to || entryDate <= to;
 
-      return matchesProject && matchesStatus && matchesFrom && matchesTo;
+      return (!entry.isDeleted && matchesProject && matchesStatus && matchesFrom && matchesTo);
     });
   });
 
@@ -324,16 +325,23 @@ export class LogtimeComponent implements OnDestroy {
     return `Entries: ${this.formatDateLabel(from)} – ${this.formatDateLabel(to)}`;
   });
 
-  readonly canSubmitTimesheet = computed (() => {
+  readonly canEditEntries = computed (() => {
     const timesheet = this.currentTimesheet();
     return (
       !!timesheet &&
-      !timesheet.isLocked &&
-      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED')
+      (!timesheet.isLocked &&
+      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED'))
     );
-  });
+  }); 
 
-  readonly canEditEntries = computed(() => this.canSubmitTimesheet());
+    readonly canSubmitTimesheet = computed (() => {
+    const timesheet = this.currentTimesheet();
+    return (
+      !!timesheet &&
+      (!timesheet.isLocked &&
+      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED'))
+    );
+  }); 
 
   //Native asynchronous timer allocation reference tracking context
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
@@ -438,6 +446,10 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   openManualPanel(): void {
+    if (!this.canEditEntries()) {
+      this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+      return;
+    }
     this.resetEntryForm();
     this.isEditMode.set(false);
     this.resetNewTaskState();
@@ -460,6 +472,12 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   openTimerPanel(): void {
+    if (!this.canEditEntries()) {
+      if (!this.canEditEntries()) {
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+        return;
+      }
+    }
     this.resetNewTaskState();
     this.activePanel.set('timer');
   }
@@ -473,6 +491,10 @@ export class LogtimeComponent implements OnDestroy {
    Performs bounds verification and double booking collision screening.
    */
   saveEntry(): void {
+  if (!this.canEditEntries()) {
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+        return;
+      }
     this.updateDuration();
 
     if (this.endTimeInvalid) {
@@ -865,6 +887,11 @@ export class LogtimeComponent implements OnDestroy {
   //populates editing controls with targets extraction contexts to alter parameters
 
   editEntry(entry: TimeEntry): void {
+    if (!this.canEditEntries()) {
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+        return;
+      }
+    this.openMenuEntryId.set(null);
     this.resetNewTaskState();
     this.entryForm.setValue({
       id: entry.id,
@@ -938,6 +965,10 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   deleteEntry(entry: TimeEntry): void {
+    if (!this.canEditEntries()) {
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+        return;
+      }
     const deleted = () => {
       this.entries.update((entries) =>
         entries.filter((existingEntry) => existingEntry.id !== entry.id),
@@ -1119,7 +1150,9 @@ export class LogtimeComponent implements OnDestroy {
         next: (entries) =>
           this.entries.set(
             //same durationMinutes-is-actually-seconds fix as onSaved() in saveEntry() — see that comment for the full explanation
-            entries.map((entry) => this.normaliseEntryDuration(entry))
+            entries
+             .filter((entry) => !entry.isDeleted)
+             .map((entry) => this.normaliseEntryDuration(entry)),
           ),
         error: (error) =>
           this.conflictMessage.set(

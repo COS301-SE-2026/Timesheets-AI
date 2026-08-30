@@ -474,12 +474,14 @@ export class TimesheetsComponent {
   private loadEntriesForWeek(timesheetId: string): void {
     this.timesheetService.getEntriesForTimesheet(timesheetId).subscribe({
       next: (entries) => {
+        // Exclude deleted records before resolving task or deriving visible rows for this timesheet
+        const activeEntries = entries.filter((entry) => !entry.isDeleted);
         //resolve any taskIds missing because it automatically says "Unknown tasks" silently
-        this.resolveMissingTasks(entries).subscribe(() => {
+        this.resolveMissingTasks(activeEntries).subscribe(() => {
           this.allTimesheets.update((list) =>
             list.map((week) => {
               if (week.summary.id !== timesheetId) return week;
-             const built = this.buildTaskRows(entries, week.days);
+             const built = this.buildTaskRows(activeEntries, week.days);
              return {
               ...week,
               tasks: built.tasks,
@@ -543,6 +545,8 @@ export class TimesheetsComponent {
     const NO_TASK_KEY = '__no_task__';
    
     for (const entry of entries) {
+      // avoid restoring deleted rows
+      if(entry.isDeleted) continue;
       const dayIndex = days.findIndex(
         (d) => d.dateStr === entry.startTime.slice(0, 10),
       );
