@@ -26,6 +26,7 @@ import org.mockito.quality.Strictness;
 import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.AssignWorkspaceMemberRequest;
+import timesheets.dto.response.AvailableUserResponse;
 import timesheets.dto.response.WorkspaceMemberResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
@@ -336,6 +337,135 @@ public class TeamServiceTest {
 
       // ASSERT: Verify the user was removed
       verify(workspaceMemberRepository).delete(member);
+    }
+  }
+
+  @Nested
+  @DisplayName("Get Available Users Tests")
+  class GetAvailableUsersTests {
+
+    @Test
+    @DisplayName("return only workspace users for manager")
+    void returnOnlyWorkspaceUsersForManager() {
+
+      // ARRANGE: setting up users in the workspace
+      User user1 = createTestUser();
+      User user2 = createTestUser();
+      user2.setId(UUID.randomUUID());
+      user2.setEmail("jane@momentum.co.za");
+
+      WorkspaceMember member1 = createTestWorkspaceMember();
+      WorkspaceMember member2 = createTestWorkspaceMember();
+
+      member2.setId(UUID.randomUUID());
+      member2.setUserId(user2.getId());
+
+      List<WorkspaceMember> workspaceMembers = List.of(member1, member2);
+      List<User> usersInWorkspace = List.of(user1, user2);
+      List<UUID> userIdsInWorkspace = List.of(user1.getId(), user2.getId());
+
+      when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
+      when(workspaceMemberRepository.findByWorkspaceId(testWorkspaceId))
+          .thenReturn(workspaceMembers);
+
+      when(userRepository.findAllById(userIdsInWorkspace)).thenReturn(usersInWorkspace);
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(true);
+
+      // ACT: getting the available users
+      List<AvailableUserResponse> responses = teamService.getAvailableUsers(testWorkspaceId);
+
+      // ASSERT: Verify only workspace users are returned with flag true
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(2);
+
+      for (AvailableUserResponse response : responses) {
+        assertThat(response.getIsInWorkspace()).isTrue();
+      }
+
+      verify(userRepository, never()).findAll();
+    }
+
+    @Test
+    @DisplayName("throw exception when workspace does not exist")
+    void throwExceptionWhenWorkspaceNotFoundForGetUsers() {
+
+      when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(false);
+
+      assertThatThrownBy(() -> teamService.getAvailableUsers(testWorkspaceId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("Workspace not found");
+    }
+
+    @Test
+    @DisplayName("throw exception when developer tries to get workspace members")
+    void throwExceptionWhenDeveloperGetsWorkspaceMembers() {
+
+      // ARRANGE: a developer should not be able to see workspace members
+      when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
+      assertThatThrownBy(() -> teamService.getAvailableUsers(testWorkspaceId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins and Managers can view workspace members");
+    }
+
+    @Test
+    @DisplayName("return empty list when workspace has no members for manager")
+    void returnEmptyListWhenWorkspaceHasNoMembersForManager() {
+
+      // ARRANGE: workspace exists but has no members
+      List<WorkspaceMember> emptyMembersList = List.of();
+
+      when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
+      when(workspaceMemberRepository.findByWorkspaceId(testWorkspaceId))
+          .thenReturn(emptyMembersList);
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(true);
+
+      // ACT: getting the available users
+      List<AvailableUserResponse> responses = teamService.getAvailableUsers(testWorkspaceId);
+
+      // ASSERT: Verify empty list is returned
+      assertThat(responses).isNotNull();
+      assertThat(responses).isEmpty();
+
+      verify(userRepository, never()).findAll();
+    }
+
+    @Test
+    @DisplayName("return empty list when workspace has no members for admin")
+    void returnAllUsersWhenWorkspaceHasNoMembersForAdmin() {
+
+      // ARRANGE: workspace exists but has no members
+      List<WorkspaceMember> emptyMembersList = List.of();
+      User user1 = createTestUser();
+      User user2 = createTestUser();
+
+      user2.setId(UUID.randomUUID());
+      List<User> allUsers = List.of(user1, user2);
+
+      when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
+
+      when(workspaceMemberRepository.findByWorkspaceId(testWorkspaceId))
+          .thenReturn(emptyMembersList);
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(userRepository.findAll()).thenReturn(allUsers);
+
+      // ACT: getting the available users
+      List<AvailableUserResponse> responses = teamService.getAvailableUsers(testWorkspaceId);
+
+      // ASSERT: Verify all users are returned with flag false
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(2);
+
+      for (AvailableUserResponse response : responses) {
+        assertThat(response.getIsInWorkspace()).isFalse();
+      }
+
+      verify(userRepository).findAll();
     }
   }
 }
