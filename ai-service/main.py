@@ -15,6 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.burnout import router as burnout_router
+from app.api.delivery_forecast import router as delivery_forecast_router
 
 app = FastAPI(
     title="Momently AI Service",
@@ -31,7 +32,7 @@ app.add_middleware(
     # will add the domain here!
 )
 app.include_router(burnout_router)
-
+app.include_router(delivery_forecast_router)
 
 @app.get("/health", tags=["Health"])
 def health():
