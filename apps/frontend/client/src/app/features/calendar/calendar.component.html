@@ -45,7 +45,7 @@ Related Requirements: N/A
                     class="fa-solid fa-rotate"
                     [class.fa-spin]="isSyncing()">
                 </i>
-                {{ isSyncing()? 'Syncing...': ('Sync' + (provider()=== 'outlook'? 'Outlook': 'Google') +' now') }}
+                {{ isSyncing()? 'Syncing...': ('Sync ' + (provider()=== 'outlook'? 'Outlook': 'Google') +' now') }}
             </button>
         </div>
     </header>

@@ -55,6 +55,7 @@ export class CalendarComponent implements OnInit {
     },
 
     eventContent:(arg)=> this.renderEventContent(arg),
+    dayHeaderContent:(arg)=> this.renderDayHeaderContent(arg),
 
     datesSet:(dateInfo)=>{
       this.currentDateTitle.set(dateInfo.view.title);
@@ -179,6 +180,29 @@ export class CalendarComponent implements OnInit {
     }
 
     return true;
+  }
+
+  private renderDayHeaderContent(arg: any){
+    if(arg.view.type=== 'dayGridMonth'){
+      return true;
+    }
+
+    const weekday=arg.date.toLocalDateString('en-US', {weekday: 'short'}).toUppercase();
+    const dayNumber= arg.date.getDate();
+
+    return{
+      html:
+        `<div class="custom-day-header">
+          <span class="day-name">
+            ${weekday}
+          </span>
+          <span class="day-number ${arg.isToday? 'is-today': ''}">
+            ${dayNumber}
+          </span>
+        </div>
+        
+        `
+    }
   }
 
   private getCategoryLabel(category: string){
