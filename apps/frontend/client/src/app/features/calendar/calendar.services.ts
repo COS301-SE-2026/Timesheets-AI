@@ -6,7 +6,7 @@
 
 import { Injectable, inject } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { Observable } from "rxjs";
+import { Observable, map } from "rxjs";
 import{
     AppEvent,
     CalendarProvider
@@ -33,53 +33,53 @@ export class CalendarService{
     private readonly apiUrl= '/api/calendar';
     private readonly googleCalendarApiUrl= '/api/integrations/google/calendar';
 
-    // mocking data rn
-    private readonly mockOutlookEvents: AppEvent[]=[
-        {
-            id: '1',
-            title: 'Daily StandUp (Outlook)',
-            start: '2026-08-18T09:00:00',
-            end: '2026-08-18T09:30:00',
-            provider: 'outlook',
-            category: 'purple'
-        },
-        {
-            id: '2',
-            title: 'Sprint Planning',
-            start: '2026-08-18T11:00:00',
-            end: '2026-08-18T12:30:00',
-            provider: 'outlook',
-            category: 'blue',
-            location: 'Boardroom A'
-        },
-        {
-            id: '3',
-            title: 'Architecture Discussion',
-            start: '2026-08-18T14:00:00',
-            end: '2026-08-18T15:00:00',
-            provider: 'outlook',
-            category: 'green'
-        },
-    ];
+    // // mocking data rn
+    // private readonly mockOutlookEvents: AppEvent[]=[
+    //     {
+    //         id: '1',
+    //         title: 'Daily StandUp (Outlook)',
+    //         start: '2026-08-18T09:00:00',
+    //         end: '2026-08-18T09:30:00',
+    //         provider: 'outlook',
+    //         category: 'purple'
+    //     },
+    //     {
+    //         id: '2',
+    //         title: 'Sprint Planning',
+    //         start: '2026-08-18T11:00:00',
+    //         end: '2026-08-18T12:30:00',
+    //         provider: 'outlook',
+    //         category: 'blue',
+    //         location: 'Boardroom A'
+    //     },
+    //     {
+    //         id: '3',
+    //         title: 'Architecture Discussion',
+    //         start: '2026-08-18T14:00:00',
+    //         end: '2026-08-18T15:00:00',
+    //         provider: 'outlook',
+    //         category: 'green'
+    //     },
+    // ];
 
-    private readonly mockGoogleEvents: AppEvent[]=[
-        {
-            id: '101',
-            title: 'Client Meeting (Google Meet)',
-            start: '2026-08-18T10:00:00',
-            end: '2026-08-18T11:00:00',
-            category: 'orange',
-            provider: 'google'
-        },
-        {
-            id: '102',
-            title: 'UX Design Discussion',
-            start: '2026-08-18T13:00:00',
-            end: '2026-08-18T14:00:00',
-            provider: 'google' 
-        },
+    // private readonly mockGoogleEvents: AppEvent[]=[
+    //     {
+    //         id: '101',
+    //         title: 'Client Meeting (Google Meet)',
+    //         start: '2026-08-18T10:00:00',
+    //         end: '2026-08-18T11:00:00',
+    //         category: 'orange',
+    //         provider: 'google'
+    //     },
+    //     {
+    //         id: '102',
+    //         title: 'UX Design Discussion',
+    //         start: '2026-08-18T13:00:00',
+    //         end: '2026-08-18T14:00:00',
+    //         provider: 'google' 
+    //     },
 
-    ];
+    // ];
 
     getEvents(
         provider: CalendarProvider,
@@ -96,12 +96,37 @@ export class CalendarService{
         }
 
         return this.http.get<CalendarEventsResponse>(
-            `${this.calendarApiUrl}/events`,
+            `${this.apiUrl}/events`,
             { params }
         ).pipe(
-            mapResponse=> mapResponse.events
+            map(response=> response.events)
         );
-        const selectedEvents= provider === 'outlook'? this.mockOutlookEvents: this.mockGoogleEvents;
-        return of( selectedEvents).pipe(delay(200));
+        // const selectedEvents= provider === 'outlook'? this.mockOutlookEvents: this.mockGoogleEvents;
+        // return of( selectedEvents).pipe(delay(200));
+    }
+
+    getGoogleConnectionStatus(): Observable<CalendarStatus>{
+        return this.http.get<CalendarStatus>(
+            `${this.googleCalendarApiUrl}/status`
+        );
+    }
+
+    connectGoogleCalendar(): Observable<unknown>{
+        return this.http.get(
+            `${this.googleCalendarApiUrl}/connect`
+        );
+    }
+
+    disconnectGoogleCalendar(): Observable<void>{
+        return this.http.post<void>(
+            `${this.googleCalendarApiUrl}/disconnect`,
+            {}
+        );
+    }
+
+    getEvent(id:string): Observable<AppEvent>{
+        return this.http.get<AppEvent>(
+            `${this.apiUrl}/events/${id}`
+        );
     }
 }

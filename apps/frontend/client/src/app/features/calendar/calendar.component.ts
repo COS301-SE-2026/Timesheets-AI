@@ -1,12 +1,11 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, signal, OnInit, ViewChild} from '@angular/core';
-import { EventClickInfo, FullCalendarComponent, FullCalendarModule, CalendarOptions} from '@fullcalendar/angular';
-import  dayGridPlugin from 'fullcalendar/daygrid';
-import timeGridPlugin from 'fullcalendar/timegrid';
-import interactionPlugin from 'fullcalendar/interaction';
+import {  EventClickArg, FullCalendarComponent, FullCalendarModule, CalendarOptions} from '@fullcalendar/angular';
+import  dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
 import { CalendarProvider, AppEvent } from './calendar.model';
 import { CalendarService } from './calendar.services';
-import { spawn } from 'node:child_process';
 export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 @Component({
   selector: 'app-calendar',
@@ -46,15 +45,17 @@ export class CalendarComponent implements OnInit {
     editable: false,
     selectable: false,
     events: [],
-    eventClick: (info: EventClickInfo)=> this.handleEventClick(info),
+    eventClick: (info: EventClickArg)=> this.handleEventClick(info),
 
     // ADDING THE FC COLOURS
-    eventClassNames:(arg)=>{
+    eventClassName:(arg)=>{
       const category= arg.event.extendedProps['category'];
       return category ? [`fc-event-${category}`]: [];
     },
 
-    eventContent:(arg: any)=> this.renderEventContent(arg),
+    eventContent:(arg)=> {
+      this.renderEventContent(arg)
+    },
 
     datesSet:(dateInfo)=>{
       this.currentDateTitle.set(dateInfo.view.title);

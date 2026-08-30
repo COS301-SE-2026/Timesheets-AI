@@ -102,22 +102,18 @@ $calendar-red-text: #dc2626;
         cursor: pointer;
         transition: background 0.2s;
 
-        // i{
-        //     font-size: 12px;
-        // }
-
         &:hover{
             background: $calendar-primary-hover;
         }
 
-        // &:active:not(:disabled){
-        //     transform: scale(0.98);
-        // }
+        &:active:not(:disabled){
+            transform: scale(0.98);
+        }
 
-        // &:disabled{
-        //     opacity: 0.6;
-        //     cursor: not-allowed;
-        // }
+        &:disabled{
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     }
 }
 
@@ -125,7 +121,7 @@ $calendar-red-text: #dc2626;
 .calendar-card{
     background: $calendar-card-bg;
     border: 1px solid $calendar-border;
-    border-radius: 120px;
+    border-radius: 20px;
     padding: 24px;
     display: flex;
     flex-direction: column;
@@ -256,7 +252,6 @@ $calendar-red-text: #dc2626;
             .custom-event-pill{
                 display: flex;
                 align-items: center;
-                font-weight: 600;  
                 padding: 2px 6px;
                 font-size: 12px;
                 font-weight: 500;
@@ -340,7 +335,8 @@ $calendar-red-text: #dc2626;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-top: 1px solid $calendar-border;
+        border-top: 1px solid $calendar-border;
+        padding-top: 16px;
         font-size: 13px;
 
         .legend-items{
@@ -393,7 +389,7 @@ $calendar-red-text: #dc2626;
     z-index: 999;
 }
 
-.event-details-modal{
+.event-details-card{
     position: fixed;
     top: 50%;
     left: 50%;
@@ -431,15 +427,16 @@ $calendar-red-text: #dc2626;
         gap: 16px;
     }
 
-    .modal-title-row{
+    .title-row{
         display: flex;
         align-items: center;
         gap: 10px;
 
-        .modal-dot{
+        .category-dot{
             width: 10px;
             height: 10px;
             border-radius: 50%;
+            display: inline-block;
 
             &.meetings{
                 color: $calendar-blue-text;
@@ -511,7 +508,7 @@ $calendar-red-text: #dc2626;
                 align-items: flex-start;
             }
 
-            .role-muted{
+            .muted-text{
                 color: $calendar-text-muted;
             }
         }
