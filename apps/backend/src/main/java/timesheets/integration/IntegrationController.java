@@ -1,5 +1,6 @@
 package timesheets.integration;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class IntegrationController {
   @GetMapping("/google/calendar/connect")
   public ResponseEntity<String> connectGoogleCalender() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    String state = oauthStateService.generateState(workspaceMemberId, "GOOGLE_CALENDER");
+    String state = oauthStateService.generateState(workspaceMemberId, "GOOGLE_CALENDAR");
     String authorizationUrl = googleOAuthService.buildAuthorizationUrl(state);
     return ResponseEntity.ok(authorizationUrl);
   }
@@ -63,10 +64,11 @@ public class IntegrationController {
     GoogleTokenResponse tokenResponse = googleOAuthService.exchangeCodeforToken(code);
 
     // calculate when access token expires
-    // why? Google access token is temporary 
-    // if it expires: use refresh token (this help the backend to get new access token w/o the user connecting back to Google Calendar)
-    // if not: use existing access token 
-    LocalDateTime expiresAt = LocalDateTIme.now().plusSeconds(tokenResponse.getExpiresIn());
+    // why? Google access token is temporary
+    // if it expires: use refresh token (this help the backend to get new access token w/o the user
+    // connecting back to Google Calendar)
+    // if not: use existing access token
+    LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn());
 
     // using the Repository class, check if the workspace memer has already connected to Google
     // Calendar
@@ -74,18 +76,30 @@ public class IntegrationController {
         integrationTokenRepository.findByWorkspaceMemberIdAndProvider(
             workspaceMemberId, "GOOGLE_CALENDAR");
 
-    // checking if the member has integration token 
+    // checking if the member has integration token
     // yes: use existing one
-    // no: create one 
+    // no: create one
     // for both cases: save the token information
 
     IntegrationToken integrationToken;
-    if(existingToken.isEmpty()){
+    if (existingToken.isEmpty()) {
       integrationToken = new IntegrationToken();
     } else {
       integrationToken = existingToken.get();
     }
 
+    integrationToken.setWorkspaceMemberId(workspaceMemberId);
+    integrationToken.setProvider("GOOGLE_CALENDAR");
+    integrationToken.setAccessToken(tokenResponse.getAccessToken());
+    integrationToken.setExpiresAt(expiresAt);
+
+    // replace refresh token if Google provide one
+    if (tokenResponse.getRefreshToken() != null) {
+      integrationToken.setRefreshToken(tokenResponse.getRefreshToken());
+    }
+
+    // store in the integration_table
+    integrationTokenRepository.save(integrationToken);
 
     return ResponseEntity.ok(
         "Google Calendar connected for the workspace member: "
