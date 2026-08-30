@@ -610,6 +610,66 @@ public class ProjectServiceTest {
   }
 
   @Nested
+  @DisplayName("Archive Project Tests")
+  class ArchiveProjectTests {
+
+    @Test
+    @DisplayName("archive project successfully")
+    void archiveProjectSuccessfully() {
+
+      Project project = createTestProject();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(projectRepository.save(any(Project.class))).thenReturn(project);
+
+      projectService.archiveProject(testProjectId, testWorkspaceMemberId);
+
+      assertThat(project.getStatus()).isEqualTo("ARCHIVED");
+      verify(projectRepository).save(project);
+    }
+
+    @Test
+    @DisplayName("throw exception when non-admin tries to archive project")
+    void throwExceptionWhenNonAdminArchivesProject() {
+      when(securityUtils.isAdmin()).thenReturn(false);
+
+      assertThatThrownBy(() -> projectService.archiveProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins can archive projects");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when archiving already archived project")
+    void throwExceptionWhenArchivingArchivedProject() {
+      Project archivedProject = createArchivedProject();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(archivedProject));
+
+      assertThatThrownBy(() -> projectService.archiveProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Project is already archived");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when project not found for archiving")
+    void throwExceptionWhenProjectNotFoundForArchive() {
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> projectService.archiveProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessageContaining("Project not found with id: " + testProjectId);
+    }
+  }
+
+  @Nested
   @DisplayName("Remove Member From Project Tests")
   class RemoveMemberFromProjectTests {
 
