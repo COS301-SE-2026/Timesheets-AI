@@ -10,7 +10,7 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
   @Override
   public String getProvider() {
     // What is specified in dbs
-    return "GOOGLE_CALENDER";
+    return "GOOGLE_CALENDAR";
   }
 
   @Override
