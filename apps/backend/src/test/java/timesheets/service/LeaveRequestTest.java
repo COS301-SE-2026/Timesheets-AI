@@ -7,6 +7,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import exception.AccessDeniedException;
+import exception.BadRequestException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
 import java.math.BigDecimal;
@@ -86,6 +88,16 @@ public class LeaveRequestTest {
     return leaveRequest;
   }
 
+  private LeaveRequest createApprovedLeaveRequest() {
+
+    LeaveRequest leaveRequest = createTestLeaveRequest();
+    leaveRequest.setStatus("APPROVED");
+    leaveRequest.setApprovedByWorkspaceMemberId(UUID.randomUUID());
+    leaveRequest.setApprovedAt(LocalDateTime.now());
+
+    return leaveRequest;
+  }
+
   private LeaveRequestRequest.Create createValidCreateRequest() {
     LeaveRequestRequest.Create request = new LeaveRequestRequest.Create();
 
@@ -95,6 +107,19 @@ public class LeaveRequestTest {
     request.setTotalDays(testTotalDays);
     request.setReason(testReason);
     request.setAttachments("[\"attachment1.pdf\"]");
+    return request;
+  }
+
+  private LeaveRequestRequest.Update createValidUpdateRequest() {
+    LeaveRequestRequest.Update request = new LeaveRequestRequest.Update();
+
+    request.setLeaveType("SICK");
+    request.setStartDate(testStartDate.plusDays(5));
+    request.setEndDate(testEndDate.plusDays(5));
+    request.setTotalDays(BigDecimal.valueOf(2));
+    request.setReason("Doctor's appointment");
+    request.setAttachments("[\"attachment1.pdf\"]");
+
     return request;
   }
 
@@ -169,6 +194,141 @@ public class LeaveRequestTest {
           .hasMessage("You already have an approved leave that overlaps with these dates");
 
       verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Update Leave Request Tests")
+  class UpdateLeaveRequestTests {
+
+    @Test
+    @DisplayName("update leave request successfully")
+    void updateLeaveRequestSuccessfully() {
+
+      // ARRANGE: setup the leave request update
+      LeaveRequest existingLeaveRequest = createTestLeaveRequest();
+      LeaveRequestRequest.Update request = createValidUpdateRequest();
+
+      when(leaveRequestRepository.findById(testRequestId))
+          .thenReturn(Optional.of(existingLeaveRequest));
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(existingLeaveRequest);
+
+      // ACT: update the leave request
+      LeaveRequestResponse response =
+          leaveRequestService.updateLeaveRequest(testRequestId, request);
+
+      // ASSERT: verify the fields were updated
+      assertThat(response).isNotNull();
+      assertThat(response.getLeaveType()).isEqualTo("SICK");
+      assertThat(response.getStartDate()).isEqualTo(testStartDate.plusDays(5));
+      assertThat(response.getEndDate()).isEqualTo(testEndDate.plusDays(5));
+      assertThat(response.getTotalDays()).isEqualTo(BigDecimal.valueOf(2));
+      assertThat(response.getReason()).isEqualTo("Doctor's appointment");
+
+      verify(leaveRequestRepository).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when leave request not found")
+    void throwExceptionWhenLeaveRequestNotFound() {
+
+      LeaveRequestRequest.Update request = createValidUpdateRequest();
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> leaveRequestService.updateLeaveRequest(testRequestId, request))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("Leave request not found");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when updating non-pending leave request")
+    void throwExceptionWhenUpdatingNonPendingLeaveRequest() {
+
+      LeaveRequest approvedLeaveRequest = createApprovedLeaveRequest();
+      LeaveRequestRequest.Update request = createValidUpdateRequest();
+
+      when(leaveRequestRepository.findById(testRequestId))
+          .thenReturn(Optional.of(approvedLeaveRequest));
+
+      assertThatThrownBy(() -> leaveRequestService.updateLeaveRequest(testRequestId, request))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Only pending leave requests can be updated");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when user tries to update someone else's request")
+    void throwExceptionWhenUpdatingOthersRequest() {
+
+      LeaveRequest existingLeaveRequest = createTestLeaveRequest();
+      LeaveRequestRequest.Update request = createValidUpdateRequest();
+      UUID otherMemberId = UUID.randomUUID();
+
+      when(leaveRequestRepository.findById(testRequestId))
+          .thenReturn(Optional.of(existingLeaveRequest));
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(otherMemberId);
+
+      assertThatThrownBy(() -> leaveRequestService.updateLeaveRequest(testRequestId, request))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("You can only update your own leave requests");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when end date is before start date")
+    void throwExceptionWhenEndDateBeforeStartDate() {
+
+      LeaveRequest existingLeaveRequest = createTestLeaveRequest();
+      LeaveRequestRequest.Update request = createValidUpdateRequest();
+
+      request.setStartDate(testEndDate.plusDays(5));
+      request.setEndDate(testStartDate.plusDays(1));
+
+      when(leaveRequestRepository.findById(testRequestId))
+          .thenReturn(Optional.of(existingLeaveRequest));
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+
+      assertThatThrownBy(() -> leaveRequestService.updateLeaveRequest(testRequestId, request))
+          .isInstanceOf(BadRequestException.class)
+          .hasMessage("End date cannot be before start date");
+
+      verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
+    }
+
+    @Test
+    @DisplayName("update only provided fields")
+    void updateOnlyProvidedFields() {
+
+      // ARRANGE: setup with only some fields updated
+      LeaveRequest existingLeaveRequest = createTestLeaveRequest();
+      LeaveRequestRequest.Update request = new LeaveRequestRequest.Update();
+
+      request.setLeaveType("SICK");
+      // all the other fields are null
+
+      when(leaveRequestRepository.findById(testRequestId))
+          .thenReturn(Optional.of(existingLeaveRequest));
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(leaveRequestRepository.save(any(LeaveRequest.class))).thenReturn(existingLeaveRequest);
+
+      // ACT: update the leave request
+      LeaveRequestResponse response =
+          leaveRequestService.updateLeaveRequest(testRequestId, request);
+
+      // ASSERT: only the leave type should change
+      assertThat(response.getLeaveType()).isEqualTo("SICK");
+      assertThat(response.getStartDate()).isEqualTo(testStartDate);
+      assertThat(response.getEndDate()).isEqualTo(testEndDate);
+      assertThat(response.getTotalDays()).isEqualTo(testTotalDays);
+      assertThat(response.getReason()).isEqualTo(testReason);
+
+      verify(leaveRequestRepository).save(any(LeaveRequest.class));
     }
   }
 }
