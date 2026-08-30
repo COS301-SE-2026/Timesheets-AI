@@ -3,6 +3,10 @@
  * Date: 2026-05-15
  * Purpose: Handles user authentication through login form with validation
  * Related Requirement: -
+ * 
+ * Fixes:
+ * Nyasha : - fixed the Google OAuth popup not showing the account selector
+ *          - added cancel_on_tap_outside: false to the Google SDK initialization. 
  */
 
 import {

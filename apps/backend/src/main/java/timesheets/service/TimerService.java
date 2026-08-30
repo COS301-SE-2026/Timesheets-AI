@@ -13,9 +13,19 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import timesheets.domain.*;
+import timesheets.domain.Project;
+import timesheets.domain.Task;
+import timesheets.domain.TimeEntry;
+import timesheets.domain.TimerSession;
+import timesheets.domain.Timesheet;
+import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.StartTimerRequest;
-import timesheets.repository.*;
+import timesheets.repository.ProjectMemberRepository;
+import timesheets.repository.ProjectRepository;
+import timesheets.repository.TaskRepository;
+import timesheets.repository.TimeEntryRepository;
+import timesheets.repository.TimerSessionRepository;
+import timesheets.repository.WorkspaceMemberRepository;
 import timesheets.security.SecurityUtils;
 
 // this is the file that has all my timer business logic
@@ -124,7 +134,27 @@ public class TimerService {
   @Transactional
   public TimerSession pauseTimer() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    return pauseTimerInternal(workspaceMemberId);
+  }
 
+  /*
+  - this pauses a timer during logout, and should not require authentication
+  - auth service should call this one
+  - it silently fails when there is no active timer found since nothing should happen with that
+   */
+  @Transactional
+  public boolean pauseTimerForLogout(UUID workspaceMemberId) {
+    try {
+      pauseTimerInternal(workspaceMemberId);
+      return true;
+    } catch (IllegalStateException e) {
+      // when no active timer is founf so that is fine, there is nothing to pause
+      return false;
+    }
+  }
+
+  // helper function to help with pausing a timer
+  private TimerSession pauseTimerInternal(UUID workspaceMemberId) {
     TimerSession activeTimer =
         timerSessionRepository
             .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId)

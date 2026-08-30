@@ -29,6 +29,17 @@ public class TimeEntryService {
   private final TimesheetService timesheetService;
   private final SecurityUtils securityUtils;
 
+  // FLAG:
+  /*
+    The current createTimeEntry() does not actually validate project, task or time range.
+    what it does:
+    1. Get workspace for authenicated member
+    2. Create or Get the timesheet
+    3. Copy the request values into a TimeEntry
+    4. Save it
+
+  */
+
   // this would be if they need to create a time entry manually
   @Transactional
   public TimeEntry createTimeEntry(TimeEntryRequest request) {
@@ -97,7 +108,10 @@ public class TimeEntryService {
     timeEntryRepository.save(entry);
   }
 
-  // this will allow a user to edit time entries as long as if they are not locked
+  /*
+  - this will allow a user to edit time entries as long as if they are not locked
+  - as per the client request both manual and timer, time entries are both editable
+  */
   @Transactional
   public TimeEntry updateTimeEntry(UUID id, TimeEntryRequest request) {
 
@@ -118,7 +132,6 @@ public class TimeEntryService {
     entry.setStartTime(request.getStartTime());
     entry.setEndTime(request.getEndTime());
     entry.setDurationSeconds(request.getDurationSeconds());
-    entry.setEntryType(request.getEntryType());
     entry.setDescription(request.getDescription());
 
     return timeEntryRepository.save(entry);
