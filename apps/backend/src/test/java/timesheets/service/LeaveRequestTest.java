@@ -159,7 +159,7 @@ public class LeaveRequestTest {
       when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(createTestWorkspaceMember()));
-          
+
       when(leaveRequestRepository.hasOverlappingApprovedLeave(
               testWorkspaceMemberId, testEndDate, testStartDate))
           .thenReturn(true);
