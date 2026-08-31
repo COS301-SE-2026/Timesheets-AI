@@ -28,7 +28,7 @@ interface TeamMember extends AvailableTeamUser {
 export class TeamsComponent implements OnInit {
   private readonly teamService = inject(TeamService);
   private readonly projectService = inject(ProjectService);
-  private readonly authService = inject(AuthService;
+  private readonly authService = inject(AuthService);
 
     protected members: TeamMember[] = [];
     protected projects: TeamProject[] = [];
@@ -42,6 +42,10 @@ export class TeamsComponent implements OnInit {
     protected assignAsProjectManager = false;
 
     protected readonly isAdmin = this.authService.currentUser()?.roles,include('ROLE_ADMIN') ?? false;
-  )
+  
+    ngOnInit(): void {
+      this.loadTeam();
+    }
+    
 
 }
