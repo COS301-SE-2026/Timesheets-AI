@@ -25,7 +25,7 @@ WEEK_START = date(2026, 8, 4)
 def should_include_hours_project_count_in_prompt():
     prompt = _build_prompt(28.4, 2, 87, 83, "USER")
     assert "28.4" in prompt
-    assert "2 in project" in prompt
+    assert "2 project" in prompt
 
 
 def should_describe_upward_movement_when_score_increased():
@@ -60,8 +60,8 @@ def should_return_text_when_gemini_call_succeeds(mock_model_class):
     mock_model_instance.generate_content.assert_called_once()
 
 
-@patch("app.service.weekly_summary.time.sleep")
-@patch("app.service.weekly_summary.genai.GenerativeModel")
+@patch("app.services.weekly_summary.time.sleep")
+@patch("app.services.weekly_summary.genai.GenerativeModel")
 def should_retry_when_gemini_calls_fails_then_succeeds(mock_model_class, mock_sleep):
     # arrange
     mock_response = MagicMock()
