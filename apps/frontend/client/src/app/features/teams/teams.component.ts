@@ -107,5 +107,7 @@ protected get workspaceMember(): TeamMember[] {
   return this.filterUsers(this.members.filter((member) => member.isInWorkspace));
 }
 
-
+protected waitingUsers(): TeamMember[] {
+  return this.filterUsers(this.members.filter((member) => !member.isInWorkspace));
+}
 }
