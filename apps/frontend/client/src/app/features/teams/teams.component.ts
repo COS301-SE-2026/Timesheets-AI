@@ -63,4 +63,46 @@ export class TeamsComponent implements OnInit {
       });
     }
 
+    // load project details and workspace member to the projects they belong to
+    private loadProjectMemberships(users: AvailableTeamUser[], projects: ProjectResponse[]) : void {
+      this.projects = projects.map(({ id, name }) => ({id, name }));
+      if (!projects.length) {
+        this.members = users.map((user) => ({ ...user, projectIds: [] }));
+        this.loading = false;
+        return;
+      }
+
+      forkJoin(
+        projects.map((project) =>
+          this.projectService.getProjectDetail(project.id).pipe(
+            catchError(() => of(null)),
+          ),
+        ),
+      ).subscribe((details) => {
+        const membershipByEmail = new Map<string, { workspaceMemberId: string; projectIds: string[] }>();
+        details.filter((detail): detail is ProjectDetailResponse => detail !== null).forEach((detail) => {
+          detail.members.forEach((member) => {
+          const match = membershipByEmail.get(member.email) ?? {
+            workspaceMemberId: member.workspaceMemberId,
+            projectIds: [],
+          };
+          if (!match.projectIds.includes(detail.id)) match.projectIds.push(detail.id);
+          membershipByEmail.set(member.email, match);
+        });
+      });
+
+      this.members = users.map((user) => {
+        const membership = membershipByEmail.get(user.email);
+        return {
+          ...user,
+          workspaceMemberId: membership?.workspaceMemberId,
+          projectIds: membership?.projectIds ?? [],
+        };
+      });
+      this.loading = false;
+    });
+}
+
+
+
 }
