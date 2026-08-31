@@ -481,18 +481,21 @@ $calendar-red-text: #dc2626;
         height: 28px;
         border-radius: 50%;
         border: none;
-        background: transparent;
+        background: $calendar-pill-bg;
         color: $calendar-text-muted;
         font-size: 20px;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         &:hover{
-            background: $calendar-pill-bg;
+            background: darken($calendar-pill-bg, 5%);
         }
     }
 
     .modal-body{
-        padding: 24px 28px;
+        padding: 28px;
         display: flex;
         flex-direction: column;
         gap: 16px;
@@ -507,19 +510,19 @@ $calendar-red-text: #dc2626;
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            display: inline-block;
+            flex-shrink: 0;
 
             &.meetings{
-                color: $calendar-blue-text;
+                background: $calendar-blue-text;
             }
             &.work{
-                color: $calendar-green-text;
+                background: $calendar-green-text;
             }
             &.calls{
-                color: $calendar-amber-text;
+                background: $calendar-amber-text;
             }
             &.deadlines{
-                color: $calendar-red-text;
+                background: $calendar-red-text;
             }
         }
 
@@ -527,10 +530,11 @@ $calendar-red-text: #dc2626;
             margin: 0;
             font-size: 20px;
             font-weight: 700;
+            letter-spacing: -0.3px;
         }   
     }
 
-    .category-badge-row{
+    .badge-row{
         .category-badge{
             display: inline-block;
             padding: 4px 12px;
@@ -560,13 +564,15 @@ $calendar-red-text: #dc2626;
     .info-list{
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        margin-top: 8px;
+        gap: 4px;
+        padding-top: 4px;
+        border-top: 1px solid $calendar-border;
 
         .info-item{
             display: flex;
-            align-items: center;
-            gap: 14px;
+            align-items: flex-start;
+            padding: 10px 0;
+            font-size: 14px;
             color: $calendar-text-body;
 
             i{
