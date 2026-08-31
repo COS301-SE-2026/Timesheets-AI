@@ -142,4 +142,54 @@ h1 {
     margin: 0;
 }
 
+// Tabs styling
+
+.tabs {
+    display: flex;
+    gap: var(--space-6);
+}
+
+.tabs button {
+    background: none;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-weight: var(--font-weight-primary);
+    padding: var(--space-2) 0;
+}
+
+.tabs button.active {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.tabs span {
+    background: var(--color-gray-light);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-caption);
+    margin-left: var(--space-1);
+    padding: var(--space-2);
+}
+
+// search field styling
+
+.search-field {
+    align-items: center;
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-button);
+    color: var(--color-text-muted);
+    display: flex;
+    gap: var(--space-2);
+    padding: 0 var(--space-3);
+}
+
+.search-field input {
+    border: 0;
+    font: inherit;
+    outline: 0;
+    padding: var(--space-3) 0;
+    width: 16rem;
+}
+
 
