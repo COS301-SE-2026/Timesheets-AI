@@ -327,8 +327,10 @@ export class LogtimeComponent implements OnDestroy {
 
   readonly canEditEntries = computed (() => {
     const timesheet = this.currentTimesheet();
+    if (!timesheet) {
+      return true;
+    }
     return (
-      !!timesheet &&
       (!timesheet.isLocked &&
       (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED'))
     );
@@ -336,8 +338,10 @@ export class LogtimeComponent implements OnDestroy {
 
     readonly canSubmitTimesheet = computed (() => {
     const timesheet = this.currentTimesheet();
+    if (!timesheet) {
+      return false;
+    }
     return (
-      !!timesheet &&
       (!timesheet.isLocked &&
       (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED'))
     );
