@@ -125,4 +125,21 @@ h1 {
     color: var(--color-semantic-green-text);
 }
 
+// Card styling
+
+.team-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    display: flex;
+    gap: var(--space-4);
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-6);
+}
+
+.team-toolbar h2 {
+    color: var(--color-text-body);
+    font-size: var(--font-size-h3);
+    margin: 0;
+}
+
 
