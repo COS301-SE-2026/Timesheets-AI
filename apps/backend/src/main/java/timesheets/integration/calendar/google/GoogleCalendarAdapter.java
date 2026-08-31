@@ -22,6 +22,8 @@ import timesheets.domain.IntegrationToken;
 import timesheets.integration.calendar.CalendarAdapter;
 import timesheets.integration.calendar.CalendarEvent;
 import timesheets.repository.IntegrationTokenRepository;
+import com.google.api.services.calendar.model.Event;
+import java.util.ArrayList;
 
 @Component
 @RequiredArgsConstructor
@@ -80,8 +82,10 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
     // making the request to get collection of calendar events and it is stored Events event
     // insert try and catch because request() might fail
 
+    Events events; 
+
     try {
-      Events events =
+          events =
           calendarService
               .events()
               .list("primary")
@@ -99,7 +103,19 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
     }
 
     // for returning, convert to match CalendarEvent expected vars
-    return Collections.emptyList();
+    List<Event> googleEvents = events.getItems();
+
+  // conversion
+    List<CalendarEvent> calendarEvents = new ArrayList<>();
+
+    for (Event googleEvent : googleEvents){
+      CalendarEvent calendarEvent = new CalendarEvent();
+      calendarEvent.setTitle(googleEvent.getSummary());
+      calendarEvent.setExternalEventId(googleEvent.getId());
+      calendarEvents.add(calendarEvent);
+    }
+
+    return calendarEvents;
   }
 
   @Override
