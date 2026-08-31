@@ -210,37 +210,39 @@ Related Requirements: N/A
                         </span>
                     </div>
 
+                    <!-- LOCATION  -->
+                    @if( event.location){
+                        <div class="info-item">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span> 
+                                {{ event.location}}
+                            </span>
+                        </div>
+                    }
+
+                    @if (event.organizer?.name || event.organizer){
+                        <div class="info-item">
+                            <i class="fa-solid fa-user"></i>
+                            <span>
+                                <strong>
+                                    {{ event.organizer?.name || event.organizer}}
+                                </strong>
+                                <span class="muted-text">(Organizer)</span>
+                            </span>
+                        </div>
+                    }
+
+                    @if (event.description){
+                        <div class="info-item align-start">
+                            <i class="fa-solid fa-align-left"></i>
+                            <p class="event-description">
+                                {{ event.description}}
+                            </p> 
+                        </div>
+                    }
+
                 </div>
 
-                @if( event.location){
-                    <div class="info-item">
-                        <i class="fa-solid fa-location-dot"></i>
-                        <span> 
-                            {{ event.location}}
-                        </span>
-                    </div>
-                }
-
-                @if (event.organizer?.name || event.organizer){
-                    <div class="info-item">
-                        <i class="fa-solid fa-user"></i>
-                        <span>
-                            <strong>
-                                {{ event.organizer?.name || event.organizer}}
-                            </strong>
-                            <span class="muted-text">(Organizer)</span>
-                        </span>
-                    </div>
-                }
-
-                @if (event.description){
-                    <div class="info-item align-start">
-                        <i class="fa-solid fa-align-left"></i>
-                        <p class="event-description">
-                            {{ event.description}}
-                        </p> 
-                    </div>
-                }
                 
             </div>    
         </div>
