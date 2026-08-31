@@ -22,9 +22,11 @@ router = APIRouter(prefix="/insights/weekly-summary", tags=["Weekly Summary"])
 @router.post(
     "/{subject_id}/generate",
     response_model=WeeklySummaryResponse,
-    responses={400: {"description": "subject_type must be USER or TEAM"}},
-    responses={404: {"description": "Task not found or deleted"}},
-    responses={502: {"description": "Gemini call failed after all retries"}},
+    responses={
+        400: {"description": "subject_type must be USER or TEAM"},
+        404: {"description": "Task not found or deleted"},
+        502: {"description": "Gemini call failed after all retries"},
+    },
 )
 def generate_and_save(
     subject_id: uuid.UUID,

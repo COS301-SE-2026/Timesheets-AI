@@ -77,9 +77,9 @@ def _call_gemini_with_retry(prompt: str) -> str:
         try:
             response = model.generate_content(prompt)
             return response.text.strip()
-        
-        #im writing a broad exception on purpose, retrying on purpose regardless of error shape
-        except Exception as e:  #noqa: BLE001
+
+        # im writing a broad exception on purpose, retrying on purpose regardless of error shape
+        except Exception as e:  # noqa: BLE001
             last_error = e
             time.sleep(RETRY_BACKOFF_SECONDS * (2**attempt))
 
