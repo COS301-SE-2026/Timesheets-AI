@@ -114,4 +114,8 @@ protected waitingUsers(): TeamMember[] {
 protected get visibleUsers(): TeamMember[] {
   return this.activeTab === 'members' ? this.workspaceMembers : this.waitingUsers;
 }
+
+protected initials(member: TeamMember): string {
+  return `${member.firstName.charAt(0)}${member.lastName.charAt(0)}`.toUpperCase();
+}
 }
