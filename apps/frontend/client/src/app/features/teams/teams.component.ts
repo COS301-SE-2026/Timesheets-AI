@@ -103,16 +103,22 @@ export class TeamsComponent implements OnInit {
     });
 }
 
-protected get workspaceMember(): TeamMember[] {
+protected get workspaceMembers(): TeamMember[] {
   return this.filterUsers(this.members.filter((member) => member.isInWorkspace));
 }
 
-protected waitingUsers(): TeamMember[] {
+protected get waitingUsers(): TeamMember[] {
   return this.filterUsers(this.members.filter((member) => !member.isInWorkspace));
 }
 
 protected get visibleUsers(): TeamMember[] {
   return this.activeTab === 'members' ? this.workspaceMembers : this.waitingUsers;
+}
+
+protected projectNames(member: TeamMember): string[] {
+  return member.projectIds
+  .map((id) => this.projects.find((projects) => project.id === id)?.name)
+  .filter((name): name is string => !!name)
 }
 
 protected initials(member: TeamMember): string {
