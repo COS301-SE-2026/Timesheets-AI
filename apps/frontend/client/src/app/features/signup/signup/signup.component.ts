@@ -5,17 +5,35 @@
  * Related Requirement: -
  */
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, AfterViewInit, ElementRef, ViewChild} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink, Router} from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../../environments/environment';
+
+interface GoogleIdentityServices {
+  accounts: {
+    id: {
+      initialize(config: {
+        client_id: string;
+        callback: (response: { credential: string }) => void;
+        cancel_on_tap_outside?: boolean;
+      }): void;
+      renderButton(parent: HTMLElement, options: { theme: string; size: string; width: number },
+      ): void;
+      prompt(): void;
+    };
+  };
+}
+declare const google: GoogleIdentityServices;
+
 @Component({
   selector: 'app-signup',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
-export class SignupComponent {
+export class SignupComponent implements AfterViewInit{
 
   // Form builder used to create reactive form structure
   private readonly formBuilder = inject(FormBuilder);
@@ -23,17 +41,13 @@ export class SignupComponent {
   private readonly router = inject(Router);
 
   private readonly authService = inject(AuthService);
-  /* Toast state */
-  protected toastMessage = '';
-  protected showToast = false;
+  
+  @ViewChild('googleBtn') googleBtn!: ElementRef;
 
   // Logo image
   protected readonly brandLogo = '/assets/momently.png';
 
-  // Toggles password visibility
   protected showPassword = false;
-
-  // Tracks whether form has been submitted (used for validation display)
   protected submitted = false;
   
   //show loading
@@ -41,6 +55,9 @@ export class SignupComponent {
 
   //Sends an error message
   protected errorMessage = '';
+
+  protected toastMessage = '';
+  protected showToast = false;
   
 
   // Reactive signup form definition
@@ -63,6 +80,51 @@ export class SignupComponent {
     ],
     acceptedTerms: [false, Validators.requiredTrue]
   });
+
+  ngAfterViewInit(): void {
+    this.renderGoogleButton();
+  }
+
+  private renderGoogleButton(): void {
+    if (!this.googleBtn) return;
+
+    google.accounts.id.initialize({
+      client_id: environment.googleClientId,
+      callback: (response: { credential: string }) => this.handleGoogleCredential(response.credential),
+      cancel_on_tap_outside: false,
+    });
+
+    google.accounts.id.renderButton(this.googleBtn.nativeElement, {
+      theme: 'outline',
+      size: 'large',
+      width: 320,
+    });
+  }
+
+  protected triggerGoogleSignUp(): void {
+    const hiddenGoogleButton = this.googleBtn.nativeElement.querySelector('div[role="button"]');
+    hiddenGoogleButton?.click();
+  }
+
+  private handleGoogleCredential(idToken: string): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.authService.googleAuth(idToken).subscribe({
+      next: (res) => {
+        this.loading = false;
+        if (res.requiresMfa) {
+          this.router.navigate(['/login'], { queryParams: { mfa: 'required' } });          
+          return;
+        }
+        this.router.navigate(['/log-time']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err.message;
+      },
+    });
+  }
 
   // Toggles password visibility in the input field
   protected togglePasswordVisibility(): void {

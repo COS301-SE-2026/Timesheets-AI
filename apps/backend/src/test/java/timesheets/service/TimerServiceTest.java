@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import exception.StateConflictException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -359,7 +360,7 @@ class TimerServiceTest {
 
       // ACT & ASSERT: a proper error message should be returned
       assertThatThrownBy(() -> timerService.discardTimer())
-          .isInstanceOf(IllegalStateException.class)
+          .isInstanceOf(StateConflictException.class)
           .hasMessage("No active timer found to discard");
 
       // confirming that it was never deleted
