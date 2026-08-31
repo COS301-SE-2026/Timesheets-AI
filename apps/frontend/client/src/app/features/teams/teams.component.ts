@@ -33,7 +33,7 @@ export class TeamsComponent implements OnInit {
     protected members: TeamMember[] = [];
     protected projects: TeamProject[] = [];
     protected activeTab: 'members' | 'waiting' = 'members';
-    protected searchTeam = '';
+    protected searchTerm = '';
     protected loading = true;
     protected errorMessage = '';
     protected actionMessage = '';
@@ -41,7 +41,7 @@ export class TeamsComponent implements OnInit {
     protected selectedProjectId = '';
     protected assignAsProjectManager = false;
 
-    protected readonly isAdmin = this.authService.currentUser()?.roles,include('ROLE_ADMIN') ?? false;
+    protected readonly isAdmin = this.authService.currentUser()?.roles.includes('ROLE_ADMIN') ?? false;
   
     ngOnInit(): void {
       this.loadTeam();
@@ -54,7 +54,7 @@ export class TeamsComponent implements OnInit {
       forkJoin({
         users: this.teamService.getAvailableUsers(),
         projects: this.projectService.getProjects(),
-      }).subcricbe({
+      }).subscribe({
         next: ({ users, projects }) => this.loadProjectMemberships(users, projects),
         error: () => {
           this.loading = false;
@@ -64,24 +64,26 @@ export class TeamsComponent implements OnInit {
     }
 
     // load project details and workspace member to the projects they belong to
-    private loadProjectMemberships(users: AvailableTeamUser[], projects: ProjectResponse[]) : void {
-      this.projects = projects.map(({ id, name }) => ({id, name }));
-      if (!projects.length) {
-        this.members = users.map((user) => ({ ...user, projectIds: [] }));
-        this.loading = false;
-        return;
-      }
+    private loadProjectMemberships(users: AvailableTeamUser[], projects: ProjectResponse[]): void {
+    this.projects = projects.map(({ id, name }) => ({ id, name }));
+    if (!projects.length) {
+      this.members = users.map((user) => ({ ...user, projectIds: [] }));
+      this.loading = false;
+      return;
+    }
 
-      forkJoin(
-        projects.map((project) =>
-          this.projectService.getProjectDetail(project.id).pipe(
-            catchError(() => of(null)),
-          ),
+    forkJoin(
+      projects.map((project) =>
+        this.projectService.getProjectDetail(project.id).pipe(
+          catchError(() => of(null)),
         ),
-      ).subscribe((details) => {
-        const membershipByEmail = new Map<string, { workspaceMemberId: string; projectIds: string[] }>();
-        details.filter((detail): detail is ProjectDetailResponse => detail !== null).forEach((detail) => {
-          detail.members.forEach((member) => {
+      ),
+    ).subscribe((details) => {
+      /* Project details supply user IDs alongside membership IDs. Match by email to bridge
+         the current Team API, whose available-user response lacks workspaceMemberId. */
+      const membershipByEmail = new Map<string, { workspaceMemberId: string; projectIds: string[] }>();
+      details.filter((detail): detail is ProjectDetailResponse => detail !== null).forEach((detail) => {
+        detail.members.forEach((member) => {
           const match = membershipByEmail.get(member.email) ?? {
             workspaceMemberId: member.workspaceMemberId,
             projectIds: [],
@@ -101,7 +103,7 @@ export class TeamsComponent implements OnInit {
       });
       this.loading = false;
     });
-}
+  }
 
 protected get workspaceMembers(): TeamMember[] {
   return this.filterUsers(this.members.filter((member) => member.isInWorkspace));
@@ -151,13 +153,13 @@ protected addToWorkspace(member: TeamMember): void {
 // assign user to project
 protected assignToProject(): void {
   const member = this.selectedMember;
-  if (!member?.workspaceMemberId || !this.selectedProjectid) return;
+  if (!member?.workspaceMemberId || !this.selectedProjectId) return;
 
   this.teamService.addToProject(this.selectedProjectId, member.workspaceMemberId, this.assignAsProjectManager).subscribe({
     next: () => {
       this.actionMessage = `${member.firstName} has been assigned to the project.`;
       this.closeAssignment();
-      this.laodTeam();
+      this.loadTeam();
     },
     error: (error) => this.actionMessage = error.error?.message ?? 'Could not assign member to the project.',
   })
@@ -177,7 +179,7 @@ protected removeFromProject(member: TeamMember, projectId: string): void {
 }
 
 // filter users
-private filterUser(users: TeamMember[]): TeamMember[] {
+private filterUsers(users: TeamMember[]): TeamMember[] {
   const term = this.searchTerm.trim().toLowerCase();
   if (!term) return users;
   return users.filter((user) => `${user.firstName} ${user.lastName} ${user.email}`.toLowerCase().includes(term));
