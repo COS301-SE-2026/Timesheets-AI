@@ -110,4 +110,8 @@ protected get workspaceMember(): TeamMember[] {
 protected waitingUsers(): TeamMember[] {
   return this.filterUsers(this.members.filter((member) => !member.isInWorkspace));
 }
+
+protected get visibleUsers(): TeamMember[] {
+  return this.activeTab === 'members' ? this.workspaceMembers : this.waitingUsers;
+}
 }
