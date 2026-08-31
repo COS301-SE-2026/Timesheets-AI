@@ -570,7 +570,7 @@ $calendar-red-text: #dc2626;
 
         .info-item{
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             padding: 10px 0;
             font-size: 14px;
             color: $calendar-text-body;
@@ -589,10 +589,20 @@ $calendar-red-text: #dc2626;
 
             &.align-start{
                 align-items: flex-start;
+
+                i{
+                    margin-top: 2px;
+                }
             }
 
             .muted-text{
                 color: $calendar-text-muted;
+            }
+
+            .event-description{
+                margin: 0;
+                line-height: 1.5;
+                color: $calendar-text-body;
             }
         }
     }
