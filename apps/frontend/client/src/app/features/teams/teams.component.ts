@@ -8,9 +8,20 @@ import { AuthService } from '../../core/services/auth.service';
 import { ProjectDetailResponse, ProjectResponse, ProjectService } from '../../core/services/project.service';
 import { AvailableTeamUser, TeamService } from '../../core/services/team.service'; 
 
+interface TeamProject {
+  id: string;
+  name: string;
+}
+
+interface TeamMember extends AvailableTeamUser {
+  workspaceMemberId?: string;
+  projectIds: string[];
+}
+
 @Component({
   selector: 'app-teams',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, FormsModule, HeaderComponent],
   templateUrl: './teams.component.html',
   styleUrl: './teams.component.scss'
 })
