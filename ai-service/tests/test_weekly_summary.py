@@ -43,8 +43,9 @@ def should_say_team_when_subject_type_is_team():
     assert "team" in prompt.lower()
 
 
+@patch("app.services.weekly_summary.genai.configure")
 @patch("app.services.weekly_summary.genai.GenerativeModel")
-def should_return_text_when_gemini_call_succeeds(mock_model_class):
+def should_return_text_when_gemini_call_succeeds(mock_model_class, mock_configure):
     # arrange
     mock_response = MagicMock()
     mock_response.text = "  You logged 28.4h this week.  "
@@ -60,9 +61,12 @@ def should_return_text_when_gemini_call_succeeds(mock_model_class):
     mock_model_instance.generate_content.assert_called_once()
 
 
+@patch("app.services.weekly_summary.genai.configure")
 @patch("app.services.weekly_summary.time.sleep")
 @patch("app.services.weekly_summary.genai.GenerativeModel")
-def should_retry_when_gemini_calls_fails_then_succeeds(mock_model_class, mock_sleep):
+def should_retry_when_gemini_calls_fails_then_succeeds(
+    mock_model_class, mock_sleep, mock_configure
+):
     # arrange
     mock_response = MagicMock()
     mock_response.text = "recovered on retry"
@@ -78,9 +82,10 @@ def should_retry_when_gemini_calls_fails_then_succeeds(mock_model_class, mock_sl
     assert mock_model_instance.generate_content.call_count == 2
 
 
+@patch("app.services.weekly_summary.genai.configure")
 @patch("app.services.weekly_summary.time.sleep")
 @patch("app.services.weekly_summary.genai.GenerativeModel")
-def should_raise_when_all_retries_are_exhausted(mock_model_class, mock_sleep):
+def should_raise_when_all_retries_are_exhausted(mock_model_class, mock_sleep, mock_configure):
     # ARRANGE
     mock_model_instance = MagicMock()
     mock_model_instance.generate_content.side_effect = Exception("persistent error")
