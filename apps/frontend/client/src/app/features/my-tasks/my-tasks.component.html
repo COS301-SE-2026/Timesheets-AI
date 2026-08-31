@@ -1,14 +1,22 @@
 <main class="my-task-page">
 
     <!-- Page header -->
-     <header class="page-header">
-        <div>
-            <h1 class="text-h1" class="page-title"> My Tasks</h1>
-            <p class="text-body text-muted" id="page-description"> All tasks assigned to you across projects.</p>
+    <header class="page-header">
+        <div class="page-header-content">
+            <div>
+                <h1 class="text-h1" class="page-title"> My Tasks</h1>
+                <p class="page-subtitle">All tasks assigned to you across projects.</p>
+            </div>
+            
         </div>
-     </header>
 
-     <!-- Summary Cards -->
+        <button type="button" class="button button-primary" (click)="openCreateModal()">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            <span>New Task</span>
+        </button>
+    </header>
+
+    <!-- Summary Cards -->
       <section class="summary-cards" aria-label="Task summary">
         <div class="summary-card">
             <div class="summary-card-icon">
@@ -200,7 +208,236 @@
         }
       </section>
 
-      @if(isDetailOpen()) {
+    @if (isCreateModalOpen()) {
+            <div
+                class="modal-overlay"
+                role="button"
+                tabindex="0"
+                aria-label="Close create task"
+                (click)="onOverlayClick($event)"
+                (keydown.enter)="closeCreateModal()"
+                (keydown.space)="closeCreateModal()"
+            >
+                <div
+                    class="modal-panel"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="create-task-modal-title"
+                >
+                    <header class="modal-header">
+                        <h2 id="create-task-modal-title" class="modal-title">Create New Task</h2>
+                        <button type="button" class="modal-close" (click)="closeCreateModal()" aria-label="Close create task">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </header>
+
+                    <form #createTaskForm="ngForm" (ngSubmit)="onSubmitCreateTask(createTaskForm)" class="task-detail-form">
+                        <!-- Error message -->
+                        @if (createError()) {
+                            <div class="alert alert-error">
+                                <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                                <span>{{ createError() }}</span>
+                            </div>
+                        }
+
+                        <!-- Task Title -->
+                        <div class="form-row">
+                            <label class="form-label" for="create-title">Title</label>
+                            <input
+                                id="create-title"
+                                class="form-control"
+                                type="text"
+                                name="title"
+                                [(ngModel)]="newTask.title"
+                                #titleInput="ngModel"
+                                required
+                                minlength="3"
+                                maxlength="300"
+                                placeholder="Enter task title"
+                                [class.form-control-invalid]="titleInput.touched && titleInput.invalid"
+                            />
+                            @if (titleInput.touched && titleInput.invalid) {
+                                <div class="form-error">
+                                    @if (titleInput.errors?.['required']) {
+                                        <span>Task title is required</span>
+                                    }
+                                    @if (titleInput.errors?.['minlength']) {
+                                        <span>Title must be at least 3 characters</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-row">
+                            <label class="form-label" for="create-description">Description</label>
+                            <textarea
+                                id="create-description"
+                                class="form-control form-textarea"
+                                name="description"
+                                [(ngModel)]="newTask.description"
+                                rows="4"
+                                placeholder="Enter task description (optional)"
+                            ></textarea>
+                        </div>
+
+                        <!-- Project -->
+                        <div class="form-row">
+                            <label class="form-label" for="create-project">Project <span class="required">*</span></label>
+                            <select
+                                id="create-project"
+                                class="form-control"
+                                name="projectId"
+                                [(ngModel)]="newTask.projectId"
+                                #projectInput="ngModel"
+                                required
+                                [class.form-control-invalid]="projectInput.touched && projectInput.invalid"
+                            >
+                                <option value="" disabled>Select a project</option>
+                                @for (project of projects(); track project.id) {
+                                    <option [value]="project.id">{{ project.name }}</option>
+                                }
+                            </select>
+                            @if (isLoadingProjects()) {
+                                <span class="text-muted text-caption">Loading projects...</span>
+                            }
+                            @if (projectInput.touched && projectInput.invalid) {
+                                <div class="form-error">Project is required</div>
+                            }
+                        </div>
+
+                        <!-- Jira and the parent task -->
+                        <div class="form-grid">
+                            <div class="form-row">
+                                <label class="form-label" for="create-jira">Jira Ticket Key</label>
+                                <input
+                                    id="create-jira"
+                                    class="form-control"
+                                    type="text"
+                                    name="jiraTicketKey"
+                                    [(ngModel)]="newTask.jiraTicketKey"
+                                    placeholder="e.g. ALPHA-101"
+                                />
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label" for="create-parent">Parent Task</label>
+                                <select
+                                    id="create-parent"
+                                    class="form-control"
+                                    name="parentTaskId"
+                                    [(ngModel)]="newTask.parentTaskId"
+                                >
+                                    <option value="">None</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- The status and the priority -->
+                        <div class="form-grid">
+                            <div class="form-row">
+                                <label class="form-label" for="create-status">Status <span class="required">*</span></label>
+                                <select
+                                    id="create-status"
+                                    class="form-control"
+                                    name="status"
+                                    [(ngModel)]="newTask.status"
+                                    #statusInput="ngModel"
+                                    required
+                                    [class.form-control-invalid]="statusInput.touched && statusInput.invalid"
+                                >
+                                    @for (option of statusDropdownOptions; track option.value) {
+                                        <option [value]="option.value">{{ option.label }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label" for="create-priority">Priority <span class="required">*</span></label>
+                                <select
+                                    id="create-priority"
+                                    class="form-control"
+                                    name="priority"
+                                    [(ngModel)]="newTask.priority"
+                                    #priorityInput="ngModel"
+                                    required
+                                    [class.form-control-invalid]="priorityInput.touched && priorityInput.invalid"
+                                >
+                                    <option value="LOW">Low</option>
+                                    <option value="MEDIUM">Medium</option>
+                                    <option value="HIGH">High</option>
+                                    <option value="CRITICAL">Critical</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Estimated hours and the due date -->
+                        <div class="form-grid">
+                            <div class="form-row">
+                                <label class="form-label" for="create-estimated">Estimated Hours</label>
+                                <input
+                                    id="create-estimated"
+                                    class="form-control"
+                                    type="number"
+                                    name="estimatedHours"
+                                    [(ngModel)]="newTask.estimatedHours"
+                                    min="0"
+                                    step="0.5"
+                                    placeholder="e.g. 8"
+                                />
+                            </div>
+
+                            <div class="form-row">
+                                <label class="form-label" for="create-due">Due Date</label>
+                                <input
+                                    id="create-due"
+                                    class="form-control form-control-date"
+                                    type="date"
+                                    name="dueDate"
+                                    [(ngModel)]="newTask.dueDate"
+                                    [min]="todayDate"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Assigned To -->
+                        <div class="form-row">
+                            <label class="form-label" for="create-assigned">Assigned To</label>
+                            <input
+                                id="create-assigned"
+                                class="form-control"
+                                type="text"
+                                name="assignedWorkspaceMemberId"
+                                [(ngModel)]="newTask.assignedWorkspaceMemberId"
+                                placeholder="Search or select a team member (optional)"
+                            />
+                        </div>
+
+                        <!-- Hint for the required fields -->
+                        <div class="form-hint">
+                            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                            <span>Fields marked with <span class="required">*</span> are required</span>
+                        </div>
+
+                        <footer class="modal-footer">
+                            <button type="button" class="modal-button modal-button-secondary" (click)="closeCreateModal()" [disabled]="isCreating()">
+                                Cancel
+                            </button>
+                            <button type="submit" class="modal-button" [disabled]="isCreating() || createTaskForm.invalid">
+                                @if (isCreating()) {
+                                    <span><i class="fa-solid fa-spinner fa-spin"></i> Creating...</span>
+                                } @else {
+                                    <span>Create Task</span>
+                                }
+                            </button>
+                        </footer>
+                    </form>
+                </div>
+            </div>
+        }
+
+
+        @if(isDetailOpen()) {
         <div
             class="modal-overlay"
             role="button"
