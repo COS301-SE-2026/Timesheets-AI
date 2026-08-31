@@ -40,6 +40,28 @@
 </p>
 
 ## Documentation
+
+<details open>
+<summary><strong>Demo 3 Documentation</strong></summary>
+<br>
+
+<div align="center">
+
+[![System Requirements Specification](https://img.shields.io/badge/System_Requirements_Specification-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/SRS.pdf)
+[![System Architecture Specification](https://img.shields.io/badge/System_Architecture_Specification-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/SAS.pdf)
+[![Coding Standards Handbook](https://img.shields.io/badge/Coding_Standards-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/Coding-Standards-Handbook.pdf)
+[![Testing Policy](https://img.shields.io/badge/Testing_Policy-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/testing-policy.pdf)
+[![User Manual](https://img.shields.io/badge/User_Manual-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/User-Manual.pdf)
+[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-View_Website-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](https://momently-brand-style.netlify.app/)
+[![Brand Style PDF](https://img.shields.io/badge/Brand_Style_PDF-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/Brand-Style-Guide.pdf)
+[![Wireframes](https://img.shields.io/badge/Wireframes-View_PDF-0F4C91?style=for-the-badge&logo=figma&logoColor=white)](./docs/demo-3/wireframes.pdf)
+[![Demo 3 Video](https://img.shields.io/badge/Demo_3-View_Video-E07830?style=for-the-badge&logo=youtube&logoColor=white)]([./docs/demo-3/demo3.pdf](https://drive.google.com/file/d/13bZs6xgG3BOoadcaZzuUZsnlmnaiI3qu/view?usp=drive_link))
+[![Demo 3 Slides](https://img.shields.io/badge/Demo_3-View_Slides-0F4C91?style=for-the-badge&logo=googleslides&logoColor=white)](https://canva.link/4vyzjoad934wpsx)
+
+</div>
+</details>
+
+
 <details open>
 <summary><strong>Demo 2 Documentation</strong></summary>
 <br>
@@ -51,24 +73,11 @@
 [![Coding Standards Handbook](https://img.shields.io/badge/Coding_Standards-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/Coding-Standards-Handbook.pdf)
 [![Testing Policy](https://img.shields.io/badge/Testing_Policy-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/testing-policy.pdf)
 [![User Manual](https://img.shields.io/badge/User_Manual-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/User-Manual.pdf)
-[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/Brand-Style-Guide.pdf)
+[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-View_Website-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](https://momently-brand-style.netlify.app/)
+[![Brand Style PDF](https://img.shields.io/badge/Brand_Style_PDF-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-2/Brand-Style-Guide.pdf)
 [![Wireframes](https://img.shields.io/badge/Wireframes-View_PDF-0F4C91?style=for-the-badge&logo=figma&logoColor=white)](./docs/demo-2/wireframes.pdf)
 [![Demo 2 Video](https://img.shields.io/badge/Demo_2-View_Video-E07830?style=for-the-badge&logo=youtube&logoColor=white)]([./docs/demo-2/demo2.pdf](https://drive.google.com/file/d/13bZs6xgG3BOoadcaZzuUZsnlmnaiI3qu/view?usp=drive_link))
 [![Demo 2 Slides](https://img.shields.io/badge/Demo_2-View_Slides-0F4C91?style=for-the-badge&logo=googleslides&logoColor=white)](https://canva.link/4vyzjoad934wpsx)
-
-
-| Document | Link |
-|---|---|
-| System Requirements Specification | [View PDF](./docs/demo-2/SRS.pdf) |
-| System Architecture Specification | [View PDF](./docs/demo-2/SAS.pdf) |
-| Coding Standards Handbook | [View PDF](./docs/demo-2/Coding-Standards-Handbook.pdf) |
-| Testing Policy | [View PDF](./docs/demo-2/testing-policy.pdf) |
-| User Manual | [View PDF](./docs/demo-2/User-Manual.pdf) |
-| Brand Style Guide | [View PDF](./docs/demo-2/Brand-Style-Guide.pdf) |
-| Wireframes | [View Figma ](https://www.figma.com/design/Ras0nDzb87hQtSOP5NZPZK/Wireframe-1?node-id=126-1521&t=H2hiPy2OuQYZ0KTM-1) |
-| Demo 2 Video | [View Video](https://drive.google.com/file/d/13bZs6xgG3BOoadcaZzuUZsnlmnaiI3qu/view?usp=drive_link) |
-| Demo 2 Slides | [View Slides](https://canva.link/4vyzjoad934wpsx) |
-| Brand Style Site | [View Site](https://momently-brand-style.netlify.app/) |
 
 </div>
 </details>

@@ -148,7 +148,7 @@ it must end with:
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.8.5</version>
+            <version>2.8.14</version>
         </dependency>
 
         <!-- So flyway is not working right now, will keep this for future reference  -->
@@ -284,6 +284,41 @@ it must end with:
                 </configuration>
             </plugin>
 
+            <!-- Note: the backend should be running when this plug-in runs:
+                - this should run in the prepare package of the Maven lifecycle
+                - the command that is executed downloads the OpenAPI spec and saves it as a json
+                - also there is a skip to allow the plugin to be skipped during the build
+                - also I have now added a check that if the backend is not running, then the build won'r fail-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <id>generate-openapi-spec</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>bash</executable>
+                            <arguments>
+                                <argument>-c</argument>
+                                <argument>
+                                    if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health | grep -q "200"; then
+                                        mkdir -p ${project.basedir}/../docs &amp;&amp;
+                                        curl -o ${project.basedir}/../docs/openapi.json http://localhost:8080/v3/api-docs
+                                    else
+                                        echo "Backend not running, skipping file generation."
+                                    fi
+                                </argument>
+                            </arguments>
+                            <skip>${skip.openapi.generation}</skip>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- okay so below I am adding the things that are going to be related to backend code quality: code from Java Code Geeks-->
             <!-- this is the spotless is like Prettier in JS-->
             <plugin>
@@ -359,4 +394,34 @@ it must end with:
 
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.12</version>
+                        <executions>
+                            <execution>
+                                <id>prepare-agent</id>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
