@@ -1,6 +1,7 @@
 package timesheets.integration.calendar.google;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +44,17 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
 
     IntegrationToken token = integrationToken.get();
 
-    String accessToken = token.getAccessToken();
+    // this token provide Momently to gain persmission to the user's Google calendar
+    // google libraries wraps tokens in objects rather raw strings, ojects allows us to track expiration time 
+    
+    String accessToken = token.getAcessToken();
+
+    AccessToken googleAcessToken = new AccessToken(accessToken, Date expirationTime);
+
+    // GoogleCredentials is Google authentication object, it will wrap the AccessToken in a format that the Google's API libraries understand
+    GoogleCredentials credentials = GoogleCredentials.create(googleAccessToken);
+
+    HttpCredentialsAdadpter requestInitializer = new HttpCredentialsAdapter(credentials);
 
     return Collections.emptyList();
   }
