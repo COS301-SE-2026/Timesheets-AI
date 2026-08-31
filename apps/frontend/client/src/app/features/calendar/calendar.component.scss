@@ -251,7 +251,6 @@ $calendar-red-text: #dc2626;
                 border-radius: 50px;
             }
 
-
             .custom-event-pill{
                 display: flex;
                 align-items: center;
@@ -296,30 +295,61 @@ $calendar-red-text: #dc2626;
                 font-weight: 200;
             }
 
-            .fc-daygrid-event{
-                border: 1px solid var(--color-primary-tint);
+            .fc-timegrid-event{
                 border-radius: 6px;
-                margin: 2px 4px;                
+                border: none;
 
-                .fc-event-meetings{
-                    background: $calendar-blue-bg;
-                    .custom-event-pill{
+                &.fc-event-meetings{
+                    background: $calendar-blue-bg;                    .custom-event-pill{
                         color: $calendar-blue-text;
                     }
                 }
-                .fc-event-work{
+                &.fc-event-work{
                     background: $calendar-green-bg;
                     .custom-event-pill{
                         color: $calendar-green-text;
                     }
                 }
-                .fc-event-calls{
+                &.fc-event-calls{
                     background: $calendar-amber-bg;
                     .custom-event-pill{
                         color: $calendar-amber-text;
                     }
                 }
-                .fc-event-deadlines{
+                &.fc-event-deadlines{
+                    background: $calendar-red-bg;
+                    .custom-event-pill{
+                        color: $calendar-red-text;
+                    }
+                }
+
+            
+
+            }
+
+            .fc-daygrid-event{
+                border: 1px solid var(--color-primary-tint);
+                border-radius: 6px;
+                margin: 2px 4px;                
+
+                &.fc-event-meetings{
+                    background: $calendar-blue-bg;                    .custom-event-pill{
+                        color: $calendar-blue-text;
+                    }
+                }
+                &.fc-event-work{
+                    background: $calendar-green-bg;
+                    .custom-event-pill{
+                        color: $calendar-green-text;
+                    }
+                }
+                &.fc-event-calls{
+                    background: $calendar-amber-bg;
+                    .custom-event-pill{
+                        color: $calendar-amber-text;
+                    }
+                }
+                &.fc-event-deadlines{
                     background: $calendar-red-bg;
                     .custom-event-pill{
                         color: $calendar-red-text;

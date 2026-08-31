@@ -65,6 +65,7 @@ export class CalendarComponent implements OnInit {
 
     slotMinTime: '06:00:00',
     slotMaxTime: '19:00:00',
+    dayMaxEventRows: true,
 
     datesSet:(dateInfo)=>{
       this.currentDateTitle.set(dateInfo.view.title);
