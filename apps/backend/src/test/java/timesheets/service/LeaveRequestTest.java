@@ -647,4 +647,98 @@ public class LeaveRequestTest {
       verify(leaveRequestRepository, never()).save(any(LeaveRequest.class));
     }
   }
+
+  @Nested
+  @DisplayName("Get Requests By Date Range Tests")
+  class GetRequestsByDateRangeTests {
+
+    @Test
+    @DisplayName("developer can view own requests by date range")
+    void developerCanViewOwnRequestsByDateRange() {
+
+      // ARRANGE: setup as developer
+      LeaveRequest leaveRequest = createTestLeaveRequest();
+      List<LeaveRequest> leaveRequests = List.of(leaveRequest);
+
+      LocalDate startDate = LocalDate.now().minusDays(10);
+      LocalDate endDate = LocalDate.now().plusDays(10);
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(leaveRequestRepository.findByWorkspaceMemberIdAndStartDateBetween(
+              testWorkspaceMemberId, startDate, endDate))
+          .thenReturn(leaveRequests);
+
+      // ACT: get requests by date range
+      List<LeaveRequestResponse> responses =
+          leaveRequestService.getRequestByDateRange(startDate, endDate);
+
+      // ASSERT: verify the responses
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(1);
+      assertThat(responses.get(0).getStartDate()).isEqualTo(testStartDate);
+
+      verify(leaveRequestRepository)
+          .findByWorkspaceMemberIdAndStartDateBetween(testWorkspaceMemberId, startDate, endDate);
+    }
+
+    @Test
+    @DisplayName("manager can view workspace requests by date range")
+    void managerCanViewWorkspaceRequestsByDateRange() {
+
+      // ARRANGE: setup as manager
+      LeaveRequest leaveRequest = createTestLeaveRequest();
+      List<LeaveRequest> leaveRequests = List.of(leaveRequest);
+
+      LocalDate startDate = LocalDate.now().minusDays(10);
+      LocalDate endDate = LocalDate.now().plusDays(10);
+
+      when(securityUtils.isManager()).thenReturn(true);
+      when(securityUtils.isAdmin()).thenReturn(false);
+
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
+      when(leaveRequestRepository.findByWorkspaceIdAndStartDateBetween(
+              testWorkspaceId, startDate, endDate))
+          .thenReturn(leaveRequests);
+
+      // ACT: get requests by date range
+      List<LeaveRequestResponse> responses =
+          leaveRequestService.getRequestByDateRange(startDate, endDate);
+
+      // ASSERT: verify the responses
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(1);
+
+      verify(leaveRequestRepository)
+          .findByWorkspaceIdAndStartDateBetween(testWorkspaceId, startDate, endDate);
+    }
+
+    @Test
+    @DisplayName("admin can view all requests by date range")
+    void adminCanViewAllRequestsByDateRange() {
+
+      // ARRANGE: setup as admin
+      LeaveRequest leaveRequest = createTestLeaveRequest();
+      List<LeaveRequest> leaveRequests = List.of(leaveRequest);
+
+      LocalDate startDate = LocalDate.now().minusDays(10);
+      LocalDate endDate = LocalDate.now().plusDays(10);
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(leaveRequestRepository.findByStartDateBetween(startDate, endDate))
+          .thenReturn(leaveRequests);
+
+      // ACT: get requests by date range
+      List<LeaveRequestResponse> responses =
+          leaveRequestService.getRequestByDateRange(startDate, endDate);
+
+      // ASSERT: verify the responses
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(1);
+
+      verify(leaveRequestRepository).findByStartDateBetween(startDate, endDate);
+    }
+  }
 }
