@@ -129,4 +129,16 @@ protected openAssignment(member: TeamMember): void {
 protected closeAssignment(): void {
   this.selectedMember = undefined;
 }
+
+// admin assigns member to workspace
+protected addToWorkspace(member: TeamMember): void {
+  this.actionMessage = '';
+  this.teamService.addToWorkspace(member.userId, 'DEVELOPER').subscribe({
+    next: () => {
+      this.actionMessage = `${member.firstName} has been added to the workspace.`;
+      this.loadTeam();
+    },
+    error: (error) => this.actionMessage = error.error?.message ?? 'Could not add this to the workspace.'
+  });
+}
 }
