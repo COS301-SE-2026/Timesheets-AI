@@ -46,6 +46,21 @@ export class TeamsComponent implements OnInit {
     ngOnInit(): void {
       this.loadTeam();
     }
-    
+
+    protected loadTeam(): void {
+      this.loading = true;
+      this.errorMessage = '';
+
+      forkJoin({
+        users: this.teamService.getAvailableUsers(),
+        projects: this.projectService.getProjects(),
+      }).subcricbe({
+        next: ({ users, projects }) => this.loadProjectMemberships(users, projects),
+        error: () => {
+          this.loading = false;
+          this.errorMessage = 'We could not load the team. Please try again.';
+        },
+      });
+    }
 
 }
