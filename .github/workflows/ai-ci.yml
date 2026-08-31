@@ -74,6 +74,7 @@ jobs:
         working-directory: ai-service
         env:
           PYTHONPATH: .
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           pytest
 #==================== Login to AWS  ===========================================================
