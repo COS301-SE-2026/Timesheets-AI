@@ -54,7 +54,9 @@
                     <span>{{ workspaceMembers.length }}</span>    
                 </button>
                 <button type="button" role="tab" 
-                    [attr.aria-selected]="activeTab === 'waiting'">Waiting room 
+                    [attr.aria-selected]="activeTab === 'waiting'"
+                    [class.active]="activeTab === 'waiting'"
+                    (click)="activeTab = 'waiting'"> Waiting room 
                     <span>{{ waitingUsers.length }}</span>
                 </button>
             </div>
@@ -62,7 +64,7 @@
             <h2> Workspace member</h2>
         }
         <label class="search-field">
-            <i class="fa-solid fa-magnify-glass" aria-hidden="true"></i>
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
             <span class="sr-only">Search team members </span>
             <input type="search" [(ngModel)]="searchTerm" placeholder="Search members..."/>
         </label>
@@ -83,13 +85,13 @@
                     <span>Actions</span>
                 </div>
                 @for (member of visibleUsers; track member.userId) {
-                <article class="member-cell" row="row">
+                <article class="member-cell" role="row">
                     <div class="member-cell">
                         <span class="avatar">{{ initials(member) }}</span>
                         <strong>{{ member.firstName }} {{ member.lastName }}</strong>
                     </div>
                     <span class="email">{{ member.email }}</span>
-                    <div classs="project-cell">
+                    <div class="project-cell">
                         @if (activeTab === 'members' && projectNames(member).length) {
                             @for (project of projectNames(member); track project) {
                                 <span class="project-chip"> {{ project }}</span>
@@ -105,11 +107,12 @@
                             <button type="button" class="primary-button small" (click)="addToWorkspace(member)">Add to workspace</button>
                         } @else {
                             <button type="button" class="text-button" (click)="openAssignment(member)"
-                            [disabled]="!member.workspaceMemberId ? '' : 'The current API does not return this member\'s workspace membership IDnuntil they belong to a project.'">Manage projects
+                            [disabled]="!member.workspaceMemberId || !projects.length"
+                            [title]="member.workspaceMemberId ? '' : 'The current API does not return this member\'s workspace membership ID until they belong to a project.'">Manage projects
                             </button>
-                            @for (projectId of member.project; track projectId) {
+                            @for (projectId of member.projectIds; track projectId) {
                                <button type="button" class="icon-button" (click)="removeFromProject(member, projectId)"
-                               [attr.aria-label]="'Remove ' + member.firstName + ' from project" title="Remove form project">
+                               [attr.aria-label]="'Remove ' + member.firstName + ' from project'" title="Remove from project">
                                <i class="fa-solid fa-xmark"></i>
                                </button>
                             }
@@ -124,7 +127,7 @@
 
 </section>
 
-@if (selcetdMember) {
+@if (selectedMember) {
     <div class="modal-backdrop" (click)="closeAssignment()">
         <section class="assignment-dialog" role="dialog" aria-modal="true" aria-labelledby="assignment-title" (click)="$event.stopPropagation()">
             <button type="button" class="dialog-close" (click)="closeAssignment()" aria-labelledby="Close">x</button>
@@ -134,7 +137,7 @@
                 <option value="" disabled>
                     Select a project
                 </option>
-                @for (projject of projects; track project.id) {
+                @for (project of projects; track project.id) {
                     @if (!selectedMember.projectIds.includes(project.id)) {
                         <option [value]="project.id">{{project.name }}</option>
                     }
@@ -144,11 +147,12 @@
                 <input type="checkbox" [(ngModel)]="assignAsProjectManager" />
                 Make project manager
             </label>
-            <div class="dialog-actiions">
+            <div class="dialog-actions">
                 <button type="button" class="secondary-button"
                 (click)="closeAssignment()">Cancel</button>
                <button type="button" class="primary-button"
                [disabled]="!selectedProjectId" (click)="assignToProject()">
+               Assign to project
                </button>
             </div>
         </section>
