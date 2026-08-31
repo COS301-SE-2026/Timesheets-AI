@@ -155,4 +155,16 @@ protected assignToProject(): void {
     error: (error) => this.actionMessage = error.error?.message ?? 'Could not assign member to the project.',
   })
 }
+
+protected removeFromProject(member: TeamMember, projectId: string): void {
+  if (!member.workspaceMemberId) return;
+  this.actionMessage = '';
+  this.teamService.removeFromProject(projectId, member.workspaceMemberId).subscribe({
+    next: () => {
+      this.actionMessage = `${member.firstName} has removed from the project.`;
+      this.loadTeam();
+    },
+    error: (error) => this.actionMessage = error.error?.message ?? 'Could not remove this member from the project.',
+  });
+}
 }
