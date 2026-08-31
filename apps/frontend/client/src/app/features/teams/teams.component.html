@@ -123,3 +123,34 @@
 }
 
 </section>
+
+@if (selcetdMember) {
+    <div class="modal-backdrop" (click)="closeAssignment()">
+        <section class="assignment-dialog" role="dialog" aria-modal="true" aria-labelledby="assignment-title" (click)="$event.stopPropagation()">
+            <button type="button" class="dialog-close" (click)="closeAssignment()" aria-labelledby="Close">x</button>
+            <p class="eyebrow">Project management</p>
+            <h2 id="assignment-title">Assign {{ selectedMember.firstName }} {{ selectedMember.lastName }}</h2>
+            <label>Project <select [(ngModel)]="selectedProjectId">
+                <option value="" disabled>
+                    Select a project
+                </option>
+                @for (projject of projects; track project.id) {
+                    @if (!selectedMember.projectIds.includes(project.id)) {
+                        <option [value]="project.id">{{project.name }}</option>
+                    }
+                }
+            </select></label>
+            <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="assignAsProjectManager" />
+                Make project manager
+            </label>
+            <div class="dialog-actiions">
+                <button type="button" class="secondary-button"
+                (click)="closeAssignment()">Cancel</button>
+               <button type="button" class="primary-button"
+               [disabled]="!selectedProjectId" (click)="assignToProject()">
+               </button>
+            </div>
+        </section>
+    </div>
+}
