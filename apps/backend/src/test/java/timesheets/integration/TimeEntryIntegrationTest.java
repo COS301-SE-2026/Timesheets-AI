@@ -86,8 +86,7 @@ class TimeEntryIntegrationTest extends BaseIntegrationTest {
     TimeEntryRequest request = new TimeEntryRequest();
 
     // dont login the user because we are trying to test that the system will reject users without a
-    // valid token
-    // expect status code to be 403 - restrict and forbid users from creating time entry
+    // valid token expect status code to be 403 - restrict and forbid users from creating time entry
     request.setProjectId(UUID.fromString("00000000-0000-0000-0001-000000000200"));
     request.setTaskId(UUID.fromString("00000000-0000-0000-0001-000000000220"));
     request.setStartTime(LocalDateTime.of(2026, 8, 4, 9, 0));

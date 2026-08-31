@@ -24,6 +24,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import {
   TimerService,
   ActiveTimerResponse,
@@ -73,6 +74,7 @@ interface TimeEntry {
   createdAt?: string;
   updatedAt?: string;
   rejectionReason?: string;
+  isDeleted?: boolean;
 }
 
 /*
@@ -118,6 +120,7 @@ interface Timesheet {
   periodEnd: string;
   status: TimeEntryStatus;
   isLocked: boolean;
+  rejectionReason?: string | null;
 }
 
 //minimal shape needed from ProjectResponse, matches GET /api/projects
@@ -149,6 +152,8 @@ export class LogtimeComponent implements OnDestroy {
   private readonly apiBaseUrl = '/api';
   private readonly timerService = inject(TimerService);
   private readonly timeEntryService = inject(TimeEntryService);
+  private readonly route = inject(ActivatedRoute);
+  private  pendingTaskId: string | null = null;
 
   //I used Enzokuhle Khumalo's workspace_members.id (real seed data), because it didnt need mfa
   private readonly workspaceMemberId =
@@ -282,7 +287,7 @@ export class LogtimeComponent implements OnDestroy {
       const matchesFrom = !from || entryDate >= from;
       const matchesTo = !to || entryDate <= to;
 
-      return matchesProject && matchesStatus && matchesFrom && matchesTo;
+      return (!entry.isDeleted && matchesProject && matchesStatus && matchesFrom && matchesTo);
     });
   });
 
@@ -320,6 +325,28 @@ export class LogtimeComponent implements OnDestroy {
     return `Entries: ${this.formatDateLabel(from)} – ${this.formatDateLabel(to)}`;
   });
 
+  readonly canEditEntries = computed (() => {
+    const timesheet = this.currentTimesheet();
+    if (!timesheet) {
+      return true;
+    }
+    return (
+      (!timesheet.isLocked &&
+      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED'))
+    );
+  }); 
+
+    readonly canSubmitTimesheet = computed (() => {
+    const timesheet = this.currentTimesheet();
+    if (!timesheet) {
+      return false;
+    }
+    return (
+      (!timesheet.isLocked &&
+      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED'))
+    );
+  }); 
+
   //Native asynchronous timer allocation reference tracking context
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -328,6 +355,20 @@ export class LogtimeComponent implements OnDestroy {
     Cascade resets: clear task selection when project changes, but preserve
     an in-progress "create new task" entry so the user doesn't lose their typing.
     */
+
+    const query = this.route.snapshot.queryParamMap;
+    const from = query.get('from') ?? query.get('date');
+    const  to = query.get('to') ?? from;
+    this.pendingTaskId = query.get('taskId');
+    if(from) {
+      this.filterForm.controls.from.setValue(from, {emitEvent: false });
+      this.filterFrom.set(from);
+    }
+    if (to) {
+      this.filterForm.controls.to.setValue(to, { emitEvent: false });
+      this.filterTo.set(to);
+    }
+
     this.entryForm.controls.projectId.valueChanges.subscribe((projectId) => {
       this.entryForm.controls.taskId.setValue('');
       this.loadTasksForProject(projectId);
@@ -409,6 +450,10 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   openManualPanel(): void {
+    if (!this.canEditEntries()) {
+      this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+      return;
+    }
     this.resetEntryForm();
     this.isEditMode.set(false);
     this.resetNewTaskState();
@@ -431,6 +476,12 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   openTimerPanel(): void {
+    if (!this.canEditEntries()) {
+      if (!this.canEditEntries()) {
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+        return;
+      }
+    }
     this.resetNewTaskState();
     this.activePanel.set('timer');
   }
@@ -444,6 +495,10 @@ export class LogtimeComponent implements OnDestroy {
    Performs bounds verification and double booking collision screening.
    */
   saveEntry(): void {
+  if (!this.canEditEntries()) {
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+        return;
+      }
     this.updateDuration();
 
     if (this.endTimeInvalid) {
@@ -836,6 +891,11 @@ export class LogtimeComponent implements OnDestroy {
   //populates editing controls with targets extraction contexts to alter parameters
 
   editEntry(entry: TimeEntry): void {
+    if (!this.canEditEntries()) {
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+        return;
+      }
+    this.openMenuEntryId.set(null);
     this.resetNewTaskState();
     this.entryForm.setValue({
       id: entry.id,
@@ -909,6 +969,10 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   deleteEntry(entry: TimeEntry): void {
+    if (!this.canEditEntries()) {
+        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+        return;
+      }
     const deleted = () => {
       this.entries.update((entries) =>
         entries.filter((existingEntry) => existingEntry.id !== entry.id),
@@ -1090,7 +1154,9 @@ export class LogtimeComponent implements OnDestroy {
         next: (entries) =>
           this.entries.set(
             //same durationMinutes-is-actually-seconds fix as onSaved() in saveEntry() — see that comment for the full explanation
-            entries.map((entry) => this.normaliseEntryDuration(entry))
+            entries
+             .filter((entry) => !entry.isDeleted)
+             .map((entry) => this.normaliseEntryDuration(entry)),
           ),
         error: (error) =>
           this.conflictMessage.set(

@@ -14,18 +14,19 @@
 import { Component, signal, inject, computed} from '@angular/core'; // UI componenet and signal store state, uodate UI changes automatically 
  //to be able use ngIf and ngFor 
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 interface NavItem {
   label: string, //text shown in sidebar
   icon: string, // CSS class or shared icon
   route: string; // Navigation URL 
+  requiresWorkspace?: boolean;
 }
 
 @Component({
   selector: 'app-sidebar', // HTML tag to show this UI component
-  imports: [MatIconModule],
+  imports: [MatIconModule, RouterModule],
   standalone: true,
   templateUrl: './sidebar.component.html', // links the HTML for the UI component 
   styleUrl: './sidebar.component.scss' // links SCSS file 
@@ -37,16 +38,16 @@ export class SidebarComponent {
 
   // create reactive state variable so it stores state, update UI automatically when changed 
   navItems = signal<NavItem[]>([
-    { label: 'Dashboard', icon:'dashboard', route:'/dashboard'}, 
-    { label: 'Timesheets', icon: 'description', route: '/timesheets' }, 
-    { label: 'Log Time', icon: 'schedule', route: '/log-time' },
-    { label: 'Projects', icon: 'folder', route: '/projects' },
-    {label: 'My Tasks', icon: 'task', route: '/my-tasks'},
-    { label: 'Calendar', icon: 'calendar_month', route: '/calendar' },
-    { label: 'Leave Requests', icon: 'business_center', route: '/leave-requests' },
-    { label: 'Reports', icon: 'bar_chart', route: '/reports' },
-    { label: 'Insights', icon: 'trending_up', route: '/insights' },
-    { label: 'Team', icon: 'groups', route: '/team' },
+    { label: 'Dashboard', icon:'dashboard', route:'/dashboard', requiresWorkspace: true}, 
+    { label: 'Timesheets', icon: 'description', route: '/timesheets', requiresWorkspace: true}, 
+    { label: 'Log Time', icon: 'schedule', route: '/log-time', requiresWorkspace: true},
+    { label: 'Projects', icon: 'folder', route: '/projects', requiresWorkspace: true},
+    { label: 'My Tasks', icon: 'task', route: '/my-tasks', requiresWorkspace: true},
+    { label: 'Calendar', icon: 'calendar_month', route: '/calendar', requiresWorkspace: true},
+    { label: 'Leave Requests', icon: 'business_center', route: '/leave-requests', requiresWorkspace: true},
+    { label: 'Reports', icon: 'bar_chart', route: '/reports', requiresWorkspace: true},
+    { label: 'Insights', icon: 'trending_up', route: '/insights', requiresWorkspace: true},
+    { label: 'Team', icon: 'groups', route: '/team', requiresWorkspace: true},
     { label: 'Settings', icon: 'settings', route: '/settings' }
   ]);
 
@@ -58,10 +59,29 @@ export class SidebarComponent {
   //   this.activeRoute.set(label);
   // }
 
+  private hasWorkspace(): boolean {
+      const user = this.authService.currentUser();
+      return user?.roles?.some((role: string) => 
+        role === 'ROLE_DEVELOPER' || role === 'ROLE_MANAGER' || role === 'ROLE_ADMIN') || false;
+    }
+
+    //if the user does not have access to a workspace, take them to the waiting page
+    navigateTo(route: string, requiresWorkspace = false): void {
+
+    if (requiresWorkspace && !this.hasWorkspace()) {
+      this.router.navigate(['/waiting-for-workspace']);
+      return;
+    }
+    
+    // otherwise navigate normally
+    this.router.navigate([route]);
+  }
+
   readonly currentUser = this.authService.currentUser;
   readonly displayName = computed(() => {
     const user = this.currentUser();
     if(!user) return 'Guest';
+
     return `${user.firstName} ${user.lastName}`.trim();
   });
 
