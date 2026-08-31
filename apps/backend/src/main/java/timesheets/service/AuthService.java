@@ -4,6 +4,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import exception.AuthException;
+import exception.AuthException.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -70,7 +72,9 @@ public class AuthService {
   @Value("${app.google.client-id}")
   private String googleClientId;
 
-  private static final String[] ACCEPTED_DOMAINS = {"momentum.co.za", "momentum.com"};
+  private static final String[] ACCEPTED_DOMAINS = {
+    "momentum.co.za", "momentum.com", "gmail.com", "cs.up.ac.za", "outlook.com"
+  };
   private static final int MAX_LOGIN_ATTEMPTS = 5;
   private static final String ISSUER = "Timesheets AI";
 
@@ -79,7 +83,7 @@ public class AuthService {
 
     // validate email domain
     if (!isAcceptedDomain(request.getEmail())) {
-      throw new IllegalArgumentException("email domain not accepted");
+      throw new AuthException(ErrorCode.EMAIL_DOMAIN);
     }
 
     // this should check if the user exists
@@ -91,7 +95,7 @@ public class AuthService {
 
       // if the email already exists then they cannot register again
       if (Boolean.TRUE.equals(user.getEmailVerified())) {
-        throw new IllegalArgumentException("email already exists");
+        throw new AuthException(ErrorCode.EMAIL_EXISTS);
       }
 
       // if they are not verified, then the email verification is sent again
@@ -173,14 +177,14 @@ public class AuthService {
     EmailVerificationToken verificationToken =
         emailVerificationTokenRepository
             .findByToken(token)
-            .orElseThrow(() -> new IllegalArgumentException("token not found"));
+            .orElseThrow(() -> new AuthException(ErrorCode.TOKEN_NOT_FOUND));
 
     if (verificationToken.getVerifiedAt() != null) {
-      throw new IllegalArgumentException("token already used");
+      throw new AuthException(ErrorCode.TOKEN_USED);
     }
 
     if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-      throw new IllegalArgumentException("token expired");
+      throw new AuthException(ErrorCode.TOKEN_EXPIRED);
     }
 
     // mark token as verified
@@ -191,7 +195,7 @@ public class AuthService {
     User user =
         userRepository
             .findById(verificationToken.getUserId())
-            .orElseThrow(() -> new IllegalArgumentException("user not found"));
+            .orElseThrow(() -> new AuthException(ErrorCode.USER_NOT_FOUND));
 
     user.setEmailVerified(true);
 
@@ -205,12 +209,12 @@ public class AuthService {
    * I am using no rollback such that there is no rollback for login failures.
    * I want the login attempts to still register in the DB
    */
-  @Transactional(noRollbackFor = {IllegalArgumentException.class, IllegalStateException.class})
+  @Transactional(noRollbackFor = {AuthException.class})
   public AuthResponse login(AuthRequest request) {
     User user =
         userRepository
             .findByEmail(request.getEmail())
-            .orElseThrow(() -> new IllegalArgumentException("invalid credentials"));
+            .orElseThrow(() -> new AuthException(ErrorCode.INVALID_CREDENTIALS));
 
     // check if the user is an SSO user(this means that they have no password)
     if (user.getPasswordHash() == null) {
@@ -220,18 +224,16 @@ public class AuthService {
               .isPresent();
 
       if (hasGoogleProvider) {
-        throw new IllegalArgumentException(
-            "this account uses Google SSO. So please sign in with Google.");
+        throw new AuthException(ErrorCode.SSO_USER);
       } else {
-        throw new IllegalArgumentException("account not properly configured. Contact support.");
+        throw new AuthException(ErrorCode.ACCOUNT_NOT_CONFIGURED);
       }
     }
     // check if the account is locked, and for how long
     if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())) {
       long minutesRemain =
           java.time.Duration.between(LocalDateTime.now(), user.getLockedUntil()).toMinutes();
-      throw new IllegalStateException(
-          "account locked. Please try again in " + minutesRemain + " minutes");
+      throw new AuthException(ErrorCode.ACCOUNT_LOCKED, minutesRemain);
     }
 
     // verify password
@@ -248,12 +250,11 @@ public class AuthService {
       if (attempts >= MAX_LOGIN_ATTEMPTS) {
         user.setLockedUntil(LocalDateTime.now().plusMinutes(30));
         userRepository.save(user);
-        throw new IllegalStateException(
-            "account locked after too many failed attempts. Try again in 30 minutes");
+        throw new AuthException(ErrorCode.ACCOUNT_LOCKED, 30);
       }
 
       userRepository.save(user);
-      throw new IllegalArgumentException("invalid credentials");
+      throw new AuthException(ErrorCode.INVALID_CREDENTIALS);
     }
 
     // reset login attempts on successful password verification
@@ -366,7 +367,7 @@ public class AuthService {
               User user =
                   userRepository
                       .findById(identity.getUserId())
-                      .orElseThrow(() -> new RuntimeException("user not found"));
+                      .orElseThrow(() -> new AuthException(ErrorCode.USER_NOT_FOUND));
               return generateAuthResponse(user, false);
             })
         .orElseGet(
@@ -470,11 +471,11 @@ public class AuthService {
 
       GoogleIdToken idTokenObj = verifier.verify(idToken);
       if (idTokenObj == null) {
-        throw new IllegalArgumentException("invalid google ID token");
+        throw new AuthException(ErrorCode.INVALID_CREDENTIALS);
       }
       return idTokenObj.getPayload();
     } catch (Exception e) {
-      throw new RuntimeException("Failed to verify Google token: " + e.getMessage());
+      throw new AuthException(ErrorCode.INVALID_CREDENTIALS);
     }
   }
 

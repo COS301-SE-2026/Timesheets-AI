@@ -1,7 +1,8 @@
 package timesheets.service;
 
-import exception.TimeEntryAccessDeniedException;
-import exception.TimeEntryNotFoundException;
+import exception.AccessDeniedException;
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
+import timesheets.dto.request.TimeEntryPatchRequest;
 import timesheets.dto.request.TimeEntryRequest;
 import timesheets.dto.response.TimeEntryResponse;
 import timesheets.repository.TimeEntryRepository;
@@ -84,7 +86,10 @@ public class TimeEntryService {
 
   // can get a time entry using the id
   public TimeEntry getTimeEntryById(UUID id) {
-    return timeEntryRepository.findById(id).orElseThrow(() -> new TimeEntryNotFoundException(id));
+
+    return timeEntryRepository
+        .findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Time entry not found with id: " + id));
   }
 
   @Transactional
@@ -94,11 +99,11 @@ public class TimeEntryService {
     TimeEntry entry = getTimeEntryById(id);
 
     if (Boolean.TRUE.equals(entry.getIsLocked())) {
-      throw new RuntimeException("Cannot delete a locked time entry");
+      throw new StateConflictException("Cannot delete a locked time entry");
     }
 
     if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
-      throw new TimeEntryAccessDeniedException("You can only delete your own time entries");
+      throw new StateConflictException("You can only delete your own time entries");
     }
 
     // remember we are only doing soft deletes
@@ -120,11 +125,11 @@ public class TimeEntryService {
     TimeEntry entry = getTimeEntryById(id);
 
     if (Boolean.TRUE.equals(entry.getIsLocked())) {
-      throw new RuntimeException("Cannot edit a locked time entry");
+      throw new StateConflictException("Cannot edit a locked time entry");
     }
 
     if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
-      throw new TimeEntryAccessDeniedException("You can only edit your own time entries");
+      throw new AccessDeniedException("You can only edit your own time entries");
     }
 
     entry.setProjectId(request.getProjectId());
@@ -133,6 +138,60 @@ public class TimeEntryService {
     entry.setEndTime(request.getEndTime());
     entry.setDurationSeconds(request.getDurationSeconds());
     entry.setDescription(request.getDescription());
+
+    return timeEntryRepository.save(entry);
+  }
+
+  // this one should only update the specified fields
+  @Transactional
+  public TimeEntry updateTimeEntryPatch(UUID id, TimeEntryPatchRequest request) {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    TimeEntry entry = getTimeEntryById(id);
+
+    // locked time entries cannot be edited
+    if (Boolean.TRUE.equals(entry.getIsLocked())) {
+      throw new StateConflictException("Cannot edit a locked time entry");
+    }
+
+    // a user cannot edit a time entry if they don't own it
+    if (!entry.getWorkspaceMemberId().equals(workspaceMemberId)) {
+      throw new AccessDeniedException("You can only edit your own time entries");
+    }
+
+    // entries cannot be edited if they are deleted
+    if (Boolean.TRUE.equals(entry.getIsDeleted())) {
+      throw new StateConflictException("Cannot edit a deleted time entry");
+    }
+
+    // only fields that are provided will be the ones that get updated
+    if (request.getProjectId() != null) {
+      entry.setProjectId(request.getProjectId());
+    }
+
+    if (request.getTaskId() != null) {
+      entry.setTaskId(request.getTaskId());
+    }
+
+    if (request.getStartTime() != null) {
+      entry.setStartTime(request.getStartTime());
+    }
+
+    if (request.getEndTime() != null) {
+      entry.setEndTime(request.getEndTime());
+    }
+
+    if (request.getDurationSeconds() != null) {
+      entry.setDurationSeconds(request.getDurationSeconds());
+    }
+
+    if (request.getEntryType() != null) {
+      entry.setEntryType(request.getEntryType());
+    }
+
+    if (request.getDescription() != null) {
+      entry.setDescription(request.getDescription());
+    }
 
     return timeEntryRepository.save(entry);
   }
