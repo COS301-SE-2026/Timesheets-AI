@@ -11,6 +11,9 @@ import timesheets.domain.IntegrationToken;
 import timesheets.integration.calendar.CalendarAdapter;
 import timesheets.integration.calendar.CalendarEvent;
 import timesheets.repository.IntegrationTokenRepository;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.http.HttpCredentialsAdapter;
 
 @Component
 @RequiredArgsConstructor
