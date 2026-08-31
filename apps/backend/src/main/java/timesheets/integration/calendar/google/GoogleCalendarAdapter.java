@@ -1,8 +1,12 @@
 package timesheets.integration.calendar.google;
 
+import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.GoogleCredentials;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,9 +16,6 @@ import timesheets.domain.IntegrationToken;
 import timesheets.integration.calendar.CalendarAdapter;
 import timesheets.integration.calendar.CalendarEvent;
 import timesheets.repository.IntegrationTokenRepository;
-import com.google.auth.oauth2.AccessToken;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.auth.http.HttpCredentialsAdapter;
 
 @Component
 @RequiredArgsConstructor
@@ -45,16 +46,21 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
     IntegrationToken token = integrationToken.get();
 
     // this token provide Momently to gain persmission to the user's Google calendar
-    // google libraries wraps tokens in objects rather raw strings, ojects allows us to track expiration time 
-    
-    String accessToken = token.getAcessToken();
+    // google libraries wraps tokens in objects rather raw strings, ojects allows us to track
+    // expiration time
 
-    AccessToken googleAcessToken = new AccessToken(accessToken, Date expirationTime);
+    String accessToken = token.getAccessToken();
 
-    // GoogleCredentials is Google authentication object, it will wrap the AccessToken in a format that the Google's API libraries understand
+    Date expirationTime =
+        Date.from(token.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant());
+
+    AccessToken googleAccessToken = new AccessToken(accessToken, expirationTime);
+
+    // GoogleCredentials is Google authentication object, it will wrap the AccessToken in a format
+    // that the Google's API libraries understand
     GoogleCredentials credentials = GoogleCredentials.create(googleAccessToken);
 
-    HttpCredentialsAdadpter requestInitializer = new HttpCredentialsAdapter(credentials);
+    HttpCredentialsAdapter requestInitializer = new HttpCredentialsAdapter(credentials);
 
     return Collections.emptyList();
   }
