@@ -300,25 +300,26 @@ $calendar-red-text: #dc2626;
                 border: none;
 
                 &.fc-event-meetings{
-                    background: $calendar-blue-bg;                    .custom-event-pill{
+                    background: $calendar-blue-bg; 
+                    .fc-event-main, .fc-event-title, .fc-event-time{
                         color: $calendar-blue-text;
                     }
                 }
                 &.fc-event-work{
                     background: $calendar-green-bg;
-                    .custom-event-pill{
+                    .fc-event-main, .fc-event-title, .fc-event-time{
                         color: $calendar-green-text;
                     }
                 }
                 &.fc-event-calls{
                     background: $calendar-amber-bg;
-                    .custom-event-pill{
+                    .fc-event-main, .fc-event-title, .fc-event-time{
                         color: $calendar-amber-text;
                     }
                 }
                 &.fc-event-deadlines{
                     background: $calendar-red-bg;
-                    .custom-event-pill{
+                    .fc-event-main, .fc-event-title, .fc-event-time{
                         color: $calendar-red-text;
                     }
                 }
