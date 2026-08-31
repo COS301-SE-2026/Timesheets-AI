@@ -118,4 +118,15 @@ protected get visibleUsers(): TeamMember[] {
 protected initials(member: TeamMember): string {
   return `${member.firstName.charAt(0)}${member.lastName.charAt(0)}`.toUpperCase();
 }
+
+protected openAssignment(member: TeamMember): void {
+  this.selectedMember = member;
+  this.selectedProjectId = this.projects.find((project) => !member.projectIds.includes(project.id))?.id ?? '';
+  this.assignAsProjectManager = false;
+  this.actionMessage = '';
+}
+
+protected closeAssignment(): void {
+  this.selectedMember = undefined;
+}
 }
