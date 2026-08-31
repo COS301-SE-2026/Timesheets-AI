@@ -103,6 +103,9 @@ export class TeamsComponent implements OnInit {
     });
 }
 
+protected get workspaceMember(): TeamMember[] {
+  return this.filterUsers(this.members.filter((member) => member.isInWorkspace));
+}
 
 
 }
