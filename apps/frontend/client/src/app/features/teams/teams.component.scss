@@ -192,4 +192,71 @@ h1 {
     width: 16rem;
 }
 
+  //Table styling
+
+  .members-table {
+    min-width: 760px;
+  }
+
+  .table-head, .member-row {
+    align-items: center;
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1.2fr 1.35fr 1.8fr 1.35fr;
+    padding: var(--space-4) var(--space-6);
+  }
+
+  .table-head {
+    background: var(--color-primary-surface);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-wide);
+    text-transform: uppercase;
+  }
+
+  .member-row {
+    border-top: 1px solid var(--color-input-border);
+    min-height: 4.8rem;
+  }
+
+  .member-cell {
+    align-items: center;
+    color: var(--color-text-body);
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .avatar {
+    align-items: center;
+    background: var(--color-primary-tint);
+    border-radius: var(--radius-pill);
+    color: var(--color-text-primary);
+    display: flex;
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-bold);
+    height: 40px;
+    justify-content: center;
+    width: 40px;
+  }
+
+  .email, .muted {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-body);
+  }
+
+  .project-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+
+  .project-chip, .waiting-badge {
+    background: var(--color-gray-light);
+    border-radius: var(--radius-pill);
+    color: var(--color-text-body);
+    font-size: var(--font-size-caption);
+    font-weight: var(font-weight-semibold);
+    padding: var(--space-1) var(--space-2);
+  }
 
