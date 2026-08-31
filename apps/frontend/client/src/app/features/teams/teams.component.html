@@ -44,6 +44,50 @@
             </div>
         </article>
     </section>
+    
+    <section class="team-card">
+        <div class="team-toolbar">
+        @if (isAdmin) {
+            <div class="tabs" role="tablist" aria-label="Team member status">
+                <button type="button" role="tab" [attr.aria-selected]="activeTab === 'members'"
+                    [class.active]="activeTab === 'members'" (click)="activeTab = 'members'">Workspace Members
+                    <span>{{ workspaceMembers.length }}</span>    
+                </button>
+                <button type="button" role="tab" 
+                    [attr.aria-selected]="activeTab === 'waiting'">Waiting room 
+                    <span>{{ waitingUsers.length }}</span>
+                </button>
+            </div>
+        } @else {
+            <h2> Workspace member</h2>
+        }
+        <label class="search-field">
+            <i class="fa-solid fa-magnify-glass" aria-hidden="true"></i>
+            <span class="sr-only">Search team members </span>
+            <input type="search" [(ngModel)]="searchTerm" placeholder="Search members..."/>
+        </label>
+        </div>
+
+        @if (!visibleUsers.length) {
+            <div class="empty-state">
+                <i class="fa-solid fa-users-viewfinder" aria-hidden="true"></i>
+                <h3>{{ activeTab === 'waiting' ? 'No users are waiting' : 'No workspace members found' }}</h3>
+                <p>{{ searchTerm ? 'Try a different search term.' : 'This list will update as users join the workspace.' }}</p>
+            </div>
+        } @else {
+            <div class="member-table" role="table">
+                <div class="table-head" role="row">
+                    <span> Member</span>
+                    <span>Email</span>
+                    <span>Projects</span>
+                    <span>Actions</span>
+                </div>
+                @for (member of visibleUsers; track member.userId) {
+                
+                }
+            </div>
+        }
+    </section>
 }
 
 </section>
