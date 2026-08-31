@@ -741,4 +741,206 @@ public class LeaveRequestTest {
       verify(leaveRequestRepository).findByStartDateBetween(startDate, endDate);
     }
   }
+
+  @Nested
+  @DisplayName("Get My Leave Requests Tests")
+  class GetMyLeaveRequestsTests {
+
+    @Test
+    @DisplayName("return my leave requests successfully")
+    void returnMyLeaveRequestsSuccessfully() {
+
+      // ARRANGE: setup the user's leave requests
+      LeaveRequest leaveRequest = createTestLeaveRequest();
+
+      List<LeaveRequest> leaveRequests = List.of(leaveRequest);
+      WorkspaceMember workspaceMember = createTestWorkspaceMember();
+
+      when(securityUtils.getCurrentUserId()).thenReturn(testUserId);
+      when(workspaceMemberRepository.findByUserId(testUserId)).thenReturn(List.of(workspaceMember));
+      when(leaveRequestRepository.findByWorkspaceMemberIdInOrderByCreatedAtDesc(
+              List.of(testWorkspaceMemberId)))
+          .thenReturn(leaveRequests);
+
+      // ACT: get my leave requests
+      List<LeaveRequestResponse> responses = leaveRequestService.getMyLeaveRequests();
+
+      // ASSERT: verify the responses
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(1);
+      assertThat(responses.get(0).getLeaveType()).isEqualTo(testLeaveType);
+      assertThat(responses.get(0).getStatus()).isEqualTo("PENDING");
+
+      verify(leaveRequestRepository)
+          .findByWorkspaceMemberIdInOrderByCreatedAtDesc(List.of(testWorkspaceMemberId));
+    }
+
+    @Test
+    @DisplayName("return empty list when user has no workspace memberships")
+    void returnEmptyListWhenNoWorkspaceMemberships() {
+
+      when(securityUtils.getCurrentUserId()).thenReturn(testUserId);
+      when(workspaceMemberRepository.findByUserId(testUserId)).thenReturn(List.of());
+
+      List<LeaveRequestResponse> responses = leaveRequestService.getMyLeaveRequests();
+
+      assertThat(responses).isNotNull();
+      assertThat(responses).isEmpty();
+
+      verify(leaveRequestRepository, never()).findByWorkspaceMemberIdInOrderByCreatedAtDesc(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("Get Leave Request By ID Tests")
+  class GetLeaveRequestByIdTests {
+
+    @Test
+    @DisplayName("developer can view own leave request")
+    void developerCanViewOwnLeaveRequest() {
+
+      // ARRANGE: setup as developer
+      LeaveRequest leaveRequest = createTestLeaveRequest();
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(leaveRequest));
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
+      // ACT: get the leave request
+      LeaveRequestResponse response = leaveRequestService.getLeaveRequestById(testRequestId);
+
+      // ASSERT: verify the response
+      assertThat(response).isNotNull();
+      assertThat(response.getId()).isEqualTo(testRequestId);
+      assertThat(response.getLeaveType()).isEqualTo(testLeaveType);
+
+      verify(leaveRequestRepository).findById(testRequestId);
+    }
+
+    @Test
+    @DisplayName("throw exception when developer tries to view someone else's request")
+    void throwExceptionWhenDeveloperViewsOthersRequest() {
+
+      // ARRANGE: developer trying to view someone else's request
+      LeaveRequest leaveRequest = createTestLeaveRequest();
+      UUID otherMemberId = UUID.randomUUID();
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(leaveRequest));
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(otherMemberId);
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
+      assertThatThrownBy(() -> leaveRequestService.getLeaveRequestById(testRequestId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("You don't have access to this leave request");
+    }
+
+    @Test
+    @DisplayName("manager can view request from their workspace")
+    void managerCanViewRequestFromWorkspace() {
+
+      // ARRANGE: setup as manager
+      LeaveRequest leaveRequest = createTestLeaveRequest();
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(leaveRequest));
+      when(securityUtils.isManager()).thenReturn(true);
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
+      when(leaveRequestRepository.findByWorkspaceId(testWorkspaceId))
+          .thenReturn(List.of(leaveRequest));
+
+      // ACT: get the leave request
+      LeaveRequestResponse response = leaveRequestService.getLeaveRequestById(testRequestId);
+
+      // ASSERT: verify the response
+      assertThat(response).isNotNull();
+      assertThat(response.getId()).isEqualTo(testRequestId);
+
+      verify(leaveRequestRepository).findById(testRequestId);
+    }
+
+    @Test
+    @DisplayName("throw exception when manager tries to view request from different workspace")
+    void throwExceptionWhenManagerViewsRequestFromDifferentWorkspace() {
+
+      // ARRANGE: setup as manager with different workspace
+      LeaveRequest leaveRequest = createTestLeaveRequest();
+      UUID differentWorkspaceId = UUID.randomUUID();
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(leaveRequest));
+      when(securityUtils.isManager()).thenReturn(true);
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(differentWorkspaceId);
+      when(leaveRequestRepository.findByWorkspaceId(differentWorkspaceId))
+          .thenReturn(List.of()); // no leave requests in this workspace
+
+      assertThatThrownBy(() -> leaveRequestService.getLeaveRequestById(testRequestId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("You don't have access to this leave request");
+    }
+
+    @Test
+    @DisplayName("admin can view any leave request")
+    void adminCanViewAnyLeaveRequest() {
+
+      // ARRANGE: setup as admin
+      LeaveRequest leaveRequest = createTestLeaveRequest();
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.of(leaveRequest));
+      when(securityUtils.isAdmin()).thenReturn(true);
+
+      // ACT: get the leave request
+      LeaveRequestResponse response = leaveRequestService.getLeaveRequestById(testRequestId);
+
+      // ASSERT: verify the response
+      assertThat(response).isNotNull();
+      assertThat(response.getId()).isEqualTo(testRequestId);
+
+      verify(leaveRequestRepository).findById(testRequestId);
+    }
+
+    @Test
+    @DisplayName("throw exception when leave request not found")
+    void throwExceptionWhenLeaveRequestNotFound() {
+
+      when(leaveRequestRepository.findById(testRequestId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> leaveRequestService.getLeaveRequestById(testRequestId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("Leave request not found");
+    }
+  }
+
+  @Nested
+  @DisplayName("Get Requests By Status Tests")
+  class GetRequestsByStatusTests {
+
+    @Test
+    @DisplayName("developer can view their own requests by status")
+    void developerCanViewOwnRequestsByStatus() {
+
+      // ARRANGE: setup as developer
+      LeaveRequest leaveRequest = createTestLeaveRequest();
+      List<LeaveRequest> leaveRequests = List.of(leaveRequest);
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(leaveRequestRepository.findByWorkspaceMemberIdAndStatus(
+              testWorkspaceMemberId, "PENDING"))
+          .thenReturn(leaveRequests);
+
+      // ACT: get requests by status
+      List<LeaveRequestResponse> responses = leaveRequestService.getRequestsByStatus("PENDING");
+
+      // ASSERT: verify the responses
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(1);
+      assertThat(responses.get(0).getStatus()).isEqualTo("PENDING");
+
+      verify(leaveRequestRepository)
+          .findByWorkspaceMemberIdAndStatus(testWorkspaceMemberId, "PENDING");
+    }
+  }
 }
