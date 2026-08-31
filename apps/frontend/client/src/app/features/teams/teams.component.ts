@@ -141,4 +141,18 @@ protected addToWorkspace(member: TeamMember): void {
     error: (error) => this.actionMessage = error.error?.message ?? 'Could not add this to the workspace.'
   });
 }
+
+protected assignToProject(): void {
+  const member = this.selectedMember;
+  if (!member?.workspaceMemberId || !this.selectedProjectid) return;
+
+  this.teamService.addToProject(this.selectedProjectId, member.workspaceMemberId, this.assignAsProjectManager).subscribe({
+    next: () => {
+      this.actionMessage = `${member.firstName} has been assigned to the project.`;
+      this.closeAssignment();
+      this.laodTeam();
+    },
+    error: (error) => this.actionMessage = error.error?.message ?? 'Could not assign member to the project.',
+  })
+}
 }
