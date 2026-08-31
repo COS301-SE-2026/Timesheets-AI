@@ -3,6 +3,7 @@ package timesheets.integration.calendar.google;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -22,8 +23,6 @@ import timesheets.domain.IntegrationToken;
 import timesheets.integration.calendar.CalendarAdapter;
 import timesheets.integration.calendar.CalendarEvent;
 import timesheets.repository.IntegrationTokenRepository;
-import com.google.api.services.calendar.model.Event;
-import java.util.ArrayList;
 
 @Component
 @RequiredArgsConstructor
@@ -82,10 +81,10 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
     // making the request to get collection of calendar events and it is stored Events event
     // insert try and catch because request() might fail
 
-    Events events; 
+    Events events;
 
     try {
-          events =
+      events =
           calendarService
               .events()
               .list("primary")
@@ -105,13 +104,32 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
     // for returning, convert to match CalendarEvent expected vars
     List<Event> googleEvents = events.getItems();
 
-  // conversion
+    // conversion
     List<CalendarEvent> calendarEvents = new ArrayList<>();
 
-    for (Event googleEvent : googleEvents){
+    for (Event googleEvent : googleEvents) {
       CalendarEvent calendarEvent = new CalendarEvent();
+
       calendarEvent.setTitle(googleEvent.getSummary());
       calendarEvent.setExternalEventId(googleEvent.getId());
+
+      // The times is stored differently in Google
+      // google stores as googlevent - getStart() and getEnd(): EventDateTime objects
+      // I am using LocalDateTime
+
+      LocalDateTime eventStartTime =
+          LocalDateTime.ofInstant(
+              java.time.Instant.ofEpochMilli(googleEvent.getStart().getDateTime().getValue()),
+              ZoneId.systemDefault());
+
+      LocalDateTime eventEndTime =
+          LocalDateTime.ofInstant(
+              java.time.Instant.ofEpochMilli(googleEvent.getEnd().getDateTime().getValue()),
+              ZoneId.systemDefault());
+
+      calendarEvent.setStartTime(eventStartTime);
+      calendarEvent.setEndTime(eventEndTime);
+
       calendarEvents.add(calendarEvent);
     }
 
