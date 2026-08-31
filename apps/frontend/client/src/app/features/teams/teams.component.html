@@ -11,4 +11,39 @@
             </button>
         }
     </header>
+
+@if (errorMessage) {
+    <div class="notice notice--error" role="alert">{{ errorMessage }}</div>
+}
+@if (actionMessage) {
+    <div class="notice notice--error" role="status">{{ actionMessage }}</div>
+}
+
+@if (loading) {
+    <div class="page-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading team... </div>
+} @else {
+    <section class="stats-grid" aria-label="Team overview">
+        <article><span class="stat-icon blue"><i class="fa-solid fa-user"></i></span>
+            <div><span>Workspace members</span><strong>{{ workspaceMembers.length }}</strong></div>
+        </article>
+        @if (isAdmin) {
+            <article>
+                <div>
+                <span> Waiting room </span>
+                <strong> {{ waitingUsers.length }}</strong>
+                </div>
+            </article>
+        }
+        <article>
+            <span class="stat-icon green">
+                <i class="fa-solid fa-folder-open"></i>
+            </span>
+            <div>
+                <span>Projects</span>
+                <strong>{{ projects.length }}</strong>
+            </div>
+        </article>
+    </section>
+}
+
 </section>
