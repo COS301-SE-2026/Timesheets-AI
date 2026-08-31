@@ -66,3 +66,49 @@ h1 {
     font-size: var(--font-size-caption);
     padding: var(--space-2) var(--space-3);
 }
+
+// Stat cards styling
+
+.stats-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: var(--space-6);
+}
+
+.stat-grid article {
+    align-items: center;
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-container);
+    display: flex;
+    gap: var(--space-4);
+    padding: var(--space-6);
+}
+
+.stats-grid span:not(.stat-icon) {
+    color: var(--color-text-muted);
+    display: block;
+    font-size: var(--font-size-body);
+}
+
+.stats-grid strong {
+    color: var(--color-text-body);
+    display: block;
+    font-size: var(--font-size-h1);
+    margin-top: var(--space-1);
+}
+
+.stat-icon {
+    align-items: center;
+    border-radius: var(--radius-card);
+    display: flex;
+    font-size: var(--font-size-h2);
+    height: 56px;
+    justify-content: center;
+    width: 56px;
+}
+
+
+
+
