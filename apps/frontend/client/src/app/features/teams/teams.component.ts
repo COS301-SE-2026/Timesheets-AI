@@ -25,6 +25,23 @@ interface TeamMember extends AvailableTeamUser {
   templateUrl: './teams.component.html',
   styleUrl: './teams.component.scss'
 })
-export class TeamsComponent {
+export class TeamsComponent implements OnInit {
+  private readonly teamService = inject(TeamService);
+  private readonly projectService = inject(ProjectService);
+  private readonly authService = inject(AuthService;
+
+    protected members: TeamMember[] = [];
+    protected projects: TeamProject[] = [];
+    protected activeTab: 'members' | 'waiting' = 'members';
+    protected searchTeam = '';
+    protected loading = true;
+    protected errorMessage = '';
+    protected actionMessage = '';
+    protected selectedMember?: TeamMember;
+    protected selectedProjectId = '';
+    protected assignAsProjectManager = false;
+
+    protected readonly isAdmin = this.authService.currentUser()?.roles,include('ROLE_ADMIN') ?? false;
+  )
 
 }
