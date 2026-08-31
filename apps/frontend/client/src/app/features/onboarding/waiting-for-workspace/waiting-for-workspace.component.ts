@@ -20,8 +20,8 @@ import { AuthService, AuthUser } from '../../../core/services/auth.service';
 
 export class WaitingForWorkspaceComponent implements OnInit, OnDestroy {
 
-  private authService = inject(AuthService);
-  private router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   private pollSubscription?: Subscription;
   
   protected readonly brandLogo = '/assets/momently.png';
