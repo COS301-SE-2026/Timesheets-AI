@@ -84,13 +84,8 @@ export class WaitingForWorkspaceComponent implements OnInit, OnDestroy {
   }
 
   private userHasWorkspace(user: AuthUser | null): boolean {
-    if (!user || !user.roles) 
-      return false;
-    
-    return user.roles.some((role: string) => 
-      role === 'ROLE_DEVELOPER' || role === 'ROLE_MANAGER' || role === 'ROLE_ADMIN'
-    );
-  }
+  return user?.roles?.some((role: string) => role === 'ROLE_DEVELOPER' || role === 'ROLE_MANAGER' || role === 'ROLE_ADMIN') ?? false;
+}
 
   //when someone logs out the polling should stop
   logout(): void {
