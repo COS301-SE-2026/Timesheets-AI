@@ -1,5 +1,8 @@
 package timesheets.integration.calendar.google;
 
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.calendar.Calendar;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -61,6 +64,13 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
     GoogleCredentials credentials = GoogleCredentials.create(googleAccessToken);
 
     HttpCredentialsAdapter requestInitializer = new HttpCredentialsAdapter(credentials);
+
+    // To get the user's calendar events
+    Calendar calendarService =
+        new Calendar.Builder(
+                new NetHttpTransport(), GsonFactory.getDefaultInstance(), requestInitializer)
+            .setApplicationName("Momently")
+            .build();
 
     return Collections.emptyList();
   }
