@@ -83,7 +83,39 @@
                     <span>Actions</span>
                 </div>
                 @for (member of visibleUsers; track member.userId) {
-                
+                <article class="member-cell" row="row">
+                    <div class="member-cell">
+                        <span class="avatar">{{ initials(member) }}</span>
+                        <strong>{{ member.firstName }} {{ member.lastName }}</strong>
+                    </div>
+                    <span class="email">{{ member.email }}</span>
+                    <div classs="project-cell">
+                        @if (activeTab === 'members' && projectNames(member).length) {
+                            @for (project of projectNames(member); track project) {
+                                <span class="project-chip"> {{ project }}</span>
+                            }
+                        } @else if (activeTab === 'members') {
+                            <span class="muted">No projects</span>
+                        }@else {
+                            <span class="waiting-badge">Waiting approval</span>
+                        }
+                    </div>
+                    <div class="actions">
+                        @if (activeTab === 'waiting') {
+                            <button type="button" class="primary-button small" (click)="addToWorkspace(member)">Add to workspace</button>
+                        } @else {
+                            <button type="button" class="text-button" (click)="openAssignment(member)"
+                            [disabled]="!member.workspaceMemberId ? '' : 'The current API does not return this member\'s workspace membership IDnuntil they belong to a project.'">Manage projects
+                            </button>
+                            @for (projectId of member.project; track projectId) {
+                               <button type="button" class="icon-button" (click)="removeFromProject(member, projectId)"
+                               [attr.aria-label]="'Remove ' + member.firstName + ' from project" title="Remove form project">
+                               <i class="fa-solid fa-xmark"></i>
+                               </button>
+                            }
+                        }
+                    </div>
+                </article>
                 }
             </div>
         }
