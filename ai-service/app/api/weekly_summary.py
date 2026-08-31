@@ -22,13 +22,15 @@ router = APIRouter(prefix="/insights/weekly-summary", tags=["Weekly Summary"])
 @router.post(
     "/{subject_id}/generate",
     response_model=WeeklySummaryResponse,
+    responses={400: {"description": "subject_type must be USER or TEAM"}},
     responses={404: {"description": "Task not found or deleted"}},
+    responses={502: {"description": "Gemini call failed after all retries"}},
 )
 def generate_and_save(
     subject_id: uuid.UUID,
     db: Annotated[Session, Depends(get_db)],
-    subject_type: str = Query(..., description="USER or TEAM"),
-    week_start: date = Query(..., description="Start of the week (Monday)"),
+    subject_type: Annotated[str, Query(..., description="USER or TEAM")],
+    week_start: Annotated[date, Query(..., description="Start of the week (Monday)")],
 ):
     if subject_type not in ("USER", "TEAM"):
         raise HTTPException(status_code=400, detail="subject_type must be USER or TEAM")
