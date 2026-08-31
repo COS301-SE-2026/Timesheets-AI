@@ -1,5 +1,9 @@
 package timesheets.service;
 
+import exception.AccessDeniedException;
+import exception.BadRequestException;
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +42,7 @@ public class TaskService {
 
     // checks if user has access to that project
     if (!userHasAccessToProject(projectId, workspaceMemberId)) {
-      throw new RuntimeException("You don't have access to  this project");
+      throw new AccessDeniedException("You don't have access to  this project");
     }
 
     List<Task> tasks = taskRepository.findByProjectIdAndIsDeletedFalse(projectId);
@@ -64,11 +68,11 @@ public class TaskService {
 
     // checks if the task has been deleted
     if (Boolean.TRUE.equals(task.getIsDeleted())) {
-      throw new RuntimeException("Task has been deleted");
+      throw new ResourceNotFoundException("Task has been deleted");
     }
 
     if (!userHasAccessToProject(task.getProjectId(), workspaceMemberId)) {
-      throw new RuntimeException("You do not have access to this task");
+      throw new AccessDeniedException("You do not have access to this task");
     }
 
     String projectName =
@@ -80,11 +84,11 @@ public class TaskService {
   }
 
   // this gets the task by the id - internal entity
-  @Transactional
+  @Transactional(readOnly = true)
   public Task getTaskById(UUID taskId) {
     return taskRepository
         .findById(taskId)
-        .orElseThrow(() -> new RuntimeException("Task not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Task not found"));
   }
 
   @Transactional(readOnly = true)
@@ -111,19 +115,20 @@ public class TaskService {
   public TaskResponse createTask(CreateTaskRequest request, UUID workspaceMemberId) {
     UUID projectId = request.getProjectId();
 
-    // to verify that the user has access to that project
+    // to verify that the user has access to create tasks on the project
     if (!userHasAccessToProject(projectId, workspaceMemberId)) {
-      throw new RuntimeException("You don't have access to this project");
+      throw new AccessDeniedException("You don't have permission to create tasks on this project");
     }
 
     // to verify that the project exists and is not archived
     Project project =
         projectRepository
             .findById(projectId)
-            .orElseThrow(() -> new RuntimeException("Project not found"));
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Project not found with id: " + projectId));
 
     if ("ARCHIVED".equals(project.getStatus())) {
-      throw new RuntimeException("Cannot create tasks on an archived project");
+      throw new StateConflictException("Cannot create tasks on an archived project");
     }
 
     // checking if the user can assign tasks to others
@@ -145,10 +150,13 @@ public class TaskService {
       Task parentTask =
           taskRepository
               .findById(request.getParentTaskId())
-              .orElseThrow(() -> new RuntimeException("Parent task not found"));
+              .orElseThrow(
+                  () ->
+                      new ResourceNotFoundException(
+                          "Parent task not found with id: " + request.getParentTaskId()));
 
       if (!parentTask.getProjectId().equals(projectId)) {
-        throw new RuntimeException("Parent task does not belong to this project");
+        throw new BadRequestException("Parent task does not belong to this project");
       }
     }
 

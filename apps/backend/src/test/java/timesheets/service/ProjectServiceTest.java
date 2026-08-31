@@ -1,10 +1,16 @@
 package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import exception.AccessDeniedException;
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,7 +32,9 @@ import timesheets.domain.TimeEntry;
 import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateProjectRequest;
+import timesheets.dto.request.UpdateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
+import timesheets.dto.response.ProjectMemberResponse;
 import timesheets.dto.response.ProjectResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
@@ -94,6 +102,19 @@ public class ProjectServiceTest {
     return member;
   }
 
+  private Project createArchivedProject() {
+    Project project = createTestProject();
+    project.setStatus("ARCHIVED");
+    return project;
+  }
+
+  private Project createDeletedProject() {
+    Project project = createTestProject();
+    project.setIsDeleted(true);
+    project.setDeletedAt(LocalDateTime.now());
+    return project;
+  }
+
   private CreateProjectRequest createValidCreateProjectRequest() {
     CreateProjectRequest request = new CreateProjectRequest();
     request.setName(testProjectName);
@@ -103,6 +124,18 @@ public class ProjectServiceTest {
     request.setStartDate(LocalDate.now());
     request.setEndDate(LocalDate.now().plusMonths(1));
     request.setManagerIds(List.of());
+    return request;
+  }
+
+  private UpdateProjectRequest createValidUpdateProjectRequest() {
+    UpdateProjectRequest request = new UpdateProjectRequest();
+    request.setName("Updated Project Name");
+    request.setDescription("Updated Description");
+    request.setBudgetHours(BigDecimal.valueOf(200));
+    request.setHourlyRate(BigDecimal.valueOf(75));
+    request.setStartDate(LocalDate.now().plusDays(1));
+    request.setEndDate(LocalDate.now().plusMonths(2));
+    request.setBudgetCost(BigDecimal.valueOf(15000));
     return request;
   }
 
@@ -166,6 +199,78 @@ public class ProjectServiceTest {
     }
 
     @Test
+    @DisplayName("return workspace projects for manager")
+    void returnWorkspaceProjectsForManager() {
+      Project project = createTestProject();
+      List<Project> projects = List.of(project);
+
+      when(securityUtils.isManager()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
+      when(projectRepository.findByWorkspaceIdAndIsDeletedFalse(testWorkspaceId))
+          .thenReturn(projects);
+
+      List<ProjectResponse> responses =
+          projectService.getProjectsForUser(testWorkspaceMemberId, false, true);
+
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(1);
+      assertThat(responses.get(0).getName()).isEqualTo(testProjectName);
+      assertThat(responses.get(0).getBudgetHours()).isEqualTo(testBudgetHours);
+      assertThat(responses.get(0).getHourlyRate()).isEqualTo(testHourlyRate);
+      assertThat(responses.get(0).getBudgetCost()).isEqualTo(testBudgetCost);
+
+      verify(projectRepository).findByWorkspaceIdAndIsDeletedFalse(testWorkspaceId);
+    }
+
+    @Test
+    @DisplayName("return assigned projects for developer")
+    void returnAssignedProjectsForDeveloper() {
+      Project project = createTestProject();
+      List<Project> projects = List.of(project);
+      ProjectMember projectMember = createTestProjectMember();
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(projectMemberRepository.findByWorkspaceMemberId(testWorkspaceMemberId))
+          .thenReturn(List.of(projectMember));
+      when(projectRepository.findAllById(List.of(testProjectId))).thenReturn(projects);
+
+      List<ProjectResponse> responses =
+          projectService.getProjectsForUser(testWorkspaceMemberId, false, false);
+
+      assertThat(responses).isNotNull();
+      assertThat(responses).hasSize(1);
+      assertThat(responses.get(0).getName()).isEqualTo(testProjectName);
+
+      // developer should not see the cost info
+      assertThat(responses.get(0).getBudgetCost()).isNull();
+
+      verify(projectRepository).findAllById(List.of(testProjectId));
+    }
+
+    @Test
+    @DisplayName("return empty list when developer has no assigned projects")
+    void returnEmptyListWhenDeveloperHasNoProjects() {
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(projectMemberRepository.findByWorkspaceMemberId(testWorkspaceMemberId))
+          .thenReturn(List.of());
+
+      List<ProjectResponse> responses =
+          projectService.getProjectsForUser(testWorkspaceMemberId, false, false);
+
+      assertThat(responses).isNotNull();
+      assertThat(responses).isEmpty();
+
+      verify(projectRepository, never()).findAllById(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("Create Projects Tests")
+  class CreateProjectsTests {
+
+    @Test
     @DisplayName("create project successfully")
     void createProject() {
 
@@ -174,6 +279,10 @@ public class ProjectServiceTest {
 
       // simulates what the project returns from DB
       Project savedProject = createTestProject();
+
+      // specifying that the user is an admin
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.isManager()).thenReturn(false);
 
       when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
@@ -201,6 +310,106 @@ public class ProjectServiceTest {
       assertThat(response.getBudgetCost()).isEqualTo(testBudgetCost);
 
       verify(projectRepository).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when non-admin tries to create project")
+    void throwExceptionWhenNonAdminCreatesProject() {
+      CreateProjectRequest request = createValidCreateProjectRequest();
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+
+      assertThatThrownBy(() -> projectService.createProject(request, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins can create projects");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("assign project managers when provided")
+    void assignProjectManagersWhenProvided() {
+
+      CreateProjectRequest request = createValidCreateProjectRequest();
+      request.setManagerIds(List.of(testWorkspaceMemberId));
+
+      Project savedProject = createTestProject();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
+      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestWorkspaceMember()));
+
+      when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestProjectMember()));
+
+      ProjectResponse response = projectService.createProject(request, testWorkspaceMemberId);
+
+      assertThat(response).isNotNull();
+      verify(projectMemberRepository, times(1)).save(any(ProjectMember.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Delete Project Tests")
+  class DeleteProjectTests {
+    @Test
+    @DisplayName("delete project successfully")
+    void deleteProjectSuccessfully() {
+      Project project = createTestProject();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(projectRepository.save(any(Project.class))).thenReturn(project);
+
+      projectService.deleteProject(testProjectId, testWorkspaceMemberId);
+
+      assertThat(project.getIsDeleted()).isTrue();
+      assertThat(project.getDeletedAt()).isNotNull();
+      verify(projectRepository).save(project);
+    }
+
+    @Test
+    @DisplayName("throw exception when non-admin tries to delete project")
+    void throwExceptionWhenNonAdminDeletesProject() {
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+
+      assertThatThrownBy(() -> projectService.deleteProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins can delete projects");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when deleting already deleted project")
+    void throwExceptionWhenDeletingDeletedProject() {
+
+      Project deletedProject = createDeletedProject();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(deletedProject));
+
+      assertThatThrownBy(() -> projectService.deleteProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Project is already deleted");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when project not found for deletion")
+    void throwExceptionWhenProjectNotFoundForDelete() {
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> projectService.deleteProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessageContaining("Project not found with id: " + testProjectId);
     }
   }
 
@@ -255,6 +464,37 @@ public class ProjectServiceTest {
 
       verify(projectRepository).findById(testProjectId);
     }
+
+    @Test
+    @DisplayName("throw exception when user has no access to project")
+    void throwExceptionWhenUserHasNoAccessToProject() {
+
+      Project project = createTestProject();
+
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(false);
+
+      assertThatThrownBy(
+              () -> projectService.getProjectDetail(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("No access to this project");
+    }
+
+    @Test
+    @DisplayName("throw exception when project not found")
+    void throwExceptionWhenProjectNotFoundForDetail() {
+
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(
+              () -> projectService.getProjectDetail(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessageContaining("Project not found with id: " + testProjectId);
+    }
   }
 
   @Nested
@@ -271,6 +511,10 @@ public class ProjectServiceTest {
 
       Project savedProject = createTestProject();
 
+      // specifying that the user is an admin
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.isManager()).thenReturn(false);
+
       when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(projectRepository.save(any(Project.class))).thenReturn(savedProject);
       when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
@@ -284,6 +528,307 @@ public class ProjectServiceTest {
       assertThat(response).isNotNull();
 
       verify(projectRepository).save(any(Project.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Update Project Tests")
+  class UpdateProjectTests {
+
+    @Test
+    @DisplayName("update project successfully as admin")
+    void updateProjectSuccessfully() {
+
+      Project project = createTestProject();
+      UpdateProjectRequest request = createValidUpdateProjectRequest();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(projectRepository.save(any(Project.class))).thenReturn(project);
+
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestProjectMember()));
+
+      ProjectResponse response =
+          projectService.updateProject(testProjectId, request, testWorkspaceMemberId);
+
+      assertThat(response).isNotNull();
+      assertThat(response.getName()).isEqualTo("Updated Project Name");
+
+      verify(projectRepository).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when developer tries to update project")
+    void throwExceptionWhenDeveloperUpdatesProject() {
+      UpdateProjectRequest request = createValidUpdateProjectRequest();
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(createTestProject()));
+
+      assertThatThrownBy(
+              () -> projectService.updateProject(testProjectId, request, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins, Managers, and Project Managers can update projects");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when updating archived project")
+    void throwExceptionWhenUpdatingArchivedProject() {
+      Project archivedProject = createArchivedProject();
+      UpdateProjectRequest request = createValidUpdateProjectRequest();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(archivedProject));
+
+      assertThatThrownBy(
+              () -> projectService.updateProject(testProjectId, request, testWorkspaceMemberId))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Cannot update an archived project");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when project not found")
+    void throwExceptionWhenProjectNotFound() {
+      UpdateProjectRequest request = createValidUpdateProjectRequest();
+
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(
+              () -> projectService.updateProject(testProjectId, request, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessageContaining("Project not found with id: " + testProjectId);
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("Archive Project Tests")
+  class ArchiveProjectTests {
+
+    @Test
+    @DisplayName("archive project successfully")
+    void archiveProjectSuccessfully() {
+
+      Project project = createTestProject();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(projectRepository.save(any(Project.class))).thenReturn(project);
+
+      projectService.archiveProject(testProjectId, testWorkspaceMemberId);
+
+      assertThat(project.getStatus()).isEqualTo("ARCHIVED");
+      verify(projectRepository).save(project);
+    }
+
+    @Test
+    @DisplayName("throw exception when non-admin tries to archive project")
+    void throwExceptionWhenNonAdminArchivesProject() {
+      when(securityUtils.isAdmin()).thenReturn(false);
+
+      assertThatThrownBy(() -> projectService.archiveProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Only Admins can archive projects");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when archiving already archived project")
+    void throwExceptionWhenArchivingArchivedProject() {
+      Project archivedProject = createArchivedProject();
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(archivedProject));
+
+      assertThatThrownBy(() -> projectService.archiveProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Project is already archived");
+
+      verify(projectRepository, never()).save(any(Project.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when project not found for archiving")
+    void throwExceptionWhenProjectNotFoundForArchive() {
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> projectService.archiveProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessageContaining("Project not found with id: " + testProjectId);
+    }
+  }
+
+  @Nested
+  @DisplayName("Remove Member From Project Tests")
+  class RemoveMemberFromProjectTests {
+
+    @Test
+    @DisplayName("remove member from project successfully")
+    void removeMemberFromProject() {
+
+      ProjectMember projectMember = createTestProjectMember();
+      projectMember.setIsActive(true);
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.existsById(testProjectId)).thenReturn(true);
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(projectMember));
+
+      projectService.removeMemberFromProject(testProjectId, testWorkspaceMemberId);
+
+      assertThat(projectMember.getIsActive()).isFalse();
+      assertThat(projectMember.getUpdatedAt()).isNotNull();
+
+      verify(projectMemberRepository).save(projectMember);
+    }
+
+    @Test
+    @DisplayName("throw exception when project not found")
+    void throwExceptionWhenProjectNotFoundForRemoval() {
+
+      when(projectRepository.existsById(testProjectId)).thenReturn(false);
+
+      assertThatThrownBy(
+              () -> projectService.removeMemberFromProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("Project not found");
+    }
+
+    @Test
+    @DisplayName("throw exception when unauthorized user tries to remove")
+    void throwExceptionWhenUnauthorizedUserRemoves() {
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.existsById(testProjectId)).thenReturn(true);
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.of(createTestProjectMember())); // not a project manager
+
+      assertThatThrownBy(
+              () -> projectService.removeMemberFromProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage(
+              "Only Admins and Managers and Project Managers can remove members from projects");
+    }
+
+    @Test
+    @DisplayName("throw exception when member not found on project")
+    void throwExceptionWhenMemberNotFound() {
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.existsById(testProjectId)).thenReturn(true);
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(Optional.empty());
+
+      assertThatThrownBy(
+              () -> projectService.removeMemberFromProject(testProjectId, testWorkspaceMemberId))
+          .isInstanceOf(ResourceNotFoundException.class)
+          .hasMessage("Member not found on this project");
+    }
+  }
+
+  @Nested
+  @DisplayName("Assign Member To Project Tests")
+  class AssignMemberToProjectTests {
+
+    @Test
+    @DisplayName("assign member to project successfully")
+    void assignMemberToProject() {
+
+      Project project = createTestProject();
+      WorkspaceMember workspaceMember = createTestWorkspaceMember();
+      User user = createTestUser();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+
+      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+      when(securityUtils.isAdmin()).thenReturn(true);
+
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(false);
+      when(projectMemberRepository.save(any(ProjectMember.class)))
+          .thenReturn(createTestProjectMember());
+      when(userRepository.findById(testUserId)).thenReturn(Optional.of(user));
+
+      ProjectMemberResponse response =
+          projectService.assignMemberToProject(testProjectId, testWorkspaceMemberId, false);
+
+      assertThat(response).isNotNull();
+      assertThat(response.getFirstName()).isEqualTo("Test");
+      assertThat(response.getLastName()).isEqualTo("User");
+      assertThat(response.getIsProjectManager()).isFalse();
+
+      verify(projectMemberRepository).save(any(ProjectMember.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when member already assigned to project")
+    void throwExceptionWhenMemberAlreadyAssigned() {
+
+      Project project = createTestProject();
+      WorkspaceMember workspaceMember = createTestWorkspaceMember();
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+
+      when(securityUtils.isAdmin()).thenReturn(true);
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+              testProjectId, testWorkspaceMemberId))
+          .thenReturn(true);
+
+      assertThatThrownBy(
+              () ->
+                  projectService.assignMemberToProject(testProjectId, testWorkspaceMemberId, false))
+          .isInstanceOf(StateConflictException.class)
+          .hasMessage("Member is already assigned to this project");
+
+      verify(projectMemberRepository, never()).save(any(ProjectMember.class));
+    }
+
+    @Test
+    @DisplayName("throw exception when member does not belong to project workspace")
+    void throwExceptionWhenMemberNotInWorkspace() {
+
+      Project project = createTestProject();
+      WorkspaceMember workspaceMember = createTestWorkspaceMember();
+      workspaceMember.setWorkspaceId(UUID.randomUUID()); // Different workspace
+
+      when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(testWorkspaceMemberId);
+      when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
+      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+
+      assertThatThrownBy(
+              () ->
+                  projectService.assignMemberToProject(testProjectId, testWorkspaceMemberId, false))
+          .isInstanceOf(AccessDeniedException.class)
+          .hasMessage("Member does not belong to the project's workspace");
+
+      verify(projectMemberRepository, never()).save(any(ProjectMember.class));
     }
   }
 }
