@@ -72,7 +72,9 @@ public class AuthService {
   @Value("${app.google.client-id}")
   private String googleClientId;
 
-  private static final String[] ACCEPTED_DOMAINS = {"momentum.co.za", "momentum.com", "gmail.com"};
+  private static final String[] ACCEPTED_DOMAINS = {
+    "momentum.co.za", "momentum.com", "gmail.com", "cs.up.ac.za", "outlook.com"
+  };
   private static final int MAX_LOGIN_ATTEMPTS = 5;
   private static final String ISSUER = "Timesheets AI";
 
