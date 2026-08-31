@@ -59,7 +59,7 @@ $calendar-red-text: #dc2626;
     // THE CONNECTION PILL AND SYNCING AREA
     .header-actions{
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         -webkit-font-smoothing: antialiased;
         align-items: center;
         gap: 12px;
