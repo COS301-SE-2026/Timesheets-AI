@@ -24,7 +24,7 @@ export class WaitingForWorkspaceComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private pollSubscription?: Subscription;
   
-  protected brandLogo = '/assets/momently.png';
+  protected readonly brandLogo = '/assets/momently.png';
 
   //this will be checking if a workspace is currently in progress
   protected checking = false;
