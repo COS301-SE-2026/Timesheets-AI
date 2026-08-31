@@ -1,46 +1,49 @@
 /**
  * Author: Kgaugelo Matsena & Lerato Sibanda
  * Date: 2026-05-19
- * Purpose: Display weekly timesheets overview with task breakdown and totals.
- * Related Requirement: -
+ * Purpose: Weekly timesheets + mnager review/approve/reject flow
+ * Related Requirement: UC3, UC7
  *
  * Patched: Zamokuhle Zwane, 25/07/2026
  * Patched: Zamokuhle Zwane, 03/08/2026
  * i fixed errors with the total duration and daily totals, they were showing up as 0hr 0m even when there were entries
  * I fixed the logic to calculate the totals correctly
+ * Patched: Lerato Sibanda, 18/08/2026 - manager review Timesheets tab + modal
  */
 
 import { Component, computed, inject, signal } from '@angular/core';
-import {
-  TimeEntryService,
-  TimeEntryResponse,
-} from '../../core/services/time-entry.service';
 import {
   TimesheetService,
   TimesheetResponse,
 } from '../../core/services/timesheet.service';
 import {
   ProjectService,
+  ProjectMemberInfo,
   ProjectResponse,
 } from '../../core/services/project.service';
 import { TaskService, TaskResponse } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import {forkJoin, Observable, of, catchError, tap} from 'rxjs';
+import { Router, RouterLink } from '@angular/router';
+import {forkJoin, Observable, of, catchError, tap, map, switchMap } from 'rxjs';
+import { TimeEntryResponse } from '../../core/services/time-entry.service';
 
 type StatusFilter = 'ALL' | TimesheetStatus;
+type ReviewStatusFilter = 'ALL' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
+type PageTab = 'mine' | 'review';
 type UiState = 'idle' | 'loading' | 'error' | 'empty';
+type TimesheetStatus = TimesheetResponse['status'];
 
 //types
 export interface Day {
   label: string; //Mon, Jul 21
+  shortLabel: string;
   dateStr: string;
   isToday?: boolean;
 }
-type TimesheetStatus = TimesheetResponse['status'];
 interface TimesheetSummary {
   id: string;
+  workspaceMemberId: string;
   status: TimesheetStatus;
   isLocked: boolean;
   periodStart: string;
@@ -60,6 +63,7 @@ interface TimesheetWeekView {
   tasks: TaskRow[];
   dailyTotals: string[];
   grandTotal: string;
+  grandTotalShort: string;
 }
 
 interface TaskRow {
@@ -69,7 +73,29 @@ interface TaskRow {
   iconClass: string;
   colorCode: string;
   loggedHours: string[]; //7 entries
+  loggedHoursShort: string[];
   total: string;
+  totalShort: string;
+}
+
+interface MemberInfo {
+  name: string;
+  role: string;
+  initials: string;
+  avatarColor: string;
+}
+
+interface ReviewRow {
+  summary: TimesheetSummary;
+  employeeName: string;
+  employeeRole: string;
+  initials: string;
+  avatarColor: string;
+  totalHours: string;
+  days: Day[];
+  tasks: TaskRow[];
+  dailyTotals: string[];
+  grandTotalShort: string;
 }
 
 const TASK_STYLE_PALETTE: { iconClass: string; colorCode: string }[] = [
@@ -81,8 +107,16 @@ const TASK_STYLE_PALETTE: { iconClass: string; colorCode: string }[] = [
   { iconClass: 'fa-solid fa-gear', colorCode: '#6BA5E7' },
 ];
 
+const AVATAR_COLORS = [
+  '#0F4C91',
+  '#2A9D8F',
+  '#E07830',
+  '#7C8CF8',
+  '#C45C8A',
+];
+
 //tiny string hash, good enough for picking a stable palette index
-function hashTaskId(id: string): number {
+function hashId(id: string): number {
   let hash = 0;
   for (let i = 0; i < id.length; i++) {
     hash = (hash << 5) - hash + id.codePointAt(i)!;
@@ -99,24 +133,35 @@ function hashTaskId(id: string): number {
   styleUrl: './timesheets.component.scss',
 })
 export class TimesheetsComponent {
-  private readonly timeEntryService = inject(TimeEntryService);
   private readonly timesheetService = inject(TimesheetService);
   private readonly projectService = inject(ProjectService);
   private readonly taskService = inject(TaskService);
+  private readonly router = inject(Router);
 
   // INTEGRATION : Set from auth/session
   // Managers see Approve / Reject when status is submitted
 
   private readonly authService = inject(AuthService);
-  readonly isManager = computed(
-    () => this.authService.currentUser()?.roles?.includes('MANAGER') ?? false,
-  );
+
+  readonly isManager = computed(() => {
+    const roles = this.authService.currentUser()?.roles ?? [];
+    return roles.some(
+      (role) =>
+        role === 'MANAGER' ||
+        role === 'ROLE_MANAGER' ||
+        role === 'ADMIN' ||
+        role === 'ROLE_ADMIN',
+    );
+  });
 
   //  INTEGRATION: Replace with GET /api/timesheets/me (or filtered status endpoints)
+  readonly pageTab = signal<PageTab>('mine');
   private readonly rawProjects = signal<ProjectResponse[]>([]);
   private readonly rawTasks = signal<TaskResponse[]>([]);
+  private readonly memberById = signal<Map<string, MemberInfo>>(new Map());
 
   private readonly allTimesheets = signal<TimesheetWeekView[]>([]);
+  private readonly reviewRows = signal<ReviewRow[]>([]);
 
   readonly statusFilters: StatusFilter[] = [
     'ALL',
@@ -125,19 +170,31 @@ export class TimesheetsComponent {
     'APPROVED',
     'REJECTED',
   ];
+
+  readonly reviewStatusFilters: ReviewStatusFilter[] = [
+    'ALL',
+    'SUBMITTED',
+    'APPROVED',
+    'REJECTED'
+  ];
+
   readonly selectedFilter = signal<StatusFilter>('ALL');
+  readonly reviewFilter = signal<ReviewStatusFilter>('SUBMITTED');
   readonly selectedTimesheetId = signal<string>('');
   readonly uiState = signal<UiState>('idle');
+  readonly reviewUiState = signal<UiState>('idle');
   readonly errorMessage = signal<string | null>(null);
   readonly toastMessage = signal<string | null>(null);
 
-  readonly showRejectDialog = signal(false);
-  readonly rejectReason = signal('');
-
   readonly showSubmitDialog = signal(false);
   readonly showSubmitSuccessDialog = signal(false);
+  readonly showReviewModal = signal(false);
+  readonly reviewTarget = signal<ReviewRow | null>(null);
+  readonly rejectReason = signal('');
+  readonly showRejectReason = signal(false);
 
   readonly actionPending = signal(false);
+  readonly maxRejectLength = 500;
 
   readonly filteredTimesheets = computed(() => {
     const filter = this.selectedFilter();
@@ -148,47 +205,52 @@ export class TimesheetsComponent {
     return list.filter((ts) => ts.summary.status === filter);
   });
 
+  readonly showAllList = computed(() => this.selectedFilter() === 'ALL');
+
+  readonly filteredReviewRows = computed(() => {
+    const filter = this.reviewFilter();
+   return this.reviewRows().filter(
+    (row) => filter === 'ALL' || row.summary.status === filter,
+   );
+  });
+
+  readonly awaitingReviewCount = computed(
+    () =>
+      this.filteredReviewRows().filter((r) => r.summary.status === 'SUBMITTED')
+    .length,
+  );
+
   readonly selectedWeek = computed<TimesheetWeekView | null>(() => {
     const list = this.filteredTimesheets();
-    if (list.length === 0) {
-      return null;
-    }
-    const match = list.find(
-      (ts) => ts.summary.id === this.selectedTimesheetId(),
+    if (list.length === 0) return null;
+    return (
+      list.find((ts) => ts.summary.id === this.selectedTimesheetId()) ?? list[0]
     );
-    return match ?? list[0];
   });
 
-  readonly summary = computed<TimesheetSummary | null>(
-    () => this.selectedWeek()?.summary ?? null,
-  );
+  readonly summary = computed(() => this.selectedWeek()?.summary ?? null);
+  readonly tasks = computed(() => this.selectedWeek()?.tasks ?? []);
 
-  readonly tasks = computed<TaskRow[]>(() => this.selectedWeek()?.tasks ?? []);
   readonly days = computed(() => this.selectedWeek()?.days ?? []);
-  readonly dailyTotals = computed<string[]>(
-    () => this.selectedWeek()?.dailyTotals ?? [],
+  readonly dailyTotals = computed(() => this.selectedWeek()?.dailyTotals ?? []);
+  readonly grandTotal = computed(
+    () => this.selectedWeek()?.grandTotal ?? '0hr 0m',
   );
-  readonly grandTotal = computed<string>(
-    () => this.selectedWeek()?.grandTotal ?? '0h 00m',
-  );
-  readonly hasEntries = computed(() => this.tasks().length > 0);
 
-  readonly weekPickerLabel = computed(() => {
-    const s = this.summary();
-    if (!s) {
-      return 'Select week';
-    }
-    return `Week ${s.weekNumber} . ${s.periodLabel}`;
-  });
+  readonly hasEntries = computed(() => this.tasks().length > 0);
 
   readonly canSubmit = computed(() => {
     const s = this.summary();
-    return !!s && s.status === 'DRAFT' && !s.isLocked;
+    return (
+      !!s &&
+      !s.isLocked && 
+      (s.status === 'DRAFT' || s.status === 'REJECTED')
+    );
   });
 
   readonly canApproveOrReject = computed(() => {
-    const s = this.summary();
-    return this.isManager() && !!s && s.status === 'SUBMITTED';
+    const target = this.reviewTarget();
+    return ( this.isManager() && !!target && target.summary.status === 'SUBMITTED');
   });
 
   readonly isReadOnly = computed(() => {
@@ -199,15 +261,18 @@ export class TimesheetsComponent {
     return s.isLocked || s.status === 'SUBMITTED' || s.status === 'APPROVED';
   });
 
+  readonly rejectReasonCount = computed(() => this.rejectReason().length);
+
   constructor() {
-    // INTEGRATION: Call loadTimesheets() on init once timesheetService exist.
     this.loadTimesheets();
   }
 
-  // INTEGRATION: Replcae body with:
-  // this.uiState.set('loading');
-  // this.timesheetService.getMyTimesheets(this.selectedFilter()).subscribe
-  // Then for the selected id, GET /api/timesheets/{id}/entries and map entries intp task rows (resolve project/task name via project & task APIs)
+  setPageTab(tab: PageTab): void {
+    this.pageTab.set(tab);
+    if (tab === 'review' && this.isManager()) {
+      this.loadReviewQueue();
+    }
+  }
 
   loadTimesheets(): void {
     this.uiState.set('loading');
@@ -239,6 +304,7 @@ export class TimesheetsComponent {
             tasks: [],
             dailyTotals: [],
             grandTotal: '0hr 0m',
+            grandTotalShort: '0.0h',
           })),
         );
 
@@ -269,19 +335,160 @@ export class TimesheetsComponent {
     });
   }
 
+  loadReviewQueue(): void {
+    if(!this.isManager()) return;
+
+    this.reviewUiState.set('loading');
+    this.errorMessage.set(null);
+
+    const filter = this.reviewFilter();
+   const timesheets$ = this.timesheetService.getReviewTimesheets(filter);
+
+    forkJoin({
+      timesheets: timesheets$,
+      projects: this.projectService.getProjects(),
+      tasks: this.taskService.getMyTasks(),
+    })
+    .pipe(switchMap(({ timesheets, projects, tasks }) => {
+      this.rawProjects.set(projects);
+      this.rawTasks.set(tasks);
+      return this.loadMemberDirectory(projects).pipe(
+        map(() => timesheets),
+      );
+    }),
+    switchMap((timesheets:  TimesheetResponse[]) => {
+      const filtered = timesheets.filter((ts: TimesheetResponse) => {
+        const me = this.authService.currentUser();
+        if (!me) return true;
+        const  member = this.memberById().get(ts.workspaceMemberId);
+        if(!member) return true;
+        const myName = `${me.firstName} ${me.lastName}`.trim();
+        return member.name !== myName;
+      });
+
+      if(filtered.length === 0) {
+        return of([] as ReviewRow[]);
+      }
+
+      return forkJoin(
+        filtered.map((ts) => 
+          this.timesheetService.getEntriesForTimesheet(ts.id).pipe(
+            catchError(() => of([] as TimeEntryResponse[])),
+            switchMap((entries) =>
+              this.resolveMissingTasks(entries).pipe(
+                map(() => this.toReviewRow(ts, entries)),
+              ),
+          ),
+      ),
+    ),
+  );
+    }),
+  )
+  .subscribe({
+    next: (rows) => {
+      const sorted = [...rows].sort((a,b) => 
+      (b.summary.submittedAt ?? '').localeCompare(
+        a.summary.submittedAt ?? '',
+      ),);
+      this.reviewRows.set(sorted);
+
+      // if(!this.reviewWeekKey() && sorted.length > 0) {
+      //   const todayStr = this.toIsoDate(new Date());
+      //   const current = sorted.find(
+      //     (r) => 
+      //       r.summary.periodStart <= todayStr &&
+      //     r.summary.periodEnd >= todayStr,
+      //   );
+      //   this.reviewWeekKey.set(
+      //     (current ?? sorted[0]).summary.periodStart,
+      //   );
+      // }
+         this.reviewUiState.set(sorted.length === 0 ? 'empty' : 'idle');
+      },
+      error: () => {
+        this.reviewUiState.set('error');
+          this.errorMessage.set(
+            'Failed to load timesheets for review. Please try again.',
+          );
+      },
+  });
+  }
+
+  private loadMemberDirectory( projects: ProjectResponse[],): Observable<unknown> {
+    const managed = projects.filter(
+      (p) => p.myRole === 'MANAGER' || p.myRole === 'ADMIN',
+    );
+    const targets = managed.length > 0 ? managed : projects;
+    if (targets.length === 0) return of(null);
+
+    return forkJoin(
+      targets.map((p) =>
+      this.projectService.getProjectDetail(p.id).pipe(
+        catchError(() => of(null)),
+      ),),
+    ).pipe(
+      tap((details) => {
+        const map = new Map(this.memberById());
+        for(const detail of details) {
+          if(!detail) continue;
+          for (const member of detail.members) {
+            map.set(member.workspaceMemberId, this.toMemberInfo(member));
+          }
+        }
+        this.memberById.set(map);
+      }),
+    );
+  }
+
+  private toMemberInfo(member: ProjectMemberInfo): MemberInfo{
+    const name = `${member.firstName} ${member.lastName}`.trim() || member.email;
+    return {
+      name,
+      role: member.role,
+      initials: this.initialsFrom(name),
+      avatarColor: AVATAR_COLORS[hashId(member.workspaceMemberId) % AVATAR_COLORS.length],
+    };
+  }
+
+  private toReviewRow(ts: TimesheetResponse, entries: TimeEntryResponse[],): ReviewRow {
+    const summary = this.toSummary(ts);
+    const days = this.buildWeekDays(summary.periodStart);
+    const built = this.buildTaskRows(entries, days);
+    const member = this.memberById().get(ts.workspaceMemberId);
+
+    return {
+      summary,
+      employeeName: member?.name ?? 'Team Member',
+      employeeRole: member?.role ?? 'DEVELOPER',
+      initials: member?.initials ?? '??',
+      avatarColor: member?.avatarColor ?? AVATAR_COLORS[0],
+      totalHours: built.grandTotalShort,
+      days,
+      tasks: built.tasks,
+      dailyTotals: built.dailyTotalsShort,
+      grandTotalShort: built.grandTotalShort,
+    };
+  }
+  
+
   private loadEntriesForWeek(timesheetId: string): void {
     this.timesheetService.getEntriesForTimesheet(timesheetId).subscribe({
       next: (entries) => {
+        // Exclude deleted records before resolving task or deriving visible rows for this timesheet
+        const activeEntries = entries.filter((entry) => !entry.isDeleted);
         //resolve any taskIds missing because it automatically says "Unknown tasks" silently
-        this.resolveMissingTasks(entries).subscribe(() => {
+        this.resolveMissingTasks(activeEntries).subscribe(() => {
           this.allTimesheets.update((list) =>
             list.map((week) => {
               if (week.summary.id !== timesheetId) return week;
-              const { tasks, dailyTotals, grandTotal } = this.buildTaskRows(
-                entries,
-                week.days,
-              );
-              return { ...week, tasks, dailyTotals, grandTotal };
+             const built = this.buildTaskRows(activeEntries, week.days);
+             return {
+              ...week,
+              tasks: built.tasks,
+              dailyTotals: built.dailyTotals,
+              grandTotal: built.grandTotal,
+              grandTotalShort: built.grandTotalShort,
+             };
             }),
           );
         });
@@ -299,7 +506,7 @@ export class TimesheetsComponent {
       new Set(
         entries
         .map((e) => e.taskId)
-        .filter((id): id is string => !!id&& !knownIds.has(id)),
+        .filter((id): id is string => !!id && !knownIds.has(id)),
       ),
     );
 
@@ -308,19 +515,12 @@ export class TimesheetsComponent {
     }
     return forkJoin(
       missingIds.map((id) =>
-        this.taskService.getTaskById(id).pipe(
-          catchError((err) => {
-            console.error(
-            `[TimesheetsComponent] getTaskById failed for missing task ${id}: will display as "Unknown task"`, err,
-          );
-          return of(null); 
-        }),
-        ),
+       this.taskService.getTaskById(id).pipe(catchError(() => of(null))),
       ),
     ).pipe(
       tap((results) => {
         const resolved = results.filter((t): t is TaskResponse => !!t);
-        if(resolved.length > 0){
+        if (resolved.length > 0){
           this.rawTasks.update((list) => [...list, ...resolved]);
         }
       }),
@@ -330,27 +530,29 @@ export class TimesheetsComponent {
   private buildTaskRows(
     entries: TimeEntryResponse[],
     days: Day[],
-  ): { tasks: TaskRow[]; dailyTotals: string[]; grandTotal: string } {
+  ): {
+    tasks: TaskRow[];
+    dailyTotals: string[];
+    dailyTotalsShort: string[];
+    grandTotal: string;
+    grandTotalShort: string;
+  } {
     const tasksById = new Map(this.rawTasks().map((t) => [t.id, t]));
     const projectById = new Map(this.rawProjects().map((p) => [p.id, p.name]));
     const secondsByGroup = new Map<string, number[]>();
     const dayTotals = new Array(days.length).fill(0);
-    console.log('[TimesheetsComponent] buildTaskRows received', entries.length, 'entries');
     
     const NO_TASK_KEY = '__no_task__';
    
     for (const entry of entries) {
+      // avoid restoring deleted rows
+      if(entry.isDeleted) continue;
       const dayIndex = days.findIndex(
         (d) => d.dateStr === entry.startTime.slice(0, 10),
       );
-      if (dayIndex == -1){
-        console.log('[TimesheetsComponent] skipping entry, no matching day:', {
-          entryStartTime: entry.startTime,
-          expectedDates: days.map(d => d.dateStr),
-        });
-        continue;
-      }
-      const groupKey = entry.taskId? entry.taskId: `${NO_TASK_KEY}:${entry.projectId}`;
+      if (dayIndex === -1) continue;
+
+      const groupKey = entry.taskId ? entry.taskId : `${NO_TASK_KEY}:${entry.projectId}`;
 
       const seconds = entry.durationMinutes;
       if (!secondsByGroup.has(groupKey)) {
@@ -362,12 +564,12 @@ export class TimesheetsComponent {
     const tasks = Array.from(secondsByGroup.entries()).map(
       ([groupKey, secondsPerDay]) => {
         const isNoTask = groupKey.startsWith(`${NO_TASK_KEY}:`);
-        const totalSecondsForGroup = secondsPerDay.reduce((a, b) => a + b, 0);
+        const totalSeconds = secondsPerDay.reduce((a, b) => a + b, 0);
         const style =
-            TASK_STYLE_PALETTE[hashTaskId(groupKey) % TASK_STYLE_PALETTE.length];
+            TASK_STYLE_PALETTE[hashId(groupKey) % TASK_STYLE_PALETTE.length];
 
         if(isNoTask){
-          const projectId = groupKey.slice(NO_TASK_KEY.length+1);
+          const projectId = groupKey.slice(NO_TASK_KEY.length + 1);
           return {
             id: groupKey,
             title: 'No task',
@@ -377,30 +579,45 @@ export class TimesheetsComponent {
             loggedHours: secondsPerDay.map((s) =>
               s > 0 ? this.formatDuration(s) : '-',
             ),
-            total: this.formatDuration(totalSecondsForGroup),
-        };
-      }
+             loggedHoursShort: secondsPerDay.map((s) =>
+              s > 0 ? this.formatHoursShort(s) : '-',
+            ),
+            total: this.formatDuration(totalSeconds),
+            totalShort: this.formatHoursShort(totalSeconds),
+          };
+        }
+            
 
-      const taskId = groupKey;
-      const task = tasksById.get(taskId);
-      return {
-        id: taskId,
-        title: task?.title ?? 'Unknown task',
-        project: projectById.get(task?.projectId ?? '') ?? 'Unknown project',
-        iconClass: style.iconClass,
-        colorCode: style.colorCode,
-        loggedHours: secondsPerDay.map((s) =>
+        const task = tasksById.get(groupKey);
+        return {
+          id: groupKey,
+          title: task?.title ?? 'Unknown task',
+          project: projectById.get(task?.projectId ?? '') ?? 'Unknown project',
+          iconClass: style.iconClass,
+          colorCode: style.colorCode,
+          loggedHours: secondsPerDay.map((s) =>
           s > 0 ? this.formatDuration(s) : '-',
         ),
-        total: this.formatDuration(totalSecondsForGroup),
-      };
-    },
+        loggedHoursShort: secondsPerDay.map((s) =>
+        s > 0 ? this.formatHoursShort(s) : '-',
+            ),
+            total: this.formatDuration(totalSeconds),
+            totalShort: this.formatHoursShort(totalSeconds),
+                };
+              },
     );
+
+    const grand = dayTotals.reduce((a,b) => a + b, 0);
 
     return {
       tasks,
       dailyTotals: dayTotals.map((s) => (s > 0 ? this.formatDuration(s) : '-')),
-      grandTotal: this.formatDuration(dayTotals.reduce((a, b) => a + b, 0)),
+      dailyTotalsShort: dayTotals.map((s) =>
+      
+       s > 0 ? this.formatHoursShort(s) : '-',
+      ),
+      grandTotal: this.formatDuration(grand),
+      grandTotalShort: this.formatHoursShort(grand, true),
     };
   }
 
@@ -408,6 +625,7 @@ export class TimesheetsComponent {
     const start = new Date(ts.periodStart);
     return {
       id: ts.id,
+      workspaceMemberId: ts.workspaceMemberId,
       status: ts.status,
       isLocked: ts.isLocked,
       periodStart: ts.periodStart,
@@ -446,6 +664,7 @@ export class TimesheetsComponent {
           month: 'short',
           day: 'numeric',
         }),
+        shortLabel: date.toLocaleDateString('en-US', { weekday: 'short'}).toUpperCase(),
         dateStr,
         isToday: dateStr === todayStr,
       };
@@ -464,17 +683,52 @@ export class TimesheetsComponent {
     const hours = Math.floor(totalSeconds / 3600);
     const mins = Math.floor((totalSeconds % 3600) / 60);
     const seconds = Math.floor(totalSeconds % 60);
-    if(hours > 0) return seconds > 0 ? `${hours}hr ${mins}m ${seconds}s` : `${hours}hr ${mins}m`;
-    if(mins > 0) return seconds > 0 ? `${mins}m ${seconds}s`: `${mins}m`;
+    if (hours > 0)
+      return seconds > 0
+        ? `${hours}hr ${mins}m ${seconds}s` : `${hours}hr ${mins}m`;
+    if (mins > 0) return seconds > 0 ? `${mins}m ${seconds}s` : `${mins}m`;
     return `${seconds}s`;
-  }
+   } 
+
+   private formatHoursShort( totalSeconds: number, withUnit = false): string {
+    if (totalSeconds <= 0) return withUnit ? '0.0h' : '0.0';
+    const hours = (totalSeconds / 3600).toFixed(1);
+    return withUnit ? `${hours}h` : hours;
+   }
+
+   private initialsFrom(name: string): string {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return '??';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+   }
 
   onFilterChange(filter: StatusFilter): void {
     this.selectedFilter.set(filter);
-    // INTEGRATION: GET /api/timesheets/me/status/{status} when filter !== ALL
-    //              GET /api/timesheets/me when filter === ALL
-
     this.loadTimesheets();
+  }
+
+  openLogTime( periodStart: string, periodEnd: string, date?: string, taskId?: string,) : void  {
+    const queryParams: Record<string, string> = {
+      from: date ?? periodStart,
+      to: date ?? periodEnd,
+    };
+    if (taskId && !taskId.startsWith('_no_task_')) {
+      queryParams[taskId] = taskId;
+    }
+    void this.router.navigate(['/log-time'], { queryParams });
+  }
+
+  openSelectedWeek(date?: string, taskId?: string): void {
+    const s = this.summary();
+    if(!s) return;
+    this.openLogTime(s.periodStart, s.periodEnd, date, taskId);
+  }
+
+
+  onReviewFilterChange(filter: ReviewStatusFilter): void {
+    this.reviewFilter.set(filter);
+    this.loadReviewQueue();
   }
 
   onWeekChange(timesheetId: string): void {
@@ -482,7 +736,11 @@ export class TimesheetsComponent {
     this.loadEntriesForWeek(timesheetId);
   }
 
-  statusLabel(status: StatusFilter | TimesheetStatus): string {
+  // onReviewWeekChange(weekKey: string) : void {
+  //   this.reviewWeekKey.set(weekKey);
+  // }
+
+  statusLabel(status: StatusFilter | TimesheetStatus | ReviewStatusFilter): string {
     if (status === 'ALL') {
       return 'ALL';
     }
@@ -490,11 +748,9 @@ export class TimesheetsComponent {
   }
 
   formatDateTime(value: string | null): string {
-    if (!value) {
-      return '-';
-    }
-    const date = new Date(value);
-    return date.toLocaleString('en-ZA', {
+
+    if (!value) return '-';
+    return new Date(value).toLocaleDateString('en-ZA', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -505,11 +761,8 @@ export class TimesheetsComponent {
   }
 
   formatDate(value: string | null): string {
-    if (!value) {
-      return '-';
-    }
-    const date = new Date(value);
-    return date.toLocaleDateString('en-ZA', {
+      if (!value) return '-';
+    return new Date(value).toLocaleDateString('en-ZA', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -519,14 +772,6 @@ export class TimesheetsComponent {
   displayHours(value: string | null): string {
     return value ?? '-';
   }
-
-  // INTEGRATION: Navigate to task/entry detail or open a side panel listiing entries for this task withing the selected timesheet period.
-
-  onViewTask(task: TaskRow): void {
-    this.showToast(`View entries for "${task.title}" (wire up navigation).`);
-  }
-
-  // INTEGRATION: Conftim, then POST /api/timesheets/{id}/submit
 
   openSubmitDialog(): void {
     if (!this.canSubmit() || this.actionPending()) {
@@ -551,14 +796,12 @@ export class TimesheetsComponent {
     }
     this.actionPending.set(true);
 
-    // INTEGRATION replace this mock update with: this.timesheetsService.submit(s.id).subscribe({...})
-
-    this.actionPending.set(true);
     this.timesheetService.submitTimesheet(s.id).subscribe({
       next: (updated) => {
         this.patchLocalStatus(s.id, updated.status, {
           submittedAt: updated.submittedAt,
           isLocked: updated.isLocked,
+          rejectionReason: null,
         });
 
         this.actionPending.set(false);
@@ -576,27 +819,34 @@ export class TimesheetsComponent {
     this.showSubmitSuccessDialog.set(false);
   }
 
-  // INTEGRATION: Confirm then POST /api/timesheets/{id}/approve
+openReviewModal(row: ReviewRow) : void {
+  this.reviewTarget.set(row);
+  this.rejectReason.set('');
+  this.showRejectReason.set(false);
+  this.showReviewModal.set(true);
+}
+
+closeReviewModal(): void {
+  if (this.actionPending()) return;
+  this.showReviewModal.set(false);
+  this.reviewTarget.set(null);
+  this.rejectReason.set('');
+  this.showRejectReason.set(false);
+}
 
   onApproveTimesheet(): void {
-    const s = this.summary();
-    if (!s || !this.canApproveOrReject()) {
-      return;
-    }
-    const confirmed = window.confirm('Approve this timesheet?');
-    if (!confirmed) {
-      return;
-    }
+    
+    const target = this.reviewTarget();
+    if (!target || !this.canApproveOrReject() || this.actionPending()) return;
+
     this.actionPending.set(true);
-    // INTEGRATION: this.timesheetService.approve(s.id).subscribe({...})
-    this.timesheetService.approveTimesheet(s.id).subscribe({
+
+    this.timesheetService.approveTimesheet(target.summary.id).subscribe({
       next: (updated) => {
-        this.patchLocalStatus(s.id, updated.status, {
-          approvedAt: updated.approvedAt,
-          isLocked: updated.isLocked,
-        });
+        this.patchReviewRow(target.summary.id, updated);
         this.actionPending.set(false);
-        this.showToast('Timesheet Approved');
+        this.closeReviewModal();
+        this.showToast('Timesheet approved');
       },
       error: () => {
         this.actionPending.set(false);
@@ -605,38 +855,28 @@ export class TimesheetsComponent {
     });
   }
 
+    enableRejectReason(): void {
+    if (!this.canApproveOrReject()) return;
+    this.showRejectReason.set(true);
+  }
+
   openRejectDialog(): void {
-    if (!this.canApproveOrReject()) {
-      return;
-    }
-    this.rejectReason.set('');
-    this.showRejectDialog.set(true);
+    this.enableRejectReason();
   }
-
-  closeRejectDialog(): void {
-    this.showRejectDialog.set(false);
-    this.rejectReason.set('');
-  }
-
-  // INTEGRATION POST /api/timesheets/{id} reject with body {reason}
 
   onConfirmReject(): void {
-    const s = this.summary();
+    const target = this.reviewTarget();
     const reason = this.rejectReason().trim();
-    if (!s || !reason) {
+    if (!target || !reason || this.actionPending()) {
       return;
     }
     this.actionPending.set(true);
-    // INTEGRATIOON: this.timesheetService.reject(s.id, reasons).subscribe({...})
-    this.timesheetService.rejectTimesheet(s.id, reason).subscribe({
+
+    this.timesheetService.rejectTimesheet(target.summary.id, reason).subscribe({
       next: (updated) => {
-        this.patchLocalStatus(s.id, updated.status, {
-          rejectedAt: updated.rejectedAt,
-          rejectionReason: updated.rejectionReason,
-          isLocked: updated.isLocked,
-        });
+        this.patchReviewRow(target.summary.id, updated);
         this.actionPending.set(false);
-        this.closeRejectDialog();
+        this.closeReviewModal();
         this.showToast('Timesheet Rejected.');
       },
       error: () => {
@@ -659,7 +899,26 @@ export class TimesheetsComponent {
     }, 4000);
   }
 
-  // Local mock mutation - remove when API responses update state
+  private patchReviewRow(id: string, updated: TimesheetResponse) : void {
+    this.reviewRows.update((list) => 
+    list.map((row) => {
+      if (row.summary.id !== id) return row;
+      return {
+        ...row,
+        summary: {
+          ...row.summary,
+          status: updated.status,
+          isLocked: updated.isLocked,
+          submittedAt: updated.submittedAt,
+          approvedAt: updated.approvedAt,
+          rejectedAt: updated.rejectedAt,
+          rejectionReason: updated.rejectionReason,
+          updatedAt: updated.updatedAt
+        },
+      };
+    }),
+  );
+  }
 
   private patchLocalStatus(
     id: string,
