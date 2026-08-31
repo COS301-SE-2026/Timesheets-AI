@@ -1,1 +1,14 @@
-<p>teams works!</p>
+<section class="team-page">
+    <header class="teams-heading">
+        <div>
+            <p class="eyebrow">Workspace Management</p>
+            <h1>Team</h1>
+            <p>Manage workspace members and their project assignments.</p>
+        </div>
+        @if (isAdmin) {
+            <button type="button" class="primary-button" (click)="activeTab = 'waiting'">
+                <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add Member
+            </button>
+        }
+    </header>
+</section>
