@@ -1,42 +1,47 @@
 <div class="timesheets-page">
 
   <!-- Page header -->
-   <header class="page-header">
-    <div class="page-header-titles">
-      <h1 class="page-header-title"> Timesheets </h1>
-      <p class="page-header-subtitles"> View and manage your timesheets.</p>
+  @if (isManager()) {
+    <div class="status-filters page-tabs" role="tablist" aria-label="Timesheet views">
+      <button type="button" role="tab" class="status-filters-chip"
+      [class.is-active]="pageTab() === 'mine'"
+      [attr.aria-selected]="pageTab() === 'mine'"
+      (click)="setPageTab('mine')"> Timesheets</button>
+      <button type="button" role="tab" class="status-filters-chip"
+      [class.is-active]="pageTab() === 'review'"
+      [attr.aria-selected]="pageTab() === 'review'"
+      (click)="setPageTab('review')"> Review Timesheets</button>
     </div>
+  }
 
-    <div class="page-header-actions" >
+  @if (pageTab() === 'mine' || !isManager()) {
+    <header class="page-header">
+      <div class="page-header-titles">
+        <h1 class="page-header-title">Timesheets</h1>
+        <p class="page-header-subtitles">View and manage your timesheets.</p>
+      </div>
+    
+  <div class="page-header-actions">
+    @if (!showAllList()){
+    <label class="week-picker" for="week-picker">
+      <span class="week-picker-name">Week</span>
+      <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
+      <select id="week-picker" class="week-picker-select"
+      [ngModel]="selectedTimesheetId()"
+      (ngModelChange)="onWeekChange($event)"
+      [disabled]="uiState() === 'loading' || filteredTimesheets().length === 0">
+      @for (week of filteredTimesheets(); track week.summary.id) {
+        <option [value]="week.summary.id">
+          Week {{ week.summary.weekNumber }} · {{ week.summary.periodLabel }}
+        </option>
+      }  
+    </select>
+    <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
+    </label>
+  }
+  </div>
+    </header>
 
-      <!-- INTEGRATION: Oprions come from GET /api/timesheets/me (or status filter), changing selection should load GET /api/timesheets/{id} + /entries -->
-
-      <!-- Week picker -->
-       <label class="week-picker" for="week-picker">
-        <span class="week-picker-name">Week</span>
-        <i class="fa-regular fa-calendar-days" aria-hidden="true"></i>
-        <select 
-          id="week-picker"
-          class="week-picker-select"
-          [ngModel]="selectedTimesheetId()"
-          (ngModelChange)="onWeekChange($event)"
-          [disabled]="uiState() === 'loading' || filteredTimesheets().length === 0">
-          @for (week of filteredTimesheets(); track week.summary.id) {
-            <option [value]="week.summary.id">
-              Week {{ week.summary.weekNumber }} . {{ week.summary.periodLabel }}
-            </option>
-          }
-        </select>
-        <i class="fa-solid fa-chevron-down week-picker-chevron" aria-hidden="true"></i>
-
-       </label>
-
-    </div>
-  </header>
-
-  <!-- Status filters : Integrate GET /api/timesheets/me/status/{status}
-   UI focuses on weekly detail status chips
-    -->
 
     <div class="status-filters" role="tablist" aria-label="Filter timesheets by status">
       @for (filter of statusFilters; track filter) {
@@ -84,6 +89,55 @@
     </a>
   </div>
 }
+
+<!-- All timesheet list -->
+ @else if (showAllList()) {
+  <section class="entry-table-wrapper review-table-wrapper" aria-label="All timesheets">
+    <table class="entry-table review-table">
+      <thead>
+        <tr>
+          <th>Period</th>
+          <th>Status</th>
+          <th>Submitted</th>
+          <th>Note</th>
+          <th class="col-action">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (week of filteredTimesheets(); track week.summary.id) {
+          <tr class="is-clickable" (click)="openLogTime(week.summary.periodStart, week.summary.periodEnd)"
+          (keydown.enter)="openLogTime(week.summary.periodStart, week.summary.periodEnd)"
+          (keydown.space)="openLogTime(week.summary.periodStart, week.summary.periodEnd)"
+          >
+            <td>
+              <strong>Week {{ week.summary.weekNumber }}</strong>
+              <div class="task-cell-meta">{{ week.summary.periodLabel }}</div>
+            </td>
+            <td>
+              <span class="status-badge" [attr.data-status]="week.summary.status">
+                {{ week.summary.status }}
+              </span>
+            </td>
+            <td>{{ formatDateTime(week.summary.submittedAt) }}</td>
+            <td>
+              @if (week.summary.status === 'REJECTED' && week.summary.rejectionReason) {
+                {{ week.summary.rejectionReason }}
+              } @else {
+                -
+              }
+            </td>
+            <td class="col-action">
+              <button type="button" class="link-action"
+              (click)="openLogTime(week.summary.periodStart, week.summary.periodEnd); $event.stopPropagation()">
+              Open <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>  
+            </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+ }
 
    <!-- Weekly detail -->
     @else {
@@ -135,10 +189,12 @@
           </div>
 
           
-          <div class="summary-card-reason">
-            <strong> Reason (if applicable) </strong>
-            <span> {{ s.rejectionReason || '-' }} </span>
-          </div>
+          @if (s.status === 'REJECTED' || s.rejectionReason) {
+            <div class="summary-card-reason">
+              <strong>Rejection reason</strong>
+              <span>{{ s.rejectionReason || '-' }}</span>
+            </div>
+          }
          </article>
       }
 
@@ -160,7 +216,9 @@
 
           <tbody>
             @for (task of tasks(); track task.id) {
-              <tr>
+              <tr class="is-clickable" (click)="openSelectedWeek(undefined, task.id)"
+              (keydown.enter)="openSelectedWeek(undefined, task.id)"
+              (heydown.space)="openSelectedWeek(undefined, task.id)">
                 <td class="col-task">
                   <div class="task-cell">
                     <span class="task-cell-dot" [style.background-color]="task.colorCode" aria-hidden="true"></span>
@@ -174,7 +232,10 @@
                 </td>
 
                 @for (hours of task.loggedHours; track $index) {
-                  <td class="col-day" [class.is-empty]="hours === '-'" [class.highlighted-today-column]="days()[$index].isToday">
+                  <td class="col-day" [class.is-empty]="hours === '-'" [class.highlighted-today-column]="days()[$index].isToday"
+                   (click)="openSelectedWeek(days()[$index].dateStr, task.id); $event.stopPropagation()"
+                   (keydown.enter)="openSelectedWeek(days()[$index].dateStr, task.id); $event.stopPropagation()"
+                   (keydown.space)="openSelectedWeek(days()[$index].dateStr, task.id); $event.stopPropagation()">
                     {{ displayHours(hours) }}
                   </td>
                 }
@@ -216,22 +277,15 @@
              Submit Timesheet</button>
         }
 
-        @if (summary()?.status === 'SUBMITTED' && !isManager()) {
+        @if (summary()?.status === 'SUBMITTED') {
             <p class="awaiting-review">
               <i class="fa-regular fa-clock" aria-hidden="true"></i>
               Awaiting review
-            </p>          
-        }
-
-        @if (canApproveOrReject()) {
-          <!-- INTEGRATION: POST /api/timesheets/{id}/approvr or reject -->
-           <button type="button" class="btn btn--primary" [disabled]="actionPending()" (click)="onApproveTimesheet()"> Approve</button>
-           <button type="button" class="btn btn--danger" [disabled]="actionPending()" (click)="openRejectDialog()"> Reject</button>
-        }
-
-        @if (isReadOnly() && summary()?.status === 'APPROVED') {
-          <p class="read-only-note"> This timesheet is approved and locked </p>
-        }
+           </p>
+          }
+          @if (isReadOnly() && summary()?.status === 'APPROVED'){
+            <p class="read-only-note"> This timesheet is approved and locked</p>
+          }
         </div>
       } @else {
         <!-- Timesheets exist but not entries yet -->
@@ -246,17 +300,108 @@
          </section>
       }
     }
+  }
 
     <!-- Submit confirmation modal -->
-    @if (showSubmitDialog()){
-    <button type="button" aria-label="Close dialog" (click)="closeSubmitDialog()" ></button>
+    @if (pageTab() === 'review' && isManager()){
+      <header class="page-header">
+        <div class="page-header-titles">
+          <h1 class="page-header-title">Timesheet Approvals</h1>
+          <p class="page-header-subtitles">Timesheets submitted by members of the project you manage.</p>
+        </div>
 
-    <dialog class="modal" aria-labelledby="submit-modal-title" open>
-      <div class="modal-icon" aria-hidden="true">
-        <i class="fa-regular fa-paper-plane"></i>
+      </header>
+    
+
+    <article class="awaiting-card" aria-label="Awaiting review">
+      <span class="awaiting-card-icon" aria-hidden="true">
+        <i class="fa-regular fa-clock"></i>
+      </span>
+      <div>
+        <span class="awaiting-card-label">Awaiting review</span>
+        <strong class="awaiting-card-value">{{ awaitingReviewCount() }}</strong>
       </div>
+    </article>
 
-      <h2 id="submit-modal-title"> Submit timesheet</h2>
+    <div class="status-filters" role="tablist" aria-label="Filter review queue">
+      @for (filter of reviewStatusFilters; track filter) {
+        <button type="button" role="tab" class="status-filters-chip"
+        [class.is-active]="reviewFilter() === filter"
+        [attr.aria-selected]="reviewFilter() === filter"
+        (click)="onReviewFilterChange(filter)">
+      {{ filter === 'ALL' ? 'All' : statusLabel(filter) }}
+      </button>
+      }
+    </div>
+
+    @if(reviewUiState() === 'loading') {
+      <output class="state-panel state-panel--loading">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Loading timesheets for review...</p>
+      </output>
+    } @else if (reviewUiState() === 'error') {
+      <div class="state-panel state-panel--error" role="alert">
+        <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+        <p>{{ errorMessage() || 'Something went wrong.' }}</p>
+        <button type="button" class="btn btn--secondary" (click)="loadReviewQueue()"> Try again</button>
+      </div>
+    } @else if (filteredReviewRows().length === 0) {
+      <div class="state-panel state-panel--empty">
+        <i class="fa-regular fa-clipboard" aria-hidden="true"></i>
+        <h2>No timesheets to review</h2>
+        <p>Submitted timesheets from your team will appear here.</p>
+      </div>
+    } @else {
+      <section class="entry-table-wrapper review-table-wrapper" aria-label="Timesheets awaiting review">
+        <table class="entry-table review-table">
+          <thead>
+            <tr>
+              <th class="col-employee">Employee</th>
+              <th>Period</th>
+              <th>Total hours</th>
+              <th>Submitted on</th>
+              <th>Status</th>
+              <th class="col-action">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of filteredReviewRows(); track row.summary.id) {
+              <tr>
+                <td class="col-employee">
+                  <div class="employee-cell">
+                    <span class="avatar" [style.background-color]="row.avatarColor">{{ row.initials }}</span>
+                    <div class="task-cell-text">
+                      <strong class="task-cell-title">{{ row.employeeName }}</strong>
+                      <span class="task-cell-meta">{{ row.employeeRole }} </span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ row.summary.periodLabel }}</td>
+                <td class="col-total">{{ row.totalHours }}</td>
+                <td>{{ formatDateTime(row.summary.submittedAt) }} </td>
+                <td>
+                  <span class="status-badge" [attr.data-status]="row.summary.status">
+                    {{ row.summary.status }}
+                  </span>
+                </td>
+                <td class="col-action">
+                  <button type="button" class="link-action" (click)="openReviewModal(row)">
+                    View <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    }
+  }
+
+  @if (showSubmitDialog()) {
+    <button type="button" class="modal-backdrop" aria-label="Close dialog" (click)="closeSubmitDialog()"></button>
+    <dialog class="modal" aria-labelledby="submit-modal-title" open>
+      <div class="modal-icon" aria-hidden="true"><i class="fa-regular fa-paper-plane"></i></div>
+      <h2 id="submit-modal-title">Submit timesheet</h2>
       <p>This timesheet will be sent for approval and cannot be edited while under review.</p>
 
       <div class="modal-actions">
@@ -276,7 +421,7 @@
           <i class="fa-solid fa-check"></i>
         </div>
 
-        <h2>Timesheet submitted</h2>
+        <h2 id="success-modal-title">Timesheet submitted</h2>
         <p>Your timesheet was submitted successfully and is awaiting review.</p>
 
         <div class="modal-actions modal-actions--center">
@@ -284,20 +429,119 @@
         </div>
       </dialog>
     }
-      <!-- Rject Reason dialog -->
 
-      @if (showRejectDialog()) {
-        <div class="dialog-backdrop" aria-hidden="true"></div>
-        <dialog class="dialog" aria-labelledby="reject-dialog-title" open>
-          <h2 id="reject-dialog-title"> Reject Timesheet </h2>
-          <p>Please provide a reason for rejection. The employee will see this on their timesheet.</p>
-          <label class="dialog-label" for="reject-reason">Reason</label>
-          <textarea id="reject-reason" class="dialog-textarea" rows="4" [ngModel]="rejectReason()" (ngModelChange)="rejectReason.set($event)" placeholder="Enter rejection reason..."></textarea>
-          <div class="dialog-actions">
-            <button type="button" class="btn btn--secondary" (click)="closeRejectDialog()">Cancel</button>
-            <button type="button" class="btn btn--danger" [disabled]="!rejectReason().trim() || actionPending()" (click)="onConfirmReject()"> Confirm Reject </button>
+    @if (showReviewModal()) {
+      @if (reviewTarget(); as target) {
+        <button type="button" class="modal-backdrop" aria-label="Close review" (click)="closeReviewModal()"></button>   
+        <dialog class="modal modal--review" aria-labelledby="review-modal-title" open>
+          <header class="review-modal-header">
+            <div class="employee-cell">
+              <span class="avatar" [style.background-color]="target.avatarColor">{{ target.initials }}</span>
+              <div class="task-cell-text">
+                <strong id="review-modal-title" class="review-modal-name"> {{ target.employeeName }}</strong>
+                <span class="task-cell-meta">
+                  Week {{ target.summary.weekNumber }} · {{ target.summary.periodLabel }}
+                </span>
+              </div>
+            </div>
+            <button type="button" class="icon-close" aria-label="Close" (click)="closeReviewModal()">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </header>
+
+          <dl class="summary-card-meta review-meta">
+            <div class="summary-meta-card">
+              <i class="fa-regular fa-file-lines summary-meta-icon" aria-hidden="true"></i>
+              <dt>Status</dt>
+              <dd><span class="status-badge" [attr.data-status]="target.summary.status">{{ target.summary.status }} </span></dd>
+            </div>
+            <div class="summary-meta-card">
+              <i class="fa-regular fa-calendar summary-meta-icon" aria-hidden="true"></i>
+              <dt>Submitted On</dt>
+              <dd>{{ formatDateTime(target.summary.submittedAt) }}</dd>
+            </div>
+            <div class="summary-meta-card">
+              <i class="fa-regular fa-clock summary-meta-icon" aria-hidden="true"></i>
+              <dt>Total Hours</dt>
+              <dd class="review-total">{{ target.grandTotalShort }}</dd>
+            </div>
+          </dl>
+
+          <div class="entry-table-wrapper review-modal-table">
+            <table class="entry-table">
+              <thead>
+                <tr>
+                  <th class="col-task"> Task</th>
+                  @for (day of target.days; track day.dateStr) {
+                    <th class="col-day">{{ day.shortLabel }}</th>
+                  }
+                  <th class="col-total">Total</th>
+                </tr>
+              </thead>
+             <tbody>
+              @for (task of target.tasks; track task.id) {
+                <tr>
+                  <td class="col-task">
+                    <div class="task-cell-text">
+                      <strong class="task-cell-title">{{ task.title }}</strong>
+                      <span class="task-cell-meta">{{ task.project }}</span>
+                    </div>
+                  </td>
+                  @for (hours of task.loggedHoursShort; track $index) {
+                    <td class="col-day" [class.is-empty]="hours === '-'">{{ hours }}</td>
+                  }
+                    <td class="col-total">{{ task.totalShort }}</td>
+                </tr>
+              }
+             </tbody>
+             <tfoot>
+              <tr class="daily-total-row">
+                <td class="col-task"><strong>Daily total</strong></td>
+                @for (total of target.dailyTotals; track $index) {
+                  <td class="col-day"><strong>{{ total }}</strong></td>
+                }
+                  <td class="col-total grand-total">{{ target.grandTotalShort }}</td>
+              </tr>
+             </tfoot>
+            </table>
           </div>
-        </dialog>
+
+          @if (showRejectReason()) {
+            <label class="reject-field" for="reject-reason">
+              <span class="reject-field-label">Reject reason</span>
+              <textarea id="reject-reason" class="reject-textarea" rows="4"
+              maxlength="500"
+              [ngModel]="rejectReason()"
+              (ngModelChange)="rejectReason.set($event)"
+              placeholder="Tell the employee what to fix before resubmitting"></textarea>
+              <span class="reject-count">{{ rejectReasonCount() }} / {{ maxRejectLength }} </span>
+            </label>
+          }
+
+          <div class="modal-actions">
+            <button type="button" class="btn btn--secondary" [disabled]="actionPending()" (click)="closeReviewModal()">Close</button>
+            @if (canApproveOrReject()) {
+              @if (showRejectReason()) {
+                <button type="button" class="btn btn--danger-solid"
+                [disabled]="!rejectReason().trim() || actionPending()"
+                (click)="onConfirmReject()">
+                Confirm reject</button>
+              } @else {
+                <button type="button" class="btn btn--danger-solid"
+                [disabled]="actionPending()" (click)="enableRejectReason()">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                Reject
+                </button>
+              }
+                <button type="button" class="btn btn--success"
+                [disabled]="actionPending()" (click)="onApproveTimesheet()">
+                <i class="fa-solid fa-check" aria-hidden="true"></i>
+                Approve
+                </button>
+              }
+          </div>
+        </dialog>  
+       }
       }
 
    <!-- Success toast -->
@@ -310,5 +554,4 @@
       </button>
     </output>
    }
-    
 </div>
