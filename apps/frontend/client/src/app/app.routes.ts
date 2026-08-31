@@ -97,6 +97,12 @@ export const routes: Routes = [
       import('./features/onboarding/waiting-for-workspace/waiting-for-workspace.component')
         .then(m => m.WaitingForWorkspaceComponent)
   },
+  {
+    path: 'calendar',
+    loadComponent: () =>
+      import('./features/calendar/calendar.component')
+        .then(m => m.CalendarComponent)
+  },
 
   /* 404 fallback */
   {
