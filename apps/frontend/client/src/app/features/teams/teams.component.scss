@@ -40,3 +40,29 @@ h1 {
     color: var(--color-text-muted);
     margin: var(--space-2) 0 0;
 }
+
+// Button styles
+
+.primary-button, .secondary-button, .text-button, .icon-button {
+    border: 0;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+    font: inherit;
+    font-weight: var(--font-weight-bold);
+}
+
+.primary-button {
+    background: var(--color-primary);
+    box-shadow: var(--elevation-1);
+    color: var(--color-text-inverse);
+    padding: var(--space-3) var(--space-4);
+}
+
+.primary-button:hover {
+  background: var(--color-primary-hover);
+}
+
+.primary-button.small {
+    font-size: var(--font-size-caption);
+    padding: var(--space-2) var(--space-3);
+}
