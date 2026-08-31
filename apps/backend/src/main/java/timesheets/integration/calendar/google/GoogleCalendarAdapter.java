@@ -3,11 +3,14 @@ package timesheets.integration.calendar.google;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.model.Events;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -66,12 +69,36 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
     HttpCredentialsAdapter requestInitializer = new HttpCredentialsAdapter(credentials);
 
     // To get the user's calendar events
+    // this communicate with the google api
     Calendar calendarService =
         new Calendar.Builder(
                 new NetHttpTransport(), GsonFactory.getDefaultInstance(), requestInitializer)
             .setApplicationName("Momently")
             .build();
 
+    // putting all the events in here
+    // making the request to get collection of calendar events and it is stored Events event
+    // insert try and catch because request() might fail
+
+    try {
+      Events events =
+          calendarService
+              .events()
+              .list("primary")
+              .setTimeMin(
+                  new com.google.api.client.util.DateTime(
+                      startTime.toInstant(ZoneOffset.UTC).toEpochMilli()))
+              .setTimeMax(
+                  new com.google.api.client.util.DateTime(
+                      endTime.toInstant(ZoneOffset.UTC).toEpochMilli()))
+              .setSingleEvents(true)
+              .setOrderBy("startTime")
+              .execute();
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to retrieve Google Calendar events", e);
+    }
+
+    // for returning, convert to match CalendarEvent expected vars
     return Collections.emptyList();
   }
 
