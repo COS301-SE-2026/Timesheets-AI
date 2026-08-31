@@ -50,6 +50,12 @@
     font-variant-numeric: tabular-nums;
 }
 
+.text-caption {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-muted);
+    margin-top: var(--space-1);
+}
+
 .text-muted {
     color: var(--color-text-muted);
 }

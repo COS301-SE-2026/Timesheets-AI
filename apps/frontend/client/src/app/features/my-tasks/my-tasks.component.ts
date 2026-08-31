@@ -8,7 +8,10 @@
  * Integrated the tasks page with backend and ensured everything matches.
  * 
  * Update: Nyasha 31 August 2026
- * I am adding the integration for task creation modal
+ * - I am adding the integration for task creation modal
+ * - Admins will be able to assign tasks to people for the selected project
+ * - Devs cannot assign other people to tasks
+ * 
  */
 
 import {
@@ -26,6 +29,8 @@ import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { TaskService, TaskResponse } from '../../core/services/task.service';
 import { ProjectService, ProjectResponse } from '../../core/services/project.service';
+import { AuthService } from '../../core/services/auth.service';
+
 
 /**
  * Represents a task assigned to a user
@@ -57,6 +62,14 @@ export interface Task {
 export interface ProjectOption {
   id: string;
   name: string;
+}
+
+export interface ProjectMemberOption {
+  workspaceMemberId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  fullName: string;
 }
 
 // status and priority options, matches tasks.status and tasks.priority CHECK constraints
@@ -154,6 +167,8 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly taskService = inject(TaskService);
   private readonly projectService = inject(ProjectService);
+  private readonly authService = inject(AuthService);
+
 
   //creating the task in the modal state
   public readonly isCreateModalOpen = signal<boolean>(false);
@@ -162,6 +177,9 @@ export class MyTasksComponent implements OnInit, OnDestroy {
 
   public readonly todayDate = new Date().toISOString().split('T')[0];
   
+
+  public readonly projectMembers = signal<ProjectMemberOption[]>([]);
+  public readonly isLoadingMembers = signal<boolean>(false);
 
 
   //the create task modal
@@ -181,6 +199,12 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public readonly projects = signal<ProjectOption[]>([]);
   public readonly isLoadingProjects = signal<boolean>(false);
 
+
+  //making sure that only users who assign tasks do so
+  public readonly canAssignTasks = computed<boolean>(() => {
+    const user = this.authService.currentUser();
+    return user?.roles?.some((role:string) =>  role === 'ROLE_ADMIN' || role === 'ROLE_MANAGER') || false;
+  });
 
   //Computed signals
 
@@ -287,11 +311,53 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     });
   }
 
+  //this should load the members when a project changes
+  public onProjectChange(projectId: string): void {
+    this.newTask.projectId = projectId;
+
+    //when the project changes the assigned should reset
+    this.newTask.assignedWorkspaceMemberId = '';
+    
+    //the members should load only if the member can assign tasks, devs do not assign tasks
+    if (this.canAssignTasks() && projectId) {
+      this.loadProjectMembers(projectId);
+    } else {
+      this.projectMembers.set([]);
+    }
+  }
+
+  //to load the members from a specific project
+  private loadProjectMembers(projectId: string): void {
+    this.isLoadingMembers.set(true);
+
+    this.projectService.getProjectDetail(projectId).subscribe({
+      next: (detail) => {
+        const members = detail.members.map((member: any) => ({
+          workspaceMemberId: member.workspaceMemberId,
+          firstName: member.firstName,
+          lastName: member.lastName,
+          email: member.email,
+          fullName: `${member.firstName} ${member.lastName}`,
+        }));
+
+        this.projectMembers.set(members);
+        this.isLoadingMembers.set(false);
+      },
+      error: (error) => {
+        console.error('[MyTasksComponent] failed to load project members:', error);
+        this.projectMembers.set([]);
+        this.isLoadingMembers.set(false);
+      },
+    });
+  }
+
   //this is for the create task modal
   public openCreateModal(): void {
     this.isCreateModalOpen.set(true);
     this.createError.set(null);
-    // Reset the form
+    this.projectMembers.set([]); //the members list gets reset
+    
+    //the form should get reset
     this.newTask = {
       title: '',
       description: '',
@@ -304,7 +370,8 @@ export class MyTasksComponent implements OnInit, OnDestroy {
       dueDate: '',
       priority: 'MEDIUM',
     };
-    // Reload projects in case the list changed
+
+    //should be reloading the projects if the list changes
     this.loadProjects();
   }
 

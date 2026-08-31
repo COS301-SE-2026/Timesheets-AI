@@ -209,21 +209,8 @@
       </section>
 
     @if (isCreateModalOpen()) {
-            <div
-                class="modal-overlay"
-                role="button"
-                tabindex="0"
-                aria-label="Close create task"
-                (click)="onOverlayClick($event)"
-                (keydown.enter)="closeCreateModal()"
-                (keydown.space)="closeCreateModal()"
-            >
-                <div
-                    class="modal-panel"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="create-task-modal-title"
-                >
+            <div class="modal-overlay" role="button" tabindex="0" aria-label="Close create task" (click)="onOverlayClick($event)">
+                <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="create-task-modal-title">
                     <header class="modal-header">
                         <h2 id="create-task-modal-title" class="modal-title">Create New Task</h2>
                         <button type="button" class="modal-close" (click)="closeCreateModal()" aria-label="Close create task">
@@ -289,6 +276,7 @@
                                 class="form-control"
                                 name="projectId"
                                 [(ngModel)]="newTask.projectId"
+                                (ngModelChange)="onProjectChange($event)"
                                 #projectInput="ngModel"
                                 required
                                 [class.form-control-invalid]="projectInput.touched && projectInput.invalid"
@@ -400,18 +388,28 @@
                             </div>
                         </div>
 
-                        <!-- Assigned To -->
-                        <div class="form-row">
-                            <label class="form-label" for="create-assigned">Assigned To</label>
-                            <input
-                                id="create-assigned"
-                                class="form-control"
-                                type="text"
-                                name="assignedWorkspaceMemberId"
-                                [(ngModel)]="newTask.assignedWorkspaceMemberId"
-                                placeholder="Search or select a team member (optional)"
-                            />
-                        </div>
+                        <!-- Assigned To: want it to be only avaible to Managers and Admins -->
+                        @if (canAssignTasks()) {
+                            <div class="form-row">
+                                <label class="form-label" for="create-assigned">Assigned To</label>
+                                <select id="create-assigned" class="form-control" name="assignedWorkspaceMemberId" [(ngModel)]="newTask.assignedWorkspaceMemberId">
+
+                                    <option value="">Select a team member</option>
+                                    @for (member of projectMembers(); track member.workspaceMemberId) {
+                                        <option [value]="member.workspaceMemberId">
+                                            {{ member.fullName }} ({{ member.email }})
+                                        </option>
+                                    }
+
+                                </select>
+                                @if (isLoadingMembers()) {
+                                    <span class="text-muted text-caption">Loading team members...</span>
+                                }
+                                @if (!newTask.projectId && projectMembers().length === 0) {
+                                    <span class="text-muted text-caption">Select a project first</span>
+                                }
+                            </div>
+                        }
 
                         <!-- Hint for the required fields -->
                         <div class="form-hint">
