@@ -142,6 +142,7 @@ protected addToWorkspace(member: TeamMember): void {
   });
 }
 
+// assign user to project
 protected assignToProject(): void {
   const member = this.selectedMember;
   if (!member?.workspaceMemberId || !this.selectedProjectid) return;
@@ -156,6 +157,7 @@ protected assignToProject(): void {
   })
 }
 
+// remove member from project
 protected removeFromProject(member: TeamMember, projectId: string): void {
   if (!member.workspaceMemberId) return;
   this.actionMessage = '';
@@ -167,4 +169,12 @@ protected removeFromProject(member: TeamMember, projectId: string): void {
     error: (error) => this.actionMessage = error.error?.message ?? 'Could not remove this member from the project.',
   });
 }
+
+// filter users
+private filterUser(users: TeamMember[]): TeamMember[] {
+  const term = this.searchTerm.trim().toLowerCase();
+  if (!term) return users;
+  return users.filter((user) => `${user.firstName} ${user.lastName} ${user.email}`.toLowerCase().includes(term));
+}
+
 }
