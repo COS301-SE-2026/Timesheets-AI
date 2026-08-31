@@ -110,5 +110,19 @@ h1 {
 }
 
 
+.blue {
+    background: var(--color-primary-surface);
+    color: var(--color-primary);
+}
+
+.pruple {
+    background: var(--color-semantic-purple);
+    color: var(--color-semantic-purple-text);
+}
+
+.green {
+    background: var(--color-semantic-green);
+    color: var(--color-semantic-green-text);
+}
 
 
