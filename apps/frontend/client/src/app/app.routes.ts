@@ -7,6 +7,7 @@
 import { Routes } from '@angular/router';
 import { LandingPageComponent } from './features/landing/landing-page/landing-page.component';
 import { authGuard } from './core/guards/auth.guard';
+import { workspaceGuard } from './core/guards/workspace.guard'; 
 
 export const routes: Routes = [
   /* Default redirect */
@@ -18,7 +19,7 @@ export const routes: Routes = [
   /* Log Time page */
   {
     path: 'log-time',
-    canActivate: [authGuard],
+    canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
       import('./features/users/developer/logtime/logtime.component').then(
         (m) => m.LogtimeComponent,
@@ -46,7 +47,7 @@ export const routes: Routes = [
   /* Timesheets page */
   {
     path: 'timesheets',
-    canActivate: [authGuard],
+    canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
       import('./features/timesheets/timesheets.component').then(
         (m) => m.TimesheetsComponent,
@@ -56,6 +57,7 @@ export const routes: Routes = [
   /* Projects page */
   {
     path: 'projects',
+    canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
       import('./features/projects/projects.component')
         .then(m => m.ProjectsComponent)
@@ -64,6 +66,7 @@ export const routes: Routes = [
   /* Project Details Page */
   {
     path: 'projects/:id',
+    canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
       import('./features/projects/project-details/project-details.component')
         .then(m => m.ProjectDetailsComponent)
@@ -72,6 +75,7 @@ export const routes: Routes = [
 
   {
     path: 'my-tasks',
+    canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
       import('./features/my-tasks/my-tasks.component')
         .then(m => m.MyTasksComponent)
@@ -79,9 +83,19 @@ export const routes: Routes = [
 
   {
     path: 'leave-requests',
+    canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
       import('./features/leave-requests/leave-requests.component')
         .then(m => m.LeaveRequestsComponent)
+  },
+
+  //waiting-for-workspace
+  {
+    path: 'waiting-for-workspace',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/onboarding/waiting-for-workspace/waiting-for-workspace.component')
+        .then(m => m.WaitingForWorkspaceComponent)
   },
 
   /* 404 fallback */

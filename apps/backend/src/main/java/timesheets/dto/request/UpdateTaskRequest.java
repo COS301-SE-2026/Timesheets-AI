@@ -66,10 +66,4 @@ public class UpdateTaskRequest {
     private String jiraTicketKey;
     private UUID parentTaskId;
   }
-
-  /*
-  - I would like to do a request to update the full task - maybe if a user requests from admin that a full task is updated??
-  - I am not sure if it is necessary for now, so I will leave it
-  */
-
 }
