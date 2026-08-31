@@ -26,7 +26,7 @@ COPY . .
 WORKDIR /app/apps/frontend/client 
 
 EXPOSE 4200
-CMD ["yarn", "start", "--host", "0.0.0.0"]
+CMD ["yarn", "start:docker", "--host", "0.0.0.0"]
 
 # Build stagea
 FROM node:22-alpine AS build
