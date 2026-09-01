@@ -15,6 +15,9 @@ public interface CalendarAdapter extends IntegrationAdapter {
   // Google creates the event and gives us an ID
   // Tha adapter can return title, startTime, endTime and externalEventId
 
+  // read one event 
+  CalendarEvent getEvent(UUID workspaceMemberId, String externalEventId);
+  
   CalendarEvent createEvent(UUID workspaceMemberId, CalendarEvent event);
 
   // when we update it, the adapter needs to know which external event
