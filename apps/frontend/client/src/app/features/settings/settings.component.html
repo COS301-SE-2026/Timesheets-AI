@@ -152,7 +152,78 @@ Realated Requirement: N/A
             </div>
         </section>
 
-        <!-- WHAT IT LOOKS LIKE -->
-         
+        <!-- WHAT IT LOOKS LIKE(LIKE CUSTOMIZATIONS) -->
+        <section class="settings-card">
+            <div class="card-icon appearance">
+                <i class="fa-solid fa-display"></i>
+            </div>
+
+            <div class="card-heading">
+                <h2>
+                    Appearance
+                </h2>
+                <p>
+                    Customize how Momently looks and feels.
+                </p>
+            </div>
+
+            <div class="card-body">
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="label-title">
+                            Theme
+                        </span>
+                        <p>
+                            Choose your prefered theme.
+                        </p>
+                    </div>
+
+                    <div class="segmented-control">
+                        <button
+                            [class.active]="s.appearance.theme=== 'light'"
+                            (click)="setTheme('light')">
+                            <i class="fa-solid fa-sun"></i> Light
+                        </button>
+                        <button
+                            [class.active]="s.appearance.theme=== 'dark'"
+                            (click)="setTheme('dark')">
+                            <i class="fa-solid fa-moon"></i> Dark
+                        </button>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="label-title">
+                            Font size
+                        </span>
+                        <p>
+                            Adjust the size of text across the app.
+                        </p>
+                    </div>
+
+                    <div class="segmented-control">
+                        <button
+                            [class.active]="s.appearance.fontSize === 'small'"
+                            (click)="setFontSize('small')">
+                            Small
+                        </button>
+                        <button
+                            [class.active]="s.appearance.fontSize === 'medium'"
+                            (click)="setFontSize('medium')">
+                            Medium
+                        </button>
+                        <button
+                            [class.active]="s.appearance.fontSize === 'large'"
+                            (click)="setFontSize('large')">
+                            Large
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACCESSIBILTY -->
+
     }
 </div>
