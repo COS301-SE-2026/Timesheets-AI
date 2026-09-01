@@ -323,5 +323,36 @@ Realated Requirement: N/A
         </section>
 
         <!-- MANAGE ACCOUNT -->
+        <section class="settings-card">
+            <div class="card-icon danger">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="card-heading">
+                <h2>
+                    Account Management
+                </h2>
+                <p>
+                    Manage your account and data.
+                </p>
+            </div>
+
+            <div class="card-body">
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="label-title">
+                            Request to delete account
+                        </span>
+                        <p>
+                            Permanently delete your account and all associated data.
+                        </p>
+                    </div>
+                    <button
+                        class="danger-button"
+                        (click)="requestAccountDeletion()">
+                        Request deletion
+                    </button>
+                </div>
+            </div>
+        </section>
     }
 </div>
