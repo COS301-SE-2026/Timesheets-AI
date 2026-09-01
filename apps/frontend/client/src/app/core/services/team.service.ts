@@ -59,5 +59,14 @@ export class TeamService {
             .pipe(catchError(this.handleError('removeFromWorkspace')));
     }
 
+    // add to project
+    addToProject(projectId: string, workspaceMemberId: string, isProjectManager = false) : Observable<ProjectMemberResponse> {
+        return this.http
+            .post<ProjectMemberResponse>(`${this.projectsUrl}/${projectId}/members`, {
+                workspaceMemberId,
+                isProjectManager,
+            })
+            .pipe(catchError(this.handleError('addToProject')));
+    }
 
 }
