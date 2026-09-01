@@ -70,6 +70,18 @@ describe('MyTasksComponent', () => {
     }),
   ];
 
+  function flushInitialRequests(tasksData: TaskResponse[] = mockTasks): void {
+    fixture.detectChanges();
+    
+    const tasksReq = httpMock.expectOne('/api/tasks/my-tasks');
+    expect(tasksReq.request.method).toBe('GET');
+    tasksReq.flush(tasksData);
+    
+    const projectsReq = httpMock.expectOne('/api/projects');
+    expect(projectsReq.request.method).toBe('GET');
+    projectsReq.flush([]);
+  }
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [MyTasksComponent],
@@ -92,9 +104,7 @@ describe('MyTasksComponent', () => {
   });
 
   it('should create', () => {
-    fixture.detectChanges(); // triggers ngOnInit -> loadTasks()
-    const req = httpMock.expectOne('/api/tasks/my-tasks');
-    req.flush([]);
+    flushInitialRequests([]);
     expect(component).toBeTruthy();
   });
  
@@ -105,10 +115,13 @@ describe('MyTasksComponent', () => {
       //assert loading state was set before the response came back
       expect(component.isLoading()).toBe(true);
  
-      const req = httpMock.expectOne('/api/tasks/my-tasks');
-      expect(req.request.method).toBe('GET');
-      req.flush(mockTasks);
- 
+      const tasksReq = httpMock.expectOne('/api/tasks/my-tasks');
+      expect(tasksReq.request.method).toBe('GET');
+      tasksReq.flush(mockTasks);
+      
+      const projectsReq = httpMock.expectOne('/api/projects');
+      projectsReq.flush([]);
+
       expect(component.isLoading()).toBe(false);
       expect(component.loadError()).toBe(false);
       expect(component.tasks()).toHaveLength(3);
@@ -118,13 +131,16 @@ describe('MyTasksComponent', () => {
      it('should set loadError and stop loading when the request fails', () => {
       // Arrange / Act
       fixture.detectChanges();
-      const req = httpMock.expectOne('/api/tasks/my-tasks');
- 
+      const tasksReq = httpMock.expectOne('/api/tasks/my-tasks'); 
       // Assert
       // simulates a backend 500, same failure shape HttpErrorResponse produces
       // https://angular.dev/api/common/http/HttpErrorResponse
-      req.flush('server error', { status: 500, statusText: 'Internal Server Error' });
+      tasksReq.flush('server error', { status: 500, statusText: 'Internal Server Error' });
  
+
+      const projectsReq = httpMock.expectOne('/api/projects');
+      projectsReq.flush([]);
+
       expect(component.isLoading()).toBe(false);
       expect(component.loadError()).toBe(true);
       expect(component.tasks()).toEqual([]);
@@ -133,14 +149,17 @@ describe('MyTasksComponent', () => {
     it('should default projectName to "Unknown Project" and assignedToName to "Unassigned" when null', () => {
       // this covers the ?? fallback logic in mapToTask(), which exists because of the GET /api/tasks/my-tasks 
       fixture.detectChanges();
-      const req = httpMock.expectOne('/api/tasks/my-tasks');
-      req.flush([
+      const tasksReq = httpMock.expectOne('/api/tasks/my-tasks');
+      tasksReq.flush([
         makeTaskResponse({
           id: 'task-null-fields',
           projectName: null,
           assignedToName: null,
         }),
       ]);
+
+      const projectsReq = httpMock.expectOne('/api/projects');
+      projectsReq.flush([]);
  
       const task = component.tasks()[0];
       expect(task.projectName).toBe('Unknown Project');
@@ -150,9 +169,7 @@ describe('MyTasksComponent', () => {
  
   describe('computed counts', () => {
     beforeEach(() => {
-      fixture.detectChanges();
-      const req = httpMock.expectOne('/api/tasks/my-tasks');
-      req.flush(mockTasks);
+      flushInitialRequests(mockTasks);
     });
  
     it('activeCount should only count non-deleted TODO/IN_PROGRESS tasks', () => {
@@ -186,9 +203,7 @@ describe('MyTasksComponent', () => {
 
   describe('applyFilters()', () => {
     beforeEach(() => {
-      fixture.detectChanges();
-      const req = httpMock.expectOne('/api/tasks/my-tasks');
-      req.flush(mockTasks);
+      flushInitialRequests(mockTasks);
     });
  
     it('should hide DONE and BLOCKED tasks by default (showCompleted/showArchived both false)', () => {
@@ -243,9 +258,7 @@ describe('MyTasksComponent', () => {
   });
   describe('additional coverage', () => {
     beforeEach(() => {
-      fixture.detectChanges();
-      const req = httpMock.expectOne('/api/tasks/my-tasks');
-      req.flush(mockTasks);
+      flushInitialRequests(mockTasks);
     });
 
     //(added these because the coverage is down)
@@ -320,9 +333,7 @@ describe('MyTasksComponent', () => {
 
   describe('event handlers', () => {
     beforeEach(() => {
-      fixture.detectChanges();
-      const req = httpMock.expectOne('/api/tasks/my-tasks');
-      req.flush(mockTasks);
+      flushInitialRequests(mockTasks);
     });
  
     it('onSearchChange should update searchQuery and re-run applyFilters', () => {
@@ -386,9 +397,7 @@ describe('MyTasksComponent', () => {
  
   describe('onStatusChange()', () => {
     beforeEach(() => {
-      fixture.detectChanges();
-      const req = httpMock.expectOne('/api/tasks/my-tasks');
-      req.flush(mockTasks);
+      flushInitialRequests(mockTasks);
     });
  
     it('should update the task status locally without hitting the network', () => {
@@ -403,9 +412,7 @@ describe('MyTasksComponent', () => {
 
    describe('task detail modal (GET /api/tasks/{taskId})', () => {
     beforeEach(() => {
-      fixture.detectChanges();
-      const req = httpMock.expectOne('/api/tasks/my-tasks');
-      req.flush(mockTasks);
+      flushInitialRequests(mockTasks);
     });
  
     it('onViewTask should open the modal and load the full task record', () => {
@@ -476,9 +483,7 @@ describe('MyTasksComponent', () => {
 
   describe('formatting helpers', () => {
     beforeEach(() => {
-      fixture.detectChanges();
-      const req = httpMock.expectOne('/api/tasks/my-tasks');
-      req.flush([]);
+      flushInitialRequests([]);
     });
  
     it('formatDate should return "-" for undefined and an invalid date string', () => {
