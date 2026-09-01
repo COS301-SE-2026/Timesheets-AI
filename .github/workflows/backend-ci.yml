@@ -68,19 +68,7 @@ jobs:
         - name: Build with Maven 
           if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
           run: mvn -f apps/backend/pom.xml clean verify 
-
-        - name: Show test report 
-          if: always()
-          run: |
-            echo "====******************************************* Surefile files **************************************========"
-            find apps/backend/target/surefire-reports -maxdepth 1 -type f -print
-
-            echo "====******************************************* Time Entry test ********************************************====="
-            cat apps/backend/target/surefire-reports/timesheets.integration.TimeEntryIntegrationTest.txt || true 
-
-            echo "=====**************************************** Timesheet test*******************************************====="
-            cat apps/backend/target/surefire-reports/timesheets.integration.TimesheetIntegrationTest.txt || true
-
+          
 #==================== Login to AWS  ===========================================================
         - name: Configure AWS Credentials
           if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true')
