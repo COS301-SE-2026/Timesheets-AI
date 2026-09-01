@@ -1,28 +1,26 @@
 package timesheets.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import exception.AuthException;
+import exception.AuthException.ErrorCode;
+import exception.BadRequestException;
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-
-import exception.AuthException;
-import exception.AuthException.ErrorCode;
-import exception.BadRequestException;
-import exception.ResourceNotFoundException;
-import exception.StateConflictException;
-import lombok.RequiredArgsConstructor;
 import timesheets.domain.EmailVerificationToken;
 import timesheets.domain.PasswordResetToken;
 import timesheets.domain.User;
@@ -30,12 +28,14 @@ import timesheets.domain.UserIdentityProvider;
 import timesheets.domain.UserMfa;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.GoogleAuthRequest;
+import timesheets.dto.request.PasswordRequest;
 import timesheets.dto.request.RegisterRequest;
 import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.enums.UserStatus;
 import timesheets.repository.EmailVerificationTokenRepository;
+import timesheets.repository.PasswordResetTokenRepository;
 import timesheets.repository.UserIdentityProviderRepository;
 import timesheets.repository.UserMfaRepository;
 import timesheets.repository.UserRepository;
@@ -53,6 +53,7 @@ import timesheets.util.TotpUtils;
 // note some of these may be integrated after Demo 1 depending on time,
 // but I have them here for completeness and to show the full implementation of authentication
 // features
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -74,7 +75,7 @@ public class AuthService {
   private final TimerService timerService;
 
   // private final OtpService otpService;
-  // private final PasswordResetTokenRepository passwordResetTokenRepository;
+  private final PasswordResetTokenRepository passwordResetTokenRepository;
 
   @Value("${app.google.client-id}")
   private String googleClientId;
@@ -282,78 +283,90 @@ public class AuthService {
   }
 
   @Transactional
-  public MessageResponse changePassword(UUID userId, String currentPassword, String newPassword, String confirmPassword) {
-    
-    //validating that a user 
-    User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+  public MessageResponse changePassword(
+      UUID userId, String currentPassword, String newPassword, String confirmPassword) {
 
-    //if a user uses SSO then they cannot change their pasword
+    // validating that a user
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+    // if a user uses SSO then they cannot change their pasword
     if (user.getPasswordHash() == null) {
       throw new StateConflictException("This account uses SSO. Cannot change password.");
     }
 
-    //this should verify the current password
+    // this should verify the current password
     if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
       throw new BadRequestException("Current password is incorrect");
     }
 
-    //passwords should not match
+    // passwords should not match
     if (!newPassword.equals(confirmPassword)) {
       throw new BadRequestException("Passwords do not match");
     }
 
-    //checking the password strength
+    // checking the password strength
     if (newPassword.length() < 8) {
       throw new BadRequestException("New password must be at least 8 characters");
     }
 
-    //this should update the password
+    // this should update the password
     user.setPasswordHash(passwordEncoder.encode(newPassword));
     user.setUpdatedAt(LocalDateTime.now());
     userRepository.save(user);
 
-    //this will be what logs the user activity
+    // this will be what logs the user activity
     log.info("Password changed for user: {}", user.getEmail());
 
     return new MessageResponse("Password changed successfully");
   }
 
   @Transactional
-  public MessageResponse forgotPassword(String email) {
+  public MessageResponse forgotPassword(PasswordRequest.Forgot request) {
     // Always return success to prevent email enumeration
-    userRepository.findByEmail(email).ifPresent(user -> {
+    userRepository
+        .findByEmail(request.getEmail())
+        .ifPresent(
+            user -> {
+              String token = UUID.randomUUID().toString();
+              // Save token to password_reset_tokens table
+              // passwordResetTokenRepository.save(resetToken);
 
-      String token = UUID.randomUUID().toString();
-      // Save token to password_reset_tokens table
-      // passwordResetTokenRepository.save(resetToken);
+              emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), token);
 
-      emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), token);
-
-      log.info("Password reset requested for user: {}", user.getEmail());
-    });
+              log.info("Password reset requested for user: {}", user.getEmail());
+            });
 
     return new MessageResponse("Password reset link sent to your email if the account exists");
   }
 
   @Transactional
-  public MessageResponse resetPassword(ResetPasswordRequest request) {
+  public MessageResponse resetPassword(PasswordRequest.Reset request) {
 
-    PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(request.getToken()).orElseThrow(() -> new ResourceNotFoundException("Password reset token not found"));
+    PasswordResetToken resetToken =
+        passwordResetTokenRepository
+            .findByToken(request.getToken())
+            .orElseThrow(() -> new ResourceNotFoundException("Password reset token not found"));
 
-    if (resetToken.getUsed()) {
-    throw new StateConflictException("Token already used");
+    if (resetToken.isUsed()) {
+      throw new StateConflictException("Token already used");
     }
 
-    if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-    throw new AuthException(ErrorCode.TOKEN_EXPIRED);
+    if (resetToken.isExpired()) {
+      throw new AuthException(ErrorCode.TOKEN_EXPIRED);
     }
 
     // mark token as used
-    resetToken.setUsed(true);
+    resetToken.markUsed();
     passwordResetTokenRepository.save(resetToken);
 
     // update user password
-    User user = userRepository.findById(resetToken.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    User user =
+        userRepository
+            .findById(resetToken.getUserId())
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
     userRepository.save(user);
 
@@ -374,8 +387,8 @@ public class AuthService {
       UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
       timerService.pauseTimerForLogout(workspaceMemberId);
     } catch (Exception e) {
-      log.debug("No active timer to pause during logout");    
-     }
+      log.debug("No active timer to pause during logout");
+    }
   }
 
   @Transactional
