@@ -13,7 +13,7 @@ Realated Requirement: N/A
             Settings
         </h1>
         <p>
-            Manage your account, integrations, prefrences and more.
+            Manage your account, integrations, preferences and more.
         </p>
     </header>
 
@@ -76,5 +76,83 @@ Realated Requirement: N/A
         </section>
 
         <!-- INTEGRATIONS -->
+        <section class="settings-card">
+            <div class="card-icon integrations">
+                <i class="fa-solid fa-link"></i>
+            </div>
+
+            <div class="card-heading">
+                <h2>
+                    Integrations
+                </h2>
+                <p>
+                    Connect and manage your tools and services.
+                </p>
+            </div>
+
+            <div class="card-body">
+                @for(integration of s.integrations; track integration.id){
+                    <div 
+                        class="integration-row"
+                        [class.read-only]="isDeveloper()">
+                        <i [class]="integration.icon"></i>
+                        <div class="integration-info">
+                            <span class="label-title">
+                                {{ integration.name }}
+                            </span>
+                            <p>
+                                {{ integration.connected }}
+                            </p>
+                        </div>
+
+                        <div class="integration-control">
+                            @(integration.connected){
+                                <span class="status-dot connected">
+                                </span>
+                                <span class="status-text">
+                                    Connected
+                                </span>
+                            }
+
+                            <mat-slide-toggle
+                                [checked]="integration.enabled"
+                                [disabled]="!canToggleIntegrations()"
+                                (change)="toggleIntegration(integration, $event.checked)">
+                            </mat-slide-toggle>
+
+                            @if(canToggleIntegrations()){
+                                <i class="fa-solid fa-chevron-right chevron"></i>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if(canAddIntegrations()){
+                    <button 
+                        class="text-link"
+                        (click)="requestIntegration()">
+                        Browse more integrations <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                }
+
+                @if(canRequestIntegrations()){
+                    <button 
+                        class="text-link"
+                        (click)="requestIntegration()">
+                        Request an integration <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                }
+
+                @if(isDeveloper){
+                    <p class="read-only-note">
+                        <i class="fa-solid fa-lock"></i>
+                        Only admins and managers can manage integrations.
+                    </p>
+                }
+            </div>
+        </section>
+
+        <!-- WHAT IT LOOKS LIKE -->
+         
     }
 </div>
