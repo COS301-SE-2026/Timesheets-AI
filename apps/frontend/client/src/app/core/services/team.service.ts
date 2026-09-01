@@ -69,4 +69,18 @@ export class TeamService {
             .pipe(catchError(this.handleError('addToProject')));
     }
 
+    // Remove user from project
+    removeFromProject(projectId: string, workspaceMemberId: string) : Observable<void> {
+        return this.http
+            .delete<void>(`${this.projectUrl}/${projectId}/members/${workspaceMemberId}`)
+            .pipe(catchError(this.handleError('removeFromProject')));
+    }
+
+    private handleError(operation: string) {
+        return (error: HttpErrorResponse) => {
+            console.error(`[TeamService] ${operation} failed`, error);
+            return throwError(() => error);
+        };
+    }
+
 }
