@@ -1,26 +1,29 @@
 package timesheets.service;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import exception.AuthException;
-import exception.AuthException.ErrorCode;
-import exception.BadRequestException;
-import exception.ResourceNotFoundException;
-import exception.StateConflictException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+
+import exception.AuthException;
+import exception.AuthException.ErrorCode;
+import exception.BadRequestException;
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import timesheets.domain.EmailVerificationToken;
 import timesheets.domain.PasswordResetToken;
 import timesheets.domain.User;
@@ -300,6 +303,10 @@ public class AuthService {
     // this should verify the current password
     if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
       throw new BadRequestException("Current password is incorrect");
+    }
+
+    if (passwordEncoder.matches(newPassword, user.getPasswordHash())) {
+      throw new BadRequestException("New password cannot be the same as the current password");
     }
 
     // passwords should not match
