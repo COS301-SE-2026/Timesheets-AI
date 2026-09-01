@@ -265,6 +265,8 @@ h1 {
     color: var(--color-status-pending-text);
 }
 
+// Action button
+
 .actions {
     align-items: center;
     display: flex;
@@ -306,4 +308,61 @@ h1 {
 .notice--success {
     background: var(--color-semantic-red);
     color: var(--color-semantic-green-text);
+}
+
+.page-state, .empty-state {
+    color: var(--color-text-muted);
+    padding: var(--space-12);
+    text-align: center;
+}
+
+.empty-state i {
+    color: var(--color-primary-tint);
+    font-size: var(--font-size-h1);
+}
+
+.empty-state h3 {
+    color: var(--color-text-body);
+    margin-bottom: var(--space-1);
+}
+
+.modal-backdrop {
+    align-items: center;
+    background: color-mix(in srgb, var(--color-dark-bg) 48%, transparent);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: vvar(--space-4);
+    position: fixed;
+    z-index: 10;
+}
+
+.assignment-dialog {
+    background: var(--color-white);
+    border-radius: var(--radius-container);
+    box-shadow: var(--elevation-3);
+    max-width: 30rem;
+    padding: var(--space-8);
+    position: relative;
+    width: 100%;
+}
+
+.assignment-dialog h2 {
+    color: var(--color-text-body);
+    margin: 0 0 var(--space-6);
+}
+
+.assignment-dialog label:not(.checkbox-label) {
+    color: var(--color-text-body);
+    display: grid;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-bold);
+    gap: var(--space-1);
+}
+
+.assignment-dialog select {
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-button);
+    font: inherit;
+    padding: var(--space-3);
 }
