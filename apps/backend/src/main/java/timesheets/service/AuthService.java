@@ -1,29 +1,26 @@
 package timesheets.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import exception.AuthException;
+import exception.AuthException.ErrorCode;
+import exception.BadRequestException;
+import exception.ResourceNotFoundException;
+import exception.StateConflictException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-
-import exception.AuthException;
-import exception.AuthException.ErrorCode;
-import exception.BadRequestException;
-import exception.ResourceNotFoundException;
-import exception.StateConflictException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import timesheets.domain.EmailVerificationToken;
 import timesheets.domain.PasswordResetToken;
 import timesheets.domain.User;
@@ -332,14 +329,20 @@ public class AuthService {
 
   @Transactional
   public MessageResponse forgotPassword(PasswordRequest.Forgot request) {
-    // Always return success to prevent email enumeration
     userRepository
         .findByEmail(request.getEmail())
         .ifPresent(
             user -> {
               String token = UUID.randomUUID().toString();
-              // Save token to password_reset_tokens table
-              // passwordResetTokenRepository.save(resetToken);
+
+              // for safety I want the reset token to expire after an hour
+              PasswordResetToken resetToken =
+                  PasswordResetToken.builder()
+                      .token(token)
+                      .userId(user.getId())
+                      .expiresAt(LocalDateTime.now().plusHours(1))
+                      .build();
+              passwordResetTokenRepository.save(resetToken);
 
               emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), token);
 
@@ -365,17 +368,24 @@ public class AuthService {
       throw new AuthException(ErrorCode.TOKEN_EXPIRED);
     }
 
-    // mark token as used
-    resetToken.markUsed();
-    passwordResetTokenRepository.save(resetToken);
-
-    // update user password
     User user =
         userRepository
             .findById(resetToken.getUserId())
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    if (passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
+      throw new BadRequestException("New password cannot be the same as the current password");
+    }
+
+    // mark token as used
+    resetToken.markUsed();
+    passwordResetTokenRepository.save(resetToken);
+
     user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+    user.setUpdatedAt(LocalDateTime.now());
     userRepository.save(user);
+
+    log.info("Password reset successfully for user: {}", user.getEmail());
 
     return new MessageResponse("Password reset successfully", "/login");
   }
