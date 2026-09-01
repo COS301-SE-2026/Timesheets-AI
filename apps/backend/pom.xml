@@ -205,6 +205,19 @@ it must end with:
             <version>2.4.0</version>
         </dependency>
 
+        <!-- Google Calendar API -->
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-calendar</artifactId>
+            <version>v3-rev20220715-2.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-oauth2-http</artifactId>
+            <version>1.24.0</version>
+        </dependency>
+
         <!-- library to automatically load environment variable from the .env file to the application-->
         <!-- was having trouble with manually loading things-->
         <dependency>
