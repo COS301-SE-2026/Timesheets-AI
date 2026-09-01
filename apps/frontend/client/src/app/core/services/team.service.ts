@@ -31,3 +31,17 @@ export interface ProjectMemberResponse {
     isProjectManager: boolean;
     joinedAt: string;
 }
+
+@Injectable({ providedIn: 'root' })
+export class TeamService {
+    private readonly http = inject(HttpClient);
+    private readonly teamUrl = '/api/teams';
+    private readonly projectUrl = '/api/projects';
+
+    getAvailableUsers(): Observable<AvailableTeamUser[]> {
+        return this.http
+            .get<AvailableTeamUser[]>(`${this.teamUrl}/members/available`)
+            .pipe(catchError(this.handleError('getAvailableUsers')));
+    }
+
+}
