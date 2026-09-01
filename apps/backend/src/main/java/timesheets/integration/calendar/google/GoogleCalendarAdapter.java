@@ -78,11 +78,15 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
 
     /* after testing, google credentials (line above) just give the access token so when it expires, it cannot refresh it (got error related here)
        UserCredentials (object created here) has accessToken, refreshToken and expiresAt
-
-       will create userCredentials
     */
 
-   UserCredentials credentials = UserCredentials.newBuilder().setClientId(googleClientId).setClientSecret(googleClientSecret).setAccessToken(googleAccessToken).setRefresh(refreshToken).build();
+    UserCredentials credentials =
+        UserCredentials.newBuilder()
+            .setClientId(googleClientId)
+            .setClientSecret(googleClientSecret)
+            .setAccessToken(googleAccessToken)
+            .setRefresh(refreshToken)
+            .build();
     HttpCredentialsAdapter requestInitializer = new HttpCredentialsAdapter(credentials);
 
     // To get the user's calendar events
@@ -175,14 +179,20 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
 
     IntegrationToken token = integrationToken.get();
     String accessToken = token.getAccessToken();
+    String refreshToken = token.getRefreshToken();
 
     Date expirationTime =
         Date.from(token.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant());
 
     AccessToken googleAccessToken = new AccessToken(accessToken, expirationTime);
 
-    GoogleCredentials credentials = GoogleCredentials.create(googleAccessToken);
-
+    UserCredentials credentials =
+        UserCredentials.newBuilder()
+            .setClientId(googleClientId)
+            .setClientSecret(googleClientSecret)
+            .setAccessToken(googleAccessToken)
+            .setRefreshToken(refreshToken)
+            .build();
     HttpCredentialsAdapter requestInitializer = new HttpCredentialsAdapter(credentials);
 
     Calendar calendarService =
