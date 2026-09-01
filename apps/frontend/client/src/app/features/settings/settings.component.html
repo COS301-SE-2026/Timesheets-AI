@@ -7,7 +7,7 @@ its role based so roles are switced in the html
 Realated Requirement: N/A
 -->
 
-<div class="setting-page">
+< class="setting-page">
     <header class="settings-header">
         <h1>
             Settings
@@ -224,6 +224,37 @@ Realated Requirement: N/A
         </section>
 
         <!-- ACCESSIBILTY -->
+        <section class="settings-card">
+            <div class="card-icon accessibility">
+                <i class="fa-solid fa-universal-access"></i>
+            </div>
+
+            <div class="card-heading">
+                <h2>
+                    Accessibility
+                </h2>
+                <p>
+                    Improve readability and visibility in the app.
+                </p>
+            </div>
+
+            <div class="card-body">
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="label-title">
+                            High contrast mode
+                        </span>
+                        <p>
+                            Increase contrast for better visibility
+                        </p>
+                    </div>
+                    <mat-slide-toggle
+                        [checked]="s.accessibility.highContrastMode"
+                        (change)="toggleHighContrast($event.checked)">
+                    </mat-slide-toggle>
+                </div>
+            </div>
+        </section>
 
     }
 </div>
