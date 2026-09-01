@@ -292,12 +292,66 @@ $calendar-red-text: #dc2626;
             .fc-timegrid-slot-label-cushion{
                 font-family: 'Roboto Mono', monospace;
                 font-size: 12px;
-                font-weight: 200;
+                font-weight: 400;
+                color: $calendar-text-muted;
+                padding-right: 10px;
+
+            }
+
+            .fc-timegrid-slot-lane{
+                border-top-color: #edf1f5;
+            }
+
+            .fc-timegrid-axis{
+                background: #ffffff;
+            }
+
+            .fc-timegrid-col{
+                background: #ffffff;
             }
 
             .fc-timegrid-event{
                 border-radius: 6px;
                 border: none;
+                overflow: hidden;
+                box-shadow: none;
+                cursor: pointer;
+
+                .fc-event-main{
+                    height: 100%;
+                    padding: 6px 8px;
+                }
+
+                .fc-event-main-frame{
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    height: 100%;
+                }
+
+                .fc-event-title-container{
+                    flex-grow: 0;
+                }
+
+                .fc-event-title{
+                    font-size: 13px;
+                    font-weight: 700;
+                    line-height: 1.25;
+                    letter-spacing: -0.1px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                
+                .fc-event-time{
+                    font-size: 11px;
+                    font-weight: 500;
+                    line-height: 1.2;
+                    opacity: 0.75;
+                }
+
+                &:hover{
+                    filter: brightness(0.98);
+                }
 
                 &.fc-event-meetings{
                     background: $calendar-blue-bg; 
