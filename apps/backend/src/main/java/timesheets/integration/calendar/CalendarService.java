@@ -18,7 +18,7 @@ public class CalendarService {
     return calendarAdapter.getEvents(workspaceMemberId, startTime, endTime);
   }
 
-  public CalendarEvent getEvent(UUID workspaceMemberId, String externalEventId){
+  public CalendarEvent getEvent(UUID workspaceMemberId, String externalEventId) {
     return calendarAdapter.getEvent(workspaceMemberId, externalEventId);
   }
 }

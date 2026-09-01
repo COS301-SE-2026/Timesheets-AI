@@ -6,6 +6,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,5 +26,13 @@ public class CalendarController {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
     List<CalendarEvent> events = calendarService.getEvents(workspaceMemberId, startTime, endTime);
     return ResponseEntity.ok(events);
+  }
+
+  @GetMapping("/events/id")
+  public ResponseEntity<CalendarEvent> getEvent(@PathVariable String id) {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    CalendarEvent event = calendarService.getEvent(workspaceMemberId, id);
+
+    return ResponseEntity.ok(event);
   }
 }
