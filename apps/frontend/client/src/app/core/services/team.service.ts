@@ -38,10 +38,19 @@ export class TeamService {
     private readonly teamUrl = '/api/teams';
     private readonly projectUrl = '/api/projects';
 
+    // fetch available users
     getAvailableUsers(): Observable<AvailableTeamUser[]> {
         return this.http
             .get<AvailableTeamUser[]>(`${this.teamUrl}/members/available`)
             .pipe(catchError(this.handleError('getAvailableUsers')));
     }
+
+    // add users to workspace
+    addToWorkspace(userId: string, role: WorkspaceRole = 'DEVELOPER'): Observable<WorkspaceMemberResponse> {
+        return this.http
+            .post<WorkspaceMemberResponse>(`${this.teamUrl}/members`, {userId, role })
+            .pipe(catchError(this.handleError('assToWorksoace')))
+    }
+
 
 }
