@@ -97,11 +97,19 @@ export const routes: Routes = [
       import('./features/onboarding/waiting-for-workspace/waiting-for-workspace.component')
         .then(m => m.WaitingForWorkspaceComponent)
   },
+  // CALENDER PAGE LINK
   {
     path: 'calendar',
     loadComponent: () =>
       import('./features/calendar/calendar.component')
         .then(m => m.CalendarComponent)
+  },
+  // SETTINGS PAGE ROUTE LINK
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('./features/settings/settings.component')
+        .then(m => m.SettingsComponent)
   },
 
   /* 404 fallback */
