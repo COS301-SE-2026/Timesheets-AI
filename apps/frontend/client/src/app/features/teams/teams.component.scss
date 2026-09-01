@@ -366,3 +366,68 @@ h1 {
     font: inherit;
     padding: var(--space-3);
 }
+
+.checkbox-label {
+    align-items: center;
+    color: var(--color-text-muted);
+    display: flex;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 var(--space-6);
+}
+
+.dialog-action {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+}
+
+.secondary-button {
+    background: var(--color-gray-light);
+    color: var(--color-text-body);
+    padding: var(--space-3) var(--space-4);
+}
+
+.dialog-close {
+    background: none;
+    border: 0;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: var(--font-size-h2);
+    position: absolute;
+    right: var(--space-3);
+    top: var(--space-2);
+}
+
+.sr-only {
+    clip: rect(0, 0, 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    position: absolute;
+    width: 1px;
+}
+
+@media (max-width: 800px) {
+    .teams-page {
+        padding: var(--space-6) var(--space-4);
+}
+
+.team-heading, .team-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.stats-grid {
+    grid-template-columns: 1fr;
+}
+
+.team-card {
+    overflow-x: auto;
+}
+
+.search-field, .search-field input {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+}
