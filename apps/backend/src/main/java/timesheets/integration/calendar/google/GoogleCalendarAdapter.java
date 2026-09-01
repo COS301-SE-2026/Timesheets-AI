@@ -7,6 +7,7 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
+import com.google.auth.oauth2.UserCredentials;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import timesheets.auth.GoogleOAuthService;
+import timesheets.auth.GoogleTokenResponse;
 import timesheets.domain.IntegrationToken;
 import timesheets.integration.calendar.CalendarAdapter;
 import timesheets.integration.calendar.CalendarEvent;
@@ -66,6 +68,7 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
     // expiration time
 
     String accessToken = token.getAccessToken();
+    String refreshToken = token.getRefreshToken();
 
     Date expirationTime =
         Date.from(token.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant());
@@ -77,7 +80,8 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
     // GoogleCredentials credentials = GoogleCredentials.create(googleAccessToken);
 
     /* after testing, google credentials (line above) just give the access token so when it expires, it cannot refresh it (got error related here)
-       UserCredentials (object created here) has accessToken, refreshToken and expiresAt
+       UserCredentials (object created here)
+       UserCredentials contains the OAuth client details, accessToken and refreshToken
     */
 
     UserCredentials credentials =
@@ -85,8 +89,9 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
             .setClientId(googleClientId)
             .setClientSecret(googleClientSecret)
             .setAccessToken(googleAccessToken)
-            .setRefresh(refreshToken)
+            .setRefreshToken(refreshToken)
             .build();
+
     HttpCredentialsAdapter requestInitializer = new HttpCredentialsAdapter(credentials);
 
     // To get the user's calendar events
@@ -255,6 +260,27 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
   }
 
   @Override
-  public CalendarEvent deleteEvent(UUID workspaceMemberId, String externalEventId) {}
+  public void deleteEvent(UUID workspaceMemberId, String externalEventId) {}
 
+  @Override
+  public void exchangeAndsaveToken(UUID workspaceMemberId, String code) {
+
+    // need to exchange Google's authorization code for tokens
+    GoogleTokenResponse tokenResponse = googleOAuthService.exchangeCodeforToken(code);
+
+    // save tokens received Google so that the user dont have to
+
+    LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn());
+
+    IntegrationToken integrationToken =
+        IntegrationToken.builder()
+            .workspaceMemberId(workspaceMemberId)
+            .provider("GOOGLE_CALENDAR")
+            .accessToken(tokenResponse.getAccessToken())
+            .refreshToken(tokenResponse.getRefreshToken())
+            .expiresAt(expiresAt)
+            .build();
+
+    integrationTokenRepository.save(integrationToken);
+  }
 }
