@@ -209,8 +209,8 @@
       </section>
 
     @if (isCreateModalOpen()) {
-            <div class="modal-overlay" role="button" tabindex="0" aria-label="Close create task" (click)="onOverlayClick($event)">
-                <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="create-task-modal-title">
+            <dialog class="modal-overlay" aria-label="Close create task" #createDialog open>
+                <div class="modal-panel" aria-modal="true" aria-labelledby="create-task-modal-title">
                     <header class="modal-header">
                         <h2 id="create-task-modal-title" class="modal-title">Create New Task</h2>
                         <button type="button" class="modal-close" (click)="closeCreateModal()" aria-label="Close create task">
@@ -431,26 +431,13 @@
                         </footer>
                     </form>
                 </div>
-            </div>
+            </dialog>
         }
 
 
         @if(isDetailOpen()) {
-        <div
-            class="modal-overlay"
-            role="button"
-            tabindex="0"
-            aria-label="Close task detail"
-            (click)="onOverlayClick($event)"
-            (keydown.enter)="closeTaskDetail()"
-            (keydown.space)="closeTaskDetail()"
-            >
-            <div
-                class="modal-panel"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="task-detail-title"
-            >
+        <div class="modal-overlay" aria-label="Close create task" #createDialog open>
+            <div class="modal-panel" aria-modal="true" aria-labelledby="create-task-modal-title">
                 <header class="modal-header">
                     <h2 id="task-detail-title" class="modal-title"> Task Detail </h2>
                     <button type="button" class="modal-close" (click)="closeTaskDetail()" aria-label="Close task detail">
@@ -487,7 +474,7 @@
 
                             <div class="form-row">
                                 <label class="form-label" for="detail-jira">Jira Ticket</label>
-                                 <input id="detail-jira" class="form-control" type="text" [value]="task.jiraTicketKey || '-'" readonly />
+                                <input id="detail-jira" class="form-control" type="text" [value]="task.jiraTicketKey || '-'" readonly />
                             </div>  
 
                             <div class="form-row">
@@ -505,32 +492,32 @@
                                 <input id="detail-due" class="form-control" type="text"  [value]="formatDate(task.dueDate)" readonly />
                             </div>
 
-                             <div class="form-row">
+                            <div class="form-row">
                                 <label class="form-label" for="detail-estimated"> Estimated hours</label>
                                 <input id="detail-estimated" class="form-control" type="text"  [value]="task.estimatedHours + 'h'" readonly />
                             </div>
 
-                             <div class="form-row">
+                            <div class="form-row">
                                 <label class="form-label" for="detail-actual"> Actual Hours</label>
                                 <input id="detail-actual" class="form-control" type="text"  [value]="task.actualHours + 'h'" readonly />
                             </div>
 
-                             <div class="form-row">
+                            <div class="form-row">
                                 <label class="form-label" for="detail-parent"> Parent Task</label>
                                 <input id="detail-parent" class="form-control" type="text"  [value]="task.parentTaskId || '-'" readonly />
                             </div>
 
-                             <div class="form-row">
+                            <div class="form-row">
                                 <label class="form-label" for="detail-completed"> Completed At</label>
                                 <input id="detail-completed" class="form-control" type="text"  [value]="formatDateTime(task.completedAt) || '-' " readonly />
                             </div>
 
-                             <div class="form-row">
+                            <div class="form-row">
                                 <label class="form-label" for="detail-created"> Created At</label>
                                 <input id="detail-created" class="form-control" type="text"  [value]="formatDateTime(task.createdAt)" readonly />
                             </div>
 
-                             <div class="form-row">
+                            <div class="form-row">
                                 <label class="form-label" for="detail-updated"> Last Updated </label>
                                 <input id="detail-updated" class="form-control" type="text"  [value]="formatDateTime(task.updatedAt)" readonly />
                             </div>
@@ -544,8 +531,9 @@
                     </form>
                 } @else {
                     <p class="modal-message"> Task details are unavailable </p>
-                } }
+                } 
+            }
             </div>
         </div>
-      }
+    }
 </main>
