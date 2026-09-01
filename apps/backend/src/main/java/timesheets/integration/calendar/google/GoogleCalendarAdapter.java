@@ -240,4 +240,21 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
 
     return calendarEvent;
   }
+
+  // will implement later
+  // adding these functions back
+
+  @Override
+  public CalendarEvent createEvent(UUID workspaceMemberId, CalendarEvent event) {
+    return event;
+  }
+
+  @Override
+  public CalendarEvent updateEvent(UUID workspaceMemberId, CalendarEvent event) {
+    return event;
+  }
+
+  @Override
+  public CalendarEvent deleteEvent(UUID workspaceMemberId, String externalEventId) {}
+
 }
