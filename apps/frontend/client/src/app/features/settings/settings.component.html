@@ -1,1 +1,80 @@
-<p>settings works!</p>
+<!-- 
+Author: Cleopatra Kwenda
+Date: 2026-09-01
+Purpose: Settings page layout 
+created to look like our desired wireframe
+its role based so roles are switced in the html
+Realated Requirement: N/A
+-->
+
+<div class="setting-page">
+    <header class="settings-header">
+        <h1>
+            Settings
+        </h1>
+        <p>
+            Manage your account, integrations, prefrences and more.
+        </p>
+    </header>
+
+    @if(!isLoading() && settings(); as s){
+        <!-- ACCOUNT AND SECURITY -->
+        <section class="settings-card">
+            <div class="card-icon security">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="card-heading">
+                <h2>
+                    Account &amp; Security
+                </h2>
+                <p>
+                    Manage your password and keep your account secure.
+                </p>
+            </div>
+
+            <div class="card-body">
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="label-title">
+                            Password
+                        </span>
+                    </div>
+
+                    <div class="settings-control">
+                        <span class="password-dots">
+                            ••••••••••
+                        </span>
+                        <button 
+                            class="secondary-button"
+                            (click)="changePassword()">
+                            Change
+                        </button>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-label">
+                        <span class="label-title">
+                            Multi-factor authentication (MFA)
+                        </span>
+                        <p>
+                            Add extra layer of security to your account.
+                        </p>
+                    </div>
+
+                    <div class="setting-control">
+                        <mat-slide-toggle
+                        [checked]="s.security.mfaEnabled"
+                        (change)="toggleMfa($event.checked)">
+                    </mat-slide-toggle>
+                    <span class="toggle-label">
+                        {{ s.security.mfaEnabled ? 'Enabled' : 'Disabled' }}
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTEGRATIONS -->
+    }
+</div>
