@@ -49,7 +49,14 @@ export class TeamService {
     addToWorkspace(userId: string, role: WorkspaceRole = 'DEVELOPER'): Observable<WorkspaceMemberResponse> {
         return this.http
             .post<WorkspaceMemberResponse>(`${this.teamUrl}/members`, {userId, role })
-            .pipe(catchError(this.handleError('assToWorksoace')))
+            .pipe(catchError(this.handleError('assToWorksoace')));
+    }
+
+    // Remove user from workspace 
+    removeFromWorkspace(workspaceMemberId: string): Observable<void> {
+        return this.http 
+            .delete<void>(`${this.teamUrl}/members/${workspaceMemberId}`)
+            .pipe(catchError(this.handleError('removeFromWorkspace')));
     }
 
 
