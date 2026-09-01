@@ -65,6 +65,11 @@ export class CalendarComponent implements OnInit {
 
     slotMinTime: '06:00:00',
     slotMaxTime: '19:00:00',
+    slotDuration: '01:00:00',
+    slotLabelInterval: '01:00:00',
+    eventMinHeight: 40,
+    eventShortHeight: 30,
+    expandRows: true,
     dayMaxEventRows: true,
 
     datesSet:(dateInfo)=>{
