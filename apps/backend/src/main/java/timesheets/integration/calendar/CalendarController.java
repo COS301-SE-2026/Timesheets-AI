@@ -28,10 +28,10 @@ public class CalendarController {
     return ResponseEntity.ok(events);
   }
 
-  @GetMapping("/events/id")
-  public ResponseEntity<CalendarEvent> getEvent(@PathVariable String id) {
+  @GetMapping("/events/{externalEventId}")
+  public ResponseEntity<CalendarEvent> getEvent(@PathVariable String externalEventId) {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    CalendarEvent event = calendarService.getEvent(workspaceMemberId, id);
+    CalendarEvent event = calendarService.getEvent(workspaceMemberId, externalEventId);
 
     return ResponseEntity.ok(event);
   }
