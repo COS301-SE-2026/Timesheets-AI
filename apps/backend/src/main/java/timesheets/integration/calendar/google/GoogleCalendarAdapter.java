@@ -9,6 +9,7 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -117,18 +118,29 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
       // google stores as googlevent - getStart() and getEnd(): EventDateTime objects
       // I am using LocalDateTime
 
-      LocalDateTime eventStartTime =
-          LocalDateTime.ofInstant(
-              java.time.Instant.ofEpochMilli(googleEvent.getStart().getDateTime().getValue()),
-              ZoneId.systemDefault());
+      if (googleEvent.getStart().getDateTime() != null
+          && googleEvent.getEnd().getDateTime() != null) {
+        LocalDateTime eventStartTime =
+            LocalDateTime.ofInstant(
+                java.time.Instant.ofEpochMilli(googleEvent.getStart().getDateTime().getValue()),
+                ZoneId.systemDefault());
 
-      LocalDateTime eventEndTime =
-          LocalDateTime.ofInstant(
-              java.time.Instant.ofEpochMilli(googleEvent.getEnd().getDateTime().getValue()),
-              ZoneId.systemDefault());
+        LocalDateTime eventEndTime =
+            LocalDateTime.ofInstant(
+                java.time.Instant.ofEpochMilli(googleEvent.getEnd().getDateTime().getValue()),
+                ZoneId.systemDefault());
 
-      calendarEvent.setStartTime(eventStartTime);
-      calendarEvent.setEndTime(eventEndTime);
+        calendarEvent.setStartTime(eventStartTime);
+        calendarEvent.setEndTime(eventEndTime);
+      } else if (googleEvent.getStart().getDate() != null
+          && googleEvent.getEnd().getDate() != null) {
+
+        LocalDate eventStartDate = LocalDate.parse(googleEvent.getStart().getDate().toString());
+        LocalDate eventEndDate = LocalDate.parse(googleEvent.getEnd().getDate().toString());
+
+        calendarEvent.setStartTime(eventStartDate.atStartOfDay());
+        calendarEvent.setEndTime(eventEndDate.atStartOfDay());
+      }
 
       calendarEvents.add(calendarEvent);
     }
