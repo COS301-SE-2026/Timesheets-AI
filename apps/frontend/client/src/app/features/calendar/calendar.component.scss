@@ -316,10 +316,12 @@ $calendar-red-text: #dc2626;
                 overflow: hidden;
                 box-shadow: none;
                 cursor: pointer;
+                min-height: 28px;
 
                 .fc-event-main{
                     height: 100%;
                     padding: 6px 8px;
+                    box-sizing: border-box;
                 }
 
                 .fc-event-main-frame{
