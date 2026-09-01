@@ -64,8 +64,8 @@ export class CalendarComponent implements OnInit {
     },
 
     slotMinTime: '06:00:00',
-    slotMaxTime: '19:00:00',
-    slotDuration: '01:00:00',
+    slotMaxTime: '17:30:00',
+    slotDuration: '0:15:00',
     slotLabelInterval: '01:00:00',
     eventMinHeight: 40,
     eventShortHeight: 30,
