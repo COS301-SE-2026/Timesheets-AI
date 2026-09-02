@@ -59,8 +59,7 @@ public class JavaMailEmailService implements EmailService {
       helper.setText(htmlContent, true);
       mailSender.send(message);
       log.info("Email successfully to: {}", to);
-    } 
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Failed to send email to: {}", to, e);
     }
   }
