@@ -215,6 +215,26 @@ protected hasProtectedMembershipId(member: TeamMember): boolean {
   return Boolean(member.worspaceMemberId);
 }
 
+// Start action function
+private startAction(actionKey: string): void {
+  this.actionMessage = '';
+  this.actionInProgress = actionKey;
+} 
+
+private finishAction(): void {
+  this.actionInProgress = '';
+}
+
+private showSuccess(message: string): void {
+  this.actionMessageKind = 'success';
+  this.actionMessage = message;
+}
+
+private showError(message: string): void {
+  this.actionMessageKind = 'error';
+  this.actionMessage = message;
+}
+
 // filter users
 private filterUsers(users: TeamMember[]): TeamMember[] {
   const term = this.searchTerm.trim().toLowerCase();
