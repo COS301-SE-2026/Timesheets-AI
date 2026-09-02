@@ -8,6 +8,8 @@ and free tiers prompts/responses may be used Google to improve their models
 references: https://ai.google.dev/gemini-api/docs
 Author: Zamokuhle Zwane
 Date: 28/08/2026
+
+Patched: updated the save_weekly_summary_insight() func
 """
 
 import os
@@ -70,7 +72,7 @@ def _build_prompt(hours_logged, project_count, latest_score, previous_score, sub
 
 def _call_gemini_with_retry(prompt: str) -> str:
     model = genai.GenerativeModel("gemini-2.5-flash-lite")
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+    genai.configure(api_key=settings.gemini_api_key)
 
     last_error = None
     for attempt in range(MAX_RETRIES):
@@ -128,7 +130,8 @@ def save_weekly_summary_insight(
     db: Session, subject_id: uuid.UUID, subject_type: str, result: dict
 ) -> AIInsight:
     insight = AIInsight(
-        workspace_member_id=subject_id,
+        workspace_id=subject_id if subject_type == "TEAM" else None,
+        workspace_member_id=subject_id if subject_type == "USER" else None,
         insight_type="WEEKLY_SUMMARY",
         scope="TEAM" if subject_type == "TEAM" else "USER",
         narrative=result["narrative"],
