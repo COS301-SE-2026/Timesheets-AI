@@ -28,7 +28,7 @@ class AIInsight(Base):
         UUID(as_uuid=True), ForeignKey("workspace_members.id"), nullable=True
     )
     workspace_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid= True), ForeignKey("workspaces.id"), nullable=True
+        UUID(as_uuid=True), ForeignKey("workspaces.id"), nullable=True
     )
     project_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("projects.id"), nullable=True
