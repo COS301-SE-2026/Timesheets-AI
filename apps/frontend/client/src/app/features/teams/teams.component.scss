@@ -329,6 +329,52 @@ h1 {
     color: var(--color-primary);
 }
 
+// action menu
+
+.action-menu {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--elevation-3);
+    min-width: 190px;
+    padding: var(--space-1);
+    position: absolute;
+    right: 0;
+    top: calc(100% + var(--space-1));
+    z-index: 3;
+}
+
+.action-menu button {
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-button);
+    color: var(--color-text-body);
+    cursor: pointer;
+    display: block;
+    font: inherit;
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    width: 100%;
+}
+
+.action-menu button:hover:not(:disabled) {
+    background: var(--color-primary-surface);
+}
+
+.action-menu .danger-action, .danger-button {
+    color: var(--color-status-overdue-text);
+}
+
+.danger-button {
+    background: var(--color-status-overdue-bg);
+    border: 0;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+    font: inherit;
+    font-weight: var(--font-weight-bold);
+    padding: var(--space-3) var(--space-4);
+}
+
 .text-button:disabled {
     cursor: not-allowed;
     opacity: 0.48;
