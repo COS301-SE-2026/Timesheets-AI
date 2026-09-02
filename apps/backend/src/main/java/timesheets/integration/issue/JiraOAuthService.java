@@ -29,10 +29,10 @@ public class JiraOAuthService {
   @Value("${app.jira.client-id}")
   private String clientId;
 
-  @Value("${app.jira,client-secret}")
+  @Value("${app.jira.client-secret}")
   private String clientSecret;
 
-  @Value("${app.jira,redirect-uri}")
+  @Value("${app.jira.redirect-uri}")
   private String redirectUri;
 
   // Used to make HTTP requests to the Atlassian OAuth API
@@ -82,7 +82,7 @@ public class JiraOAuthService {
     String encodedCredentials =
         Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
 
-    headers.set("Authorization", "Basic" + encodedCredentials);
+    headers.set("Authorization", "Basic " + encodedCredentials);
 
     // Build JSON request body required by the OAuth token endpoint
     String body =
