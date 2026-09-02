@@ -147,8 +147,7 @@
                                                     </button>
                                                 }
                                             </div>
-                                        }
-                                            </button>
+
                                         }
                                     }
                                 </div>
@@ -162,33 +161,87 @@
 </section>
 }
 
+<!-- Assign member to a workspace dialog layout -->
+
 @if (selectedMember) {
     <div class="modal-backdrop">
         <section class="assignment-dialog" role="dialog" aria-modal="true" aria-labelledby="assignment-title" >
             <button type="button" class="dialog-close" (click)="closeAssignment()" aria-label="Close">x</button>
             <p class="eyebrow">Project management</p>
-            <h2 id="assignment-title">Assign {{ selectedMember.firstName }} {{ selectedMember.lastName }}</h2>
+            <h2 id="assignment-title">{{ assignmentMode === 'add' ? 'Assign' : 'Remove' }} {{ selectedMember.firstName }} {{ selectedMember.lastName }}</h2>
             <label>Project <select [(ngModel)]="selectedProjectId">
                 <option value="" disabled>
                     Select a project
                 </option>
                 @for (project of projects; track project.id) {
-                    @if (!selectedMember.projectIds.includes(project.id)) {
+                    @if ((assignmentMode === 'add' && !selectedMember.projectIds.includes(project.id)) || (assignmentMode === 'remove' && selectedMember.projectIds.includes(project.id))) {
                         <option [value]="project.id">{{project.name }}</option>
                     }
                 }
             </select></label>
+            @if (assignmentMode === 'add' && isAdmin) {
             <label class="checkbox-label">
                 <input type="checkbox" [(ngModel)]="assignAsProjectManager" />
                 Make project manager
             </label>
+        }
             <div class="dialog-actions">
                 <button type="button" class="secondary-button"
                 (click)="closeAssignment()" [disabled]="actionInProgress">Cancel</button>
                <button type="button" class="primary-button"
-               [disabled]="!selectedProjectId || actionInProgress" (click)="assignToProject()">
-               {{ actionInProgress ? 'Assigning...' : 'Assign to project' }}
+               [disabled]="!selectedProjectId || actionInProgress" (click)="assignmentMode === 'add' ? assignToProject() : confirmProjectRemoval()" >
+               {{ actionInProgress ? 'Saving...' : assignmentMode === 'add' ? 'Assign to project' : 'Remove from project' }}
                </button>
+            </div>
+        </section>
+    </div>
+}
+
+<!-- Create project dialog layout  -->
+@if (showCreateProjectDialog) {
+    <div class="modal-backdrop">
+        <section class="assignment-dialog" role="dialog" aria-modal="true" aria-labelledby="create-project-title">
+            <button type="button" class="dialog-close" (click)="closeCreateProject()" aria-label="Close">x</button>
+            <p class="eyebrow">Project management</p>
+            <h2 id="create-project-title">Create a project</h2>
+            <label>Project name 
+                <input type="text" [(ngModel)]="newProject.name" mxlength="255" placeholder="e.g. Website redesign" />
+            </label>
+            <label>Description <textarea [(ngModel)]="newProject.description" rows="3" placeholder="Optional"></textarea> </label>
+            @if (isAdmin) {
+                <label>Project manager
+                <select [(ngModel)]="newProject.managerIds" multiple>
+                    @for (member of workspaceMembers; track member.userId) {
+                        @if (member.worspaceMemberId) {
+                            <option [value]="member.workspaceMemberId">{{ member.firstName }} {{ member.lastName }} </option>
+                        }
+                    }
+                </select>
+                </label>
+                <p class="form-help">Select one or more workspace members to make project managers.</p>
+            } @else {
+                <p class="form-help">You can create this project and add members, but only an administrator can designate a project manager.</p>
+            }
+            <div class="dialog-actions">
+                <button type="button" class="secondary-button" (click)="closeCreateProject()" [disabled]="actionInProgress">Cancel</button>
+                <button type="button" class="primary-button" [disabled]="!newProject.name.trim() || actionInProgress" (click)="crateProject()">
+                    {{ actionInProgress ? 'Creating...' : 'Create project' }}
+                </button>
+            </div>
+        </section>
+    </div>
+}
+
+<!-- Remove member from workspace layout -->
+
+@if (memberToRemoveFromWorkspace) {
+    <div class="modal-backdrop">
+        <section class="assignment-dialog" role="alertdialog" aria-modal="true" aria-labelledby="remove-workspace-title">
+            <h2 id="remove-workspace-title"> Remove {{ memberToRemoveFromWorkspace.firstName }} from the workspace?</h2>
+            <p>They will lose workspace access and project memberships.</p>
+            <div class="dialog-actions">
+                <button type="button" class="secondary-button" (click)="cancelWorkspaceRemoval()" [disabled]="actionInProgress">Cancel</button>
+                <button type="button" class="danger-button" (click)="removeFromWorkspace()" [disabled]="actionInProgress">Remove user</button>
             </div>
         </section>
     </div>
