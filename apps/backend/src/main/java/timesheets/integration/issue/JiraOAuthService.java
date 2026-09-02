@@ -58,7 +58,7 @@ public class JiraOAuthService {
     read:jira-user --> read Jira user information
     read:me --> read the authenticated user's identity
   */
-  public String buildAuthrizationUrl(String state) {
+  public String buildAuthorizationUrl(String state) {
     return AUTHORIZATION_URL
         + "?audience=api.atlassian.com"
         + "&client_id="
