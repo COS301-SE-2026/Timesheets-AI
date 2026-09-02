@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
 from app.api.productivity import router as productivity_router
+from app.api.dashboard import router as dashboard_router
 
 # adding logging here as well
 logging.basicConfig(level=logging.INFO)
@@ -35,7 +36,11 @@ app.add_middleware(
 app.include_router(health_router)
 # added a matching productivity router to the main app
 app.include_router(productivity_router)
-
+app.include_router(burnout_router)
+app.include_router(delivery_forecast_router)
+app.include_router(anomaly_router)
+app.include_router(weekly_summary_router)
+app.include_router(dashboard_router)
 
 @app.get("/", include_in_schema=False)
 def root():
