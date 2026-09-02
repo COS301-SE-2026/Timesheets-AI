@@ -131,7 +131,7 @@
                                             <i class="fa-solid" [class.fa-spinner]="isActionInProgress('remove-' + member.userId + '-' + projectId)" [class.fa-spin]="isActionInProgress('remove-' + member.userId + '-' + projectId)" [class.fa-xmark]="!isActionInProgress('remove-' + member.userId + '-' + projectId)"></i>
                                             </button>
                                         }
-                                        } 
+                                    }
                                 </div>
                             </td>
                         </tr>
@@ -139,12 +139,9 @@
                 </tbody>
             </table>
            </div>
-           
     }
-}
-           
-
 </section>
+}
 
 @if (selectedMember) {
     <div class="modal-backdrop">
