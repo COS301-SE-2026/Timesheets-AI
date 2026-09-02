@@ -11,17 +11,18 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+
 def get_github_activity(
-         db: Session,
+    db: Session,
     workspace_member_id: UUID,
     start: datetime,
     end: datetime,
 ) -> dict:
-    
-    #real V1 git_commits columns: lines_added, lines_removed, not additions/deletions
-    github_rows = db.execute(
-        text(
-            """
+    # real V1 git_commits columns: lines_added, lines_removed, not additions/deletions
+    github_rows = (
+        db.execute(
+            text(
+                """
             SELECT repository_name, commit_time, lines_added, lines_removed
             FROM git_commits
             WHERE workspace_member_id = :member_id
@@ -29,13 +30,17 @@ def get_github_activity(
               AND commit_time <= :end_time
             ORDER BY commit_time ASC
             """
-        ),
-        {"member_id": workspace_member_id, "start_time": start, "end_time": end},
-    ).mappings().all()
+            ),
+            {"member_id": workspace_member_id, "start_time": start, "end_time": end},
+        )
+        .mappings()
+        .all()
+    )
 
-    time_rows = db.execute(
-        text(
-            """
+    time_rows = (
+        db.execute(
+            text(
+                """
             SELECT duration_seconds
             FROM time_entries
             WHERE workspace_member_id = :member_id
@@ -43,9 +48,12 @@ def get_github_activity(
               AND start_time <= :end_time
               AND is_deleted = false
             """
-        ),
-        {"member_id": workspace_member_id, "start_time": start, "end_time": end},
-    ).mappings().all()
+            ),
+            {"member_id": workspace_member_id, "start_time": start, "end_time": end},
+        )
+        .mappings()
+        .all()
+    )
 
     hours_logged = sum(float(row["duration_seconds"] or 0) for row in time_rows) / 3600.0
 
@@ -61,7 +69,7 @@ def get_github_activity(
     alignment = None
     explanation = None
 
-    #not calculating an alignment verdict until there's enough signal, a fake "0.00" is worse than showing nothing for a brand new github connection
+    # not calculating an alignment verdict until there's enough signal, a fake "0.00" is worse than showing nothing for a brand new github connection
     if hours_logged > 0 and commit_count == 0:
         alignment = "LOW_ACTIVITY"
         explanation = "Time was logged during this period, but no GitHub commits were detected."
