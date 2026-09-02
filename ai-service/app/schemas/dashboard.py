@@ -29,6 +29,7 @@ class DashboardInsight(BaseModel):
     workspace_id: Optional[UUID] = None
     created_at: datetime
 
+
 class GitHubActivity(BaseModel):
     connected: bool
     hours_logged: float
@@ -40,6 +41,7 @@ class GitHubActivity(BaseModel):
     active_days: int
     alignment: Optional[str] = None
     explanation: Optional[str] = None
+
 
 class DashboardResponse(BaseModel):
     workspace_member_id: UUID

@@ -12,9 +12,9 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.dashboard import router as dashboard_router
 from app.api.health import router as health_router
 from app.api.productivity import router as productivity_router
-from app.api.dashboard import router as dashboard_router
 
 # adding logging here as well
 logging.basicConfig(level=logging.INFO)
@@ -41,6 +41,7 @@ app.include_router(delivery_forecast_router)
 app.include_router(anomaly_router)
 app.include_router(weekly_summary_router)
 app.include_router(dashboard_router)
+
 
 @app.get("/", include_in_schema=False)
 def root():

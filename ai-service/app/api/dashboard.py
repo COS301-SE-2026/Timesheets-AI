@@ -6,6 +6,7 @@ Date: 01/09/2026
 """
 
 from datetime import datetime, timedelta, timezone
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -27,10 +28,7 @@ router = APIRouter(
     "/dashboard/{workspace_member_id}",
     response_model=DashboardResponse,
 )
-def get_dashboard(
-    workspace_member_id: UUID,
-    db: Session = Depends(get_db),
-):
+def get_dashboard(workspace_member_id: UUID, db: Annotated[Session, Depends(get_db)]):
     member = db.query(WorkspaceMember).filter(WorkspaceMember.id == workspace_member_id).first()
 
     if member is None:
