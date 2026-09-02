@@ -8,6 +8,7 @@ import { Routes } from '@angular/router';
 import { LandingPageComponent } from './features/landing/landing-page/landing-page.component';
 import { authGuard } from './core/guards/auth.guard';
 import { workspaceGuard } from './core/guards/workspace.guard'; 
+import { teamGuard } from './core/guards/team.guard'
 
 export const routes: Routes = [
   /* Default redirect */
@@ -87,6 +88,15 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/leave-requests/leave-requests.component')
         .then(m => m.LeaveRequestsComponent)
+  },
+
+  // Team page
+
+  {
+    path: 'team',
+    canActivate: [authGuard, workspaceGuard, teamGuard ],
+    loadComponent: () =>
+      import('./features/teams/teams.component').then((m) => m.TeamsComponent),
   },
 
   //waiting-for-workspace
