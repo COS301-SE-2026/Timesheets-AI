@@ -73,7 +73,7 @@ export class SignupComponent implements AfterViewInit{
         // Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d).+$/)
         // REGEX need to match backend exactly
         Validators.pattern(
-            /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\S+$).{8,20}$/
+            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\S+$).{8,20}$/
 
         )
       ]
