@@ -6,6 +6,7 @@ Author: Zamokuhle Zwane
 Date: 12/07/2026
 
 Patch: added scop and narrative fields
+Patch: added workspace id
 """
 
 import uuid
@@ -25,6 +26,9 @@ class AIInsight(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     workspace_member_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("workspace_members.id"), nullable=True
+    )
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid= True), ForeignKey("workspaces.id"), nullable=True
     )
     project_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("projects.id"), nullable=True
