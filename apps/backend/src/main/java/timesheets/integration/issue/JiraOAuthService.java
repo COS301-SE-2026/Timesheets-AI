@@ -143,9 +143,11 @@ public class JiraOAuthService {
     }
   }
 
-  private String encode(String value){
+  private String encode(String value) {
     return java.net.URLEncoder.encode(value, StandardCharsets.UTF_8);
   }
 
-  private String escapeJson(String value) { return value .replace("\\", "\\\\") .replace("\"", "\\\""); }
+  private String escapeJson(String value) {
+    return value.replace("\\", "\\\\").replace("\"", "\\\"");
+  }
 }
