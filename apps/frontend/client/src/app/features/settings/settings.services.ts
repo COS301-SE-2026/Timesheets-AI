@@ -41,7 +41,7 @@ export class SettingsService{
                 id: 'google-calendar',
                 name: 'Google Calendar',
                 description: 'Sync your calendar events and avaiability.',
-                icon: 'fa-regular fa-calendar',
+                icon: 'fa-brands fa-google',
                 connected: true,
                 enabled: true,
             },

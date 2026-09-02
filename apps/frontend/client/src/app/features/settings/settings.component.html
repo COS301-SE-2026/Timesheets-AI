@@ -281,23 +281,28 @@ Realated Requirement: N/A
                             Choose how you want to be notified.
                         </p>
                     </div>
-                    <mat-select
-                        class="settings-select"
-                        [value]="s.notifications.notificationType"
-                        (selectionChange)="setNotificationType($event.value)">
-                        <mat-option 
-                            value="ALL">
-                            All notifications
-                        </mat-option>
-                        <mat-option 
-                            value="MENTIONS_ONLY">
-                            Mentions only
-                        </mat-option>
-                        <!-- <mat-option 
-                            value="DO_NOT_DISTURB">
-                            Do Not Disturb
-                        </mat-option> -->
-                    </mat-select>
+                    <mat-form-field
+                        appearance="outline"
+                        class="settings-select">
+                        <mat-select
+                            class="settings-select"
+                            [value]="s.notifications.notificationType"
+                            (selectionChange)="setNotificationType($event.value)">
+                            <mat-option 
+                                value="ALL">
+                                All notifications
+                            </mat-option>
+                            <mat-option 
+                                value="MENTIONS_ONLY">
+                                Mentions only
+                            </mat-option>
+                            <!-- <mat-option 
+                                value="DO_NOT_DISTURB">
+                                Do Not Disturb
+                            </mat-option> -->
+                        </mat-select>
+                    </mat-form-field>
+                    
                 </div>
 
                 <!-- <div class="setting-row">

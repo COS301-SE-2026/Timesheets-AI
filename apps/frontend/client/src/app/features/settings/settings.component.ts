@@ -1,16 +1,16 @@
 import { Component, OnInit, Inject, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSelectModule} from '@angular/material/select';
+import { MatFormField, MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from './settings.services';
 import { CurrentUserService } from './current-user.services';
 import { UserSettings, UserRole, IntegrationStatus, NotificationType } from './settings.model';
-import { sign } from 'node:crypto';
+import { MatFormFieldModule } from '@angular/material/form-field';
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatSlideToggleModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, MatSlideToggleModule, MatSelectModule, MatFormFieldModule],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
