@@ -209,6 +209,35 @@ protected openCreateProject(): void {
   this.actionMessage = '';
 }
 
+// Close create project dialog
+
+projected closeCreateProject(): void {
+  if (!this.actionInProgress) this.showCreateProjectDialog = false;
+}
+
+// Create project
+
+protected createProject(): void {
+  if (!this.newProject.name.trim()) return;
+  const request: CreateProjectRequest = {
+    ...this.newProject,
+    name: this.newProject.name.trim(),
+    managerIds: this.isAdmin ? this.newProject.managerIds : [],
+  };
+
+  this.startAction('create-project');
+  this.projectService.createProject(request)
+  .pipe(finalize(() => this.finishAction()))
+  .subscribe({
+    next: (project) => {
+      this.showCreateProjectDialog = false;
+      this.showSuccess(`${project.name} has been created.`);
+      this.loadTeam();
+    },
+    error: (error) => this.showError(error.error?.message ?? 'Could not create the project.'),
+  });
+}
+
 
 // admin assigns member to workspace
 protected addToWorkspace(member: TeamMember): void {
