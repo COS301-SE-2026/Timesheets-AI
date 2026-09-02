@@ -176,7 +176,7 @@ protected assignToProject(): void {
   if (!member?.workspaceMemberId || !this.selectedProjectId) return;
 
   this.startAction(`project-${member.userId}`);
-  this.teamService.addToProject(this.selectedProjectId, member.workspaceMemberId, this.assignProjectManager)
+  this.teamService.addToProject(this.selectedProjectId, member.workspaceMemberId, this.assignAsProjectManager)
     .pipe(finalize(() => this.finishAction()))
     .subscribe({
       next: () => {
@@ -199,7 +199,7 @@ protected removeFromProject(member: TeamMember, projectId: string): void {
       this.showSuccess(`${member.firstName} has been removed from ${this.projectName(projectId)}.`);
       this.loadTeam();
     },
-    error: (error) => this.showErrorerror.error?.message ?? 'Could not remove this member from the project.',
+    error: (error) => this.showError(error.error?.message ?? 'Could not remove this member from the project.'),
   });
 }
 
@@ -207,12 +207,12 @@ protected isActionInProgress(actionKey: string): boolean {
   return this.actionInProgress === actionKey;
 }
 
-protected canManagerProject(member: TeamMember): boolean {
+protected canManageProjects(member: TeamMember): boolean {
   return Boolean(member.workspaceMemberId) && this.projects.some((project) => !member.projectIds.includes(project.id));
 }
 
-protected hasProtectedMembershipId(member: TeamMember): boolean {
-  return Boolean(member.worspaceMemberId);
+protected hasProjectMembershipId(member: TeamMember): boolean {
+  return Boolean(member.workspaceMemberId);
 }
 
 // Start action function
