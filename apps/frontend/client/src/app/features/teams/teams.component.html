@@ -124,7 +124,7 @@
                                         @if (isActionInProgress('workspace-' + member.userId)) { Adding... } @else {Add to workspace}
                                         </button>
                                     } @else {
-                                        <button type="button" class="menu-trigger" (click)="toogleActionMenu(member)"
+                                        <button type="button" class="menu-trigger" (click)="toggleActionMenu(member)"
                                         [attr.aria-expanded]="openActionMenuUserId === member.userId"
                                         [attr.aria-label]=" 'Actions for ' + member.firstName + ' ' + member.lastName">
                                         <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
@@ -212,7 +212,7 @@
                 <label>Project manager
                 <select [(ngModel)]="newProject.managerIds" multiple>
                     @for (member of workspaceMembers; track member.userId) {
-                        @if (member.worspaceMemberId) {
+                        @if (member.workspaceMemberId) {
                             <option [value]="member.workspaceMemberId">{{ member.firstName }} {{ member.lastName }} </option>
                         }
                     }
@@ -224,7 +224,7 @@
             }
             <div class="dialog-actions">
                 <button type="button" class="secondary-button" (click)="closeCreateProject()" [disabled]="actionInProgress">Cancel</button>
-                <button type="button" class="primary-button" [disabled]="!newProject.name.trim() || actionInProgress" (click)="crateProject()">
+                <button type="button" class="primary-button" [disabled]="!newProject.name.trim() || actionInProgress" (click)="createProject()">
                     {{ actionInProgress ? 'Creating...' : 'Create project' }}
                 </button>
             </div>
