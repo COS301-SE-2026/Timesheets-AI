@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, inject, signal, OnInit, ViewChild} from '@angular/core';
+import { Component, inject, signal, ViewChild} from '@angular/core';
 import {  EventClickArg, CalendarOptions} from '@fullcalendar/core';
 import { FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular'
 import  dayGridPlugin from '@fullcalendar/daygrid';
@@ -17,7 +17,7 @@ export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 })
 
 
-export class CalendarComponent implements OnInit {
+export class CalendarComponent {
   @ViewChild('calendar')
   calendarComponent!: FullCalendarComponent;
 
@@ -45,7 +45,23 @@ export class CalendarComponent implements OnInit {
     height: 'auto',
     editable: false,
     selectable: false,
-    events: [],
+    events: (fetchInfo, successCallback, failurCallback)=>{
+      this.calendarService.getEvents(
+        fetchInfo.start.toISOString(),
+        fetchInfo.end.toISOString()
+      ).subscribe(
+        {
+          next: (events)=>{
+            successCallback(events);
+          },
+          error: (error)=>{
+            console.error('Failed to load calendar evemts.', error);
+            failurCallback(error);
+          }
+        }
+      );
+    },
+
     eventClick: (info: EventClickArg)=> this.handleEventClick(info),
 
     // ADDING THE FC COLOURS
@@ -78,40 +94,53 @@ export class CalendarComponent implements OnInit {
   };
 
   
-  ngOnInit(): void{
-    this.loadEvents();
-  }
+  // ngOnInit(): void{
+  //   this.loadEvents();
+  // }
 
-  loadEvents(): void{
-    this.calendarService.getEvents(this.provider(), '', '').subscribe(
-    {
-      next: (events)=>{
-        const api= this.calendarComponent?.getApi();
-        if(api){
-          api.removeAllEventSources();
-          api.addEventSource(events);
-        }else{
-          this.calendarOptions.events= events;
-        }
+  // loadEvents(): void{
+  //   this.calendarService.getEvents(this.provider(), '', '').subscribe(
+  //   {
+  //     next: (events)=>{
+  //       const api= this.calendarComponent?.getApi();
+  //       if(api){
+  //         api.removeAllEventSources();
+  //         api.addEventSource(events);
+  //       }else{
+  //         this.calendarOptions.events= events;
+  //       }
 
-        this.isConnected.set(true);
+  //       this.isConnected.set(true);
 
-        this.lastSyncedLabel.set(
-          this.formatSyncedLabel(
-            new Date().toISOString()
-          )
-        );
-      },
+  //       this.lastSyncedLabel.set(
+  //         this.formatSyncedLabel(
+  //           new Date().toISOString()
+  //         )
+  //       );
+  //     },
 
-      error:()=>{
-        this.isConnected.set(false);
-      }
-    });
-  }
+  //     error:()=>{
+  //       this.isConnected.set(false);
+  //     }
+  //   });
+  // }
 
   changeView(view: CalendarView): void{
     this.activeView.set(view);
     this.calendarComponent.getApi().changeView(view);
+  }
+
+  connectGoogleCalendar():void{
+    this.calendarService.connectGoogleCalendar().subscribe(
+      {
+        next:(authorizationUrl)=>{
+          window.location.href= authorizationUrl;
+        },
+        error:(error)=>{
+          console.error('Failed to connect Google Calendar', error);
+        }
+      }
+    );
   }
 
   navigate(direction: 'prev' | 'next' | 'today'):void{
@@ -125,27 +154,20 @@ export class CalendarComponent implements OnInit {
   syncCalendar(): void{
     this.isSyncing.set(true);
 
-    this.calendarService.getEvents(this.provider(),'', '').subscribe({
-      next: (events)=>{
-        const api= this.calendarComponent?.getApi();
-        if(api){
-          api.removeAllEventSources();
-          api.addEventSource(events);
-        }
-          this.isSyncing.set(false);
-          this.isConnected.set(true);
+    const api= this.calendarComponent?.getApi();
+    if(!api){
+      this.isSyncing.set(false);
+      return;
+    }
 
-          this.lastSyncedLabel.set(
-            this.formatSyncedLabel(
-              new Date().toISOString()
-            )
-          );
-        },
-        error:()=> {
-          this.isSyncing.set(false);
-          this.isConnected.set(false);
-        }
-    });
+    api.refetchEvents();
+
+    this.isSyncing.set(false);
+    this.isConnected.set(true);
+
+    this.lastSyncedLabel.set(
+      this.formatSyncedLabel(new Date().toISOString())
+    );
   }
 
   handleEventClick(info: EventClickArg): void{
