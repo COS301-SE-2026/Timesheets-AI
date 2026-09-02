@@ -101,7 +101,7 @@ def _get_week_totals(db: Session, subject_id: uuid.UUID, subject_type: str, week
     total_seconds = (
         db.query(func.sum(TimeEntry.duration_seconds)).filter(and_(*filters)).scalar() or 0
     )
-    hours_logged = round(total_seconds / 60.0, 1)
+    hours_logged = round(total_seconds / 3600.0, 1)
 
     project_count = db.query(TimeEntry.project_id).filter(and_(*filters)).distinct().count()
 
