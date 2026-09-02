@@ -19,6 +19,12 @@
     margin-bottom: var(--space-8);
 }
 
+.header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
 .eyebrow {
     color: var(--color-text-primary);
     font-size: var(--font-size-caption);
@@ -289,6 +295,7 @@ h1 {
 // Action button
 
 .actions {
+    position: relative;
     align-items: center;
     display: flex;
     flex-wrap: wrap;
@@ -301,6 +308,25 @@ h1 {
     color: var(--color-primary);
     font-size: var(--font-size-caption);
     padding: var(--space-2) var(--space-3);
+}
+
+.menu-trigger {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-button);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 18px;
+    height: 36px;
+    justify-content: center;
+    width: 36px;
+}
+
+.menu-trigger:hover, .menu-trigger[aria-expanded='true'] {
+    background: var(--color-primary-surface);
+    color: var(--color-primary);
 }
 
 .text-button:disabled {
