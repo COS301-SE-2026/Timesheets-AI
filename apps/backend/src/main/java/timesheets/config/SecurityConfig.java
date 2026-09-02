@@ -78,6 +78,7 @@ public class SecurityConfig {
                         "/api/auth/forgot-password",
                         "/api/auth/reset-password",
                         "/api/integrations/google/calendar/callback",
+                        "/api/integrations/jira/callback",
                         "/actuator/**")
                     .permitAll()
                     .anyRequest()
