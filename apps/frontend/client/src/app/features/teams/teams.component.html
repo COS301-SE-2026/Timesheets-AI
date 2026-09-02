@@ -13,7 +13,7 @@
     </header>
 
 @if (errorMessage) {
-    <div class="notice notice--error" role="alert">{{ errorMessage }}</div>
+    <div class="notice" [class.notice--success]="actionMessageKind === 'success'" [class.notice--error]="actionMessageKind === 'error'" role="status">{{ actionMessage }}</div>
 }
 @if (actionMessage) {
     <div class="notice notice--error" role="status">{{ actionMessage }}</div>
@@ -77,68 +77,78 @@
                 <p>{{ searchTerm ? 'Try a different search term.' : 'This list will update as users join the workspace.' }}</p>
             </div>
         } @else {
-            <div class="member-table" role="table">
-                <div class="table-head" role="row">
-                    <span> Member</span>
-                    <span>Email</span>
-                    <span>Projects</span>
-                    <span>Actions</span>
-                </div>
-                @for (member of visibleUsers; track member.userId) {
-                <article class="member-row" role="row">
-                    <div class="member-cell">
-                        <span class="avatar">{{ initials(member) }}</span>
-                        <strong>{{ member.firstName }} {{ member.lastName }}</strong>
-                    </div>
-                    <span class="email">{{ member.email }}</span>
-                    <div class="project-cell">
-                        @if (activeTab === 'members' && projectNames(member).length) {
-                            @for (projectId of member.projectIds; track projectId) {
-                                <span class="project-chip">
-                                    {{ projectName(projectId) }}
-                                    <button
-                                        type="button"
-                                        class="remove-project-button"
-                                        (click)="removeFromProject(member, projectId)"
-                                        [attr.aria-label]="'Remove ' + member.firstName + ' from project'">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
-                                </span>
-                            }
-                        } @else if (activeTab === 'members') {
-                            <span class="muted">No projects</span>
-                        } @else {
-                            <span class="waiting-badge">Waiting approval</span>
-                        }
-                    </div>
-                    <div class="actions">
-                        @if (activeTab === 'waiting') {
-                            <button type="button" class="primary-button small" (click)="addToWorkspace(member)">Add to workspace</button>
-                        } @else {
-                            <button type="button" class="text-button" (click)="openAssignment(member)"
-                            [disabled]="!member.workspaceMemberId || !projects.length"
-                            [title]="member.workspaceMemberId ? '' : 'The current API does not return this member\'s workspace membership ID until they belong to a project.'">Manage projects
-                            </button>
-                            @for (projectId of member.projectIds; track projectId) {
-                               <button type="button" class="icon-button" (click)="removeFromProject(member, projectId)"
-                               [attr.aria-label]="'Remove ' + member.firstName + ' from project'" title="Remove from project">
-                               <i class="fa-solid fa-xmark"></i>
-                               </button>
-                            }
-                        }
-                    </div>
-                </article>
-                }
-            </div>
-        }
-    </section>
+           <div class="entry-table-wrapper" aria-label="Team members">
+            <table class="entry-table team-table">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Email</th>
+                        <th>{{ activeTab === 'waiting' ? 'Status' : 'Projects' }} </th>
+                        <th class="col-action">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (member of visibleUsers; track member.userId) {
+                        <tr>
+                            <td>
+                                <div class="member-cell">
+                                    <span class="avatar" aria-hidden="true">{{ initials(member) }}</span>
+                                    <strong> {{ member.firstName }} {{member.lastName }} </strong>
+                                </div>
+                            </td>
+                            <td class="email">{{ member.email }}</td>
+                            <td>
+                                @if (activeTab === 'members' && projectNames(member).length) {
+                                    <div class="project-cell">
+                                        @for (projectId of member.projectIds; track projectId) {
+                                            <span class="project-chip">{{ projectName(projectId) }}</span>
+                                        }
+                                    </div>
+                                } @else if (activeTab === 'members') {
+                                    <span class="muted">No projects</span>
+                                } @else {
+                                    <span class="waiting-badge">Waiting approval</span>
+                                }
+                            </td>
+                            <td class="col-action">
+                                <div class="actions">
+                                    @if (activeTab === 'waiting') {
+                                        <button type="button" class="primary-button small" (click)="addToWorkspace(member)"
+                                        [disabled]="isActionInProgress('workspace-' + member.userId)">
+                                        @if (isActionInProgress('workspace-' + member.userId)) { Adding... } @else {Add to workspace}
+                                        </button>
+                                    } @else {
+                                        <button type="button" class="text-button" (click)="openAssignment(member)"
+                                        [disabled]="!canManageProjects(member)"
+                                        [title]="!hasProjectMembershipId(member) ? 'This use case has no workspace membership identifier in the current API response.' : '' ">
+                                        Add to project
+                                        </button>
+                                        @for (projectId of member.projectIds; track projectId) {
+                                            <button type="button" class="icon-button" (click)="removeFromProject(member, projectId)"
+                                            [disabled]="isActionInProgress('remove-' + member.userId + '-' + projectId)"
+                                            [attr.aria-label]="'Remove ' + member.firstName + ' from ' + projectName(projectId)"
+                                            [title]="'Remove from ' + projectName(projectId)">
+                                            <i class="fa-solid" [class.fa-spinner]="isActionInProgress('remove-' + member.userId + '-' + projectId)" [class.fa-spin]="isActionInProgress('remove-' + member.userId + '-' + projectId)" [class.fa-xmark]="!isActionInProgress('remove-' + member.userId + '-' + projectId)"></i>
+                                            </button>
+                                        }
+                                        } 
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+           </div>
+           
+    }
 }
+           
 
 </section>
 
 @if (selectedMember) {
-    <div class="modal-backdrop" (click)="closeAssignment()">
-        <section class="assignment-dialog" role="dialog" aria-modal="true" aria-labelledby="assignment-title" (click)="$event.stopPropagation()">
+    <div class="modal-backdrop">
+        <section class="assignment-dialog" role="dialog" aria-modal="true" aria-labelledby="assignment-title" >
             <button type="button" class="dialog-close" (click)="closeAssignment()" aria-label="Close">x</button>
             <p class="eyebrow">Project management</p>
             <h2 id="assignment-title">Assign {{ selectedMember.firstName }} {{ selectedMember.lastName }}</h2>
@@ -158,10 +168,10 @@
             </label>
             <div class="dialog-actions">
                 <button type="button" class="secondary-button"
-                (click)="closeAssignment()">Cancel</button>
+                (click)="closeAssignment()" [disabled]="actionInProgress">Cancel</button>
                <button type="button" class="primary-button"
-               [disabled]="!selectedProjectId" (click)="assignToProject()">
-               Assign to project
+               [disabled]="!selectedProjectId || actionInProgress" (click)="assignToProject()">
+               {{ actionInProgress ? 'Assigning...' : 'Assign to project' }}
                </button>
             </div>
         </section>
