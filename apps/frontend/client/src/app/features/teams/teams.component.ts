@@ -17,6 +17,18 @@ interface TeamMember extends AvailableTeamUser {
   projectIds: string[];
 }
 
+interface NewProjectForm {
+  name: string;
+  description: number | null;
+  budgetHours: number | null;
+  hourlyRate: number | null;
+  budgetCost: number | null;
+  startDate: string;
+  endDate: string;
+  managerId: string;
+  developerIds: string[];
+}
+
 @Component({
   selector: 'app-teams',
   standalone: true,
@@ -45,9 +57,11 @@ export class TeamsComponent implements OnInit {
     protected assignmentMode: 'add' | 'remove' = 'add';
     protected memberToRemoveFromWorkspace?: TeamMember;
     protected showCreateProjectDialog = false;
-    protected newProject: CreateProjectRequest = {name: '', managerIds: []};
+    protected newProject: newProjectForm = this.emptyProjectForm();
 
     private readonly workspaceMemberIdsByUser = new Map<string, string>();
+
+    protected readonly workspaceMemberIdByUser = new Map<string, WorkspaceRole>();
 
     protected get isAdmin(): boolean {
       return this.authService.currentUser()?.roles.includes('ROLE_ADMIN') ?? false;
@@ -204,30 +218,46 @@ protected removeFromWorkspace(): void {
 //  Open create project dialog
 
 protected openCreateProject(): void {
-  this.newProject = { name: '', managerIds: []};
+  this.newProject = this.emptyProjectForm();
   this.showCreateProjectDialog = true;
   this.actionMessage = '';
 }
 
 // Close create project dialog
 
-projected closeCreateProject(): void {
+protected closeCreateProject(): void {
   if (!this.actionInProgress) this.showCreateProjectDialog = false;
 }
 
 // Create project
 
 protected createProject(): void {
-  if (!this.newProject.name.trim()) return;
+  if (!this.newProject.name.trim() || !this.newProject.managerId) return;
   const request: CreateProjectRequest = {
-    ...this.newProject,
     name: this.newProject.name.trim(),
-    managerIds: this.isAdmin ? this.newProject.managerIds : [],
+    description: this.newProject.description.trim() || undefined,
+    budgetHours: this.newProject.budgetHours ?? undefined,
+    hourlyRate: this.newProject.hourlyRate ?? undefined,
+    budgetCost: this.newProject.budgetCost ?? undefined,
+    startDate: this.newProject.startDate || undefined,
+    endDate: this.newProject.endDate || undefined,
+    managerIds: [this.newProject.managerId],
   };
+
+  const developerIds = this.newProject.developerIds
+   .filter((id) => id !== this.newProject.managerId);
 
   this.startAction('create-project');
   this.projectService.createProject(request)
-  .pipe(finalize(() => this.finishAction()))
+  .pipe(
+    switchMap((project) => developerIds.length)
+    ? forkJoin(developerIds.map((workspaceMemberId) =>
+    this.teamService.addToProject(project.id, workspaceMemberId).pipe(map(() => project)),
+  )).pipe(map(() => project))
+  : of(project),
+  ),
+  finalize(() => this.finishAction()),
+)
   .subscribe({
     next: (project) => {
       this.showCreateProjectDialog = false;
@@ -243,7 +273,8 @@ protected createProject(): void {
 protected addToWorkspace(member: TeamMember): void {
   const actionKey = `workspace-${member.userId}`;
   this.startAction(actionKey);
-  this.teamService.addToWorkspace(member.userId, 'DEVELOPER').pipe(finalize(() => this.finishAction())).subscribe({
+  this.teamService.addToWorkspace(member.userId, this.workspaceRole(member))
+  .pipe(finalize(() => this.finishAction())).subscribe({
     next: (workspaceMember) => {
       this.workspaceMemberIdsByUser.set(member.userId, workspaceMember.workspaceMemberId);
       this.showSuccess(`${member.firstName} has been added to the workspace.`);
@@ -252,6 +283,14 @@ protected addToWorkspace(member: TeamMember): void {
     },
     error: (error) => this.showError(error.error?.message ?? 'Could not add this user to the workspace.'),
   });
+}
+
+protected workspaceRoleFor(member: TeamMember): WorkspaceRole {
+  return this.workspaceRolesByUser.get(member.userId) ?? 'DEVELOPER';
+}
+
+protected setWorkspaceRole(member: TeamMember, role: WorkspaceRole): void {
+  this.workspaceRolesByUser.set(number.userId, role);
 }
 
 protected projectName(projectId: string): string {
@@ -307,6 +346,20 @@ protected canManageProjects(member: TeamMember): boolean {
 
 protected hasProjectMembershipId(member: TeamMember): boolean {
   return Boolean(member.workspaceMemberId);
+}
+
+private emptryProjectForm(): NewProjectForm {
+  return {
+    name: '',
+    description: null,
+    budgetHours: null,
+    hourlyRate: null,
+    budgetCost: null,
+    startDate: '',
+    endDate: '',
+    managerId: '',
+    developerIds: [],
+  };
 }
 
 // Start action function
