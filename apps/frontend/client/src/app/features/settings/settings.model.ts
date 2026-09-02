@@ -40,7 +40,7 @@ export interface AccessibiltySettings{
 
 export type NotificationType= 'ALL'| 'MENTIONS_ONLY'| 'DO_NOT_DISTURB';
 
-export type NotificationSettings{
+export type NotificationSettings={
     notificationType: NotificationType;
     doNotDisturbEnabled: boolean;
     doNotDisturbStart: string;
@@ -50,7 +50,7 @@ export type NotificationSettings{
 export interface UserSettings{
     security: AccountSecuritySettings;
     integrations: IntegrationStatus[];
-    appearance: AppearanceSettings;
-    accessibility:AccessibiltySettings;
+    // appearance: AppearanceSettings;
+    // accessibility:AccessibiltySettings;
     notifications: NotificationSettings;
 }
