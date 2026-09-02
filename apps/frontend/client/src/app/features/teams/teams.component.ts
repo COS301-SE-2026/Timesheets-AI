@@ -295,6 +295,12 @@ protected isActionInProgress(actionKey: string): boolean {
   return this.actionInProgress === actionKey;
 }
 
+// Dismiss action message
+
+protected dismissActionMessage(): void {
+  this.actionMessage = '';
+}
+
 protected canManageProjects(member: TeamMember): boolean {
   return Boolean(member.workspaceMemberId) && this.projects.some((project) => !member.projectIds.includes(project.id));
 }
@@ -322,6 +328,16 @@ private showError(message: string): void {
   this.actionMessageKind = 'error';
   this.actionMessage = message;
 }
+
+// Confirm project removal
+
+protected confirmProjectRemoval(): void {
+  const member = this.selectedMember;
+  if (!member || !this.selectedProjectId) return;
+  this.selectedMember = undefined;
+  this.removeFromProject(member, this.selectedProjectId);
+}
+
 
 // filter users
 private filterUsers(users: TeamMember[]): TeamMember[] {
