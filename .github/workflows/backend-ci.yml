@@ -68,7 +68,7 @@ jobs:
         - name: Build with Maven 
           if: steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true'
           run: mvn -f apps/backend/pom.xml clean verify 
-
+          
 #==================== Login to AWS  ===========================================================
         - name: Configure AWS Credentials
           if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.backend == 'true' || steps.retry.outputs.backend == 'true')
