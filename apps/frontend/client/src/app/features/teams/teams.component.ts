@@ -178,8 +178,27 @@ protected requestWorkspaceRemoval(member: TeamMember) : void {
   this.memberToRemoveFromWorkspace = member;
 }
 
+// Cancel workspace removal
 protected cancelWorkspaceRemoval(): void {
   if (!this.actionInProgress) this.memberToRemoveFromWorkspace = undefined;
+}
+
+// Remove fom workspace
+protected removeFromWorkspace(): void {
+  const member = this.memberToRemoveFromWorkspace;
+  if (!member?.workspaceMemberId) return;
+
+  this.startAction(`workspace-remove-${member.userId}`);
+  this.teamService.removeFromWorkspace(member.workspaceMemberId)
+  .pipe(finalize(() => this.finishAction()))
+  .subscribe({
+    next: () => {
+      this.memberToRemoveFromWorkspace = undefined;
+      this.showSuccess(`${member.firstName} has been removed from the workspace.`);
+      this.loadTeam();
+    },
+    error: (error) => this.showError(error.error?.message ?? 'Could not remove this user from the workspace.'),
+  });
 }
 
 
