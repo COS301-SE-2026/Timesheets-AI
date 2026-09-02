@@ -46,7 +46,7 @@ public class TeamService {
     }
 
     // since a user can belong to multiple workspaces, this is to ensure correct workspace
-    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+    UUID workspaceId = request.getWorkspaceId();
 
     // if the workspace does not exist then cannot assign a user there
     if (!workspaceRepository.existsById(workspaceId)) {
@@ -94,16 +94,12 @@ public class TeamService {
       throw new AccessDeniedException("Only Admins can remove users from workspaces");
     }
 
-    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
     WorkspaceMember member =
         workspaceMemberRepository
             .findById(workspaceMemberId)
             .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
-    // checking that that user actually belongs to the workspace
-    if (!member.getWorkspaceId().equals(workspaceId)) {
-      throw new AccessDeniedException("Member does not belong to your workspace");
-    }
+    UUID workspaceId = member.getWorkspaceId();
 
     // I want to make sure that workspace admins do not go below 1 cause there should always be
     // someone who has access to them
