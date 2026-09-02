@@ -16,6 +16,7 @@ import timesheets.auth.OAuthStateService;
 import timesheets.domain.IntegrationToken;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.security.SecurityUtils;
+import timesheets.integration.issue.JiraOAuthService;
 
 @RestController
 @RequestMapping("/api/integrations")
@@ -26,7 +27,7 @@ public class IntegrationController {
   private final GoogleOAuthService googleOAuthService;
   private final SecurityUtils securityUtils;
   private final IntegrationTokenRepository integrationTokenRepository;
-
+  private final JiraOAuthService jiraOAuthService;
   @GetMapping("/google/calendar/connect")
   public ResponseEntity<String> connectGoogleCalender() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
@@ -105,4 +106,16 @@ public class IntegrationController {
         "Google Calendar connected for the workspace member: "
             + validatedState.getWorkspaceMemberId());
   }
+
+  @GetMapping("/jira/connect")
+  public ResponseEntity<String> connectJira(){
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    String state = oauthStateService.generateState(workspaceMemberId, "JIRA");
+
+    String authorizationUrl = jiraOAuthService.buildAuthorizationUrl(state);
+
+    return ResponseEntity.ok(authorizationUrl);
+  }
+
 }
