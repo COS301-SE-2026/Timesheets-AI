@@ -1,11 +1,13 @@
-import { injectable, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
 
 export type WorkspaceRole = 'ADMIN' | 'MANAGER' | 'DEVELOPER';
 
 export interface AvailableTeamUser {
     userId: string;
+    workspaceMemberId?: string;
     firstName: string;
     lastName: string;
     email: string;
@@ -23,7 +25,7 @@ export interface WorkspaceMemberResponse {
 
 export interface ProjectMemberResponse {
     projectMemberId: string;
-    workspaceMemmberId: string;
+    workspaceMemberId: string;
     userId: string;
     firstName: string;
     lastName: string;
@@ -36,7 +38,7 @@ export interface ProjectMemberResponse {
 export class TeamService {
     private readonly http = inject(HttpClient);
     private readonly teamUrl = '/api/teams';
-    private readonly projectUrl = '/api/projects';
+    private readonly projectsUrl = '/api/projects';
 
     // fetch available users
     getAvailableUsers(): Observable<AvailableTeamUser[]> {
@@ -49,7 +51,7 @@ export class TeamService {
     addToWorkspace(userId: string, role: WorkspaceRole = 'DEVELOPER'): Observable<WorkspaceMemberResponse> {
         return this.http
             .post<WorkspaceMemberResponse>(`${this.teamUrl}/members`, {userId, role })
-            .pipe(catchError(this.handleError('assToWorksoace')));
+            .pipe(catchError(this.handleError('addToWorksoace')));
     }
 
     // Remove user from workspace 
@@ -72,7 +74,7 @@ export class TeamService {
     // Remove user from project
     removeFromProject(projectId: string, workspaceMemberId: string) : Observable<void> {
         return this.http
-            .delete<void>(`${this.projectUrl}/${projectId}/members/${workspaceMemberId}`)
+            .delete<void>(`${this.projectsUrl}/${projectId}/members/${workspaceMemberId}`)
             .pipe(catchError(this.handleError('removeFromProject')));
     }
 
