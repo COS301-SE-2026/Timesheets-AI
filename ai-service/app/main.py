@@ -5,7 +5,12 @@ FastAPI application Demo 1 scaffold
 Endpoints:
   GET  /health         liveness probe
   GET  /docs           Swagger UI
-  POST /insights       plaeturns mock aggregation
+  POST /insights/productivity/...       productivity score
+  POST /insights/anomaly/...            anomaly detection
+  POST /insights/burnout/...            burnout risk
+  POST /insights/delivery-forecast/...  delivery forecast
+  POST /insights/task-switching/...     task switching
+  POST /insights/weekly-summary/...     weekly summary (Gemini)
 
   Patched: 25 August 2026
   added router imports
@@ -19,6 +24,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.anomaly import router as anomaly_router
 from app.api.burnout import router as burnout_router
 from app.api.delivery_forecast import router as delivery_forecast_router
+from app.api.health import router as health_router
+from app.api.productivity import router as productivity_router
+from app.api.task_switching import router as task_switching_router
 from app.api.weekly_summary import router as weekly_summary_router
 from app.scheduler import start_scheduler, stop_scheduler
 
@@ -45,9 +53,12 @@ app.add_middleware(
     allow_headers=["*"],
     # will add the domain here!
 )
+app.include_router(health_router)
+app.include_router(productivity_router)
+app.include_router(anomaly_router)
 app.include_router(burnout_router)
 app.include_router(delivery_forecast_router)
-app.include_router(anomaly_router)
+app.include_router(task_switching_router)
 app.include_router(weekly_summary_router)
 
 
