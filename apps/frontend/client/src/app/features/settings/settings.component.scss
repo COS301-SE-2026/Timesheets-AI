@@ -92,4 +92,28 @@ $red-bg: #fdecec;
         }
 
     }
+
+    // HEADINGS OF THE CARDS
+    .card-heading{
+        grid-column: 2;
+        grid-row: 1;
+
+        padding-right: 24px;
+
+        h2{
+            margin: 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: $text-title;
+        }
+
+        p{
+            margin: 6px 0 0;
+            font-size: 13px;
+            color: $text-muted;
+            line-height: 1.5;
+        }
+    }
+
+    
 }
