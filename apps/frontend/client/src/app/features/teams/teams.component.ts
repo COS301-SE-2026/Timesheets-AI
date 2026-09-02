@@ -2,8 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { HeaderComponent } from '../../shared/components/header/header.component';
+import { catchError, finalize } from 'rxjs/operators';
 import { AuthService } from '../../core/services/auth.service';
 import { ProjectDetailResponse, ProjectResponse, ProjectService } from '../../core/services/project.service';
 import { AvailableTeamUser, TeamService } from '../../core/services/team.service'; 
@@ -21,7 +20,7 @@ interface TeamMember extends AvailableTeamUser {
 @Component({
   selector: 'app-teams',
   standalone: true,
-  imports: [CommonModule, FormsModule, HeaderComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './teams.component.html',
   styleUrl: './teams.component.scss'
 })
@@ -37,12 +36,18 @@ export class TeamsComponent implements OnInit {
     protected loading = true;
     protected errorMessage = '';
     protected actionMessage = '';
+    protected actionMessageKind: 'success' | 'error' = 'success';
     protected selectedMember?: TeamMember;
     protected selectedProjectId = '';
     protected assignAsProjectManager = false;
+    protected actionInProgress = '';
 
-    protected readonly isAdmin = this.authService.currentUser()?.roles.includes('ROLE_ADMIN') ?? false;
-  
+    private readonly workspaceMemberIdsByUser = new Map<string, string>();
+
+    protected get isAdmin(): boolean {
+      return this.authService.currentUser()?.roles.includes('ROLE_ADMIN') ?? false;
+    }
+    
     ngOnInit(): void {
       this.loadTeam();
     }
@@ -67,7 +72,11 @@ export class TeamsComponent implements OnInit {
     private loadProjectMemberships(users: AvailableTeamUser[], projects: ProjectResponse[]): void {
     this.projects = projects.map(({ id, name }) => ({ id, name }));
     if (!projects.length) {
-      this.members = users.map((user) => ({ ...user, projectIds: [] }));
+      this.members = users.map((user) => ({
+        ...user,
+        workspaceMemberId: user.workspaceMemberId ?? this.workspaceMemberIdsByUser.get(user.userId),
+        projectIds: [],
+      }));
       this.loading = false;
       return;
     }
@@ -97,7 +106,10 @@ export class TeamsComponent implements OnInit {
         const membership = membershipByEmail.get(user.email);
         return {
           ...user,
-          workspaceMemberId: membership?.workspaceMemberId,
+          workspaceMemberId: 
+          user.workspaceMemberId ??
+          membership?.workspaceMemberId ??
+          this.workspaceMemberIdsByUser.get(user.userId),
           projectIds: membership?.projectIds ?? [],
         };
       });
@@ -119,7 +131,7 @@ protected get visibleUsers(): TeamMember[] {
 
 protected projectNames(member: TeamMember): string[] {
   return member.projectIds
-  .map((id) => this.projects.find((projects) => project.id === id)?.name)
+  .map((id) => this.projects.find((project) => project.id === id)?.name)
   .filter((name): name is string => !!name)
 }
 
@@ -135,19 +147,27 @@ protected openAssignment(member: TeamMember): void {
 }
 
 protected closeAssignment(): void {
-  this.selectedMember = undefined;
+  //this.selectedMember = undefined;
+  if (!this.actionInProgress) this.selectedMember = undefined;
 }
 
 // admin assigns member to workspace
 protected addToWorkspace(member: TeamMember): void {
-  this.actionMessage = '';
-  this.teamService.addToWorkspace(member.userId, 'DEVELOPER').subscribe({
-    next: () => {
-      this.actionMessage = `${member.firstName} has been added to the workspace.`;
+  const actionKey = `workspace-${member.userId}`;
+  this.startAction(actionKey);
+  this.teamService.addToWorkspace(member.userId, 'DEVELOPER').pipe(finalize(() => this.finishAction())).subscribe({
+    next: (workspaceMember) => {
+      this.workspaceMemberIdsByUser.set(member.userId, workspaceMember.workspaceMemberId);
+      this.showSuccess(`${member.firstName} has been added to the workspace.`);
+      this.activeTab = 'members';
       this.loadTeam();
     },
-    error: (error) => this.actionMessage = error.error?.message ?? 'Could not add this to the workspace.'
+    error: (error) => this.showError(error.error?.message ?? 'Could not add this user to the workspace.'),
   });
+}
+
+protected projectName(projectId: string): string {
+  return this.projects.find((project) => project.id === projectId)?.name ?? '';
 }
 
 // assign user to project
@@ -155,27 +175,44 @@ protected assignToProject(): void {
   const member = this.selectedMember;
   if (!member?.workspaceMemberId || !this.selectedProjectId) return;
 
-  this.teamService.addToProject(this.selectedProjectId, member.workspaceMemberId, this.assignAsProjectManager).subscribe({
-    next: () => {
-      this.actionMessage = `${member.firstName} has been assigned to the project.`;
-      this.closeAssignment();
-      this.loadTeam();
-    },
-    error: (error) => this.actionMessage = error.error?.message ?? 'Could not assign member to the project.',
-  })
+  this.startAction(`project-${member.userId}`);
+  this.teamService.addToProject(this.selectedProjectId, member.workspaceMemberId, this.assignProjectManager)
+    .pipe(finalize(() => this.finishAction()))
+    .subscribe({
+      next: () => {
+        this.selectedMember = undefined;
+        this.showSuccess(`${member.firstName} has been assigned to the project.`);
+        this.loadTeam();
+      },
+      error: (error) => this.showError(error.error?.message ?? 'Could not assign this meber to the project.'),
+    });
 }
 
 // remove member from project
 protected removeFromProject(member: TeamMember, projectId: string): void {
   if (!member.workspaceMemberId) return;
-  this.actionMessage = '';
-  this.teamService.removeFromProject(projectId, member.workspaceMemberId).subscribe({
+  this.startAction(`remove-${member.userId}-${projectId}`);
+  this.teamService.removeFromProject(projectId, member.workspaceMemberId)
+  .pipe(finalize(() => this.finishAction()))
+  .subscribe({
     next: () => {
-      this.actionMessage = `${member.firstName} has removed from the project.`;
+      this.showSuccess(`${member.firstName} has been removed from ${this.projectName(projectId)}.`);
       this.loadTeam();
     },
-    error: (error) => this.actionMessage = error.error?.message ?? 'Could not remove this member from the project.',
+    error: (error) => this.showErrorerror.error?.message ?? 'Could not remove this member from the project.',
   });
+}
+
+protected isActionInProgress(actionKey: string): boolean {
+  return this.actionInProgress === actionKey;
+}
+
+protected canManagerProject(member: TeamMember): boolean {
+  return Boolean(member.workspaceMemberId) && this.projects.some((project) => !member.projectIds.includes(project.id));
+}
+
+protected hasProtectedMembershipId(member: TeamMember): boolean {
+  return Boolean(member.worspaceMemberId);
 }
 
 // filter users
