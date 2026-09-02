@@ -243,3 +243,191 @@ $red-bg: #fdecec;
         opacity: 0.85;
     }
 }
+
+// INTEGRATION AREA
+.integration-row{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 58px;
+    padding: 10px 0;
+
+    &:not(:last-child){
+        border-bottom: 1px solid #f0f1f4;
+    }
+
+    > i{
+        width: 30px;
+        font-size: 22px;
+        text-align: center;
+        color: $text-title;
+        flex-shrink: 0;
+    }
+
+    .integration-info{
+        flex: 1;
+        min-width: 0;
+
+        .label-title{
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: $text-title;
+        }
+
+        p{
+            margin: 3px 0 0;
+            font-size: 13px;
+            color: $text-muted;
+        }
+    }
+
+    .integration-control{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    .chevron{
+        color: #9ca3af;
+        font-size: 13px;
+        margin-left: 4px;
+    }
+
+    &:read-only{
+        opacity: 0.55;
+        pointer-events: none;
+    }
+}
+
+// CONNECTION STATUS
+.status-dot{
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+
+    &.connected{
+        background: $green;
+    }
+}
+
+.status-text{
+    font-size: 13px;
+    color: $text-muted;
+    font-weight: 500;
+}
+
+// READ ONLY NOTICE
+.read-only-note{
+    margin: 12px 0 0;
+    font-size: 13px;
+    color: $text-muted;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+// NOTIFICATIONS SELECTION
+.settings-select{
+    min-width: 210px;
+    flex-shrink: 0;
+
+    ::ng-deep .mat-mdc-select-trigger{
+        min-height: 40px;
+        border: 1px solid $card-border;
+        border-radius: 8px;
+        padding: 0 12px;
+        font-size: 13px;
+        color: $text-title;
+        display: flex;
+        align-items: center;
+    }
+}
+
+// STYLING TOGGLES
+::ng-deep .mat-mdc-slide-toggle{
+    --mdc-switch-selected-track-color: #{$primary};
+    --mdc-switch-selected-handle-color: #ffffff;
+    --mdc-switch-selected-hover-track-color: #{$primary};
+    --mdc-switch-selected-focus-track-color: #{$primary};
+}
+
+// RESPONSIVENESS
+@media (max-width: 900px){
+    .settings-page{
+        padding: 24px 20px;
+    }
+
+    .settings-card{
+        grid-template-columns: 56px minmax(0,1fr);
+        row-gap: 16px;
+
+        .card-heading{
+            grid-column: 2;
+        }
+    
+
+        .card-body{
+            grid-column: 1/ -1;
+            grid-row: 2;
+            border-left: none;
+            border-top: 1px solid $card-border;
+            padding-left: 0;
+            padding-top: 16px;
+        }
+    }
+}
+
+@media (max-width: 600px){
+    .settings-page{
+        padding: 20px 14px;
+    }
+
+    .settings-header{
+        h1{
+            font-size: 23px;
+        }
+    }
+
+    .settings-card{
+        padding: 16px;
+
+        grid-template-columns: 48px minmax(0,1f);
+        column-gap: 12px;
+
+        .card-icon{
+            width: 40px;
+            height: 40px;
+        }
+    }
+
+    .setting-row{
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .setting-control{
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .integration-row{
+        align-items: flex-start;
+
+        .integration-control{
+            gap: 8px;
+        }
+    }
+
+    .settings-select{
+        width: 100%;
+    }
+
+    .secondary-button{
+        padding: 8px 20px;
+    }
+}
