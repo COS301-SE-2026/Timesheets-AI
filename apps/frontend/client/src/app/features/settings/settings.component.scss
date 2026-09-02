@@ -61,6 +61,35 @@ $red-bg: #fdecec;
 
     // CARDS ICONS
     .card-icon{
-        
+        grid-column: 1;
+        grid-row: 1;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+
+        &.security{
+            background: #e6f0fe;
+            color: #2563eb;
+        }
+
+        &.integrations{
+            background: #efeafe;
+            color: #7c3aed;
+        }
+
+        &.notifications{
+            background: #fef3e0;
+            color: #d97706;
+        }
+
+        &.danger{
+            background: $red-bg;
+            color: $red;
+        }
+
     }
 }
