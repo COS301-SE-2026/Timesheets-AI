@@ -123,23 +123,13 @@ public class AuthService {
       // send verification email
       emailService.sendVerificationEmail(user.getEmail(), user.getFirstName(), token);
 
-      // return RegisterResponse.builder()
-      //     .id(user.getId().toString())
-      //     .email(user.getEmail())
-      //     .firstName(user.getFirstName())
-      //     .lastName(user.getLastName())
-      //     .createdAt(user.getCreatedAt())
-      //     .message("Verification email sent. Please check your inbox.")
-      //     .build();
-
-      // DEMO 2
       return RegisterResponse.builder()
           .id(user.getId().toString())
           .email(user.getEmail())
           .firstName(user.getFirstName())
           .lastName(user.getLastName())
           .createdAt(user.getCreatedAt())
-          .message("Account created successfully.")
+          .message("Verification email sent. Please check your inbox.")
           .build();
     }
 
@@ -270,10 +260,9 @@ public class AuthService {
     user.setLockedUntil(null);
     userRepository.save(user);
 
-    // TODO
-    // if (!Boolean.TRUE.equals(user.getEmailVerified())) {
-    //   throw new IllegalStateException("please verify your email before logging in");
-    // }
+    if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+      throw new AuthException(ErrorCode.EMAIL_NOT_VERIFIED);
+    }
 
     // check if MFA is enabled
     boolean mfaEnabled =
@@ -350,6 +339,26 @@ public class AuthService {
             });
 
     return new MessageResponse("Password reset link sent to your email if the account exists");
+  }
+
+  @Transactional
+  public void sendPasswordResetEmail(String email) {
+    User user =
+        userRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+    String token = UUID.randomUUID().toString();
+
+    PasswordResetToken resetToken =
+        PasswordResetToken.builder()
+            .token(token)
+            .userId(user.getId())
+            .expiresAt(LocalDateTime.now().plusHours(1))
+            .build();
+    passwordResetTokenRepository.save(resetToken);
+
+    emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), token);
   }
 
   @Transactional
