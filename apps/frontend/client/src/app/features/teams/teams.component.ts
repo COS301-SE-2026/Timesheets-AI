@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { AuthService } from '../../core/services/auth.service';
-import { ProjectDetailResponse, ProjectResponse, ProjectService } from '../../core/services/project.service';
+import {CreateProjectRequest, ProjectDetailResponse, ProjectResponse, ProjectService } from '../../core/services/project.service';
 import { AvailableTeamUser, TeamService } from '../../core/services/team.service'; 
 
 interface TeamProject {
@@ -41,6 +41,11 @@ export class TeamsComponent implements OnInit {
     protected selectedProjectId = '';
     protected assignAsProjectManager = false;
     protected actionInProgress = '';
+    protected openActionMenuUserId = '';
+    protected assignmentMode: 'add' | 'remove' = 'add';
+    protected memberToRemoveFromWorkspace?: TeamMember;
+    protected showCreateProjectDialog = false;
+    protected newProject: CreateProjectRequest = {name: '', managerIds: []};
 
     private readonly workspaceMemberIdsByUser = new Map<string, string>();
 
@@ -140,16 +145,43 @@ protected initials(member: TeamMember): string {
 }
 
 protected openAssignment(member: TeamMember): void {
+  this.openActionMenuUserId = '';
   this.selectedMember = member;
   this.selectedProjectId = this.projects.find((project) => !member.projectIds.includes(project.id))?.id ?? '';
   this.assignAsProjectManager = false;
+  this.assignmentMode = 'add';
   this.actionMessage = '';
+}
+
+protected openProjectRemoval(member: TeamMember) : void {
+  this.openActionMenuUserId = '';
+  this.selectedMember = member;
+  this.selectedProjectId = member.projectIds[0] ?? '';
+  this.assignmentMode = 'remove';
+  this.actionMessage = '';
+
 }
 
 protected closeAssignment(): void {
   //this.selectedMember = undefined;
   if (!this.actionInProgress) this.selectedMember = undefined;
 }
+
+// Actions toggle menu
+protected toggleActionMenu(member: TeamMember): void {
+  this.openActionMenuUserId = this.openActionMenuUserId === member.userId ? '' : member.userId; 
+}
+
+// Remove user from a workspace
+protected requestWorkspaceRemoval(member: TeamMember) : void {
+  this.openActionMenuUserId = '';
+  this.memberToRemoveFromWorkspace = member;
+}
+
+protected cancelWorkspaceRemoval(): void {
+  if (!this.actionInProgress) this.memberToRemoveFromWorkspace = undefined;
+}
+
 
 // admin assigns member to workspace
 protected addToWorkspace(member: TeamMember): void {
