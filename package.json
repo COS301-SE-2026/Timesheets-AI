@@ -12,7 +12,7 @@
     "lint": "turbo run lint",
     "coverage": "turbo run coverage",
     "clean": "turbo run clean",
-    "backend:dev": "export $(grep -v '^#' .env | xargs) && cd apps/backend && mvn spring-boot:run -Dspring-boot.run.profiles=dev",
+    "backend:dev": "export $(grep -v '^#' .env | sed 's/\\r$//' | xargs) && cd apps/backend && mvn spring-boot:run -Dspring-boot.run.profiles=dev",
     "backend:build": "cd apps/backend && mvn clean package -DskipTests",
     "backend:test": "cd apps/backend && mvn test",
     "backend:coverage": "cd apps/backend && mvn verify -P coverage",
