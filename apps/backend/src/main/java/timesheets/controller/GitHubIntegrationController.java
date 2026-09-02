@@ -20,6 +20,7 @@ import timesheets.auth.OAuthStateService;
 import timesheets.domain.IntegrationToken;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.security.SecurityUtils;
+import timesheets.service.GitHubService;
 
 @RestController
 @RequestMapping("/api/integrations/github")
@@ -29,6 +30,7 @@ public class GitHubIntegrationController {
   private final GitHubOAuthService gitHubOAuthService;
   private final SecurityUtils securityUtils;
   private final IntegrationTokenRepository integrationTokenRepository;
+  private final GitHubService gitHubService;
 
   @GetMapping("/connect")
   public ResponseEntity<String> connect() {
@@ -68,5 +70,12 @@ public class GitHubIntegrationController {
     integrationTokenRepository.save(integrationToken);
 
     return ResponseEntity.ok("GitHub connected for workspace member: " + workspaceMemberId);
+  }
+
+  @PostMapping("/sync")
+  public ResponseEntity<Integer> sync() {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    int synced = gitHubService.syncRecentCommits(workspaceMemberId);
+    return ResponseEntity.ok(synced);
   }
 }
