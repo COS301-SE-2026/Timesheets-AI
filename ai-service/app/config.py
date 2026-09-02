@@ -15,9 +15,9 @@ class Settings(BaseSettings):
     # As suggested i moved the placeholder db url and moved it to .env.example
     database_url: str = "postgresql://postgres:postgres@localhost:5432/momently_dev"
 
-    # here i'll place the api key for whatever api we use for the ai service. As it stands we may use anthropic's api.
-    anthropic_api_key: str = ""  # come back to:  Replace with actual API key
-
+    # here i'll place the api key for whatever api we use for the ai service
+    anthropic_api_key: str = ""
+    gemini_api_key: str = "" #we went with gemini instead
     app_env: str = "development"
     log_level: str = "info"
 
