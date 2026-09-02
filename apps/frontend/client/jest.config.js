@@ -4,4 +4,7 @@ module.exports = {
   preset: 'jest-preset-angular',
   setupFilesAfterEnv: ['<rootDir>/setup-jest.js'],
   testEnvironment: 'jsdom',
+  transformIgnorePatterns:[
+    'node_modules/(?!(@fullcalendar|preact)/)'
+  ],
 };
