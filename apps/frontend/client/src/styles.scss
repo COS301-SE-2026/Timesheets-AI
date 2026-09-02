@@ -6,12 +6,21 @@ MOMENTLY DESIGN SYSTEM
 
 @use
 './app/shared/styles/index' as *;
+@use '@angular/material' as mat;
 
 @import 'material-icons/iconfont/material-icons.css';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
 
 /*The "as *" means all forwarded tokens are available globally without needing to prefix them*/
 
 html, body {
+  @include mat.theme(
+    (
+      color: mat.$violet-palette,
+      typography: Roboto,
+      density: 0
+    )
+  );
   height: 100%;
   margin: 0;
 }
