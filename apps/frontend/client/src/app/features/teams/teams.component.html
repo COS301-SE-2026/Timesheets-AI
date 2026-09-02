@@ -1,22 +1,28 @@
 <section class="team-page">
     <header class="teams-heading">
         <div>
-            <p class="eyebrow">Workspace Management</p>
             <h1>Team</h1>
+            <!-- <p class="eyebrow">Workspace Management</p> -->
             <p>Manage workspace members and their project assignments.</p>
         </div>
         @if (isAdmin) {
-            <button type="button" class="primary-button" (click)="activeTab = 'waiting'">
+            <button type="button" class="secondary-button" (click)="activeTab = 'waiting'">
                 <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add Member
             </button>
         }
+        <button type="button" class="primary-button" (click)="openCreateProject()">
+            <i class="fa-solid fa-folder-plus" aria-hidden="true"></i> New project
+        </button>
     </header>
 
 @if (errorMessage) {
     <div class="notice" [class.notice--success]="actionMessageKind === 'success'" [class.notice--error]="actionMessageKind === 'error'" role="status">{{ actionMessage }}</div>
 }
 @if (actionMessage) {
-    <div class="notice notice--error" role="status">{{ actionMessage }}</div>
+    <div class="notice notice--error" role="status">
+        <span>{{ actionMessage }}</span>
+        <button type="button" class="notice-dismiss" (click)="dismissActionMessage()">Dismiss</button>
+    </div>
 }
 
 @if (loading) {
@@ -118,17 +124,30 @@
                                         @if (isActionInProgress('workspace-' + member.userId)) { Adding... } @else {Add to workspace}
                                         </button>
                                     } @else {
-                                        <button type="button" class="text-button" (click)="openAssignment(member)"
-                                        [disabled]="!canManageProjects(member)"
-                                        [title]="!hasProjectMembershipId(member) ? 'This use case has no workspace membership identifier in the current API response.' : '' ">
-                                        Add to project
+                                        <button type="button" class="menu-trigger" (click)="toogleActionMenu(member)"
+                                        [attr.aria-expanded]="openActionMenuUserId === member.userId"
+                                        [attr.aria-label]=" 'Actions for ' + member.firstName + ' ' + member.lastName">
+                                        <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
                                         </button>
-                                        @for (projectId of member.projectIds; track projectId) {
-                                            <button type="button" class="icon-button" (click)="removeFromProject(member, projectId)"
-                                            [disabled]="isActionInProgress('remove-' + member.userId + '-' + projectId)"
-                                            [attr.aria-label]="'Remove ' + member.firstName + ' from ' + projectName(projectId)"
-                                            [title]="'Remove from ' + projectName(projectId)">
-                                            <i class="fa-solid" [class.fa-spinner]="isActionInProgress('remove-' + member.userId + '-' + projectId)" [class.fa-spin]="isActionInProgress('remove-' + member.userId + '-' + projectId)" [class.fa-xmark]="!isActionInProgress('remove-' + member.userId + '-' + projectId)"></i>
+                                        @if (openActionMenuUserId === member.userId) {
+                                            <div class="action-menu" role="menu">
+                                                <button type="button" role="menuitem" (click)="openAssignment(member)"
+                                                [disabled]="!canManageProjects(member)"
+                                                [title]="!hasProjectMembershipId(member) ? 'This user has no workspace membership identifier in the current API response.' : ''">
+                                                Add to project
+                                                </button>
+
+                                                <button type="button" role="menuitem" (click)="openProjectRemoval(member)" [disabled]="!member.projectIds.length">
+                                                    Remove from project
+                                                </button>
+                                                @if (isAdmin) {
+                                                    <button type="button" role="menuitem" class="danger-action" (click)="requestWorkspaceRemoval(member)"
+                                                    [disabled]="!hasProjectMembershipId(member)">
+                                                    Remove from workspace
+                                                    </button>
+                                                }
+                                            </div>
+                                        }
                                             </button>
                                         }
                                     }
