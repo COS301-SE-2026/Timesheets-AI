@@ -14,9 +14,9 @@ import timesheets.auth.GoogleTokenResponse;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
 import timesheets.domain.IntegrationToken;
+import timesheets.integration.issue.JiraOAuthService;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.security.SecurityUtils;
-import timesheets.integration.issue.JiraOAuthService;
 
 @RestController
 @RequestMapping("/api/integrations")
@@ -28,6 +28,7 @@ public class IntegrationController {
   private final SecurityUtils securityUtils;
   private final IntegrationTokenRepository integrationTokenRepository;
   private final JiraOAuthService jiraOAuthService;
+
   @GetMapping("/google/calendar/connect")
   public ResponseEntity<String> connectGoogleCalender() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
@@ -108,7 +109,7 @@ public class IntegrationController {
   }
 
   @GetMapping("/jira/connect")
-  public ResponseEntity<String> connectJira(){
+  public ResponseEntity<String> connectJira() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     String state = oauthStateService.generateState(workspaceMemberId, "JIRA");
@@ -118,4 +119,49 @@ public class IntegrationController {
     return ResponseEntity.ok(authorizationUrl);
   }
 
+  @GetMapping("/jira/callback")
+  public ResponseEntity<String> jiraCallback(
+      @RequestParam String code, @RequestParam String state) {
+
+    // validare the state
+    OAuthState validatedState = oauthStateService.validateState(state);
+
+    // verify the users are the one that started OAuth flow
+    UUID workspaceMemberId = validatedState.getWorkspaceMemberId();
+
+    JiraOAuthService.JiraTokenResponse tokenResponse = jiraOAuthService.exchangeCode(code);
+
+    // get cloud id associated with the token
+    String cloudId = jiraOAuthService.getCloudID(tokenResponse.getAccessToken());
+
+    // calculate when the access token expires
+    LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn());
+
+    Optional<IntegrationToken> existingToken =
+        integrationTokenRepository.findByWorkspaceMemberIdAndProvider(workspaceMemberId, "JIRA");
+
+    // Use existing token or create a new one
+    IntegrationToken integrationToken;
+
+    if (existingToken.isEmpty()) {
+      integrationToken = new IntegrationToken();
+    } else {
+      integrationToken = existingToken.get();
+    }
+
+    integrationToken.setWorkspaceMemberId(workspaceMemberId);
+    integrationToken.setProvider("JIRA");
+    integrationToken.setProviderResourceId(cloudId);
+    integrationToken.setAccessToken(tokenResponse.getAccessToken());
+    integrationToken.setExpiresAt(expiresAt);
+
+    // Jira provides a refresh token
+    if (tokenResponse.getRefreshToken() != null) {
+      integrationToken.setRefreshToken(tokenResponse.getRefreshToken());
+    }
+
+    integrationTokenRepository.save(integrationToken);
+
+    return ResponseEntity.ok("Jira connected for the workspace member:" + workspaceMemberId);
+  }
 }
