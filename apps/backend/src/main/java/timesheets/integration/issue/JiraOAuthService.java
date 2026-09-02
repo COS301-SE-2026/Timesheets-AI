@@ -1,8 +1,15 @@
 package timesheets.integration.issue;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,7 +26,7 @@ public class JiraOAuthService {
   private static final String RESOURCES_URL =
       "https://api.atlassian.com/oauth/token/accessible-resources";
 
-  @Value("${app.jira,client-id}")
+  @Value("${app.jira.client-id}")
   private String clientId;
 
   @Value("${app.jira,client-secret}")
@@ -32,7 +39,7 @@ public class JiraOAuthService {
   private final RestTemplate restTemplate;
 
   // Used to parse JSON responses returned by Atlassian
-  private final ObjectMapper objectmapper;
+  private final ObjectMapper objectMapper;
 
   public JiraOAuthService() {
     // Create the HTTP client used for OAuth requests
@@ -57,7 +64,7 @@ public class JiraOAuthService {
         + "&client_id="
         + clientId
         + "&scope=read%3Ajira-work%20read%3Ajira-user%20read%3Ame"
-        + "redirect_uri="
+        + "&redirect_uri="
         + encode(redirectUri)
         + "&state="
         + encode(state)
@@ -75,7 +82,7 @@ public class JiraOAuthService {
     String encodedCredentials =
         Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
 
-    headers.set("Authorization:", "Basic" + encodedCredentials);
+    headers.set("Authorization", "Basic" + encodedCredentials);
 
     // Build JSON request body required by the OAuth token endpoint
     String body =
@@ -92,7 +99,7 @@ public class JiraOAuthService {
     HttpEntity<String> request = new HttpEntity<String>(body, headers);
 
     ResponseEntity<String> response =
-        restTemplare.exchange(TOKEN_URL, HttpMethod.POST, request, String.class);
+        restTemplate.exchange(TOKEN_URL, HttpMethod.POST, request, String.class);
 
     try {
 
@@ -101,8 +108,8 @@ public class JiraOAuthService {
 
       return new JiraTokenResponse(
           json.get("access_token").asText(),
-          json.has("refresh_token") ? json.get("refresh_time").asText() : null,
-          josn.has("expires_in") ? json.get("expires_in").asLong() : 3600);
+          json.has("refresh_token") ? json.get("refresh_token").asText() : null,
+          json.has("expires_in") ? json.get("expires_in").asLong() : 3600);
     } catch (Exception e) {
       // Throw an application error if the OAuth response cannot be parsed correctly
       throw new RuntimeException("Failed to parse Jira OAuth response", e);
