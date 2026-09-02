@@ -1,38 +1,38 @@
 <section class="team-page">
     <header class="teams-heading">
         <div>
-            <h1 class="eyebrow">Workspace Management</h1>
-            <p>Team</p>
+            <p class="eyebrow">Workspace Management</p>
+            <h1>Team</h1>
             <p>Manage workspace members and their project assignments.</p>
         </div>
         @if (isAdmin) {
-        <button type="button" class="primary-button" (click)="activeTab = 'waiting'">
-            <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add Member
-        </button>
+            <button type="button" class="primary-button" (click)="activeTab = 'waiting'">
+                <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add Member
+            </button>
         }
     </header>
 
-    @if (errorMessage) {
+@if (errorMessage) {
     <div class="notice notice--error" role="alert">{{ errorMessage }}</div>
-    }
-    @if (actionMessage) {
+}
+@if (actionMessage) {
     <div class="notice notice--error" role="status">{{ actionMessage }}</div>
-    }
+}
 
-    @if (loading) {
+@if (loading) {
     <div class="page-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading team... </div>
-    } @else {
+} @else {
     <section class="stats-grid" aria-label="Team overview">
         <article><span class="stat-icon blue"><i class="fa-solid fa-user"></i></span>
             <div><span>Workspace members</span><strong>{{ workspaceMembers.length }}</strong></div>
         </article>
         @if (isAdmin) {
-        <article>
-            <div>
+            <article>
+                <div>
                 <span> Waiting room </span>
                 <strong> {{ waitingUsers.length }}</strong>
-            </div>
-        </article>
+                </div>
+            </article>
         }
         <article>
             <span class="stat-icon green">
@@ -44,117 +44,126 @@
             </div>
         </article>
     </section>
-
+    
     <section class="team-card">
         <div class="team-toolbar">
-            @if (isAdmin) {
+        @if (isAdmin) {
             <div class="tabs" role="tablist" aria-label="Team member status">
                 <button type="button" role="tab" [attr.aria-selected]="activeTab === 'members'"
                     [class.active]="activeTab === 'members'" (click)="activeTab = 'members'">Workspace Members
-                    <span>{{ workspaceMembers.length }}</span>
+                    <span>{{ workspaceMembers.length }}</span>    
                 </button>
-                <button type="button" role="tab" [attr.aria-selected]="activeTab === 'waiting'"
-                    [class.active]="activeTab === 'waiting'" (click)="activeTab = 'waiting'"> Waiting room
+                <button type="button" role="tab" 
+                    [attr.aria-selected]="activeTab === 'waiting'"
+                    [class.active]="activeTab === 'waiting'"
+                    (click)="activeTab = 'waiting'"> Waiting room 
                     <span>{{ waitingUsers.length }}</span>
                 </button>
             </div>
-            } @else {
+        } @else {
             <h2> Workspace Members</h2>
-            }
-            <label class="search-field">
-                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                <span class="sr-only">Search team members </span>
-                <input type="search" [(ngModel)]="searchTerm" placeholder="Search members..." />
-            </label>
+        }
+        <label class="search-field">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <span class="sr-only">Search team members </span>
+            <input type="search" [(ngModel)]="searchTerm" placeholder="Search members..."/>
+        </label>
         </div>
 
         @if (!visibleUsers.length) {
-        <div class="empty-state">
-            <i class="fa-solid fa-users-viewfinder" aria-hidden="true"></i>
-            <h3>{{ activeTab === 'waiting' ? 'No users are waiting' : 'No workspace members found' }}</h3>
-            <p>{{ searchTerm ? 'Try a different search term.' : 'This list will update as users join the workspace.' }}
-            </p>
-        </div>
-        } @else {
-        <div class="member-table" role="table">
-            <div class="table-head" role="row">
-                <span> Member</span>
-                <span>Email</span>
-                <span>Projects</span>
-                <span>Actions</span>
+            <div class="empty-state">
+                <i class="fa-solid fa-users-viewfinder" aria-hidden="true"></i>
+                <h3>{{ activeTab === 'waiting' ? 'No users are waiting' : 'No workspace members found' }}</h3>
+                <p>{{ searchTerm ? 'Try a different search term.' : 'This list will update as users join the workspace.' }}</p>
             </div>
-            @for (member of visibleUsers; track member.userId) {
-            <article class="member-row" role="row">
-                <div class="member-cell">
-                    <span class="avatar">{{ initials(member) }}</span>
-                    <strong>{{ member.firstName }} {{ member.lastName }}</strong>
+        } @else {
+            <div class="member-table" role="table">
+                <div class="table-head" role="row">
+                    <span> Member</span>
+                    <span>Email</span>
+                    <span>Projects</span>
+                    <span>Actions</span>
                 </div>
-                <span class="email">{{ member.email }}</span>
-                <div class="project-cell">
-                    @if (activeTab === 'members' && projectNames(member).length) {
-                    @for (project of projectNames(member); track project) {
-                    <span class="project-chip"> {{ project }}</span>
-                    }
-                    } @else if (activeTab === 'members') {
-                    <span class="muted">No projects</span>
-                    }@else {
-                    <span class="waiting-badge">Waiting approval</span>
-                    }
-                </div>
-                <div class="actions">
-                    @if (activeTab === 'waiting') {
-                    <button type="button" class="primary-button small" (click)="addToWorkspace(member)">Add to
-                        workspace</button>
-                    } @else {
-                    <button type="button" class="text-button" (click)="openAssignment(member)"
-                        [disabled]="!member.workspaceMemberId || !projects.length"
-                        [title]="member.workspaceMemberId ? '' : 'The current API does not return this member\'s workspace membership ID until they belong to a project.'">Manage
-                        projects
-                    </button>
-                    @for (projectId of member.projectIds; track projectId) {
-                    <button type="button" class="icon-button" (click)="removeFromProject(member, projectId)"
-                        [attr.aria-label]="'Remove ' + member.firstName + ' from project'" title="Remove from project">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                    }
-                    }
-                </div>
-            </article>
-            }
-        </div>
+                @for (member of visibleUsers; track member.userId) {
+                <article class="member-row" role="row">
+                    <div class="member-cell">
+                        <span class="avatar">{{ initials(member) }}</span>
+                        <strong>{{ member.firstName }} {{ member.lastName }}</strong>
+                    </div>
+                    <span class="email">{{ member.email }}</span>
+                    <div class="project-cell">
+                        @if (activeTab === 'members' && projectNames(member).length) {
+                            @for (projectId of member.projectIds; track projectId) {
+                                <span class="project-chip">
+                                    {{ projectName(projectId) }}
+                                    <button
+                                        type="button"
+                                        class="remove-project-button"
+                                        (click)="removeFromProject(member, projectId)"
+                                        [attr.aria-label]="'Remove ' + member.firstName + ' from project'">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </span>
+                            }
+                        } @else if (activeTab === 'members') {
+                            <span class="muted">No projects</span>
+                        } @else {
+                            <span class="waiting-badge">Waiting approval</span>
+                        }
+                    </div>
+                    <div class="actions">
+                        @if (activeTab === 'waiting') {
+                            <button type="button" class="primary-button small" (click)="addToWorkspace(member)">Add to workspace</button>
+                        } @else {
+                            <button type="button" class="text-button" (click)="openAssignment(member)"
+                            [disabled]="!member.workspaceMemberId || !projects.length"
+                            [title]="member.workspaceMemberId ? '' : 'The current API does not return this member\'s workspace membership ID until they belong to a project.'">Manage projects
+                            </button>
+                            @for (projectId of member.projectIds; track projectId) {
+                               <button type="button" class="icon-button" (click)="removeFromProject(member, projectId)"
+                               [attr.aria-label]="'Remove ' + member.firstName + ' from project'" title="Remove from project">
+                               <i class="fa-solid fa-xmark"></i>
+                               </button>
+                            }
+                        }
+                    </div>
+                </article>
+                }
+            </div>
         }
     </section>
-    }
+}
 
 </section>
 
 @if (selectedMember) {
-<div class="modal-backdrop" (click)="closeAssignment()">
-    <section class="assignment-dialog" role="dialog" aria-modal="true" aria-labelledby="assignment-title"
-        (click)="$event.stopPropagation()">
-        <button type="button" class="dialog-close" (click)="closeAssignment()" aria-label="Close">x</button>
-        <p class="eyebrow">Project management</p>
-        <h2 id="assignment-title">Assign {{ selectedMember.firstName }} {{ selectedMember.lastName }}</h2>
-        <label>Project <select [(ngModel)]="selectedProjectId">
+    <div class="modal-backdrop" (click)="closeAssignment()">
+        <section class="assignment-dialog" role="dialog" aria-modal="true" aria-labelledby="assignment-title" (click)="$event.stopPropagation()">
+            <button type="button" class="dialog-close" (click)="closeAssignment()" aria-label="Close">x</button>
+            <p class="eyebrow">Project management</p>
+            <h2 id="assignment-title">Assign {{ selectedMember.firstName }} {{ selectedMember.lastName }}</h2>
+            <label>Project <select [(ngModel)]="selectedProjectId">
                 <option value="" disabled>
                     Select a project
                 </option>
                 @for (project of projects; track project.id) {
-                @if (!selectedMember.projectIds.includes(project.id)) {
-                <option [value]="project.id">{{project.name }}</option>
-                }
+                    @if (!selectedMember.projectIds.includes(project.id)) {
+                        <option [value]="project.id">{{project.name }}</option>
+                    }
                 }
             </select></label>
-        <label class="checkbox-label">
-            <input type="checkbox" [(ngModel)]="assignAsProjectManager" />
-            Make project manager
-        </label>
-        <div class="dialog-actions">
-            <button type="button" class="secondary-button" (click)="closeAssignment()">Cancel</button>
-            <button type="button" class="primary-button" [disabled]="!selectedProjectId" (click)="assignToProject()">
-                Assign to project
-            </button>
-        </div>
-    </section>
-</div>
+            <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="assignAsProjectManager" />
+                Make project manager
+            </label>
+            <div class="dialog-actions">
+                <button type="button" class="secondary-button"
+                (click)="closeAssignment()">Cancel</button>
+               <button type="button" class="primary-button"
+               [disabled]="!selectedProjectId" (click)="assignToProject()">
+               Assign to project
+               </button>
+            </div>
+        </section>
+    </div>
 }
