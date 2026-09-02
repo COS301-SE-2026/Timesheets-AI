@@ -1,6 +1,5 @@
 import { SidebarComponent } from './sidebar.component';
 import { AuthService } from '../../../core/services/auth.service';
-import { createComponentTest } from '../../testing/component-test-helper';
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { Router } from '@angular/router';

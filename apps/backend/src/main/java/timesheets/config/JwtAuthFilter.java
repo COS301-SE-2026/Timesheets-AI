@@ -26,6 +26,8 @@ import timesheets.service.TokenBlacklistService;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
+  private static final org.slf4j.Logger log =
+      org.slf4j.LoggerFactory.getLogger(JwtAuthFilter.class);
 
   private final JwtService jwtService;
   private final UserDetailsService userDetailsService;
@@ -75,6 +77,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
       }
     } catch (Exception ignored) {
+      log.error("JWT auth failed", ignored);
       // invalid token - just continue unauthenticated
     }
 

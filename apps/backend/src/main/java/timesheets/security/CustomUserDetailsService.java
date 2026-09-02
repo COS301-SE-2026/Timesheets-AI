@@ -58,7 +58,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         user.getEmailVerified(),
         defaultWorkspaceMemberId,
         workspaceId,
-        user.getPasswordHash(),
+        user.getPasswordHash() != null ? user.getPasswordHash() : "",
         user.getStatus() == UserStatus.ACTIVE && Boolean.TRUE.equals(user.getEmailVerified()),
         true,
         true,

@@ -23,6 +23,9 @@ public class TimeEntryResponse {
   private UUID taskId;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
+
+  // this is actually durationSeconds but the frontend is already using this name and it's going to
+  // cause issues
   private Integer durationMinutes;
   private String entryType;
   private String description;
@@ -48,4 +51,8 @@ public class TimeEntryResponse {
         .updatedAt(entry.getUpdatedAt())
         .build();
   }
+
+  // this is actually durationSeconds but the frontend is already using this name and it's going to
+  // cause issues
+
 }
