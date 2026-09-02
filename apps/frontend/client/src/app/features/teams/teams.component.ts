@@ -201,6 +201,14 @@ protected removeFromWorkspace(): void {
   });
 }
 
+//  Open create project dialog
+
+protected openCreateProject(): void {
+  this.newProject = { name: '', managerIds: []};
+  this.showCreateProjectDialog = true;
+  this.actionMessage = '';
+}
+
 
 // admin assigns member to workspace
 protected addToWorkspace(member: TeamMember): void {
