@@ -19,15 +19,15 @@ $red-bg: #fdecec;
 .settings-page{
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
 
-    background: $page-bg;
     color: $text-body;
     width: 100%;
     max-width: 1250px;
     margin: 0 auto;
-    padding: 24px 32px;
+    padding: 24px 32px 40px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    box-sizing: border-box;
 }
 
 // HEADEING AREA
@@ -55,7 +55,7 @@ $red-bg: #fdecec;
     border-radius: 14px;
 
     display: grid;
-    grid-template-columns: 56px 240px minmax(0, 1fr);
+    grid-template-columns: 68px 260px minmax(0, 1fr);
     column-gap: 16px;
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 
@@ -63,13 +63,15 @@ $red-bg: #fdecec;
     .card-icon{
         grid-column: 1;
         grid-row: 1;
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
+        width: 48px;
+        height: 48px;
+        margin-top: 14px;
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 17px;
+        font-size: 18px;
+        flex-shrink: 0;
 
         &.security{
             background: #e6f0fe;
@@ -98,7 +100,7 @@ $red-bg: #fdecec;
         grid-column: 2;
         grid-row: 1;
 
-        padding-right: 24px;
+        padding-right: 16px 16px 16px 0;
 
         h2{
             margin: 0;
@@ -122,8 +124,9 @@ $red-bg: #fdecec;
         min-width: 0;
         display: flex;
         flex-direction: column;
+        justify-content: center;
         border-left: 1px solid $card-border;
-        padding-left: 24px;
+        padding: 0 20px 0 24px;
     }
 }
 
@@ -133,7 +136,7 @@ $red-bg: #fdecec;
     justify-content: space-between;
     align-items: center;
     gap: 20px;
-    min-height: 58px;
+    min-height: 64px;
     padding: 10px 0;
 
     &:not(:last-child){
@@ -353,6 +356,16 @@ $red-bg: #fdecec;
     --mdc-switch-selected-handle-color: #ffffff;
     --mdc-switch-selected-hover-track-color: #{$primary};
     --mdc-switch-selected-focus-track-color: #{$primary};
+    --mdc-switch-unselected-track-color: #d1d5db;
+    --mdc-switch-uselected-handle-color: #ffffff;
+}
+
+::ng-deep .mdc-switch__track{
+    border-radius: 999px;
+}
+
+::ng-deep .mdc-switch__handle{
+    border-radius: 50%;
 }
 
 // RESPONSIVENESS
