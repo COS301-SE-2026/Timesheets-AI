@@ -25,52 +25,52 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GitCommit {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-    @Column(name = "workspace_member_id", nullable = false)
-    private UUID workspaceMemberId;
+  @Column(name = "workspace_member_id", nullable = false)
+  private UUID workspaceMemberId;
 
-    @Column(name = "project_id")
-    private UUID projectId;
+  @Column(name = "project_id")
+  private UUID projectId;
 
-    @Column(name = "commit_hash", nullable = false, length = 100)
-    private String commitHash;
+  @Column(name = "commit_hash", nullable = false, length = 100)
+  private String commitHash;
 
-    @Column(name = "repository_name")
-    private String repositoryName;
+  @Column(name = "repository_name")
+  private String repositoryName;
 
-    @Column(name = "repository_url")
-    private String repositoryUrl;
+  @Column(name = "repository_url")
+  private String repositoryUrl;
 
-    @Column(name = "commit_message")
-    private String commitMessage;
+  @Column(name = "commit_message")
+  private String commitMessage;
 
-    @Column(name = "commit_time")
-    private LocalDateTime commitTime;
+  @Column(name = "commit_time")
+  private LocalDateTime commitTime;
 
-    @Column(name = "lines_added")
-    private Integer linesAdded;
+  @Column(name = "lines_added")
+  private Integer linesAdded;
 
-    @Column(name = "lines_removed")
-    private Integer linesRemoved;
+  @Column(name = "lines_removed")
+  private Integer linesRemoved;
 
-    @Column(name = "author_name")
-    private String authorName;
+  @Column(name = "author_name")
+  private String authorName;
 
-    @Column(name = "author_email")
-    private String authorEmail;
+  @Column(name = "author_email")
+  private String authorEmail;
 
-    @Column(name = "github_author_login")
-    private String githubAuthorLogin;
+  @Column(name = "github_author_login")
+  private String githubAuthorLogin;
 
-    @Column(name = "changed_files")
-    private Integer changedFiles;
+  @Column(name = "changed_files")
+  private Integer changedFiles;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+  @Column(name = "created_at")
+  private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+  @Column(name = "updated_at")
+  private LocalDateTime updatedAt;
 }

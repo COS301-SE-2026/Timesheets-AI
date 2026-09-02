@@ -26,7 +26,7 @@ import timesheets.repository.IntegrationTokenRepository;
 @Service
 @RequiredArgsConstructor
 public class GitHubService {
-    private final IntegrationTokenRepository integrationTokenRepository;
+  private final IntegrationTokenRepository integrationTokenRepository;
   private final GitCommitRepository gitCommitRepository;
   private final RestClient restClient = RestClient.create();
 
@@ -40,7 +40,7 @@ public class GitHubService {
 
     String accessToken = token.getAccessToken();
 
-    //step 1: Asks who is this on github
+    // step 1: Asks who is this on github
     Map<String, Object> githubUser =
         restClient
             .get()
@@ -115,7 +115,7 @@ public class GitHubService {
         Map<String, Object> commitDetail = (Map<String, Object>) commit.get("commit");
         Map<String, Object> author = (Map<String, Object>) commitDetail.get("author");
 
-        //github gives the commit date as an iso string like 2026-08-27T14:20:00Z (ref docs above)
+        // github gives the commit date as an iso string like 2026-08-27T14:20:00Z (ref docs above)
         String dateStr = (String) author.get("date");
         LocalDateTime commitTime =
             dateStr != null ? OffsetDateTime.parse(dateStr).toLocalDateTime() : LocalDateTime.now();
@@ -131,7 +131,8 @@ public class GitHubService {
                 .authorName((String) author.get("name"))
                 .authorEmail((String) author.get("email"))
                 .githubAuthorLogin(githubLogin)
-                //github's line-level stats need a separate, more expensive per-commit api call, skipping for the first sync pass
+                // github's line-level stats need a separate, more expensive per-commit api call,
+                // skipping for the first sync pass
                 .linesAdded(0)
                 .linesRemoved(0)
                 .createdAt(LocalDateTime.now())
