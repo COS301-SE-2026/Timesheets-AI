@@ -59,6 +59,7 @@ services:
 
       APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:4200,https://momentlyapp.org/}
       APP_CORS_ALLOWED_METHODS: ${APP_CORS_ALLOWED_METHODS:-GET,POST,PUT,DELETE,PATCH,OPTIONS}
+      APP_CORS_ALLOWED_HEADERS: ${APP_CORS_ALLOWED_HEADERS:-*}
       # FIX: correct Docker networking (NEVER localhost inside containers)
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-momently_dev}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-momently}
