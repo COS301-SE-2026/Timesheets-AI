@@ -1,13 +1,14 @@
 package timesheets.dto.request;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
+
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -50,4 +51,9 @@ public class CreateTaskRequest {
       message = "Priority must be LOW, MEDIUM, HIGH or CRITICAL")
   @Builder.Default
   private String priority = "MEDIUM";
+
+  @Builder.Default
+  private boolean createJiraIssue = false;
+  
+  private CreateJiraIssueRequest jiraDetails;
 }
