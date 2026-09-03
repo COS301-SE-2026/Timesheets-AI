@@ -1,9 +1,12 @@
 package timesheets.integration;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +17,8 @@ import timesheets.auth.GoogleTokenResponse;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
 import timesheets.domain.IntegrationToken;
+import timesheets.dto.IssueDto;
+import timesheets.integration.issue.JiraAdapter;
 import timesheets.integration.issue.JiraOAuthService;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.security.SecurityUtils;
@@ -28,6 +33,7 @@ public class IntegrationController {
   private final SecurityUtils securityUtils;
   private final IntegrationTokenRepository integrationTokenRepository;
   private final JiraOAuthService jiraOAuthService;
+  private final JiraAdapter jiraAdapter;
 
   @GetMapping("/google/calendar/connect")
   public ResponseEntity<String> connectGoogleCalender() {
@@ -103,9 +109,15 @@ public class IntegrationController {
     // store in the integration_table
     integrationTokenRepository.save(integrationToken);
 
-    return ResponseEntity.ok(
-        "Google Calendar connected for the workspace member: "
-            + validatedState.getWorkspaceMemberId());
+    // return ResponseEntity.ok(
+    //     "Google Calendar connected for the workspace member: "
+    //         + validatedState.getWorkspaceMemberId());
+
+    // ensures that the redirect! forgot to redirect to frontend
+    // cleo need to redirect it to the calendar page
+    return ResponseEntity.status(HttpStatus.FOUND)
+        .header(HttpHeaders.LOCATION, "http://localhost:4200")
+        .build();
   }
 
   @GetMapping("/jira/connect")
@@ -162,6 +174,18 @@ public class IntegrationController {
 
     integrationTokenRepository.save(integrationToken);
 
-    return ResponseEntity.ok("Jira connected for the workspace member:" + workspaceMemberId);
+    // return ResponseEntity.ok("Jira connected for the workspace member:" + workspaceMemberId);
+
+    // cleo need to redirect it to the calendar page
+    return ResponseEntity.status(HttpStatus.FOUND)
+        .header(HttpHeaders.LOCATION, "http://localhost:4200")
+        .build();
+  }
+
+  @GetMapping("/jira/issues")
+  public ResponseEntity<List<IssueDto>> getJiraIssues() {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    List<IssueDto> issues = jiraAdapter.getIssues(workspaceMemberId);
+    return ResponseEntity.ok(issues);
   }
 }
