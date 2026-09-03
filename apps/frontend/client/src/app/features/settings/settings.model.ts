@@ -38,6 +38,18 @@ export interface AccessibiltySettings{
     highContrastMode: boolean;
 }
 
+// CHANGE PASSWORD AREA
+export interface ChangePasswordRequest{
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+}
+
+export interface ChangePasswordResponse{
+    message: string;
+    redirectUrl?: string;
+}
+
 export type NotificationType= 'ALL'| 'MENTIONS_ONLY'| 'DO_NOT_DISTURB';
 
 export type NotificationSettings={

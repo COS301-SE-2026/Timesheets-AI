@@ -8,13 +8,13 @@ import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, of } from "rxjs";
 import { delay } from "rxjs";
-import { UserSettings, IntegrationStatus, AppearanceSettings, NotificationSettings } from "./settings.model";
+import { UserSettings, IntegrationStatus, AppearanceSettings, NotificationSettings, ChangePasswordRequest, ChangePasswordResponse } from "./settings.model";
 
 @Injectable({ providedIn: 'root'})
 export class SettingsService{
     private http= inject(HttpClient);
     private readonly apiUrl= 'api/settings';
-
+    private readonly authUrl= 'api/auth';
 
     private mockSettings: UserSettings={
         security:{
@@ -53,6 +53,13 @@ export class SettingsService{
             doNotDisturbEnabled: false,
         },
     };
+
+    changePassword(request: ChangePasswordRequest): Observable<ChangePasswordResponse>{
+        return this.http.post<ChangePasswordResponse>(
+            `${this.authUrl}/change-password`,
+            request
+        );
+    }
 
     getSettings(): Observable<UserSettings>{
         return of(this.mockSettings).pipe(delay(200));
