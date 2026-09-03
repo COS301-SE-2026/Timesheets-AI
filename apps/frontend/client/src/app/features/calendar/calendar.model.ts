@@ -6,6 +6,8 @@
 
 export type CalendarProvider='outlook' | 'google';
 
+export type EventCategory= | 'meetings' | 'work' | 'calls'| 'deadline';
+
 export interface AppEvent {
     id:string;
     title: string;
@@ -14,7 +16,7 @@ export interface AppEvent {
     description?: string;
     location?: string;
     provider: CalendarProvider;
-    category?: 'purple' | 'blue' | 'green' | 'orange' | string;
+    category?:  EventCategory;
     categoryLabel?:string;
 
     organizer?:{
