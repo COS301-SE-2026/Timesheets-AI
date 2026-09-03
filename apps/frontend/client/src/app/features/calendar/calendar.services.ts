@@ -133,6 +133,8 @@ export class CalendarService{
 
     // CONVERTS BACKEND DTO TO APPS INTERNAL CALENDAR MODEL
     private mapBackendEvent(event: BackenCalendarEvent): AppEvent{
+        const category= this.getEventCategory(event.title);
+        
         return{
             id: event.externalEventId,
             title: event.title,
@@ -141,7 +143,26 @@ export class CalendarService{
 
             // BACKEND DOESNT PROVIDE THESE FIELDS
             provider: 'google',
-            category: 'meetings'
+            category
         };
+    }
+
+    private getEventCategory(title: string): AppEvent['category']{
+        const normalizedTitle=title.toLowerCase();
+
+        if( normalizedTitle.includes('deadline') || normalizedTitle.includes('due')){
+            return 'deadline';
+        }
+
+        if( normalizedTitle.includes('call') || normalizedTitle.includes('check-in') || normalizedTitle.includes('check in')){
+            return 'calls';
+        }
+
+        if( normalizedTitle.includes('sprint planning') || normalizedTitle.includes('sprint duration') || normalizedTitle.includes(' work')){
+            return 'work';
+        }
+
+        return 'meetings';
+
     }
 }
