@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import timesheets.auth.GoogleOAuthService;
 import timesheets.auth.GoogleTokenResponse;
 import timesheets.auth.OAuthState;
@@ -182,10 +179,19 @@ public class IntegrationController {
         .build();
   }
 
+  // this will get all the current issues for the user
   @GetMapping("/jira/issues")
   public ResponseEntity<List<JiraIssueResponse>> getJiraIssues() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
     List<JiraIssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
     return ResponseEntity.ok(issues);
+  }
+
+  // this will get a specific Jira issue by it's key
+  @GetMapping("/jira/issues/{issueKey}")
+  public ResponseEntity<JiraIssueResponse> getJiraIssue(@PathVariable String issueKey) {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    JiraIssueResponse issue = jiraAdapter.getIssue(workspaceMemberId, issueKey);
+    return ResponseEntity.ok(issue);
   }
 }
