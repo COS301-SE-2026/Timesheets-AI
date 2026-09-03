@@ -7,6 +7,7 @@ import lombok.Data;
 
 public class AccountDeletionRequest {
 
+  // this is the user request for account deletion
   @Data
   public static class Request {
 
@@ -14,6 +15,7 @@ public class AccountDeletionRequest {
     private String reason;
   }
 
+  // this will be for an admin to process a deletion request
   @Data
   public static class Process {
 
@@ -31,6 +33,7 @@ public class AccountDeletionRequest {
     }
   }
 
+  // this will be for when a user cancels their request
   @Data
   public static class Cancel {
     // no fields yet since the user id is in the Security Context
