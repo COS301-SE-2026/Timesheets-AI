@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, inject, signal, ViewChild} from '@angular/core';
+import { Component, inject, signal, ViewChild, OnInit} from '@angular/core';
 import {  EventClickArg, CalendarOptions} from '@fullcalendar/core';
 import { FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular'
 import  dayGridPlugin from '@fullcalendar/daygrid';
@@ -17,21 +17,21 @@ export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 })
 
 
-export class CalendarComponent {
+export class CalendarComponent implements OnInit{
   @ViewChild('calendar')
   calendarComponent!: FullCalendarComponent;
 
   private calendarService= inject(CalendarService);
 
   activeView= signal<CalendarView>('dayGridMonth');
-  provider= signal<CalendarProvider>( 'outlook');
+  provider= signal<CalendarProvider>( 'google');
   isSyncing= signal<boolean>(false);
   selectedEvent= signal<AppEvent | null>(null);
   currentDateTitle= signal<string>('');
 
   // HEADER PILL STUFF
   isConnected= signal<boolean>(false);
-  lastSyncedLabel= signal<string | null>('synced just now');
+  lastSyncedLabel= signal<string | null>(null);
 
   calendarOptions: CalendarOptions={
     plugins:[
@@ -45,18 +45,23 @@ export class CalendarComponent {
     height: 'auto',
     editable: false,
     selectable: false,
-    events: (fetchInfo, successCallback, failurCallback)=>{
+    events: (fetchInfo, successCallback, failureCallback)=>{
       this.calendarService.getEvents(
         fetchInfo.start.toISOString(),
         fetchInfo.end.toISOString()
       ).subscribe(
         {
           next: (events)=>{
+            this.isConnected.set(true);
+            this.lastSyncedLabel.set(
+              this.formatSyncedLabel(new Date().toISOString())
+            );
             successCallback(events);
           },
           error: (error)=>{
             console.error('Failed to load calendar evemts.', error);
-            failurCallback(error);
+            this.isConnected.set(false);
+            failureCallback(error);
           }
         }
       );
@@ -66,8 +71,8 @@ export class CalendarComponent {
 
     // ADDING THE FC COLOURS
     eventClassNames:(arg)=>{
-      const category= arg.event.extendedProps['category'];
-      return category ? [`fc-event-${category}`]: [];
+      const category= arg.event.extendedProps['category'] || 'meetings';
+      return [`fc-event-${category}`];
     },
 
     eventContent:(arg)=> this.renderEventContent(arg),
@@ -94,36 +99,13 @@ export class CalendarComponent {
   };
 
   
-  // ngOnInit(): void{
-  //   this.loadEvents();
-  // }
-
-  // loadEvents(): void{
-  //   this.calendarService.getEvents(this.provider(), '', '').subscribe(
-  //   {
-  //     next: (events)=>{
-  //       const api= this.calendarComponent?.getApi();
-  //       if(api){
-  //         api.removeAllEventSources();
-  //         api.addEventSource(events);
-  //       }else{
-  //         this.calendarOptions.events= events;
-  //       }
-
-  //       this.isConnected.set(true);
-
-  //       this.lastSyncedLabel.set(
-  //         this.formatSyncedLabel(
-  //           new Date().toISOString()
-  //         )
-  //       );
-  //     },
-
-  //     error:()=>{
-  //       this.isConnected.set(false);
-  //     }
-  //   });
-  // }
+  ngOnInit(): void{
+    // CHECKING IF COMING BACK FROM OAUTH REDIRECT
+    const urlParams= new URLSearchParams(window.location.search);
+    if(urlParams.has('code') && urlParams.has('state')){
+      this.syncCalendar();
+    }
+  }
 
   changeView(view: CalendarView): void{
     this.activeView.set(view);
@@ -155,19 +137,12 @@ export class CalendarComponent {
     this.isSyncing.set(true);
 
     const api= this.calendarComponent?.getApi();
-    if(!api){
-      this.isSyncing.set(false);
-      return;
+
+    if(api){
+      api.refetchEvents();
     }
 
-    api.refetchEvents();
-
     this.isSyncing.set(false);
-    this.isConnected.set(true);
-
-    this.lastSyncedLabel.set(
-      this.formatSyncedLabel(new Date().toISOString())
-    );
   }
 
   handleEventClick(info: EventClickArg): void{
