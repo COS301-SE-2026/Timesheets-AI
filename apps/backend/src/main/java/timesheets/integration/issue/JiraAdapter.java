@@ -61,7 +61,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
         "https://api.atlassian.com/ex/jira/"
             + cloudId
             + "/rest/api/3/search/jql"
-            + "?jql=assignee%3DcurrentUser()"
+            + "?jql=assignee=currentUser()"
             + "&maxResults=50"
             + "&fields=summary,status,issuetype";
 
