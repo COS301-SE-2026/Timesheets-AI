@@ -65,6 +65,31 @@ $calendar-red-text: #dc2626;
         gap: 12px;
     }
 
+    .connection-pill-button{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: $calendar-card-bg;
+        border: 1px solid $calendar-border;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 500;
+        color: $calendar-text-body;
+        transition: background 0.2s;
+
+        .status-dot{
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: $calendar-text-muted;
+        }
+
+        &:hover{
+            background: $calendar-pill-bg;
+        }
+    }
+
     .connection-status{
         display: inline-flex;
         align-items: center;
