@@ -2,7 +2,6 @@
     <header class="teams-heading">
         <div>
             <h1>Team</h1>
-            <!-- <p class="eyebrow">Workspace Management</p> -->
             <p>Manage workspace members and their project assignments.</p>
         </div>
         @if (isAdmin) {
@@ -19,7 +18,7 @@
     <div class="notice" [class.notice--success]="actionMessageKind === 'success'" [class.notice--error]="actionMessageKind === 'error'" role="status">{{ actionMessage }}</div>
 }
 @if (actionMessage) {
-    <div class="notice notice--error" role="status">
+    <div class="notice notice--success" role="status">
         <span>{{ actionMessage }}</span>
         <button type="button" class="notice-dismiss" (click)="dismissActionMessage()">Dismiss</button>
     </div>
@@ -119,10 +118,20 @@
                             <td class="col-action">
                                 <div class="actions">
                                     @if (activeTab === 'waiting') {
-                                        <button type="button" class="primary-button small" (click)="addToWorkspace(member)"
-                                        [disabled]="isActionInProgress('workspace-' + member.userId)">
-                                        @if (isActionInProgress('workspace-' + member.userId)) { Adding... } @else {Add to workspace}
-                                        </button>
+                                        <div class="workspace-add-controls">
+                                            <label class="sr-only" [for]=" 'workspace-role-' + member.userId">Workspace role</label>
+                                                <select [id]="'workspace-role-' + member.userId"
+                                                [ngModel]="workspaceRoleFor(member)"
+                                                (ngModelChange)="setWorkspaceRole(member, $event)">
+                                                <option value="MANAGER">Manager</option>
+                                                <option value="DEVELOPER">Developer</option>
+                                                </select>
+                                                <button type="button" class="primary-button small" (click)="addToWorkspace(member)"
+                                                [disabled]="isActionInProgress('workspace-' + member.userId)">
+                                                <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                                                @if (isActionInProgress('workspace-' + member.userId)) { Adding...} @else { Add to Workspace }
+                                            </button>                                   
+                                        </div>
                                     } @else {
                                         <button type="button" class="menu-trigger" (click)="toggleActionMenu(member)"
                                         [attr.aria-expanded]="openActionMenuUserId === member.userId"
@@ -134,16 +143,16 @@
                                                 <button type="button" role="menuitem" (click)="openAssignment(member)"
                                                 [disabled]="!canManageProjects(member)"
                                                 [title]="!hasProjectMembershipId(member) ? 'This user has no workspace membership identifier in the current API response.' : ''">
-                                                Add to project
+                                                <i class="fa-solid fa-folder-plus" aria-hidden="true"></i> Add to project
                                                 </button>
 
                                                 <button type="button" role="menuitem" (click)="openProjectRemoval(member)" [disabled]="!member.projectIds.length">
-                                                    Remove from project
+                                                   <i class="fa-solid fa-folder-minus" aria-hidden="true"></i> Remove from project
                                                 </button>
                                                 @if (isAdmin) {
                                                     <button type="button" role="menuitem" class="danger-action" (click)="requestWorkspaceRemoval(member)"
                                                     [disabled]="!hasProjectMembershipId(member)">
-                                                    Remove from workspace
+                                                       <i class="fa-solid fa-user-minus" aria-hidden="true"></i> Remove from workspace
                                                     </button>
                                                 }
                                             </div>
@@ -187,9 +196,10 @@
         }
             <div class="dialog-actions">
                 <button type="button" class="secondary-button"
-                (click)="closeAssignment()" [disabled]="actionInProgress">Cancel</button>
+                (click)="closeAssignment()" [disabled]="actionInProgress"><i class="fa-solid fa-xmark" aria-hidden="true"></i>  Cancel</button>
                <button type="button" class="primary-button"
                [disabled]="!selectedProjectId || actionInProgress" (click)="assignmentMode === 'add' ? assignToProject() : confirmProjectRemoval()" >
+               <i [class]="assignmentMode === 'add' ? 'fa-solid fa-user-plus' : 'fa-solid fa-user-minus'" aria-hidden="true" ></i>
                {{ actionInProgress ? 'Saving...' : assignmentMode === 'add' ? 'Assign to project' : 'Remove from project' }}
                </button>
             </div>
@@ -204,13 +214,17 @@
             <button type="button" class="dialog-close" (click)="closeCreateProject()" aria-label="Close">x</button>
             <p class="eyebrow">Project management</p>
             <h2 id="create-project-title">Create a project</h2>
-            <label>Project name 
-                <input type="text" [(ngModel)]="newProject.name" mxlength="255" placeholder="e.g. Website redesign" />
-            </label>
-            <label>Description <textarea [(ngModel)]="newProject.description" rows="3" placeholder="Optional"></textarea> </label>
-            @if (isAdmin) {
+             <div class="project-form-grid">
+                <label>Project name <input type="text" [(ngModel)]="newProject.name" maxlength="255" placeholder="e.g. Website redesign"/> </label>
+                <label>Budget hours <input type="number" [(ngModel)]="newProject.budgetHours" min="0" step="0.5" placeholder="0" /> </label>
+                <label class="full-width">Description <textarea [(ngModel)]="newProject.description" rows="3" placeholder="Describe the project"></textarea> </label>
+                <label>Hourly rate <input type="number" [(ngModel)]="newProject.hourlyRate" min="0" step="0.01" placeholder="0.00"/> </label>
+                <label>Budget cost <input type="number" [(ngModel)]="newProject.budgetCost" min="0" step="0.01" placeholder="0.00"/> </label>
+                <label>Start Date <input type="date" [(ngModel)]="newProject.startDate"/> </label>
+                <label>End date <input type="date" [(ngModel)]="newProject.endDate" /> </label>
                 <label>Project manager
-                <select [(ngModel)]="newProject.managerIds" multiple>
+                <select [(ngModel)]="newProject.managerId" >
+                    <option value="" disabled>Select a project manager</option>
                     @for (member of workspaceMembers; track member.userId) {
                         @if (member.workspaceMemberId) {
                             <option [value]="member.workspaceMemberId">{{ member.firstName }} {{ member.lastName }} </option>
@@ -218,14 +232,21 @@
                     }
                 </select>
                 </label>
-                <p class="form-help">Select one or more workspace members to make project managers.</p>
-            } @else {
-                <p class="form-help">You can create this project and add members, but only an administrator can designate a project manager.</p>
-            }
+               <label>Developers
+                <select [(ngModel)]="newProject.developerIds" multiple>
+                    @for (member of workspaceMembers; track member.userId) {
+                        @if (member.workspaceMemberId) {
+                            <option [value]="member.workspaceMemberId" [disabled]="member.workspaceMemberId === newProject.managerId">{{ member.firstName }} {{ member.lastName }} </option>
+                        }
+                    }
+                </select>
+               </label>
+               </div>
+               <p class="form-help">Choose one project manager, then select the remaining project members as developers.</p>
             <div class="dialog-actions">
-                <button type="button" class="secondary-button" (click)="closeCreateProject()" [disabled]="actionInProgress">Cancel</button>
-                <button type="button" class="primary-button" [disabled]="!newProject.name.trim() || actionInProgress" (click)="createProject()">
-                    {{ actionInProgress ? 'Creating...' : 'Create project' }}
+                <button type="button" class="secondary-button" (click)="closeCreateProject()" [disabled]="actionInProgress"><i class="fa-solid fa-xmark" aria-hidden="true"></i> Cancel</button>
+                <button type="button" class="primary-button" [disabled]="!newProject.name.trim() || !newProject.managerId || actionInProgress" (click)="createProject()">
+                    <i class="fa-solid fa-folder-plus" aria-hidden="true"></i> {{ actionInProgress ? 'Creating...' : 'Create project' }}
                 </button>
             </div>
         </section>
@@ -240,8 +261,8 @@
             <h2 id="remove-workspace-title"> Remove {{ memberToRemoveFromWorkspace.firstName }} from the workspace?</h2>
             <p>They will lose workspace access and project memberships.</p>
             <div class="dialog-actions">
-                <button type="button" class="secondary-button" (click)="cancelWorkspaceRemoval()" [disabled]="actionInProgress">Cancel</button>
-                <button type="button" class="danger-button" (click)="removeFromWorkspace()" [disabled]="actionInProgress">Remove user</button>
+                <button type="button" class="secondary-button" (click)="cancelWorkspaceRemoval()" [disabled]="actionInProgress"> <i class="fa-solid fa-xmark" aria-hidden="true"></i> Cancel</button>
+                <button type="button" class="danger-button" (click)="removeFromWorkspace()" [disabled]="actionInProgress"> <i class="fa-solid fa-user-minus" aria-hidden="true"></i> Remove user</button>
             </div>
         </section>
     </div>
