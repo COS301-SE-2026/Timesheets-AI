@@ -91,7 +91,6 @@ services:
     environment:
       API_URL: http://backend:8080
     ports:
-    
       - "4200:4200"
     volumes:
       - ./apps/frontend/client:/app/apps/frontend/client
@@ -131,6 +130,10 @@ services:
     ports:
       - "9090:9090"
 
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.enable-remote-write-receiver'
+
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     
@@ -167,6 +170,11 @@ services:
       - "9100:9100"
 
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/9100"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   postgres_data:
