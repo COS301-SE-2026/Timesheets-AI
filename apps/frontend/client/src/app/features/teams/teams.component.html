@@ -4,21 +4,23 @@
             <h1>Team</h1>
             <p>Manage workspace members and their project assignments.</p>
         </div>
+        <div class="header-actions">
         @if (isAdmin) {
-            <button type="button" class="secondary-button" (click)="activeTab = 'waiting'">
-                <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add Member
+            <button type="button" class="primary-button" (click)="activeTab = 'waiting'">
+                <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Add to workspace
             </button>
         }
         <button type="button" class="primary-button" (click)="openCreateProject()">
             <i class="fa-solid fa-folder-plus" aria-hidden="true"></i> New project
         </button>
+        </div>
     </header>
 
 @if (errorMessage) {
     <div class="notice" [class.notice--success]="actionMessageKind === 'success'" [class.notice--error]="actionMessageKind === 'error'" role="status">{{ actionMessage }}</div>
 }
 @if (actionMessage) {
-    <div class="notice notice--success" role="status">
+    <div class="notice" [class.notice--success]="actionMessageKind === 'success'" [class.notice--error]="actionMessageKind === 'error'">
         <span>{{ actionMessage }}</span>
         <button type="button" class="notice-dismiss" (click)="dismissActionMessage()">Dismiss</button>
     </div>
@@ -33,6 +35,9 @@
         </article>
         @if (isAdmin) {
             <article>
+                <span class="stat-icon purple">
+                    <i class="fa-solid fa-clock"></i>
+                </span>
                 <div>
                 <span> Waiting room </span>
                 <strong> {{ waitingUsers.length }}</strong>
@@ -112,7 +117,7 @@
                                 } @else if (activeTab === 'members') {
                                     <span class="muted">No projects</span>
                                 } @else {
-                                    <span class="waiting-badge">Waiting approval</span>
+                                    <span class="waiting-badge">Awaiting approval</span>
                                 }
                             </td>
                             <td class="col-action">
@@ -151,7 +156,8 @@
                                                 </button>
                                                 @if (isAdmin) {
                                                     <button type="button" role="menuitem" class="danger-action" (click)="requestWorkspaceRemoval(member)"
-                                                    [disabled]="!hasProjectMembershipId(member)">
+                                                     [disabled]="!member.workspaceMemberId"
+                                                    [title]="!member.workspaceMemberId ? 'This user has no workspace membership identifier.' : ''">
                                                        <i class="fa-solid fa-user-minus" aria-hidden="true"></i> Remove from workspace
                                                     </button>
                                                 }
