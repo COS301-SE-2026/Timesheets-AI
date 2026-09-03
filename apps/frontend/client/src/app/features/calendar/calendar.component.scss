@@ -85,6 +85,11 @@ $calendar-red-text: #dc2626;
             background: $calendar-text-muted;
         }
 
+        .google-icon{
+            color: #4285f4;
+            font-size: 14px;
+        }
+
         &:hover{
             background: $calendar-pill-bg;
         }
@@ -105,9 +110,13 @@ $calendar-red-text: #dc2626;
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: $calendar-green-text;
+            background: $calendar-text-muted;
         }
 
+        &.connected{
+            background: $calendar-green-text;   
+        }
+        
         .sync-meta{
             color: $calendar-text-muted;
         }
