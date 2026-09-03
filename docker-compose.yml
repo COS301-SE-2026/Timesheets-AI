@@ -57,6 +57,8 @@ services:
 
       SERVER_PORT: ${SERVER_PORT:-8080}
 
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:4200,https://momentlyapp.org/}
+      APP_CORS_ALLOWED_METHODS: ${APP_CORS_ALLOWED_METHODS:-GET,POST,PUT,DELETE,PATCH,OPTIONS}
       # FIX: correct Docker networking (NEVER localhost inside containers)
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-momently_dev}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-momently}
@@ -71,12 +73,12 @@ services:
     ports:
       - "8080:8080"
 
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"] 
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"] 
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+    #   start_period: 60s
 
   frontend:
     image: momently-frontend 
@@ -138,10 +140,8 @@ services:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     
     depends_on:
-      backend:
-          condition: service_healthy
-      node-exporter:
-          condition: service_healthy
+     - backend
+     - node-exporter
 
   # provide dashboards
   # good for visuals 
@@ -176,10 +176,28 @@ services:
       timeout: 5s
       retries: 3
 
+
+  # this is our load generation tool 
+  k6:
+    image: grafana/k6:latest
+    container_name: k6
+    ports: 
+      - "6565:6565"
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://momently-prometheus:9090/api/v1/write # sends data (write) to Prometheus 
+    volumes:
+      - ./k6:/scripts
+    command: run --out experimental-prometheus-rw /scripts/script.js
+    depends_on:
+      - prometheus
+      - backend
+
 volumes:
   postgres_data:
     name: momently-postgres-data
   grafana-storage:
+
+
 
 
 # Prometheus, Node exporter & Grafana - https://www.youtube.com/watch?v=8ubjLF-q4sw
