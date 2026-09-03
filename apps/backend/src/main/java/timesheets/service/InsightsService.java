@@ -65,12 +65,12 @@ public class InsightsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 3600.0)
                           .sum();
 
                   return PersonalInsightsResponse.ProjectHours.builder()
                       .projectId(entry.getKey())
-                      .projectName("Project " + entry.getKey()) // TODO: join with projects table
+                      .projectName("Project " + entry.getKey())
                       .hours(hours)
                       .entryCount(entry.getValue().size())
                       .build();
@@ -89,12 +89,12 @@ public class InsightsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 3600.0)
                           .sum();
 
                   return PersonalInsightsResponse.TaskHours.builder()
                       .taskId(entry.getKey())
-                      .taskTitle("Task " + entry.getKey()) // TODO: join with tasks table
+                      .taskTitle("Task " + entry.getKey())
                       .hours(hours)
                       .status("TODO") // TODO: join with tasks table
                       .build();
@@ -114,7 +114,7 @@ public class InsightsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 3600.0)
                           .sum();
 
                   return PersonalInsightsResponse.DailyTrend.builder()

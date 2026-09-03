@@ -7,6 +7,8 @@ import exception.ConflictException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +19,7 @@ import timesheets.dto.response.MessageResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+  private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
   /*
   ! 400 - Bad Request
@@ -97,6 +100,7 @@ public class GlobalExceptionHandler {
   // moving forward
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleGenericException(Exception e) {
+    log.error("Unhandled exception", e);
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(new ErrorResponse(500, "Internal Server Error", "An unexpected error occurred"));
@@ -116,6 +120,7 @@ public class GlobalExceptionHandler {
       case EMAIL_EXISTS:
         return HttpStatus.CONFLICT;
       case EMAIL_DOMAIN:
+      case EMAIL_NOT_VERIFIED:
       case TOKEN_NOT_FOUND:
       case TOKEN_EXPIRED:
       case TOKEN_USED:

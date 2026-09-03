@@ -8,9 +8,10 @@ and free tiers prompts/responses may be used Google to improve their models
 references: https://ai.google.dev/gemini-api/docs
 Author: Zamokuhle Zwane
 Date: 28/08/2026
+
+Patched: updated the save_weekly_summary_insight() func
 """
 
-import os
 import time
 import uuid
 from datetime import date, datetime, timedelta
@@ -19,6 +20,7 @@ import google.generativeai as genai
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.models.ai_insight import AIInsight
 from app.models.time_entry import TimeEntry
 
@@ -70,7 +72,7 @@ def _build_prompt(hours_logged, project_count, latest_score, previous_score, sub
 
 def _call_gemini_with_retry(prompt: str) -> str:
     model = genai.GenerativeModel("gemini-2.5-flash-lite")
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+    genai.configure(api_key=settings.gemini_api_key)
 
     last_error = None
     for attempt in range(MAX_RETRIES):
@@ -99,7 +101,7 @@ def _get_week_totals(db: Session, subject_id: uuid.UUID, subject_type: str, week
     total_seconds = (
         db.query(func.sum(TimeEntry.duration_seconds)).filter(and_(*filters)).scalar() or 0
     )
-    hours_logged = round(total_seconds / 3600, 1)
+    hours_logged = round(total_seconds / 3600.0, 1)
 
     project_count = db.query(TimeEntry.project_id).filter(and_(*filters)).distinct().count()
 
@@ -108,17 +110,19 @@ def _get_week_totals(db: Session, subject_id: uuid.UUID, subject_type: str, week
 
 def _get_recent_productivity_scores(db: Session, subject_id: uuid.UUID, subject_type: str):
     scope = "TEAM" if subject_type == "TEAM" else "USER"
-    rows = (
-        db.query(AIInsight)
-        .filter(
-            AIInsight.workspace_member_id == subject_id,
-            AIInsight.insight_type == "PRODUCTIVITY",
-            AIInsight.scope == scope,
-        )
-        .order_by(AIInsight.created_at.desc())
-        .limit(2)
-        .all()
+    query = db.query(AIInsight).filter(
+        AIInsight.insight_type == "PRODUCTIVITY",
+        AIInsight.scope == scope,
     )
+    if subject_type == "TEAM":
+        query = query.filter(
+            AIInsight.workspace_id == subject_id,
+        )
+    else:
+        query = query.filter(
+            AIInsight.workspace_member_id == subject_id,
+        )
+    rows = query.order_by(AIInsight.created_at.desc()).limit(2).all()
     if len(rows) < 2:
         return (rows[0].score if rows else None), None
     return rows[0].score, rows[1].score
@@ -128,7 +132,8 @@ def save_weekly_summary_insight(
     db: Session, subject_id: uuid.UUID, subject_type: str, result: dict
 ) -> AIInsight:
     insight = AIInsight(
-        workspace_member_id=subject_id,
+        workspace_id=subject_id if subject_type == "TEAM" else None,
+        workspace_member_id=subject_id if subject_type == "USER" else None,
         insight_type="WEEKLY_SUMMARY",
         scope="TEAM" if subject_type == "TEAM" else "USER",
         narrative=result["narrative"],
