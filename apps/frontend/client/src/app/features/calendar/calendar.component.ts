@@ -7,6 +7,8 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { CalendarProvider, AppEvent } from './calendar.model';
 import { CalendarService } from './calendar.services';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router} from '@angular/router';
 export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 @Component({
   selector: 'app-calendar',
@@ -22,6 +24,10 @@ export class CalendarComponent implements OnInit{
   calendarComponent!: FullCalendarComponent;
 
   private calendarService= inject(CalendarService);
+  private http= inject(HttpClient);
+  private route= inject(ActivatedRoute);
+  private router= inject(Router);
+
 
   activeView= signal<CalendarView>('dayGridMonth');
   provider= signal<CalendarProvider>( 'google');
@@ -47,8 +53,8 @@ export class CalendarComponent implements OnInit{
     selectable: false,
     events: (fetchInfo, successCallback, failureCallback)=>{
       this.calendarService.getEvents(
-        fetchInfo.start.toISOString(),
-        fetchInfo.end.toISOString()
+        this.formatCalendarDate(fetchInfo.start),
+        this.formatCalendarDate(fetchInfo.end)
       ).subscribe(
         {
           next: (events)=>{
@@ -101,10 +107,26 @@ export class CalendarComponent implements OnInit{
   
   ngOnInit(): void{
     // CHECKING IF COMING BACK FROM OAUTH REDIRECT
-    const urlParams= new URLSearchParams(window.location.search);
-    if(urlParams.has('code') && urlParams.has('state')){
-      this.syncCalendar();
-    }
+    this.route.queryParams.subscribe(
+      params=>{
+        if(params['connected']=== 'true'){
+          this.isConnected.set(true);
+          this.syncCalendar();
+
+          // CLEANING PARAM FROM BROWSER BAR
+          this.router.navigate(
+            [], {
+              queryParams: {connected: null},
+              queryParamsHandling: 'merge'
+            }
+          );
+        }
+      }
+    );
+    // const urlParams= new URLSearchParams(window.location.search);
+    // if(urlParams.has('code') && urlParams.has('state')){
+    //   this.isConnected.set(true);
+    // }
   }
 
   changeView(view: CalendarView): void{
@@ -113,16 +135,29 @@ export class CalendarComponent implements OnInit{
   }
 
   connectGoogleCalendar():void{
-    this.calendarService.connectGoogleCalendar().subscribe(
+    this.http.get('/api/integrations/google/calendar/connect',{
+      responseType: 'text'
+    }).subscribe(
       {
-        next:(authorizationUrl)=>{
-          window.location.href= authorizationUrl;
+        next:(authUrl: string)=>{
+          window.location.href= authUrl;
         },
         error:(error)=>{
           console.error('Failed to connect Google Calendar', error);
         }
       }
     );
+  }
+
+  private formatCalendarDate(date: Date): string{
+    const year= date.getFullYear();
+    const month= String(date.getMonth()+1).padStart(2, '0');
+    const day= String(date.getDate()).padStart(2, '0');
+    const hours= String(date.getHours()).padStart(2, '0');
+    const minutes= String(date.getMinutes()).padStart(2, '0');
+    const seconds= String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   }
 
   navigate(direction: 'prev' | 'next' | 'today'):void{
