@@ -17,7 +17,7 @@ import timesheets.auth.GoogleTokenResponse;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
 import timesheets.domain.IntegrationToken;
-import timesheets.dto.IssueDto;
+import timesheets.dto.response.JiraIssueResponse;
 import timesheets.integration.issue.JiraAdapter;
 import timesheets.integration.issue.JiraOAuthService;
 import timesheets.repository.IntegrationTokenRepository;
@@ -183,9 +183,9 @@ public class IntegrationController {
   }
 
   @GetMapping("/jira/issues")
-  public ResponseEntity<List<IssueDto>> getJiraIssues() {
+  public ResponseEntity<List<JiraIssueResponse>> getJiraIssues() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    List<IssueDto> issues = jiraAdapter.getIssues(workspaceMemberId);
+    List<JiraIssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
     return ResponseEntity.ok(issues);
   }
 }
