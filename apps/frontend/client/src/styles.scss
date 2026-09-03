@@ -8,6 +8,7 @@ MOMENTLY DESIGN SYSTEM
 './app/shared/styles/index' as *;
 
 @import 'material-icons/iconfont/material-icons.css';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
 
 /*The "as *" means all forwarded tokens are available globally without needing to prefix them*/
 
