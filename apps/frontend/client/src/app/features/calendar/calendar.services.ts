@@ -6,19 +6,18 @@
 
 import { Injectable, inject } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { Observable, map, of, delay } from "rxjs";
+import { Observable, map } from "rxjs";
 import{
     AppEvent,
-    CalendarProvider
 }from './calendar.model';
 
 
 // BACKEND RESPONSES
-export interface CalendarStatus{
-    connected: boolean;
-    provider: string;
-    lastSyncedAt: string | null;
-}
+// export interface CalendarStatus{
+//     connected: boolean;
+//     provider: string;
+//     lastSyncedAt: string | null;
+// }
 
 interface BackenCalendarEvent{
     title: string;
@@ -124,18 +123,16 @@ export class CalendarService{
     //     );
     // }
 
-    getEvent(id:string): Observable<AppEvent>{
+    getEvent(externalEventId:string): Observable<AppEvent>{
         return this.http.get<BackenCalendarEvent>(
-            `${this.apiUrl}/events/${id}`
+            `${this.apiUrl}/events/${externalEventId}`
         ).pipe(
             map(event=> this.mapBackendEvent(event))
         );
     }
 
     // CONVERTS BACKEND DTO TO APPS INTERNAL CALENDAR MODEL
-    private mapBackendEvent(
-        event: BackenCalendarEvent
-    ): AppEvent{
+    private mapBackendEvent(event: BackenCalendarEvent): AppEvent{
         return{
             id: event.externalEventId,
             title: event.title,
@@ -144,7 +141,7 @@ export class CalendarService{
 
             // BACKEND DOESNT PROVIDE THESE FIELDS
             provider: 'google',
-            category: 'work'
-        }
+            category: 'meetings'
+        };
     }
 }
