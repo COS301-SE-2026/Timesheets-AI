@@ -26,35 +26,28 @@ Related Requirements: N/A
                     <span class="status-dot">
                     </span>
                     <span>
-                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }} connected
+                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }}
+                        {{ isConnected() ? 'connected' : 'not connected'}}
                     </span>
-                    @if(lastSyncedLabel()){
+                    @if(isConnected() && lastSyncedLabel()){
                         <span class="sync-meta">
                             &middot; {{ lastSyncedLabel() }}
                         </span>
                     }
                 </div>
-            }@else{
-                <button
-                    class="connection-pill-button"
-                    (click)="connectGoogleCalendar()">
-                    <span class="status-dot"></span>
-                    <i class="fa-brands fa-google"></i>
-                    Connect Google Calendar
+
+                <!-- SYNCING AREA -->
+                <button 
+                    class="sync-button"
+                    (click)="isConnected()? syncCalendar(): connectGoogleCalendar()"
+                    [disabled]="isSyncing()">
+                    <i 
+                        class="fa-solid fa-rotate"
+                        [class.fa-spin]="isSyncing()">
+                    </i>
+                    {{ isSyncing()? 'Syncing...': (isConnected()? 'Sync now': 'Sync Google now') }}
                 </button>
             }
-
-            <!-- SYNCING AREA -->
-            <button 
-                class="sync-button"
-                (click)="syncCalendar()"
-                [disabled]="isSyncing()">
-                <i 
-                    class="fa-solid fa-rotate"
-                    [class.fa-spin]="isSyncing()">
-                </i>
-                {{ isSyncing()? 'Syncing...': ('Sync ' + (provider()=== 'outlook'? 'Outlook': 'Google') +' now') }}
-            </button>
         </div>
     </header>
 
