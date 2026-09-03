@@ -23,7 +23,8 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
-    width: 100%;
+    align-items: wrap;
+    justify-content: flex-end;
 }
 
 .eyebrow {
@@ -63,6 +64,7 @@ h1 {
     box-shadow: var(--elevation-1);
     color: var(--color-text-inverse);
     padding: var(--space-3) var(--space-4);
+    
 }
 
 .primary-button:hover {
@@ -72,6 +74,21 @@ h1 {
 .primary-button.small {
     font-size: var(--font-size-caption);
     padding: var(--space-2) var(--space-3);
+}
+
+.workspace-add-controls {
+    align-items: center;
+    display: flex;
+    gap: var(--space-2);
+    justify-content: flex-end;
+}
+
+.workspace-add-controls select {
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-bottom);
+    color: var(--color-text-body);
+    font: inherit;
+    padding: var(--space-2);
 }
 
 // Stat cards styling
@@ -280,7 +297,7 @@ h1 {
   }
 
   .project-chip, .waiting-badge {
-    background: var(--color-gray-light);
+    background: var(--color-primary-surface);
     border-radius: var(--radius-pill);
     color: var(--color-text-body);
     font-size: var(--font-size-caption);
@@ -339,7 +356,7 @@ h1 {
     box-shadow: var(--elevation-3);
     min-width: 190px;
     padding: var(--space-1);
-    position: absolute;
+    position: relative;
     right: 0;
     top: calc(100% + var(--space-1));
     z-index: 3;
@@ -364,16 +381,6 @@ h1 {
 
 .action-menu .danger-action, .danger-button {
     color: var(--color-status-overdue-text);
-}
-
-.danger-button {
-    background: var(--color-status-overdue-bg);
-    border: 0;
-    border-radius: var(--radius-button);
-    cursor: pointer;
-    font: inherit;
-    font-weight: var(--font-weight-bold);
-    padding: var(--space-3) var(--space-4);
 }
 
 .text-button:disabled {
@@ -448,16 +455,20 @@ h1 {
     padding: var(--space-4);
     position: fixed;
     z-index: 10;
+    overflow-y: auto;
 }
 
 .assignment-dialog {
     background: var(--color-white);
     border-radius: var(--radius-container);
     box-shadow: var(--elevation-3);
-    max-width: 30rem;
+    max-width: 44rem;
     padding: var(--space-8);
     position: relative;
     width: 100%;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .assignment-dialog h2 {
@@ -486,6 +497,13 @@ h1 {
     display: flex;
     gap: var(--space-2);
     margin: var(--space-4) 0 var(--space-6);
+
+    input[type="checkbox"] {
+        margin: 0;
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
 }
 
 .dialog-actions {
@@ -511,6 +529,25 @@ width: 100%;
     min-height: 8rem;
 }
 
+
+
+.project-form-grid select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 20px;
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-button);
+    background: var(--color-white);
+    color: var(--color-text-body);
+    font: inherit;
+    padding: var(--space-3);
+    cursor: pointer;
+}
+
+.project-form-grid .full-width {
+    grid-column: 1 / -1;
+}
+
 .form-help {
     color: var(--color-text-muted);
     font-size: var(--font-size-caption);
@@ -532,6 +569,21 @@ width: 100%;
     position: absolute;
     right: var(--space-3);
     top: var(--space-2);
+}
+
+.dialog-actions i, .primary-button i, .secondary-button i, .danger-button i, .action-menu i {
+    margin-right: var(--space-1);
+}
+
+.danger-button {
+    background: var(--color-semantic-red-text);
+    border: 0;
+    border-radius: var(--radius-button);
+    color: var(--color-text-inverse);
+    cursor: pointer;
+    font: inherit;
+    font-weight: var(--font-weight-bold);
+    padding: var(--space-3) var(--space-4);
 }
 
 .sr-only {
@@ -564,6 +616,18 @@ width: 100%;
 .search-field, .search-field input {
     box-sizing: border-box;
     width: 100%;
+}
+
+.project-form-grid {
+    grid-template-columns: 1fr;
+}
+
+.project-form-grid .full-width {
+    grid-column: auto;
+}
+
+.workspace-add-controls {
+    justify-content: flex-start;
 }
 
 }
