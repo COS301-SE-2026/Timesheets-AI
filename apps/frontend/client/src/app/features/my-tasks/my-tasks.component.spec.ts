@@ -73,6 +73,10 @@ describe('MyTasksComponent', () => {
   function flushInitialRequests(tasksData: TaskResponse[] = mockTasks): void {
     fixture.detectChanges();
     
+    const jiraStatusReq = httpMock.expectOne('/api/integrations/jira/status');
+    expect(jiraStatusReq.request.method).toBe('GET');
+    jiraStatusReq.flush({ connected: false });
+
     const tasksReq = httpMock.expectOne('/api/tasks/my-tasks');
     expect(tasksReq.request.method).toBe('GET');
     tasksReq.flush(tasksData);
@@ -115,6 +119,10 @@ describe('MyTasksComponent', () => {
       //assert loading state was set before the response came back
       expect(component.isLoading()).toBe(true);
  
+      const jiraStatusReq = httpMock.expectOne('/api/integrations/jira/status');
+      expect(jiraStatusReq.request.method).toBe('GET');
+      jiraStatusReq.flush({ connected: false });
+
       const tasksReq = httpMock.expectOne('/api/tasks/my-tasks');
       expect(tasksReq.request.method).toBe('GET');
       tasksReq.flush(mockTasks);
@@ -129,6 +137,12 @@ describe('MyTasksComponent', () => {
     });
 
      it('should set loadError and stop loading when the request fails', () => {
+
+      const jiraStatusReq = httpMock.expectOne('/api/integrations/jira/status');
+      expect(jiraStatusReq.request.method).toBe('GET');
+      jiraStatusReq.flush({ connected: false });
+
+
       // Arrange / Act
       fixture.detectChanges();
       const tasksReq = httpMock.expectOne('/api/tasks/my-tasks'); 
@@ -147,6 +161,11 @@ describe('MyTasksComponent', () => {
     });
  
     it('should default projectName to "Unknown Project" and assignedToName to "Unassigned" when null', () => {
+
+      const jiraStatusReq = httpMock.expectOne('/api/integrations/jira/status');
+      expect(jiraStatusReq.request.method).toBe('GET');
+      jiraStatusReq.flush({ connected: false });
+
       // this covers the ?? fallback logic in mapToTask(), which exists because of the GET /api/tasks/my-tasks 
       fixture.detectChanges();
       const tasksReq = httpMock.expectOne('/api/tasks/my-tasks');
