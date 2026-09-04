@@ -50,7 +50,7 @@
 [![System Requirements Specification](https://img.shields.io/badge/System_Requirements_Specification-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/SRS.pdf)
 [![System Architecture Specification](https://img.shields.io/badge/System_Architecture_Specification-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/SAS.pdf)
 [![Coding Standards Handbook](https://img.shields.io/badge/Coding_Standards-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/Coding-Standards-Handbook.pdf)
-[![Testing Policy](https://img.shields.io/badge/Testing_Policy-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/testing-policy.pdf)
+[![Testing Policy](https://img.shields.io/badge/Testing_Policy-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/Testing-Policy.pdf)
 [![User Manual](https://img.shields.io/badge/User_Manual-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/User-Manual.pdf)
 [![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-View_Website-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](https://momently-brand-style.netlify.app/)
 [![Brand Style PDF](https://img.shields.io/badge/Brand_Style_PDF-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/Brand-Style-Guide.pdf)
