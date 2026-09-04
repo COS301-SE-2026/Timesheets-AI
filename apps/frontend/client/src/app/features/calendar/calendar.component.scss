@@ -111,10 +111,10 @@ $calendar-red-text: #dc2626;
             height: 8px;
             border-radius: 50%;
             background: $calendar-text-muted;
-        }
 
-        &.connected{
-            background: $calendar-green-text;   
+            &.connected{
+                background: $calendar-green-text;   
+            }
         }
         
         .sync-meta{
