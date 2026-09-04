@@ -152,14 +152,13 @@ Related Requirements: N/A
 
     <!-- POP UP OF THE CLICKED EVENT  -->
     @if(selectedEvent(); as event){
-        <div 
+        <button 
             class="modal-backdrop"
             (click)="closeEventDetails()">
-        </div>
+        </button>
 
-        <div 
+        <dialog 
             class="event-details-card"
-            role="dialog"
             aria-modal="true">
             <button 
                 class="close-button"
@@ -246,6 +245,6 @@ Related Requirements: N/A
 
                 
             </div>    
-        </div>
+        </dialog>
     }
 </div>
