@@ -54,7 +54,66 @@ public class IntegrationController {
      the state string to link Google Calendar to different workspaceMemberId
   */
   @GetMapping("/google/calendar/callback")
-  public ResponseEntity<String> googleCalendarCallBack(
+  // public ResponseEntity<String> googleCalendarCallBack(
+  //     @RequestParam String code, @RequestParam String state) {
+
+  //   OAuthState validatedState = oauthStateService.validateState(state);
+
+  //   // Get the workspace member ID from the validated state
+  //   // this is the member who started the OAuth connection
+  //   UUID workspaceMemberId = validatedState.getWorkspaceMemberId();
+
+  //   // get the Google code and exchange it for tokens (accessToken, refreshToken, expiresIn) and
+  // I
+  //   // will store these in the integrations_token table
+  //   // Exchange Google's authorization code for tokens
+  //   GoogleTokenResponse tokenResponse = googleOAuthService.exchangeCodeforToken(code);
+
+  //   // calculate when access token expires
+  //   // why? Google access token is temporary
+  //   // if it expires: use refresh token (this help the backend to get new access token w/o the
+  // user
+  //   // connecting back to Google Calendar)
+  //   // if not: use existing access token
+  //   LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn());
+
+  //   // using the Repository class, check if the workspace memer has already connected to Google
+  //   // Calendar
+  //   Optional<IntegrationToken> existingToken =
+  //       integrationTokenRepository.findByWorkspaceMemberIdAndProvider(
+  //           workspaceMemberId, "GOOGLE_CALENDAR");
+
+  //   // checking if the member has integration token
+  //   // yes: use existing one
+  //   // no: create one
+  //   // for both cases: save the token information
+
+  //   IntegrationToken integrationToken;
+  //   if (existingToken.isEmpty()) {
+  //     integrationToken = new IntegrationToken();
+  //   } else {
+  //     integrationToken = existingToken.get();
+  //   }
+
+  //   integrationToken.setWorkspaceMemberId(workspaceMemberId);
+  //   integrationToken.setProvider("GOOGLE_CALENDAR");
+  //   integrationToken.setAccessToken(tokenResponse.getAccessToken());
+  //   integrationToken.setExpiresAt(expiresAt);
+
+  //   // replace refresh token if Google provide one
+  //   if (tokenResponse.getRefreshToken() != null) {
+  //     integrationToken.setRefreshToken(tokenResponse.getRefreshToken());
+  //   }
+
+  //   // store in the integration_table
+  //   integrationTokenRepository.save(integrationToken);
+
+  //   return ResponseEntity.ok(
+  //       "Google Calendar connected for the workspace member: "
+  //           + validatedState.getWorkspaceMemberId());
+  // }
+
+  public ResponseEntity<Void> googleCalendarCallBack(
       @RequestParam String code, @RequestParam String state) {
 
     OAuthState validatedState = oauthStateService.validateState(state);

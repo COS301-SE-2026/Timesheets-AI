@@ -77,7 +77,7 @@ public class AuthService {
   // private final OtpService otpService;
   private final PasswordResetTokenRepository passwordResetTokenRepository;
 
-  @Value("${app.google.sso-client-id}")
+  @Value("${app.google.client-id}")
   private String googleClientId;
 
   private static final String[] ACCEPTED_DOMAINS = {
