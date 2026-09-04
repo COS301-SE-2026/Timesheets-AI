@@ -293,14 +293,14 @@ public class JiraAdapter implements IssueTrackerAdapter {
         .replace("\r", "\\r");
   }
 
-  //! this method has been failing so I need to look at it again
+  // ! this method has been failing so I need to look at it again
   private IntegrationToken getValidToken(UUID workspaceMemberId) {
     IntegrationToken token =
         integrationTokenRepository
             .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "JIRA")
             .orElseThrow(() -> new RuntimeException("Jira is not connected for this user"));
 
-    //this will check if the token has expired or expires in 5 mins
+    // this will check if the token has expired or expires in 5 mins
     if (token.getExpiresAt() != null
         && token.getExpiresAt().minusMinutes(5).isBefore(LocalDateTime.now())) {
 
@@ -310,7 +310,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
         JiraOAuthService.JiraTokenResponse newToken =
             jiraOAuthService.refreshAccessToken(token.getRefreshToken());
 
-        //wanting to update the token in the DB so that we always have the most recent updated
+        // wanting to update the token in the DB so that we always have the most recent updated
         token.setAccessToken(newToken.getAccessToken());
         token.setExpiresAt(LocalDateTime.now().plusSeconds(newToken.getExpiresIn()));
 
