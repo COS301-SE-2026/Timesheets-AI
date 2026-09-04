@@ -67,6 +67,7 @@ export interface CreateProjectRequest {
   budgetCost?: number;
   startDate?: string;
   endDate?: string;
+  managerIds: string[];
 }
 
 @Injectable({ providedIn: 'root' })

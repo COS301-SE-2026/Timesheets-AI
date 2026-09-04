@@ -120,6 +120,7 @@ public class GlobalExceptionHandler {
       case EMAIL_EXISTS:
         return HttpStatus.CONFLICT;
       case EMAIL_DOMAIN:
+      case EMAIL_NOT_VERIFIED:
       case TOKEN_NOT_FOUND:
       case TOKEN_EXPIRED:
       case TOKEN_USED:
