@@ -186,7 +186,7 @@ public class JiraOAuthService {
     }
   }
 
-  //this is the refresh token support
+  // this is the refresh token support
   public JiraTokenResponse refreshAccessToken(String refreshToken) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
@@ -196,7 +196,7 @@ public class JiraOAuthService {
         Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
     headers.set("Authorization", "Basic " + encodedCredentials);
 
-    //making sure that the body is exactly the way Jira expects it to be
+    // making sure that the body is exactly the way Jira expects it to be
     String body =
         "{"
             + "\"grant_type\":\"refresh_token\","
