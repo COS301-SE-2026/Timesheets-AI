@@ -59,11 +59,14 @@ public class JiraOAuthService {
     read:me --> read the authenticated user's identity
   */
   public String buildAuthorizationUrl(String state) {
+    String scopes = "read:jira-work " + "write:jira-work " + "read:jira-user " + "read:me ";
+
     return AUTHORIZATION_URL
         + "?audience=api.atlassian.com"
         + "&client_id="
-        + clientId
-        + "&scope=read%3Ajira-work%20read%3Ajira-user%20read%3Ame"
+        + encode(clientId)
+        + "&scope="
+        + encode(scopes)
         + "&redirect_uri="
         + encode(redirectUri)
         + "&state="
@@ -180,6 +183,40 @@ public class JiraOAuthService {
 
     public long getExpiresIn() {
       return expiresIn;
+    }
+  }
+
+  //this is the refresh token support
+  public JiraTokenResponse refreshAccessToken(String refreshToken) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+
+    String credentials = clientId + ":" + clientSecret;
+    String encodedCredentials =
+        Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+    headers.set("Authorization", "Basic " + encodedCredentials);
+
+    //making sure that the body is exactly the way Jira expects it to be
+    String body =
+        "{"
+            + "\"grant_type\":\"refresh_token\","
+            + "\"refresh_token\":\""
+            + escapeJson(refreshToken)
+            + "\""
+            + "}";
+
+    HttpEntity<String> request = new HttpEntity<>(body, headers);
+    ResponseEntity<String> response =
+        restTemplate.exchange(TOKEN_URL, HttpMethod.POST, request, String.class);
+
+    try {
+      JsonNode json = objectMapper.readTree(response.getBody());
+      return new JiraTokenResponse(
+          json.get("access_token").asText(),
+          json.has("refresh_token") ? json.get("refresh_token").asText() : refreshToken,
+          json.has("expires_in") ? json.get("expires_in").asLong() : 3600);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to refresh Jira token", e);
     }
   }
 }
