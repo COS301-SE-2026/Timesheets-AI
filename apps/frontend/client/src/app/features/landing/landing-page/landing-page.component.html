@@ -17,7 +17,8 @@ Related Requirements: N/A
         <!-- LOGO AREA -->
         <a 
             class="brand brand--hero" 
-            routerLink="/"
+            (click)="goHome()"
+            style="cursor: pointer;"
             aria-label="Momently home">
 
             <img 
@@ -39,6 +40,14 @@ Related Requirements: N/A
 
         <!-- AUTH BUTTON( LOG-IN / SIGN-UP) -->
         <div class="auth-buttons">
+            <button 
+                type="button"
+                class="nav-tab-btn"
+                [class.active]="activeTab === 'help'"
+                (click)="toggleTab()">
+                {{ activeTab === 'home' ? 'Help' : 'Home'}}
+            </button>
+
             <a routerLink="/login" class="btn-login">
                 Login
             </a>
@@ -48,39 +57,40 @@ Related Requirements: N/A
         </div>
     </header>
 
-    <!-- HERO SECTION -->
-    <section class="hero-section">
-        <div class="hero-content">
-            <div class="badge-tag">
-                <i class="fa-solid fa-wand-magic-sparkles"> </i> AI-POWERED TIME ANALYTICS
+    @if (activeTab === 'home'){
+        <!-- HERO SECTION -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="badge-tag">
+                    <i class="fa-solid fa-wand-magic-sparkles"> </i> AI-POWERED TIME ANALYTICS
+                </div>
+
+                <h1 class="hero-title">
+                    Time tracking <br />
+                    that drives <br />
+                    <span class="highlight">
+                        productivity.
+                    </span>
+                </h1>
+
+                <p class="hero-description">
+                    Momently helps development teams track time effortlessly, gain 
+                    intelligent insight, and deliver more impact.
+                </p>
             </div>
 
-            <h1 class="hero-title">
-                Time tracking <br />
-                that drives <br />
-                <span class="highlight">
-                    productivity.
-                </span>
-            </h1>
+            <!-- SREENSHOT OF OUR PRETTIEST PAGE -->
+            <div class="hero-preview">
+                <div class="hero-glow"></div>
 
-            <p class="hero-description">
-                Momently helps development teams track time effortlessly, gain 
-                intelligent insight, and deliver more impact.
-            </p>
-        </div>
-
-        <!-- SREENSHOT OF OUR PRETTIEST PAGE -->
-        <div class="hero-preview">
-            <div class="hero-glow"></div>
-
-            <div class="image-wrapper">
-                <img 
-                    src="/assets/images/dashboard-preview.png"
-                    alt="Momently App Screenshot"
-                    class="preview-img"/>
-            </div>
-        </div>
-    </section>
+                <div class="image-wrapper">
+                    <img 
+                        src="/assets/images/dashboard-preview.png"
+                        alt="Momently App Screenshot"
+                        class="preview-img"/>
+                </div>
+                </div>
+        </section>
 
     <!-- FEATURES GRID AREA -->
     <section class="features-section">
@@ -100,17 +110,101 @@ Related Requirements: N/A
 
                     </div>
 
-                <h3>
-                    {{ item.title }}
-                </h3>
-                <p>
-                    {{ item.description}}
-                </p>
+                    <h3>
+                        {{ item.title }}
+                    </h3>
+                    <p>
+                        {{ item.description}}
+                    </p>
             </div>
-            }
+        
+    }
         </div>
     </section>
+    }
+    
 
+    <!-- HELP VIEW PAGE -->
+    @if (activeTab === 'help'){
+        <div class="help-view-wrapper">
+
+            <!-- HELP HERO SECTION -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <div class="badge-tag help-badge">
+                        <i class="fa-solid fa-wand-magic-sparkles"> </i> HELP CENTRE
+                    </div>
+
+                    <h1 class="hero-title">
+                        How can we <br />
+                        <span class="highlight">
+                            help
+                        </span>
+                        you?
+                    </h1>
+
+                    <p class="hero-description">
+                        Explore our complete resource guide. Watch quick step-by-step
+                        video tutorial or download the full user manual to get the most
+                        out of Momently.
+                    </p>
+                </div>
+
+                <!-- HOURGLASS COMPONENT -->
+                <div class="hero-preview">
+                    <app-hourglass></app-hourglass>
+                </div>
+            </section>
+
+            <!--  HELP CARDS AREA-->
+            <section class="features-section help-cards-section">
+                <div class="features-grid help-grid">
+                    <div class="features-card help-card">
+                        <div class="features-icon icon-orange">
+                            <i class="fa-solid fa-circle-play"></i>
+                        </div>
+
+                        <h3>
+                            Watch Tutorial Video
+                        </h3>
+                        <p>
+                            Take a guided visual tour of Momently's
+                            task dashboard and workflow features.
+                        </p>
+                        <button 
+                            class="btn-card-action btn-orange"
+                            (click)="watchDemo()">
+
+                            <i class="fa-solid fa-play"></i>Watch Video
+                        
+                        </button>
+                    </div>
+
+                    <div class="features-card help-card">
+                        <div class="features-icon icon-blue">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+
+                        <h3>
+                            Download User Manual
+                        </h3>
+                        <p>
+                            Get the full PDF manual covering setup, keyboard
+                            shortcuts, and team collaboration.
+                        </p>
+                        <button 
+                            class="btn-card-action btn-blue"
+                            (click)="downloadManual()">
+
+                            <i class="fa-solid fa-download"></i>Download PDF
+                        
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    }
+    
     <!-- CLIENT NAMES AND LOGOS -->
     <section class="logos-section">
         <p class="trust-text">
