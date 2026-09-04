@@ -55,7 +55,7 @@
 [![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-View_Website-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](https://momently-brand-style.netlify.app/)
 [![Brand Style PDF](https://img.shields.io/badge/Brand_Style_PDF-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/Brand-Style-Guide.pdf)
 [![Wireframes](https://img.shields.io/badge/Wireframes-View_PDF-0F4C91?style=for-the-badge&logo=figma&logoColor=white)](./docs/demo-3/wireframes.pdf)
-[![Demo 3 Video](https://img.shields.io/badge/Demo_3-View_Video-E07830?style=for-the-badge&logo=youtube&logoColor=white)]([./docs/demo-3/demo3.pdf](https://drive.google.com/drive/folders/12RIyDXoud6MwCfxmoFKlf9WS0ubIgIwN?usp=drive_link))
+[![Demo 3 Video](https://img.shields.io/badge/Demo_3-View_Video-E07830?style=for-the-badge&logo=youtube&logoColor=white)]([(https://drive.google.com/drive/folders/12RIyDXoud6MwCfxmoFKlf9WS0ubIgIwN?usp=drive_link))
 [![Demo 3 Slides](https://img.shields.io/badge/Demo_3-View_Slides-0F4C91?style=for-the-badge&logo=googleslides&logoColor=white)](https://canva.link/4vyzjoad934wpsx)
 
 </div>
