@@ -14,11 +14,11 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.ai_insight import AIInsight
+from app.models.project import Project
+from app.models.user import User
 from app.models.workspace_member import WorkspaceMember
 from app.schemas.dashboard import DashboardInsight, DashboardResponse
 from app.services.github_activity import get_github_activity
-from app.models.project import Project
-from app.models.user import User
 
 router = APIRouter(
     prefix="/insights",
@@ -72,7 +72,6 @@ def get_dashboard(workspace_member_id: UUID, db: Annotated[Session, Depends(get_
         project_rows = db.query(Project.id, Project.name).filter(Project.id.in_(project_ids)).all()
         project_names = {p_id: name for p_id, name in project_rows}
 
-
     github_start = datetime.now(timezone.utc) - timedelta(days=7)
     github_end = datetime.now(timezone.utc)
     github = get_github_activity(db, workspace_member_id, github_start, github_end)
@@ -90,7 +89,7 @@ def get_dashboard(workspace_member_id: UUID, db: Annotated[Session, Depends(get_
                 recommendation=row.recommendation,
                 narrative=row.narrative,
                 project_id=row.project_id,
-                project_name = project_names.get(row.project_id),
+                project_name=project_names.get(row.project_id),
                 workspace_member_id=row.workspace_member_id,
                 member_name=member_names.get(row.workspace_member_id),
                 workspace_id=row.workspace_id,

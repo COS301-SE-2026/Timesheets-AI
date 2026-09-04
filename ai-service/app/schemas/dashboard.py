@@ -25,9 +25,9 @@ class DashboardInsight(BaseModel):
     recommendation: Optional[str] = None
     narrative: Optional[str] = None
     project_id: Optional[UUID] = None
-    project_name: Optional[str] = None  
+    project_name: Optional[str] = None
     workspace_member_id: Optional[UUID] = None
-    member_name: Optional[str] = None   
+    member_name: Optional[str] = None
     workspace_id: Optional[UUID] = None
     created_at: datetime
 
