@@ -175,7 +175,7 @@ public class IntegrationController {
 
     // cleo need to redirect it to the calendar page
     return ResponseEntity.status(HttpStatus.FOUND)
-        .header(HttpHeaders.LOCATION, "http://localhost:4200")
+        .header(HttpHeaders.LOCATION, "http://localhost:4200/my-tasks")
         .build();
   }
 
