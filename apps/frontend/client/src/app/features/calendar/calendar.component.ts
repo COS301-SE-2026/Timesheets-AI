@@ -1,7 +1,7 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, signal, ViewChild, OnInit} from '@angular/core';
 import {  EventClickArg, CalendarOptions} from '@fullcalendar/core';
-import { FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular'
+import { FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular';
 import  dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
