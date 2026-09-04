@@ -53,7 +53,7 @@
 [![User Manual](https://img.shields.io/badge/User_Manual-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/User-Manual.pdf)
 [![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/Brand-Style-Guide.pdf)
 [![Wireframes](https://img.shields.io/badge/Wireframes-View_PDF-0F4C91?style=for-the-badge&logo=figma&logoColor=white)](./docs/demo-3/wireframes.pdf)
-[![Demo 3 Video](https://img.shields.io/badge/Demo_2-View_Video-E07830?style=for-the-badge&logo=youtube&logoColor=white)]([./docs/demo-3/demo2.pdf](https://drive.google.com/file/d/13bZs6xgG3BOoadcaZzuUZsnlmnaiI3qu/view?usp=drive_link))
+[![Demo 3 Video](https://img.shields.io/badge/Demo_2-View_Video-E07830?style=for-the-badge&logo=youtube&logoColor=white)]([./docs/demo-3/demo2.pdf](https://drive.google.com/drive/folders/1gpO3XaNUE5g1n7dqh99ziZ2QS6ZSBFLI?usp=drive_link))
 
 | Document | Link |
 |---|---|
@@ -64,7 +64,7 @@
 | User Manual | [View PDF](./docs/demo-3/User-Manual.pdf) |
 | Brand Style Guide | [View PDF](./docs/demo-3/Brand-Style-Guide.pdf) |
 | Wireframes | [View Figma ](https://www.figma.com/design/Ras0nDzb87hQtSOP5NZPZK/Wireframe-1?node-id=126-1521&t=H2hiPy2OuQYZ0KTM-1) |
-| Demo 3 Video | [View Video](https://drive.google.com/file/d/13bZs6xgG3BOoadcaZzuUZsnlmnaiI3qu/view?usp=drive_link) |
+| Demo 3 Video | [View Video](https://drive.google.com/drive/folders/1gpO3XaNUE5g1n7dqh99ziZ2QS6ZSBFLI?usp=drive_link) |
 | Brand Style Site | [View Site](https://momently-brand-style.netlify.app/) |
 
 
