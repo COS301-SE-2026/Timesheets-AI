@@ -23,7 +23,9 @@ Related Requirements: N/A
         <div class="header-actions">
             @if (isConnected()){
                 <div class="connection-status">
-                    <span class="status-dot">
+                    <span 
+                        class="status-dot"
+                        [class.connected]="isConnected()">
                     </span>
                     <span>
                         {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }}
