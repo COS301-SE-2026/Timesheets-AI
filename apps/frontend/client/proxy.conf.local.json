@@ -1,0 +1,31 @@
+{
+    "/api": {
+        "target": "http://localhost:8080",
+        "secure": false,
+        "changeOrigin": true
+    },
+
+    "/actuator": {
+        "target": "http://localhost:8080",
+        "secure": false,
+        "changeOrigin": true
+    },
+
+    "/swagger-ui": {
+        "target": "http://localhost:8080",
+        "secure": false,
+        "changeOrigin": true
+    },
+
+    "/v3": {
+        "target":"http://localhost:8080",
+        "secure": false,
+        "changeOrigin": true
+    },
+
+    "/ai": {
+        "target": "http://localhost:8080",
+        "secure": false,
+        "changeOrigin": true
+    }
+}

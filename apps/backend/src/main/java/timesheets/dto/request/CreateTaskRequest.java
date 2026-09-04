@@ -50,4 +50,8 @@ public class CreateTaskRequest {
       message = "Priority must be LOW, MEDIUM, HIGH or CRITICAL")
   @Builder.Default
   private String priority = "MEDIUM";
+
+  @Builder.Default private boolean createJiraIssue = false;
+
+  private CreateJiraIssueRequest jiraDetails;
 }

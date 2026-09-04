@@ -9,6 +9,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import exception.AuthException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -210,8 +211,8 @@ class AuthServiceTest {
 
     // ACT and ASSERT: an exception should be thrown
     assertThatThrownBy(() -> authService.register(request))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessageContaining("email already exists");
+        .isInstanceOf(AuthException.class)
+        .hasMessageContaining("Email already exists");
   }
 
   @Nested
@@ -262,8 +263,8 @@ class AuthServiceTest {
 
       // ACT and ASSERT
       assertThatThrownBy(() -> authService.login(request))
-          .isInstanceOf(IllegalArgumentException.class)
-          .hasMessageContaining("invalid credentials");
+          .isInstanceOf(AuthException.class)
+          .hasMessageContaining("Invalid credentials");
     }
   }
 

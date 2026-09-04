@@ -1,8 +1,10 @@
 package timesheets.service;
 
+import exception.AccessDeniedException;
+import exception.BadRequestException;
 import exception.ConflictException;
 import exception.ResourceNotFoundException;
-import exception.UnauthorizedException;
+import exception.StateConflictException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -13,9 +15,19 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import timesheets.domain.*;
+import timesheets.domain.Project;
+import timesheets.domain.Task;
+import timesheets.domain.TimeEntry;
+import timesheets.domain.TimerSession;
+import timesheets.domain.Timesheet;
+import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.StartTimerRequest;
-import timesheets.repository.*;
+import timesheets.repository.ProjectMemberRepository;
+import timesheets.repository.ProjectRepository;
+import timesheets.repository.TaskRepository;
+import timesheets.repository.TimeEntryRepository;
+import timesheets.repository.TimerSessionRepository;
+import timesheets.repository.WorkspaceMemberRepository;
 import timesheets.security.SecurityUtils;
 
 // this is the file that has all my timer business logic
@@ -87,7 +99,7 @@ public class TimerService {
         projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
             project.getId(), workspaceMemberId);
     if (!isMember) {
-      throw new UnauthorizedException(
+      throw new AccessDeniedException(
           "You are not assigned to this project"); // cause I want to see if they actually have
       // access
     }
@@ -98,7 +110,7 @@ public class TimerService {
       task = taskRepository.findById(request.getTaskId()).orElse(null);
 
       if (task != null && !task.getProjectId().equals(project.getId())) {
-        throw new IllegalArgumentException("Task does not belong to the specified project");
+        throw new BadRequestException("Task does not belong to the specified project");
       }
     }
     // above I am getting the task and seeing if it actually belongs o the project
@@ -124,15 +136,35 @@ public class TimerService {
   @Transactional
   public TimerSession pauseTimer() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    return pauseTimerInternal(workspaceMemberId);
+  }
 
+  /*
+  - this pauses a timer during logout, and should not require authentication
+  - auth service should call this one
+  - it silently fails when there is no active timer found since nothing should happen with that
+   */
+  @Transactional
+  public boolean pauseTimerForLogout(UUID workspaceMemberId) {
+    try {
+      pauseTimerInternal(workspaceMemberId);
+      return true;
+    } catch (StateConflictException e) {
+      // when no active timer is found so that is fine, there is nothing to pause
+      return false;
+    }
+  }
+
+  // helper function to help with pausing a timer
+  private TimerSession pauseTimerInternal(UUID workspaceMemberId) {
     TimerSession activeTimer =
         timerSessionRepository
             .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId)
-            .orElseThrow(() -> new IllegalStateException("No active timer found"));
+            .orElseThrow(() -> new StateConflictException("No active timer found"));
 
     // check if the timer is already paused
     if (Boolean.TRUE.equals(activeTimer.getIsPaused())) {
-      throw new IllegalStateException("Timer is already paused");
+      throw new StateConflictException("Timer is already paused");
     }
 
     activeTimer.setIsPaused(true);
@@ -149,11 +181,11 @@ public class TimerService {
     TimerSession activeTimer =
         timerSessionRepository
             .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId)
-            .orElseThrow(() -> new IllegalStateException("No active timer found"));
+            .orElseThrow(() -> new StateConflictException("No active timer found"));
 
     // should see if there is an active timer for the user
     if (!Boolean.TRUE.equals(activeTimer.getIsPaused())) {
-      throw new IllegalStateException("Timer is not paused");
+      throw new StateConflictException("Timer is not paused");
     }
 
     // calculates how long it is paused
@@ -187,7 +219,7 @@ public class TimerService {
     TimerSession activeTimer =
         timerSessionRepository
             .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId)
-            .orElseThrow(() -> new IllegalStateException("No active timer found"));
+            .orElseThrow(() -> new StateConflictException("No active timer found"));
 
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime startedAt = activeTimer.getStartedAt();
@@ -261,7 +293,7 @@ public class TimerService {
     TimerSession activeTimer =
         timerSessionRepository
             .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId)
-            .orElseThrow(() -> new IllegalStateException("No active timer found to discard"));
+            .orElseThrow(() -> new StateConflictException("No active timer found to discard"));
 
     timerSessionRepository.delete(
         activeTimer); // will just delete the timer entry without creating a new one

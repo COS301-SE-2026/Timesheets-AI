@@ -1,0 +1,48 @@
+<main class="status-page">
+  <div class="bg-decor" aria-hidden="true"></div>
+
+  <section class="status-layout">
+    <div class="status-text">
+      <h1 class="status-title">Welcome to Momently!</h1>
+      <h2 class="status-subtitle">Your account has been created successfully.</h2>
+      
+      <div class="status-message-box">
+        <p class="status-body">
+          You haven't been assigned to a workspace yet.
+        </p>
+        <p class="status-body-secondary">
+          Your workspace administrator has been notified and will assign you to the appropriate workspace. Once you've been assigned, you'll have access to time tracking and projects.
+        </p>
+      </div>
+
+      <div class="status-features">
+        <h3>What happens next?</h3>
+        <ul>
+          <li>- Your administrator will assign you to the appropriate workspace</li>
+          <li>- Once you're assigned, your access will be updated automatically</li>
+          <li>- You'll then have access to the features available to you</li>
+        </ul>
+      </div>
+      
+      <div class="status-buttons">
+        <button (click)="checkWorkspace()" class="submit-button" [disabled]="checking">
+          {{ checking ? 'Checking...' : 'Check for Workspace' }}
+        </button>
+      </div>
+      
+      <p class="status-footnote">
+        Auto-checking every 30 minutes
+        @if (lastChecked) {
+          <br /><small>Last checked: {{ lastChecked | date:'HH:mm:ss' }}</small>
+        }
+        @if (checkCount > 0) {
+          <br /><small>Check #{{ checkCount }}</small>
+        }
+      </p>
+    </div>
+
+    <div class="status-visual">
+      <app-hourglass></app-hourglass>
+    </div>
+  </section>
+</main>

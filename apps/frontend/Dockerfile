@@ -6,7 +6,7 @@ FROM node:22-alpine AS dev
 WORKDIR /app
 
 # Create a non-root user 
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copy the dependency files 
 COPY package.json yarn.lock ./
@@ -20,13 +20,13 @@ RUN yarn install --frozen-lockfile
 # Copy angular application 
 COPY . .
 
-RUN chown -R appuser:appgroup /app
-USER appuser
+# RUN chown -R appuser:appgroup /app
+# USER appuser
 
 WORKDIR /app/apps/frontend/client 
 
 EXPOSE 4200
-CMD ["yarn", "start", "--host", "0.0.0.0"]
+CMD ["yarn", "start:docker", "--host", "0.0.0.0"]
 
 # Build stagea
 FROM node:22-alpine AS build
