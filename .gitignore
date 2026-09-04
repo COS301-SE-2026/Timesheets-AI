@@ -79,3 +79,5 @@ target/
 **/coverage/
 
 **/.turbo/
+
+aws/

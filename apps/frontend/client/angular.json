@@ -41,7 +41,11 @@
                 "output": "/assets"
               }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "src/styles.scss",
+              "material-icons/iconfont/material-icons.css",
+              "@fortawesome/fontawesome-free/css/all.min.css"
+          ],
             "scripts": []
           },
           "configurations": {
@@ -85,7 +89,11 @@
             },
             "development": {
               "buildTarget": "client:build:development",
-              "proxyConfig": "proxy.conf.json"
+              "proxyConfig": "proxy.conf.local.json"
+            },
+            "docker": {
+              "buildTarget": "client:build:development",
+              "proxyConfig": "proxy.conf.docker.json"
             }
           },
           "defaultConfiguration": "development"

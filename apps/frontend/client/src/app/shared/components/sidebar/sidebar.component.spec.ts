@@ -1,6 +1,5 @@
 import { SidebarComponent } from './sidebar.component';
 import { AuthService } from '../../../core/services/auth.service';
-import { createComponentTest } from '../../testing/component-test-helper';
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -57,7 +56,7 @@ describe('SidebarCoponent', () => {
 
     // Load all sidebar navigation items
     it('should contain all navigation items', () => {
-        expect(component.navItems()).toHaveLength(11);
+        expect(component.navItems()).toHaveLength(10); //i removed report feild from nav bar so the test should affirm that
     });
 
     // should return the users full name

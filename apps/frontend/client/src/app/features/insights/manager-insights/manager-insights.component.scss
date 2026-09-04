@@ -1,0 +1,33 @@
+@use '../insights-shared' as *;
+
+.git-effort-layout {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: var(--space-6);
+  align-items: start;
+  margin-top: 4px;
+}
+
+.project-read-note {
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+  line-height: var(--line-height-loose);
+  margin: 0;
+}
+//added this because text was spilling out of card
+.delivery-forecast-row {
+  flex-wrap: wrap;
+
+  .l-main { flex: 1 1 100%; }
+
+  .l-val {
+    white-space: normal;
+    flex: 1 1 100%;
+    text-align: left;
+    margin-top: 2px;
+  }
+}
+
+@media (max-width: 700px) {
+  .git-effort-layout { grid-template-columns: 1fr; }
+}

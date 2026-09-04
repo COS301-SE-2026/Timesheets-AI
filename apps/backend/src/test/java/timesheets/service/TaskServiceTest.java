@@ -1,10 +1,13 @@
 package timesheets.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,9 +20,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import timesheets.domain.Project;
+import timesheets.domain.ProjectMember;
 import timesheets.domain.Task;
 import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
+import timesheets.dto.request.CreateTaskRequest;
 import timesheets.dto.response.TaskResponse;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
@@ -80,8 +85,8 @@ class TaskServiceTest {
 
     user = new User();
     user.setId(userId);
-    user.setFirstName("John");
-    user.setLastName("Doe");
+    user.setFirstName("Enzokuhle");
+    user.setLastName("Khumalo");
   }
 
   @Nested
@@ -125,7 +130,7 @@ class TaskServiceTest {
       // it is a small thing but frontend really wants it
       assertThat(response.getProjectName()).isEqualTo("Test Project");
 
-      assertThat(response.getAssignedToName()).isEqualTo("John Doe");
+      assertThat(response.getAssignedToName()).isEqualTo("Enzokuhle Khumalo");
 
       // I want to confirm it checked access, fetched the tasks, and got the project details.
       verify(projectMemberRepository)
@@ -176,7 +181,7 @@ class TaskServiceTest {
       assertThat(result.getTitle()).isEqualTo("Test Task");
       assertThat(result.getDescription()).isEqualTo("Test Description");
       assertThat(result.getProjectName()).isEqualTo("Test Project");
-      assertThat(result.getAssignedToName()).isEqualTo("John Doe");
+      assertThat(result.getAssignedToName()).isEqualTo("Enzokuhle Khumalo");
       assertThat(result.getStatus()).isEqualTo("TODO");
       assertThat(result.getPriority()).isEqualTo("MEDIUM");
 
@@ -189,6 +194,117 @@ class TaskServiceTest {
       verify(projectRepository, times(1)).findById(projectId); // project name retrieved
       verify(workspaceMemberRepository, times(1)).findById(assignedWorkspaceMemberId);
       verify(userRepository, times(1)).findById(userId);
+    }
+  }
+
+  @Nested
+  @DisplayName("Get My Tasks Tests")
+  class GetMyTasksTests {
+
+    @Test
+    @DisplayName("returns all tasks for the user")
+    void getMyTasks() {
+      /*
+      ARRANGE
+      - finds all the tasks assigned to the user
+      - fetches the prject name
+      - also get the name for display
+      */
+      when(taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId))
+          .thenReturn(List.of(task));
+
+      // the task also needs the project name and assigness full name
+      when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+      when(workspaceMemberRepository.findById(assignedWorkspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+      when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+      // ACT: call the actual function
+      List<TaskResponse> result = taskService.getMyTasks(workspaceMemberId);
+
+      assertThat(result).isNotNull();
+      assertThat(result).hasSize(1);
+      assertThat(result.get(0).getId()).isEqualTo(taskId);
+      assertThat(result.get(0).getProjectName())
+          .isEqualTo("Test Project"); // project name is attatched
+      assertThat(result.get(0).getAssignedToName())
+          .isEqualTo("Enzokuhle Khumalo"); // making sure the name is also ther
+
+      // ensuring that the repo was called correctly
+      verify(taskRepository, times(1))
+          .findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId);
+    }
+  }
+
+  @DisplayName("Create Task Tests")
+  class CreateTaskTests {
+
+    private CreateTaskRequest createValidRequest() {
+      CreateTaskRequest request = new CreateTaskRequest();
+
+      request.setTitle("New Task");
+      request.setDescription("New Description");
+
+      request.setProjectId(projectId);
+      request.setEstimatedHours(BigDecimal.valueOf(8));
+
+      request.setAssignedWorkspaceMemberId(workspaceMemberId);
+      request.setDueDate(LocalDate.now().plusDays(7));
+
+      request.setPriority("HIGH");
+      request.setStatus("TODO");
+      return request;
+    }
+
+    @Test
+    @DisplayName("developer should create a task and assign themselves to it")
+    void createTask() {
+
+      // ARRANGE: creating a task and assigning themeselves to it
+      CreateTaskRequest request = createValidRequest();
+      request.setAssignedWorkspaceMemberId(workspaceMemberId);
+
+      // simulating that they are a developer because they are not another role
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
+      // the user has access to the project, but they are not a manager
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+              projectId, workspaceMemberId))
+          .thenReturn(true);
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+              projectId, workspaceMemberId))
+          .thenReturn(Optional.of(new ProjectMember()));
+
+      // the project exists but is not archived
+      when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
+      when(taskRepository.save(any(Task.class)))
+          .thenAnswer(
+              inv -> inv.getArgument(0)); // when the task is saved, it gives back the project
+
+      when(workspaceMemberRepository.findById(workspaceMemberId))
+          .thenReturn(Optional.of(workspaceMember));
+      when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+      /*
+      ACT
+      - the service should allow task creation since they have access to the project
+      - they are assigning the task to themselves
+       */
+      TaskResponse result = taskService.createTask(request, workspaceMemberId);
+
+      /*
+      ASSERT
+      - a task response should not be null
+      - the task should have the correct title
+      - the tasks is assigned to the developer
+      - the task is saved to the DB
+       */
+      assertThat(result).isNotNull();
+      assertThat(result.getTitle()).isEqualTo("New Task");
+      assertThat(result.getAssignedToName()).isEqualTo("John Doe");
+
+      verify(taskRepository, times(1)).save(any(Task.class));
     }
   }
 }

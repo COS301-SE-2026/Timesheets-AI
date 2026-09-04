@@ -9,13 +9,20 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor // this will have a class with all the args
 public class ErrorResponse {
 
   private Integer status;
   private String error;
   private String message;
   private UUID activeTimerId;
+
+  public ErrorResponse(Integer status, String error, String message) {
+    this.status = status;
+    this.error = error;
+    this.message = message;
+    this.activeTimerId = null;
+  }
 
   // this could be to indicate a timer conflict if the user tries to create a second timer
   public static ErrorResponse conflict(String message, UUID activeTimerId) {

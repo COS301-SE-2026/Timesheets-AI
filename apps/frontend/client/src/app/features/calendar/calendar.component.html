@@ -1,0 +1,252 @@
+<!-- 
+Author: Cleopatra Kwenda
+Date: 2026-07-30
+Purpose: will display our desired wireframe of 
+the Calendar page.
+Related Requirements: N/A
+-->
+
+<div class="calendar-page">
+    <!-- HEADER AREA -->
+    <header class="calendar-header">
+        <div>
+            <h1>
+                Calendar
+            </h1>
+
+            <p>
+                View your schedule and plan your work.
+            </p>
+        </div>
+
+        <!-- CONNECTION PILL -->
+        <div class="header-actions">
+            @if (isConnected()){
+                <div class="connection-status">
+                    <span 
+                        class="status-dot"
+                        [class.connected]="isConnected()">
+                    </span>
+                    <span>
+                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }}
+                        {{ isConnected() ? 'connected' : 'not connected'}}
+                    </span>
+                    @if(isConnected() && lastSyncedLabel()){
+                        <span class="sync-meta">
+                            &middot; {{ lastSyncedLabel() }}
+                        </span>
+                    }
+                </div>
+
+                <!-- SYNCING AREA -->
+                <button 
+                    class="sync-button"
+                    (click)="isConnected()? syncCalendar(): connectGoogleCalendar()"
+                    [disabled]="isSyncing()">
+                    <i 
+                        class="fa-solid fa-rotate"
+                        [class.fa-spin]="isSyncing()">
+                    </i>
+                    {{ isSyncing()? 'Syncing...': (isConnected()? 'Sync now': 'Sync Google now') }}
+                </button>
+            }
+        </div>
+    </header>
+
+    <!-- CALENDAER NAVIGATION TOOLS  -->
+    <section class="calendar-card">
+        <div class="calendar-toolbar">
+            <div class="date-navigation">
+                <button
+                    class="today-button"
+                    (click)="navigate('today')">
+                    Today
+                </button>
+
+                <div class="nav-arrows">
+                    <button
+                        class="icon-button"
+                        (click)="navigate('prev')"
+                        aria-label="Previous">
+                        <i class="fa-solid fa-chevron-left">
+
+                        </i>
+                    </button>
+                    <button
+                        class="icon-button"
+                        (click)="navigate('next')"
+                        aria-label="Next">
+                        <i class="fa-solid fa-chevron-right">
+                            
+                        </i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- DATE TITTLE -->
+            <h2 class="calendar-title">
+                {{ currentDateTitle()}}
+            </h2>
+
+            <!-- TAB SWITCH AREA -->
+            <div class="view-switcher">
+                <button
+                    [class.active]="activeView()=== 'dayGridMonth'"
+                    (click)="changeView('dayGridMonth')">
+                    Month
+                </button>
+
+                <button
+                    [class.active]="activeView()=== 'timeGridWeek'"
+                    (click)="changeView('timeGridWeek')">
+                    Week
+                </button>
+
+                <button
+                    [class.active]="activeView()=== 'timeGridDay'"
+                    (click)="changeView('timeGridDay')">
+                    Day
+                </button>
+            </div>
+        </div>
+
+        <!-- CALENDAR AREA -->
+        <div class="calendar-container">
+            <full-calendar
+                #calendar
+                [options]="calendarOptions">
+            </full-calendar>
+        </div>
+
+        <!-- THE READ ONLY CARD AREA + LEGEND OF THE COLOURS SYMBOLISM -->
+        <div class="calendar-legend">
+            <div class="legend-items">
+                <span class="legend-item">
+                    <span class="legend-dot blue"></span>
+                    Meetings
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot green"></span>
+                    Work
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot amber"></span>
+                    Calls
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot red"></span>
+                    Deadlines
+                </span>
+            </div>
+
+
+            <div class="legend-readonly">
+                <i class="fa-solid fa-lock"></i>
+                    This is a read-only calendar
+                    Events are imported from
+                    {{ provider() === 'outlook'? 'Outlook': 'Google Calendar'}}.
+                    To make changes, use your calendar provider.
+            
+            </div>
+        </div>
+        
+    </section>
+
+    <!-- POP UP OF THE CLICKED EVENT  -->
+    @if(selectedEvent(); as event){
+        <button 
+            class="modal-backdrop"
+            (click)="closeEventDetails()">
+        </button>
+
+        <dialog 
+            class="event-details-card"
+            aria-modal="true">
+            <button 
+                class="close-button"
+                (click)="closeEventDetails()"
+                aria-label="Close Modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="modal-body">
+                <div class="title-row">
+                    @if(event.category){
+                        <span
+                            class="category-dot"
+                            [ngClass]="event.category"></span>
+                    }
+                    <h2>
+                        {{ event.title}}
+                    </h2>
+                </div>
+
+                @if (event.categoryLabel || event.category){
+                    <div class="badge-row">
+                        <span 
+                            class="category-badge"
+                            [ngClass]="event.category">
+                            {{ event.categoryLabel || event.category }}
+                        </span>
+                    </div>
+                }
+
+                <!-- IN DEPTH DETAILS INFO -->
+                <div class="info-list">
+                    <!-- DATE -->
+                    <div class="info-item">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span>
+                            {{ event.start | date:'EEE, d MMM yyyy'}}
+                        </span>
+                    </div>
+
+                    <!-- TIME -->
+                    <div class="info-item">
+                        <i class="fa-regular fa-clock"></i>
+                        <span>
+                            {{ event.start | date:'HH:mm'}}
+                            @if(event.end){
+                                - {{ event.end | date:'HH:mm'}}
+                            }
+                        </span>
+                    </div>
+
+                    <!-- LOCATION  -->
+                    @if( event.location){
+                        <div class="info-item">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span> 
+                                {{ event.location}}
+                            </span>
+                        </div>
+                    }
+
+                    @if (event.organizer?.name || event.organizer){
+                        <div class="info-item">
+                            <i class="fa-solid fa-user"></i>
+                            <span>
+                                <strong>
+                                    {{ event.organizer?.name || event.organizer}}
+                                </strong>
+                                <span class="muted-text">(Organizer)</span>
+                            </span>
+                        </div>
+                    }
+
+                    @if (event.description){
+                        <div class="info-item align-start">
+                            <i class="fa-solid fa-align-left"></i>
+                            <p class="event-description">
+                                {{ event.description}}
+                            </p> 
+                        </div>
+                    }
+
+                </div>
+
+                
+            </div>    
+        </dialog>
+    }
+</div>
