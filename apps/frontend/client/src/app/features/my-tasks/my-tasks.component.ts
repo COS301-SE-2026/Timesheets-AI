@@ -30,6 +30,7 @@ import { Router } from '@angular/router';
 import { TaskService, TaskResponse } from '../../core/services/task.service';
 import { ProjectService, ProjectResponse } from '../../core/services/project.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ReplacePipe } from '../../shared/pipes/replace.pipe';
 
 
 /**
@@ -57,6 +58,8 @@ export interface Task {
   parentTaskId?: string;
   isDeleted: boolean;
   deletedAt?: string;
+  jiraStatus?: string;   
+  jiraIssueType?: string;
 }
 
 export interface ProjectOption {
@@ -82,6 +85,16 @@ export interface UpdateStatusRequest {
   status: TaskStatus;
 }
 
+export interface JiraDetails {
+    summary: string;
+    description?: string;
+    projectKey: string;
+    issueType: string;
+    priority?: string;
+    dueDate?: string;
+    assigneeEmail?: string;
+}
+
 export interface CreateTaskRequest {
   title: string;
   description?: string;
@@ -93,6 +106,8 @@ export interface CreateTaskRequest {
   assignedWorkspaceMemberId?: string;
   dueDate?: string;
   priority: TaskPriority;
+  createJiraIssue?: boolean;
+  jiraDetails?: JiraDetails;
 }
 
 interface StatusFilterOption {
@@ -145,7 +160,7 @@ const PRIORITY_ICONS: Record<TaskPriority, string> = {
 
 @Component({
   selector: 'app-my-tasks',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReplacePipe],
   templateUrl: './my-tasks.component.html',
   styleUrl: './my-tasks.component.scss',
   standalone: true,
@@ -164,11 +179,21 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public readonly isDetailOpen = signal<boolean>(false);
   public readonly isDetailLoading = signal<boolean>(false);
   public readonly detailError = signal<string | null>(null);
+
+
   private readonly router = inject(Router);
   private readonly taskService = inject(TaskService);
   private readonly projectService = inject(ProjectService);
   private readonly authService = inject(AuthService);
 
+  public readonly isSyncingJira = signal<boolean>(false);
+  public readonly isLinkingJira = signal<boolean>(false);
+  public readonly isLinkJiraOpen = signal<boolean>(false);
+  public linkJiraKey = '';
+  public linkJiraTask: Task | null = null;
+
+  public readonly isJiraConnected = signal<boolean>(false);
+  public readonly isConnectingJira = signal<boolean>(false);
 
   //creating the task in the modal state
   public readonly isCreateModalOpen = signal<boolean>(false);
@@ -194,6 +219,16 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     assignedWorkspaceMemberId: '',
     dueDate: '',
     priority: 'MEDIUM',
+    createJiraIssue: false,
+    jiraDetails: {
+        summary: '',
+        description: '',
+        projectKey: '',
+        issueType: 'Task',
+        priority: 'Medium',
+        dueDate: '',
+        assigneeEmail: '',
+    },
   };
 
   public readonly projects = signal<ProjectOption[]>([]);
@@ -262,12 +297,41 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.loadTasks();
     this.loadProjects();
+    this.checkJiraConnection();
   }
 
   //cleanup subscription when the component is destroyed
   public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  public checkJiraConnection(): void {
+    this.taskService.checkJiraConnection().subscribe({
+      next: (response) => {
+        this.isJiraConnected.set(response.connected);
+      },
+      error: () => {
+        this.isJiraConnected.set(false);
+      }
+    });
+  }
+
+  public connectToJira(): void {
+    this.isConnectingJira.set(true);
+
+    this.taskService.connectJira().subscribe({
+      next: (url: string) => {
+        this.isConnectingJira.set(false);
+        // Redirect to Jira OAuth page
+        window.location.href = url;
+      },
+      error: (error) => {
+        console.error('Failed to connect to Jira:', error);
+        this.isConnectingJira.set(false);
+        this.createError.set('Failed to connect to Jira. Please try again.');
+      }
+    });
   }
 
   // loads the logged in user's tasks from GET /api/tasks/my-tasks
@@ -369,6 +433,16 @@ export class MyTasksComponent implements OnInit, OnDestroy {
       assignedWorkspaceMemberId: '',
       dueDate: '',
       priority: 'MEDIUM',
+      createJiraIssue: false,
+      jiraDetails: {
+        summary: '',
+        description: '',
+        projectKey: '',
+        issueType: 'Task',
+        priority: 'Medium',
+        dueDate: '',
+        assigneeEmail: '',
+      },
     };
 
     //should be reloading the projects if the list changes
@@ -406,6 +480,17 @@ export class MyTasksComponent implements OnInit, OnDestroy {
       assignedWorkspaceMemberId: this.newTask.assignedWorkspaceMemberId || undefined,
       dueDate: this.newTask.dueDate || undefined,
       priority: this.newTask.priority,
+
+      createJiraIssue: this.newTask.createJiraIssue || false,
+      jiraDetails: this.newTask.createJiraIssue && this.newTask.jiraDetails ? {
+        summary: this.newTask.jiraDetails.summary || this.newTask.title,
+        description: this.newTask.jiraDetails.description || this.newTask.description,
+        projectKey: this.newTask.jiraDetails.projectKey,
+        issueType: this.newTask.jiraDetails.issueType,
+        priority: this.newTask.jiraDetails.priority,
+        dueDate: this.newTask.jiraDetails.dueDate || this.newTask.dueDate,
+        assigneeEmail: this.newTask.jiraDetails.assigneeEmail || undefined,
+      } : undefined,
     };
 
     this.taskService.createTask(request).subscribe({
@@ -442,6 +527,8 @@ export class MyTasksComponent implements OnInit, OnDestroy {
       estimatedHours: response.estimatedHours ?? 0,
       actualHours: response.actualHours ?? 0,
       jiraTicketKey: response.jiraTicketKey ?? undefined,
+      jiraStatus: (response as any).jiraStatus ?? undefined,
+      jiraIssueType: (response as any).jiraIssueType ?? undefined,
       assignedToName: response.assignedToName ?? 'Unassigned',
       assignedWorkspaceMemberId: response.assignedWorkspaceMemberId ?? undefined,
       dueDate: response.dueDate ?? undefined,
@@ -515,7 +602,6 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  // Handles show archived checkbox changes
 
   public onToggleArchived(event: Event): void {
     const checkbox = event.target as HTMLInputElement;
@@ -655,5 +741,78 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     if (this.isCreateModalOpen()) {
       this.closeCreateModal();
     }
+  }
+
+  public onJiraToggleChange(): void {
+      if (this.newTask.createJiraIssue && this.newTask.jiraDetails) {
+          this.newTask.jiraDetails.summary = this.newTask.title;
+          this.newTask.jiraDetails.description = this.newTask.description;
+          this.newTask.jiraDetails.dueDate = this.newTask.dueDate;
+          this.newTask.jiraDetails.priority = this.mapPriorityToJira(this.newTask.priority);
+      }
+  }
+
+  private mapPriorityToJira(priority: string): string {
+      const map: Record<string, string> = {
+          'LOW': 'Low',
+          'MEDIUM': 'Medium', 
+          'HIGH': 'High',
+          'CRITICAL': 'Critical'
+      };
+      return map[priority] || 'Medium';
+  }
+
+  public openLinkJiraModal(task: Task): void {
+      this.linkJiraTask = task;
+      this.linkJiraKey = '';
+      this.isLinkJiraOpen.set(true);
+  }
+
+  public closeLinkJiraModal(): void {
+      this.isLinkJiraOpen.set(false);
+      this.linkJiraTask = null;
+      this.linkJiraKey = '';
+  }
+
+  public onLinkJiraSubmit(): void {
+      if (!this.linkJiraTask || !this.linkJiraKey.trim()) return;
+      
+      this.isLinkingJira.set(true);
+      const issueKey = this.linkJiraKey.trim().toUpperCase();
+      
+      this.taskService.linkTaskToJira(this.linkJiraTask.id, issueKey).subscribe({
+          next: () => {
+              this.isLinkingJira.set(false);
+              this.loadTasks();
+              this.closeLinkJiraModal();
+          },
+          error: (error) => {
+              console.error('Failed to link task to Jira:', error);
+              this.isLinkingJira.set(false);
+          }
+      });
+  }
+
+  public onSyncJira(task: Task): void {
+      if (!task.jiraTicketKey) return;
+      
+      this.isSyncingJira.set(true);
+      
+      this.taskService.syncTaskFromJira(task.id).subscribe({
+          next: (updatedTask: TaskResponse) => {
+              const updated = this.mapToTask(updatedTask);
+              this.updateTaskInTaskList(updated);
+              this.isSyncingJira.set(false);
+          },
+          error: (error) => {
+              console.error('Failed to sync with Jira:', error);
+              this.isSyncingJira.set(false);
+          }
+      });
+  }
+
+  public getJiraStatusClass(status: string): string {
+    if (!status) return 'status-unknown';
+    return 'status-' + status.toLowerCase().replace(/ /g, '-');
   }
 }
