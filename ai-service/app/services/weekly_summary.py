@@ -71,7 +71,7 @@ def _build_prompt(hours_logged, project_count, latest_score, previous_score, sub
 
 
 def _call_gemini_with_retry(prompt: str) -> str:
-    model = genai.GenerativeModel("gemini-2.5-flash-lite")
+    model = genai.GenerativeModel("gemini-3.5-flash-lite")
     genai.configure(api_key=settings.gemini_api_key)
 
     last_error = None

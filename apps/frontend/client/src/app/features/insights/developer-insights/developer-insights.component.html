@@ -1,0 +1,135 @@
+<div class="page-header">
+  <div class="page-header-row">
+    <h1 class="page-title">Insights</h1>
+    <button class="export-btn"><i class="fa-solid fa-file-export"></i> Export insights</button>
+  </div>
+</div>
+
+@if (loading()) {
+  <p class="note">Loading your insights…</p>
+} @else if (error()) {
+  <p class="note">{{ error() }}</p>
+} @else {
+  @if (data(); as data) {
+
+    <app-insight-card
+      variant="summary"
+      title="Weekly summary"
+      [subtitle]="data.weeklySummary.weekLabel + ' · ' + data.weeklySummary.generatedNote"
+      badge="ai"
+      [span]="12"
+    >
+      <p class="summary" [innerHTML]="data.weeklySummary.narrative"></p>
+    </app-insight-card>
+    <br>
+
+    <app-scope-switcher [options]="scopeOptions" [value]="scope()" (valueChange)="setScope($event)"></app-scope-switcher>
+
+    @if (scope() === 'overall') {
+      <div class="grid">
+
+        <app-insight-card title="Productivity score" subtitle="This week" variant="insight" badge="ai" [span]="4">
+          <div class="metric">{{ data.overall.productivity.score }}<span class="metric-unit"> / 100</span></div>
+          <div class="bar-track"><div class="bar-fill amber" [style.width.%]="data.overall.productivity.score"></div></div>
+          <div class="note">{{ data.overall.productivity.note }}</div>
+        </app-insight-card>
+
+        <app-insight-card title="Productivity trend" subtitle="Last 6 weeks, overall score" variant="insight" badge="ai" [span]="8">
+          <app-insight-chart [config]="trendChart()" [height]="180"></app-insight-chart>
+        </app-insight-card>
+
+        <app-insight-card title="Task-switching frequency" subtitle="Daily average" variant="insight" badge="ai" [span]="6">
+          <div class="metric">{{ data.overall.taskSwitching.perDay }}<span class="metric-unit"> switches/day</span></div>
+          <div class="note">{{ data.overall.taskSwitching.note }}</div>
+        </app-insight-card>
+
+        <app-insight-card title="Delivery forecast" [subtitle]="data.overall.deliveryForecast.taskName" variant="insight" badge="ai" [span]="6">
+          <div class="metric-sm">{{ data.overall.deliveryForecast.forecastDate }}</div>
+          <div class="metric-label">{{ data.overall.deliveryForecast.note }}</div>
+        </app-insight-card>
+
+        <app-insight-card title="Flagged time entries" subtitle="ML data-accuracy classification" variant="insight" badge="ai" [span]="12">
+          <div class="list">
+            @for (e of data.overall.flaggedEntries; track e.title) {
+              <div class="list-row" [class.risk-high]="e.level === 'high'">
+                <div class="l-main">
+                  <span class="l-title">{{ e.title }}</span>
+                  <span class="l-sub">{{ e.sub }}</span>
+                </div>
+                <span class="chip" [class.chip-risk-high]="e.level === 'high'" [class.chip-risk-med]="e.level !== 'high'">
+                  {{ e.level === 'high' ? 'Review' : 'Low confidence' }}
+                </span>
+              </div>
+            } @empty {
+              <div class="note">Nothing flagged this week.</div>
+            }
+          </div> 
+        </app-insight-card>
+
+        <app-insight-card title="Calendar vs tracked time" subtitle="This week, hours" variant="raw" badge="comparison" [span]="5">
+          <div class="compare-bars">
+            <div class="compare-row">
+              <span class="name">Calendar</span>
+              <div class="compare-track"><div class="compare-fill" style="width:34%"></div></div>
+              <span class="val">{{ data.overall.calendarVsTracked.calendarHours }}h</span>
+            </div>
+            <div class="compare-row">
+              <span class="name">Tracked</span>
+              <div class="compare-track"><div class="compare-fill you" style="width:20%"></div></div>
+              <span class="val">{{ data.overall.calendarVsTracked.trackedHours }}h</span>
+            </div>
+          </div>
+          <div class="note">{{ data.overall.calendarVsTracked.unmatchedHours }}h of meeting time this week has no matching timesheet entry.</div>
+        </app-insight-card>
+
+        <app-insight-card title="Jira vs logged time" subtitle="Tickets you're assigned this sprint" variant="raw" badge="comparison" [span]="7">
+          <div class="list">
+            @for (t of data.overall.jiraVsLogged; track t.ticket) {
+              <div class="list-row">
+                <div class="l-main">
+                  <span class="l-title">{{ t.ticket }}</span>
+                  <span class="l-sub">Jira estimate: {{ t.estimateHours }}h</span>
+                </div>
+                <span class="l-val">Logged: {{ t.loggedHours }}h</span>
+              </div>
+            } @empty {
+              <div class="note">No Jira comparisons yet.</div>
+            }
+          </div>
+        </app-insight-card>
+
+        <app-insight-card title="Git commits vs effort" subtitle="This week, your commits vs logged hours, by day" variant="raw" badge="comparison" [span]="12">
+          <div class="git-effort-layout">
+            <div>
+              <div class="metric">{{ data.overall.gitEffort.correlation }}</div>
+              <div class="metric-label">Your correlation, up from {{ data.overall.gitEffort.correlationPrevWeek }} last week</div>
+            </div>
+            <app-insight-chart [config]="gitEffortChart()" [height]="170"></app-insight-chart>
+          </div>
+          <div class="note">{{ data.overall.gitEffort.note }}</div>
+        </app-insight-card>
+
+      </div>
+    }
+
+    @if (scope() === 'project') {
+      <div class="grid">
+
+        @for (p of data.byProject.projects; track p.name) {
+          <app-insight-card [title]="p.name" subtitle="Your productivity on this project" variant="insight" badge="ai" [span]="6">
+            <div class="metric">{{ p.score }}</div>
+            <div class="bar-track"><div class="bar-fill amber" [style.width.%]="p.score"></div></div>
+            <div class="note">{{ p.note }}</div>
+          </app-insight-card>
+        } @empty {
+          <p class="note">No per-project breakdown yet, check back once there's more logged activity.</p>
+        }
+
+        <app-insight-card title="Hours by project" subtitle="This week, your logged time" variant="raw" badge="raw" [span]="12">
+          <app-insight-chart [config]="hoursByProjectChart()" [height]="160"></app-insight-chart>
+        </app-insight-card>
+
+      </div>
+    }
+  }
+}

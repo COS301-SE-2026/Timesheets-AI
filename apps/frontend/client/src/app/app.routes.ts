@@ -98,6 +98,15 @@ export const routes: Routes = [
         .then(m => m.WaitingForWorkspaceComponent)
   },
 
+  {
+    path: 'insights',
+    canActivate: [authGuard, workspaceGuard],
+    loadComponent: () =>
+      import('./features/insights/insights.component').then(
+        (m) => m.InsightsComponent,
+      ),
+  },
+
   /* 404 fallback */
   {
     path: 'not-found',

@@ -45,7 +45,7 @@ export class SidebarComponent {
     { label: 'My Tasks', icon: 'task', route: '/my-tasks', requiresWorkspace: true},
     { label: 'Calendar', icon: 'calendar_month', route: '/calendar', requiresWorkspace: true},
     { label: 'Leave Requests', icon: 'business_center', route: '/leave-requests', requiresWorkspace: true},
-    { label: 'Reports', icon: 'bar_chart', route: '/reports', requiresWorkspace: true},
+    //{ label: 'Reports', icon: 'bar_chart', route: '/reports', requiresWorkspace: true},
     { label: 'Insights', icon: 'trending_up', route: '/insights', requiresWorkspace: true},
     { label: 'Team', icon: 'groups', route: '/team', requiresWorkspace: true},
     { label: 'Settings', icon: 'settings', route: '/settings' }
