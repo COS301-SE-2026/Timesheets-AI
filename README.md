@@ -76,6 +76,7 @@
 [![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-3/Brand-Style-Guide.pdf)
 [![Wireframes](https://img.shields.io/badge/Wireframes-View_PDF-0F4C91?style=for-the-badge&logo=figma&logoColor=white)](./docs/demo-3/wireframes.pdf)
 [![Demo 3 Video](https://img.shields.io/badge/Demo_2-View_Video-E07830?style=for-the-badge&logo=youtube&logoColor=white)]([./docs/demo-3/demo2.pdf](https://drive.google.com/drive/folders/1gpO3XaNUE5g1n7dqh99ziZ2QS6ZSBFLI?usp=drive_link))
+[![NFR TESTING](https://img.shields.io/badge/Demo_3-View_Slides-0F4C91?style=for-the-badge&logo=googleslides&logoColor=white)](./docs/demo-3/NFR-TESTING.pdf)
 
 | Document | Link |
 |---|---|
