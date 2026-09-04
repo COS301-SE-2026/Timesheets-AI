@@ -23,10 +23,10 @@ export class CalendarComponent implements OnInit{
   @ViewChild('calendar')
   calendarComponent!: FullCalendarComponent;
 
-  private calendarService= inject(CalendarService);
-  private http= inject(HttpClient);
-  private route= inject(ActivatedRoute);
-  private router= inject(Router);
+  private readonly calendarService= inject(CalendarService);
+  private readonly http= inject(HttpClient);
+  private readonly route= inject(ActivatedRoute);
+  private readonly router= inject(Router);
 
 
   activeView= signal<CalendarView>('dayGridMonth');
