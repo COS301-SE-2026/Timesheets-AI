@@ -47,6 +47,9 @@ public class IntegrationToken {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
+  @Column(name = "provider_resource_id")
+  private String providerResourceId;
+
   @PrePersist
   protected void onCreate() {
     createdAt = LocalDateTime.now();
