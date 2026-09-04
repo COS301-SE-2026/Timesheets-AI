@@ -272,13 +272,13 @@ public class TaskService {
         .orElse(false);
   }
 
-  //had to do research on how to extract in this way
+  // had to do research on how to extract in this way
   private String getDefaultJiraProject(UUID workspaceMemberId) {
     try {
       List<JiraIssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
 
       if (issues != null && !issues.isEmpty()) {
-        //the project key can be taken from the first issue
+        // the project key can be taken from the first issue
         String projectKey = issues.get(0).getProjectKey();
 
         if (projectKey != null && !projectKey.isEmpty()) {
