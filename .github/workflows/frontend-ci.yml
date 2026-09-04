@@ -4,7 +4,7 @@ name: Frontend Pipeline
 # the workflow only runs if the files inside
 on:
     push:
-        branches: [main, dev]
+        branches: [main, dev, dev2]
 
     pull_request:
         branches: [main, dev]
