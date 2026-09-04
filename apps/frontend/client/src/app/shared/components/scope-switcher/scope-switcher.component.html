@@ -1,0 +1,7 @@
+<div class="scope-switcher">
+  @for (opt of options; track opt.value) {
+    <button type="button" [class.active]="opt.value === value" (click)="select(opt.value)">
+      {{ opt.label }}
+    </button>
+  }
+</div>

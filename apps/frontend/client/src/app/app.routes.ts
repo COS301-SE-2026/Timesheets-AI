@@ -8,6 +8,7 @@ import { Routes } from '@angular/router';
 import { LandingPageComponent } from './features/landing/landing-page/landing-page.component';
 import { authGuard } from './core/guards/auth.guard';
 import { workspaceGuard } from './core/guards/workspace.guard'; 
+import { teamGuard } from './core/guards/team.guard'
 
 export const routes: Routes = [
   /* Default redirect */
@@ -89,6 +90,15 @@ export const routes: Routes = [
         .then(m => m.LeaveRequestsComponent)
   },
 
+  // Team page
+
+  {
+    path: 'team',
+    canActivate: [authGuard, workspaceGuard, teamGuard ],
+    loadComponent: () =>
+      import('./features/teams/teams.component').then((m) => m.TeamsComponent),
+  },
+
   //waiting-for-workspace
   {
     path: 'waiting-for-workspace',
@@ -96,6 +106,21 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/onboarding/waiting-for-workspace/waiting-for-workspace.component')
         .then(m => m.WaitingForWorkspaceComponent)
+  },
+  {
+    path: 'calendar',
+    loadComponent: () =>
+      import('./features/calendar/calendar.component')
+        .then(m => m.CalendarComponent)
+  },
+
+  {
+    path: 'insights',
+    canActivate: [authGuard, workspaceGuard],
+    loadComponent: () =>
+      import('./features/insights/insights.component').then(
+        (m) => m.InsightsComponent,
+      ),
   },
 
   /* 404 fallback */

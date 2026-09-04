@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.Project;
@@ -16,7 +17,9 @@ import timesheets.domain.ProjectMember;
 import timesheets.domain.Task;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateTaskRequest;
+import timesheets.dto.response.JiraIssueResponse;
 import timesheets.dto.response.TaskResponse;
+import timesheets.integration.issue.JiraAdapter;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
 import timesheets.repository.TaskRepository;
@@ -26,6 +29,7 @@ import timesheets.security.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TaskService {
 
   private final SecurityUtils securityUtils;
@@ -34,6 +38,7 @@ public class TaskService {
   private final ProjectMemberRepository projectMemberRepository;
   private final WorkspaceMemberRepository workspaceMemberRepository;
   private final UserRepository userRepository;
+  private final JiraAdapter jiraAdapter;
 
   // this gets all the active tasks of a project - only if the user has access to
   // that project
@@ -165,7 +170,6 @@ public class TaskService {
     task.setProjectId(projectId);
     task.setTitle(request.getTitle());
     task.setDescription(request.getDescription());
-    task.setJiraTicketKey(request.getJiraTicketKey());
     task.setParentTaskId(request.getParentTaskId());
     task.setEstimatedHours(request.getEstimatedHours());
 
@@ -183,6 +187,42 @@ public class TaskService {
     // if the task gets marked as done right away, then the timestamp is updated
     if ("DONE".equals(task.getStatus())) {
       task.setCompletedAt(LocalDateTime.now());
+    }
+
+    // if the user wants to create a Jira issue then this is requested, want to make this optional
+    // for the user
+    if (request.isCreateJiraIssue() && request.getJiraDetails() != null) {
+      try {
+        // when there is no project key, the default is what will be use
+        if (request.getJiraDetails().getProjectKey() == null
+            || request.getJiraDetails().getProjectKey().isEmpty()) {
+
+          String defaultProjectKey = getDefaultJiraProject(workspaceMemberId);
+
+          if (defaultProjectKey != null) {
+            request.getJiraDetails().setProjectKey(defaultProjectKey);
+            log.info("Using default Jira project: {}", defaultProjectKey);
+          } else {
+            throw new RuntimeException(
+                "No default Jira project found. Please specify a project key.");
+          }
+        }
+
+        // going to be using the adapter to create the issue
+        JiraIssueResponse jiraIssue =
+            jiraAdapter.createIssue(workspaceMemberId, request.getJiraDetails());
+
+        // the jira ticket will be stored here, so that it is stored in the system
+        task.setJiraTicketKey(jiraIssue.getKey());
+
+        log.info("Created Jira issue {} for task '{}'", jiraIssue.getKey(), request.getTitle());
+
+      } catch (Exception e) {
+        log.error(
+            "Failed to create Jira issue for task '{}': {}", request.getTitle(), e.getMessage());
+
+        throw new RuntimeException("Failed to create Jira issue: " + e.getMessage(), e);
+      }
     }
 
     Task savedTask = taskRepository.save(task);
@@ -230,5 +270,29 @@ public class TaskService {
         .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
         .map(ProjectMember::getIsProjectManager)
         .orElse(false);
+  }
+
+  // had to do research on how to extract in this way
+  private String getDefaultJiraProject(UUID workspaceMemberId) {
+    try {
+      List<JiraIssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
+
+      if (issues != null && !issues.isEmpty()) {
+        // the project key can be taken from the first issue
+        String projectKey = issues.get(0).getProjectKey();
+
+        if (projectKey != null && !projectKey.isEmpty()) {
+          log.debug("Using default Jira project from first issue: {}", projectKey);
+          return projectKey;
+        }
+      }
+
+      log.debug("No existing Jira issues found to determine default project");
+      return null;
+
+    } catch (Exception e) {
+      log.warn("Could not determine default Jira project: {}", e.getMessage());
+      return null;
+    }
   }
 }

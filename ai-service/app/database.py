@@ -47,3 +47,6 @@ def check_connection():
     except Exception:
         logger.exception("Database connection error: %s")
         return False
+
+
+from app import models  # noqa: F401,E402 — registers all model tables with Base.metadata
