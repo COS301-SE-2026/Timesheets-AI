@@ -11,16 +11,31 @@ Endpoints:
   added router imports
 """
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.anomaly import router as anomaly_router
 from app.api.burnout import router as burnout_router
+from app.api.dashboard import router as dashboard_router
 from app.api.delivery_forecast import router as delivery_forecast_router
+from app.api.weekly_summary import router as weekly_summary_router
+from app.scheduler import start_scheduler, stop_scheduler
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
+
 
 app = FastAPI(
     title="Momently AI Service",
     description="Productivity insights and anomaly detection for Momently",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -33,6 +48,9 @@ app.add_middleware(
 )
 app.include_router(burnout_router)
 app.include_router(delivery_forecast_router)
+app.include_router(anomaly_router)
+app.include_router(weekly_summary_router)
+app.include_router(dashboard_router)
 
 
 @app.get("/health", tags=["Health"])
