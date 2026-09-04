@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,9 @@ public class IntegrationController {
   private final IntegrationTokenRepository integrationTokenRepository;
   private final JiraOAuthService jiraOAuthService;
   private final JiraAdapter jiraAdapter;
+
+  @Value("${app.frontend-url}")
+  private String frontendUrl;
 
   @GetMapping("/google/calendar/connect")
   public ResponseEntity<String> connectGoogleCalender() {
@@ -172,7 +176,7 @@ public class IntegrationController {
     // ensures that the redirect! forgot to redirect to frontend
     // cleo need to redirect it to the calendar page
     return ResponseEntity.status(HttpStatus.FOUND)
-        .header(HttpHeaders.LOCATION, "http://localhost:4200")
+        .header(HttpHeaders.LOCATION, frontendUrl + "/calendar?connected=true")
         .build();
   }
 
@@ -234,7 +238,7 @@ public class IntegrationController {
 
     // cleo need to redirect it to the calendar page
     return ResponseEntity.status(HttpStatus.FOUND)
-        .header(HttpHeaders.LOCATION, "http://localhost:4200/my-tasks")
+        .header(HttpHeaders.LOCATION, frontendUrl + "/my-tasks")
         .build();
   }
 
