@@ -59,7 +59,8 @@ public class ProjectService {
       projects = projectRepository.findByWorkspaceIdAndIsDeletedFalse(workspaceId);
     } else {
       List<UUID> projectIds =
-          projectMemberRepository.findByWorkspaceMemberId(workspaceMemberId).stream()
+          // projectMemberRepository.findByWorkspaceMemberId(workspaceMemberId).stream()
+          projectMemberRepository.findByWorkspaceMemberIdAndIsActiveTrue(workspaceMemberId).stream()
               .map(ProjectMember::getProjectId)
               .collect(Collectors.toList());
 
@@ -260,7 +261,8 @@ public class ProjectService {
     }
 
     // finds all the members assigned to this project
-    List<ProjectMember> projectMembers = projectMemberRepository.findByProjectId(projectId);
+    List<ProjectMember> projectMembers =
+        projectMemberRepository.findByProjectIdAndIsActiveTrue(projectId);
 
     // should build all the info on the members in that project
     List<ProjectDetailResponse.MemberInfo> memberInfos =
