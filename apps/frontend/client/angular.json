@@ -41,11 +41,7 @@
                 "output": "/assets"
               }
             ],
-            "styles": [
-              "src/styles.scss",
-              "material-icons/iconfont/material-icons.css",
-              "@fortawesome/fontawesome-free/css/all.min.css"
-          ],
+            "styles": ["src/styles.scss"],
             "scripts": []
           },
           "configurations": {
