@@ -1914,37 +1914,6 @@
   dependencies:
     "@fortawesome/fontawesome-common-types" "7.3.1"
 
-"@fullcalendar/angular@^6":
-  version "6.1.21"
-  resolved "https://registry.yarnpkg.com/@fullcalendar/angular/-/angular-6.1.21.tgz#8162bc015f078dcedc87dbf8989316dc856f9fe7"
-  integrity sha512-ao2VKdqmu+y++Hyfb5q2qt9vXrNl9twgP74ClhcnVvDWaMNh7ku2QMAfkiYsyUXRY5YX74jP3eWSYAVGrU/rZQ==
-  dependencies:
-    tslib "^2.3.0"
-
-"@fullcalendar/core@^6":
-  version "6.1.21"
-  resolved "https://registry.yarnpkg.com/@fullcalendar/core/-/core-6.1.21.tgz#e8b0ed592a60aba44499802fefdbb1fcc91b0a07"
-  integrity sha512-t3u/+sqh3Iq7TWtUnVLcGDUE6OWZh0UD3c04bI/l7lSLAgAKr3kngBmhHiQD1QXpwC8ZN5iNqG7a7gOVixhSKQ==
-  dependencies:
-    preact "~10.12.1"
-
-"@fullcalendar/daygrid@^6", "@fullcalendar/daygrid@~6.1.21":
-  version "6.1.21"
-  resolved "https://registry.yarnpkg.com/@fullcalendar/daygrid/-/daygrid-6.1.21.tgz#70eef7af5951b35a5f0380b15e32e5389ae029bc"
-  integrity sha512-QYb1y40RGYLlOxKpYWg8O+7njEnKnFG8Tt7qjnubJGR35s1phQg67E+81y2TyAbbm59p2JFOCXGDk9t6KDujIA==
-
-"@fullcalendar/interaction@^6":
-  version "6.1.21"
-  resolved "https://registry.yarnpkg.com/@fullcalendar/interaction/-/interaction-6.1.21.tgz#e7fd36d7d328a02e1d7a1dcc174db7650a6edf31"
-  integrity sha512-WPYpqtljDWmU0Xm2cOtFrLlocgxv7cgkOppj34Q6OUUat8a6Cnd6kYo2JR+irP223PE5lBYHFNp1qh7SIpJc0w==
-
-"@fullcalendar/timegrid@^6":
-  version "6.1.21"
-  resolved "https://registry.yarnpkg.com/@fullcalendar/timegrid/-/timegrid-6.1.21.tgz#62e8462f2c5f9bf1c8c4f4e1d9880f09cd8b4524"
-  integrity sha512-2DnShx/jallGmb8QCkr6pAOu/zuPhJrP7+uTrAtSnbqsX7GF3lTxqSeNGkTQwsgF5g/ia8udhQ+JNYaE+TN1cQ==
-  dependencies:
-    "@fullcalendar/daygrid" "~6.1.21"
-
 "@humanfs/core@^0.19.2":
   version "0.19.2"
   resolved "https://registry.yarnpkg.com/@humanfs/core/-/core-0.19.2.tgz#a8272ca03b2acf492670222b2320b6c421bfde60"
@@ -8362,11 +8331,6 @@ postcss@^8.2.14, postcss@^8.4.33, postcss@^8.4.49, postcss@^8.5.3:
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
 
-preact@~10.12.1:
-  version "10.12.1"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.12.1.tgz#8f9cb5442f560e532729b7d23d42fd1161354a21"
-  integrity sha512-l8386ixSsBdbreOAkqtrwqHwdvR35ID8c3rKPa8lCWuO86dBi32QWHV4vfsZK1utLLFMvw+Z5Ad4XLkZzchscg==
-
 prelude-ls@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.2.1.tgz#debc6489d7a6e6b0e7611888cec880337d316396"
@@ -9373,24 +9337,6 @@ tar@^7.4.3:
     minipass "^7.1.2"
     minizlib "^3.1.0"
     yallist "^5.0.0"
-
-temporal-polyfill@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/temporal-polyfill/-/temporal-polyfill-1.0.4.tgz#a8ab966cb7c10f0c9490aa52b4b669ba182aec64"
-  integrity sha512-MLEU0qOD2uXlz24oINNtdLZQl8RgmMxSnRtKEGZGGetTJjlRwQJjk+VsJ4EREaUoiaTb8NJOcUiKtoAiWn9EBg==
-  dependencies:
-    temporal-spec "1.0.1"
-    temporal-utils "1.0.2"
-
-temporal-spec@1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/temporal-spec/-/temporal-spec-1.0.1.tgz#5679ce2dd0089865afe80e0a8bd22a9033c16717"
-  integrity sha512-wxVoanmDeavXie1vu2JaQ3WIc3JZnWAOYFBsJyATaVsXsycKYUflGsyBmrRSnoCpZJpwPyr38VpgSUlQ8CbFxg==
-
-temporal-utils@1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/temporal-utils/-/temporal-utils-1.0.2.tgz#a9f27b645fdf503e469dfb4df8c421d697079dbd"
-  integrity sha512-1B8Dl4KzrOvsNUlpoWGno2VLQlxroLjDgc5NBjVC9ax9ymdo+ezfyvhyjEMx+IVfhINr6CIG2gcnlP95iRrybQ==
 
 terser-webpack-plugin@^5.3.16:
   version "5.6.1"
