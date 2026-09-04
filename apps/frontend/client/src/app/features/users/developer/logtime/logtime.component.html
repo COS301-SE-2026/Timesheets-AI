@@ -48,7 +48,7 @@
         <button
           class="btn btn--primary"
           type="button"
-          [disabled]="timesheet.isLocked || timesheet.status !== 'DRAFT'"
+          [disabled]="!canSubmitTimesheet()"
           (click)="submitTimesheet()"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -59,6 +59,24 @@
       }
     </div>
   </header>
+
+  @if (currentTimesheet(); as timesheet) {
+    @if (timesheet.status === 'REJECTED') {
+      <section class="banner banner--danger" role="alert">
+        This timesheet was rejected {{ timesheet.rejectionReason ? ':' + timesheet.rejectionReason : '.' }}
+      </section>
+    }
+      @if (timesheet.status === 'APPROVED') {
+        <section class="banner banner--success">
+          Timesheet has been approved and is locked.
+        </section>
+      }
+      @if (timesheet.status === 'SUBMITTED') {
+        <section class="banner banner--success">
+          The timesheet is awaiting review.
+        </section>
+      }
+    }
 
   <!-- Conflict error banner, shown when a time overlap is detected -->
   @if (conflictMessage()) {
@@ -95,10 +113,10 @@
 
   <!-- Entry action buttons to open manual or timer panels -->
   <section class="entry-actions">
-    <button class="btn btn--outline" type="button" (click)="openManualPanel()">
+    <button class="btn btn--outline" type="button" [disabled]="!canEditEntries()" (click)="openManualPanel()">
       + Add Manual Time Entry
     </button>
-    <button class="btn btn--primary" type="button" (click)="openTimerPanel()">
+    <button class="btn btn--primary" type="button" [disabled]="!canEditEntries()" (click)="openTimerPanel()">
       Start Automatic Time Entry
     </button>
   </section>
@@ -495,43 +513,23 @@
                 <td class="col-description">
                   <span>{{ entry.description }}</span>
                   <!-- Status notes shown below description -->
-                  @if (entry.status === "SUBMITTED") {
+                  @if ( currentTimesheet()?.status === "SUBMITTED") {
                     <em class="status-note">Awaiting review</em>
                   }
-                  @if (entry.status === "APPROVED") {
+                  @if ( currentTimesheet()?.status === "APPROVED") {
                     <em class="status-note status-note--approved">Approved</em>
                   }
                   <!-- Rejection reason shown for rejected entries -->
-                  @if (entry.status === "REJECTED") {
+                  @if (currentTimesheet()?.status === "REJECTED") {
                     <em class="status-note status-note--rejected">
-                      {{ entry.rejectionReason }}
+                      {{ currentTimesheet()?.rejectionReason }}
                     </em>
                   }
                 </td>
                 <td class="col-actions">
-                  <!-- Edit button shown for draft and rejected entries -->
-                  @if (
-                    entry.status === "DRAFT" || entry.status === "REJECTED"
-                  ) {
-                    <button
-                      type="button"
-                      class="icon-btn"
-                      aria-label="Edit entry"
-                      (click)="editEntry(entry)"
-                    >
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                          d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"
-                        ></path>
-                      </svg>
-                    </button>
-                  }
-                  <!--
-                    overflow menu for draft entries: only delete now.
-                    submit moved to the timesheet level (see header), so
-                    a per-entry submit no longer applies here
-                  -->
-                  @if (entry.status === "DRAFT") {
+                 <!-- Draft and rejected timesheets expose all row actions through one menu  -->
+                  @if (canEditEntries()) {
+
                     <div class="action-menu">
                       <button
                         type="button"
@@ -548,6 +546,9 @@
                       <!-- Dropdown shown when this entry's menu is open -->
                       @if (openMenuEntryId() === entry.id) {
                         <div class="action-menu__dropdown">
+                          <button type="button" (click)="editEntry(entry)">
+                            Update
+                          </button>
                           <button type="button" (click)="deleteEntry(entry)">
                             Delete
                           </button>
@@ -578,6 +579,7 @@
       <button
         class="btn btn--outline btn--full"
         type="button"
+        [disabled]="!canEditEntries()"
         (click)="openManualPanel()"
       >
         + Add Another Entry

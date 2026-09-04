@@ -26,6 +26,8 @@ import timesheets.service.TokenBlacklistService;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
+  private static final org.slf4j.Logger log =
+      org.slf4j.LoggerFactory.getLogger(JwtAuthFilter.class);
 
   private final JwtService jwtService;
   private final UserDetailsService userDetailsService;
@@ -45,10 +47,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     String token = authHeader.substring(7); // 7 is length of "Bearer "
-
+    // NEED TO FIX THIS
     if (tokenBlacklistService.isBlacklisted(
         token)) { // 'blacklist' check to prevent use of tokens that have been invalidated (e.g.on
       // logout)
+      // this line is skipping authentication so a blacklisted token will reach the controller as
+      // unauthenticated request
       filterChain.doFilter(request, response);
       return;
     }
@@ -73,6 +77,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
       }
     } catch (Exception ignored) {
+      log.error("JWT auth failed", ignored);
       // invalid token - just continue unauthenticated
     }
 

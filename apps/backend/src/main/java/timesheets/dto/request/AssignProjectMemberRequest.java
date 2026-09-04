@@ -3,13 +3,12 @@ package timesheets.dto.request;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.Data;
-import timesheets.enums.WorkspaceRole;
 
 @Data
-public class AssignMemberRequest {
+public class AssignProjectMemberRequest {
+
   @NotNull(message = "Workspace member ID is required")
   private UUID workspaceMemberId;
 
-  @NotNull(message = "Role is required")
-  private WorkspaceRole role; // MANAGER or DEVELOPER
+  private Boolean isProjectManager = false; // a project manager or just a developer
 }

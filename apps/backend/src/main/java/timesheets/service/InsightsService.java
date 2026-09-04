@@ -9,8 +9,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import timesheets.client.AiServiceClient;
 import timesheets.domain.TimeEntry;
 import timesheets.dto.request.ProductivityReportRequest;
+import timesheets.dto.response.AiDashboardResponse;
 import timesheets.dto.response.PersonalInsightsResponse;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.security.SecurityUtils;
@@ -25,6 +27,7 @@ public class InsightsService {
 
   private final TimeEntryRepository timeEntryRepository;
   private final SecurityUtils securityUtils;
+  private final AiServiceClient aiServiceClient;
 
   public PersonalInsightsResponse getInsightsSummary(ProductivityReportRequest request) {
 
@@ -65,12 +68,12 @@ public class InsightsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 3600.0)
                           .sum();
 
                   return PersonalInsightsResponse.ProjectHours.builder()
                       .projectId(entry.getKey())
-                      .projectName("Project " + entry.getKey()) // TODO: join with projects table
+                      .projectName("Project " + entry.getKey())
                       .hours(hours)
                       .entryCount(entry.getValue().size())
                       .build();
@@ -89,14 +92,14 @@ public class InsightsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 3600.0)
                           .sum();
 
                   return PersonalInsightsResponse.TaskHours.builder()
                       .taskId(entry.getKey())
-                      .taskTitle("Task " + entry.getKey()) // TODO: join with tasks table
+                      .taskTitle("Task " + entry.getKey())
                       .hours(hours)
-                      .status("TODO") // TODO: join with tasks table
+                      .status("TODO")
                       .build();
                 })
             .sorted((a, b) -> Double.compare(b.getHours(), a.getHours()))
@@ -114,7 +117,7 @@ public class InsightsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 3600.0)
                           .sum();
 
                   return PersonalInsightsResponse.DailyTrend.builder()
@@ -135,5 +138,10 @@ public class InsightsService {
         .hoursPerTask(hoursPerTask)
         .dailyTrend(dailyTrend)
         .build();
+  }
+
+  public AiDashboardResponse getAiDashboard() {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    return aiServiceClient.getDashboardInsights(workspaceMemberId);
   }
 }

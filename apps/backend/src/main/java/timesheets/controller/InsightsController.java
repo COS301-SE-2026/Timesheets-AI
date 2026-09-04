@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import timesheets.dto.request.ProductivityReportRequest;
+import timesheets.dto.response.AiDashboardResponse;
 import timesheets.dto.response.PersonalInsightsResponse;
 import timesheets.service.InsightsService;
 
@@ -34,5 +35,12 @@ public class InsightsController {
     PersonalInsightsResponse response = insightsService.getInsightsSummary(request);
     // authenticated user in the specified date range
     return ResponseEntity.ok(response);
+  }
+
+  // added a new endpoint ai endpoint
+
+  @GetMapping("/ai")
+  public ResponseEntity<AiDashboardResponse> getAiDashboard() {
+    return ResponseEntity.ok(insightsService.getAiDashboard());
   }
 }

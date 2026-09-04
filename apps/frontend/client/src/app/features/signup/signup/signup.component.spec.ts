@@ -9,10 +9,7 @@ the HttpTestingController intercepts the request instead of hitting the actual b
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import {HttpTestingController, provideHttpClientTesting, } from '@angular/common/http/testing';
 import {
   AuthService,
   RegisterRequest,
@@ -20,6 +17,21 @@ import {
 } from '../../../core/services/auth.service';
 import { SignupComponent } from './signup.component';
 import { FormGroup } from '@angular/forms';
+
+interface GoogleIdentityServicesStub{
+  accounts: {
+    id: {
+      initialize: jest.Mock;
+      renderButton: jest.Mock;
+      prompt: jest.Mock;
+    };
+  };
+}
+
+
+jest.mock('ng2-charts', () => ({
+  BaseChartDirective: jest.fn(),
+}));
 
 interface SignupComponentInternals {
   signupForm: FormGroup;
@@ -193,6 +205,16 @@ describe('SignupComponent', () => {
   };
 
   beforeEach(async () => {
+    (window as unknown as { google: GoogleIdentityServicesStub }).google = {
+      accounts: {
+        id: {
+          initialize: jest.fn(),
+          renderButton: jest.fn(),
+          prompt: jest.fn(),
+        },
+      },
+    };
+
     await TestBed.configureTestingModule({
       imports: [SignupComponent],
       providers: [
@@ -212,6 +234,7 @@ describe('SignupComponent', () => {
   });
 
   afterEach(() => {
+    delete (window as unknown as { google?: GoogleIdentityServicesStub }).google;
     httpMock.verify();
   });
 

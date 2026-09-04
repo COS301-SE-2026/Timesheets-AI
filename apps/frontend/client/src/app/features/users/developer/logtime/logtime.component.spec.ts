@@ -14,6 +14,7 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
 // Unit tests for log time page
 
@@ -55,7 +56,7 @@ describe('LogtimeComponent', () => {
       endTime: `${today()}T11:00:00`,
       durationMinutes: 7200, // 2 hours, in seconds
       description: 'Existing entry for overlap testing.',
-      status: undefined,
+      status: 'DRAFT' as const,
       isDeleted: false,
     },
   ];
@@ -80,7 +81,7 @@ describe('LogtimeComponent', () => {
     httpMock.expectOne('/api/projects').flush(mockProjects);
    
     //no active timer running at start of normal test, 204 No Content
-    httpMock.expectOne('/api/timers/active').flush(null, {status: 204, statusText: 'No Content'})
+    httpMock.expectOne('/api/timers/active').flush(null, {status: 204, statusText: 'No Content'});
 
     httpMock.expectOne(`/api/tasks/project/${projectOneId}`).flush(
       mockTasks.filter((t)=> t.projectId === projectOneId),);
@@ -89,7 +90,18 @@ describe('LogtimeComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LogtimeComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(), provideHttpClientTesting(),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              queryParamMap : {
+                get: jest.fn(),
+              }
+            }
+          }
+        }
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LogtimeComponent);

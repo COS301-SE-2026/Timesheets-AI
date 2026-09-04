@@ -14,7 +14,8 @@ export interface ProjectMember{
     lastName: string;
     email: string;
     hoursLogged: number;
-    hoursLoggedLabel: string;
+    /** making this to accept null for now until frontend team fixs the mock files with mock data */
+    hoursLoggedLabel?: string;
     role: ProjectRole;
     joinedAt: string;
 }

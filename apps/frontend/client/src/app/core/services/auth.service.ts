@@ -90,6 +90,7 @@ export class AuthService {
       catchError(this.handleError),
     );
   }
+
   googleAuth(idToken: string): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/google`, { idToken })
@@ -148,5 +149,18 @@ export class AuthService {
     const message =
       error.error?.message || 'Something went wrong, try again in a bit.';
     return throwError(() => new Error(message));
+  }
+
+  refreshUser(): Observable<AuthResponse> {
+
+    const token = this.getToken();
+    
+    if (!token) {
+      return throwError(() => new Error('No token available'));
+    }
+    
+    return this.http.get<AuthResponse>(`${this.baseUrl}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).pipe(tap((res) => this.persistSession(res)), catchError(this.handleError));
   }
 }
