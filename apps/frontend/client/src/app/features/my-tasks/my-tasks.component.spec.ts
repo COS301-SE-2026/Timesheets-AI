@@ -138,13 +138,16 @@ describe('MyTasksComponent', () => {
 
      it('should set loadError and stop loading when the request fails', () => {
 
+      // Arrange / Act
+      fixture.detectChanges();
+
+
       const jiraStatusReq = httpMock.expectOne('/api/integrations/jira/status');
       expect(jiraStatusReq.request.method).toBe('GET');
       jiraStatusReq.flush({ connected: false });
 
-
       // Arrange / Act
-      fixture.detectChanges();
+      
       const tasksReq = httpMock.expectOne('/api/tasks/my-tasks'); 
       // Assert
       // simulates a backend 500, same failure shape HttpErrorResponse produces
@@ -162,12 +165,13 @@ describe('MyTasksComponent', () => {
  
     it('should default projectName to "Unknown Project" and assignedToName to "Unassigned" when null', () => {
 
+      // this covers the ?? fallback logic in mapToTask(), which exists because of the GET /api/tasks/my-tasks 
+      fixture.detectChanges();
+
       const jiraStatusReq = httpMock.expectOne('/api/integrations/jira/status');
       expect(jiraStatusReq.request.method).toBe('GET');
       jiraStatusReq.flush({ connected: false });
 
-      // this covers the ?? fallback logic in mapToTask(), which exists because of the GET /api/tasks/my-tasks 
-      fixture.detectChanges();
       const tasksReq = httpMock.expectOne('/api/tasks/my-tasks');
       tasksReq.flush([
         makeTaskResponse({
