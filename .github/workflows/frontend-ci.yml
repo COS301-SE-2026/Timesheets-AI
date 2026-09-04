@@ -80,7 +80,7 @@ jobs:
 
 #==================== Login to AWS  ===========================================================
             - name: Configure AWS Credentials
-              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/dev2' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
               uses: aws-actions/configure-aws-credentials@d0834ad3a60a024346910e522a81b0002bd37fea
               with:
                 aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -89,7 +89,7 @@ jobs:
 
 #==================== Login to AWS ECR  ===========================================================
             - name: Login to AWS ECR
-              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/dev2' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
               id: login-to-ecr
               uses: aws-actions/amazon-ecr-login@33f92af657bba1882ab79d8621debd2f6769a0c9
 
@@ -116,7 +116,7 @@ jobs:
         # docker tag is giving same image another name 
         # latest - give us the newest version and aws ec2 instance will run this to get latest version 
             - name: Tag Docker Image
-              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/dev2' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
               run: |
                 docker tag momently-frontend:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:latest
                 docker tag momently-frontend:${{ github.sha }} ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:${{ github.sha }}
@@ -124,7 +124,7 @@ jobs:
 #====================== Push to ECR ======================
 
             - name: Push Docker Image
-              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
+              if: github.event_name == 'push' && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/dev2' || github.ref == 'refs/heads/main') && (steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true')
               run: |
                 docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:latest
                 docker push ${{ steps.login-to-ecr.outputs.registry }}/momently-frontend:${{ github.sha }}
