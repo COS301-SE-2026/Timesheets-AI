@@ -30,7 +30,7 @@ interface BackenCalendarEvent{
 })
 
 export class CalendarService{
-    private http=inject(HttpClient);
+    private readonly http=inject(HttpClient);
     private readonly apiUrl= '/api/calendar';
     private readonly googleCalendarApiUrl= '/api/integrations/google/calendar';
 
