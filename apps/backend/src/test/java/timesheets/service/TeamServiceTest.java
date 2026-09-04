@@ -118,12 +118,13 @@ public class TeamServiceTest {
 
       // ARRANGE: setting up the request and the user
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
+      request.setWorkspaceId(testWorkspaceId);
+
       User user = createTestUser();
       WorkspaceMember savedMember = createTestWorkspaceMember();
 
       // specifying that the user is an admin
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
 
       when(userRepository.findById(testUserId)).thenReturn(Optional.of(user));
@@ -165,9 +166,9 @@ public class TeamServiceTest {
     @DisplayName("throw exception when workspace does not exist")
     void throwExceptionWhenWorkspaceNotFound() {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
+      request.setWorkspaceId(testWorkspaceId);
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(false);
 
       assertThatThrownBy(() -> teamService.assignUserToWorkspace(request))
@@ -181,9 +182,9 @@ public class TeamServiceTest {
     @DisplayName("throw exception when user does not exist")
     void throwExceptionWhenUserNotFound() {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
+      request.setWorkspaceId(testWorkspaceId);
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
 
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
       when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
@@ -199,9 +200,9 @@ public class TeamServiceTest {
     @DisplayName("throw exception when user is already a member of workspace")
     void throwExceptionWhenUserAlreadyInWorkspace() {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
+      request.setWorkspaceId(testWorkspaceId);
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
 
       when(userRepository.findById(testUserId)).thenReturn(Optional.of(createTestUser()));
@@ -229,7 +230,6 @@ public class TeamServiceTest {
       List<WorkspaceMember> admins = List.of(createTestAdminWorkspaceMember());
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(member));
       when(workspaceMemberRepository.findAllByWorkspaceIdAndRole(
@@ -260,33 +260,12 @@ public class TeamServiceTest {
     void throwExceptionWhenWorkspaceMemberNotFound() {
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
 
       when(workspaceMemberRepository.findById(testWorkspaceMemberId)).thenReturn(Optional.empty());
 
       assertThatThrownBy(() -> teamService.removeUserFromWorkspace(testWorkspaceMemberId))
           .isInstanceOf(ResourceNotFoundException.class)
           .hasMessage("Workspace member not found");
-
-      verify(workspaceMemberRepository, never()).delete(any(WorkspaceMember.class));
-    }
-
-    @Test
-    @DisplayName("throw exception when member does not belong to workspace")
-    void throwExceptionWhenMemberNotInWorkspace() {
-
-      WorkspaceMember member = createTestWorkspaceMember();
-      member.setWorkspaceId(UUID.randomUUID());
-
-      when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
-
-      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
-          .thenReturn(Optional.of(member));
-
-      assertThatThrownBy(() -> teamService.removeUserFromWorkspace(testWorkspaceMemberId))
-          .isInstanceOf(AccessDeniedException.class)
-          .hasMessage("Member does not belong to your workspace");
 
       verify(workspaceMemberRepository, never()).delete(any(WorkspaceMember.class));
     }
@@ -301,9 +280,9 @@ public class TeamServiceTest {
       List<WorkspaceMember> admins = List.of(adminMember);
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(adminMember));
+
       when(workspaceMemberRepository.findAllByWorkspaceIdAndRole(
               testWorkspaceId, WorkspaceRole.ADMIN))
           .thenReturn(admins);
@@ -321,13 +300,14 @@ public class TeamServiceTest {
 
       WorkspaceMember member = createTestWorkspaceMember();
       WorkspaceMember adminMember = createTestAdminWorkspaceMember();
+
       List<WorkspaceMember> admins = List.of(adminMember);
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
 
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(member));
+
       when(workspaceMemberRepository.findAllByWorkspaceIdAndRole(
               testWorkspaceId, WorkspaceRole.ADMIN))
           .thenReturn(admins);
