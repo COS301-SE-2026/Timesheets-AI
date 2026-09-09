@@ -118,7 +118,6 @@ public class TeamServiceTest {
 
       // ARRANGE: setting up the request and the user
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
-      request.setWorkspaceId(testWorkspaceId);
 
       User user = createTestUser();
       WorkspaceMember savedMember = createTestWorkspaceMember();
@@ -166,7 +165,6 @@ public class TeamServiceTest {
     @DisplayName("throw exception when workspace does not exist")
     void throwExceptionWhenWorkspaceNotFound() {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
-      request.setWorkspaceId(testWorkspaceId);
 
       when(securityUtils.isAdmin()).thenReturn(true);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(false);
@@ -182,7 +180,6 @@ public class TeamServiceTest {
     @DisplayName("throw exception when user does not exist")
     void throwExceptionWhenUserNotFound() {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
-      request.setWorkspaceId(testWorkspaceId);
 
       when(securityUtils.isAdmin()).thenReturn(true);
 
@@ -200,7 +197,6 @@ public class TeamServiceTest {
     @DisplayName("throw exception when user is already a member of workspace")
     void throwExceptionWhenUserAlreadyInWorkspace() {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
-      request.setWorkspaceId(testWorkspaceId);
 
       when(securityUtils.isAdmin()).thenReturn(true);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
