@@ -124,6 +124,7 @@ public class TeamServiceTest {
 
       // specifying that the user is an admin
       when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
 
       when(userRepository.findById(testUserId)).thenReturn(Optional.of(user));
@@ -167,6 +168,7 @@ public class TeamServiceTest {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
 
       when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(false);
 
       assertThatThrownBy(() -> teamService.assignUserToWorkspace(request))
@@ -182,7 +184,7 @@ public class TeamServiceTest {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
 
       when(securityUtils.isAdmin()).thenReturn(true);
-
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
       when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
 
@@ -199,6 +201,7 @@ public class TeamServiceTest {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
 
       when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
 
       when(userRepository.findById(testUserId)).thenReturn(Optional.of(createTestUser()));
