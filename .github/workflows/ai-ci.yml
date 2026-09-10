@@ -56,7 +56,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt 
 
-#===================== PLAN stage ================================
+#===================== PLAN stage =================================
 
         # ruff is recommended for Python FastAPI (made by Astral) 
         # it is fast and it ahndles linting, auto fix sytnax and formatting so no need for different kinds of tools 
