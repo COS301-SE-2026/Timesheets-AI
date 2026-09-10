@@ -84,6 +84,17 @@ export class AuthService {
       .pipe(catchError(this.handleError));
   }
 
+  verifyEmail(token: string): Observable<{ message: string; redirectUrl: string }> {
+    return this.http
+      .post<{ message: string; redirectUrl: string }>(
+        `${this.baseUrl}/verify-email`,
+        null,
+        { params: { token } }
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+
   login(payload: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, payload).pipe(
       tap((res) => this.persistSession(res)),

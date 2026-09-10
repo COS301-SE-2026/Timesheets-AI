@@ -123,6 +123,15 @@ export const routes: Routes = [
       ),
   },
 
+  {
+    path: 'verify-email',
+    data: { layout: 'auth' },
+    loadComponent: () =>
+      import('./pages/verify-email/verify-email.component').then(
+        (m) => m.VerifyEmailComponent,
+      ),
+  },
+
   /* 404 fallback */
   {
     path: 'not-found',
