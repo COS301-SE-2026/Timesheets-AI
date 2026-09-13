@@ -27,6 +27,7 @@ RUN python -m pip install --upgrade \
  
 # Copy only necessary files explicitly
 COPY main.py .
+COPY app/ ./app/
 COPY tests/ ./tests/
 
 RUN chown -R appuser:appgroup /app
