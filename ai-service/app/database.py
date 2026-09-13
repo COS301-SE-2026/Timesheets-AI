@@ -16,11 +16,11 @@ from app.config import settings
 
 # In this file, I am setting up the db connection and session managing
 # it will be used in the health endpoint
-# if part is to fix the CI/test fix 
-# the production will use else path 
+# if part is to fix the CI/test fix
+# the production will use else path
 if settings.database_url.startswith("sqlite"):
     engine = create_engine(
-        settings.database_url, 
+        settings.database_url,
     )
 else:
     engine = create_engine(
