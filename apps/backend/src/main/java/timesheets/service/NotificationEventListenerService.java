@@ -7,13 +7,16 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import timesheets.domain.User;
 import timesheets.domain.WorkspaceMember;
 import timesheets.domain.event.LongRunningTimerEvent;
 import timesheets.domain.event.TimesheetApprovedEvent;
 import timesheets.domain.event.TimesheetRejectedEvent;
 import timesheets.domain.event.TimesheetSubmittedEvent;
 import timesheets.enums.WorkspaceRole;
+import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
 
 @Component
