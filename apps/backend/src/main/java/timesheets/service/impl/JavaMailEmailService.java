@@ -33,7 +33,7 @@ public class JavaMailEmailService implements EmailService {
     String subject = "Verify your email - Timesheets AI";
     String htmlContent = buildVerificationEmailHtml(firstName, token);
 
-    sendEmail(email, subject, htmlContent);
+    sendEmail(email, subject, htmlContent, true);
   }
 
   @Override
@@ -42,12 +42,12 @@ public class JavaMailEmailService implements EmailService {
     String subject = "Reset your password - Timesheets AI";
     String htmlContent = buildPasswordResetEmailHtml(firstName, token);
 
-    sendEmail(email, subject, htmlContent);
+    sendEmail(email, subject, htmlContent, true);
   }
 
   @Override
   public void sendGenericEmail(String to, String subject, String htmlContent) {
-    sendEmail(to, subject, htmlContent);
+    sendEmail(to, subject, htmlContent, false);
   }
 
   // this is what will send a reminder when a users timer has been running for more than 8 hours
@@ -57,11 +57,11 @@ public class JavaMailEmailService implements EmailService {
     String subject = "Your timer is still running - Timesheets AI";
     String htmlContent = buildLongRunningTimerEmailHtml(firstName);
 
-    sendEmail(email, subject, htmlContent);
+    sendEmail(email, subject, htmlContent, false);
   }
 
   // this is for creating and sending the HTML email
-  private void sendEmail(String to, String subject, String htmlContent) {
+  private void sendEmail(String to, String subject, String htmlContent, boolean includeHourglass) {
 
     try {
       MimeMessage message = mailSender.createMimeMessage();
