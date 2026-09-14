@@ -1,3 +1,5 @@
+//this is a concrete Subject in the observer pattern
+
 package timesheets.service;
 
 import exception.AccessDeniedException;
