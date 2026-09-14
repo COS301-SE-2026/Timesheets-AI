@@ -1,12 +1,10 @@
-package timesheets.calendar;
+package timesheets.integration.calendar;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import timesheets.integration.calendar.CalendarAdapter;
-import timesheets.integration.calendar.CalendarEvent;
 
 @Service
 @RequiredArgsConstructor

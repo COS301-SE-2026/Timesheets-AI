@@ -1,0 +1,23 @@
+<div class="verify-email-page">
+  <div class="verify-email-card">
+
+    <h1>Email Verification</h1>
+
+    @if (loading) {
+      <p>Verifying your email address...</p>
+    }
+
+    @if (!loading && success) {
+      <p>{{ message }}</p>
+      <p>Redirecting you to login...</p>
+    }
+
+    @if (!loading && !success) {
+      <p>{{ message }}</p>
+      <button type="button" (click)="goToLogin()">
+        Back to Login
+      </button>
+    }
+
+  </div>
+</div>

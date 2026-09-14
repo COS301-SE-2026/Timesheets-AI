@@ -9,6 +9,7 @@ WORKDIR /app
 # trigger AI to build an image 
 
 RUN apt-get update \
+    && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends wget \
     && addgroup --system appgroup \
     && adduser --system --ingroup appgroup appuser \

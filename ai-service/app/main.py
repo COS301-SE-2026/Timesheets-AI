@@ -1,6 +1,6 @@
 """
 Momently AI Service
-FastAPI application Demo 1 scaffold
+FastAPI application Demo 4 scaffold
 
 Endpoints:
   GET  /health         liveness probe
