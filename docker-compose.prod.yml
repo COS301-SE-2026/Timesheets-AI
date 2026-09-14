@@ -29,8 +29,6 @@ services:
       backend: 
         condition: service_healthy
       
-      ai-service:
-        condition: service_healthy
 
       
 
