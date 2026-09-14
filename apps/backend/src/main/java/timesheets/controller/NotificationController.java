@@ -21,7 +21,7 @@ public class NotificationController {
 
   /*
   - gets all the notifications for the current workspace member
-  - notifications are returned with the newest notifications first 
+  - notifications are returned with the newest notifications first
   */
   @GetMapping
   public ResponseEntity<List<NotificationResponse>> getMyNotifications() {
@@ -39,7 +39,7 @@ public class NotificationController {
     return ResponseEntity.ok(notificationService.getMyUnreadNotifications());
   }
 
-  //gets the unread notifications for a current workspace member, can be used with the badge
+  // gets the unread notifications for a current workspace member, can be used with the badge
   @GetMapping("/unread/count")
   public ResponseEntity<Long> getMyUnreadCount() {
 
