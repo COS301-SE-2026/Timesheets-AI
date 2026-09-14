@@ -39,4 +39,7 @@ public interface TimerSessionRepository extends JpaRepository<TimerSession, UUID
   // there is a timer that is true
   Optional<TimerSession> findFirstByWorkspaceMemberIdInAndIsRunningTrue(
       List<UUID> workspaceMemberIds);
+
+  // finds a previously running timer
+  List<TimerSession> findByIsRunningTrue();
 }
