@@ -21,8 +21,4 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
 
   // counts the unread notifications for the notifications badge
   long countByWorkspaceMemberIdAndIsReadFalse(UUID workspaceMemberId);
-
-  // doing this so I can prevent duplicate notifications
-  boolean existsByWorkspaceMemberIdAndTypeAndEntityId(
-      UUID workspaceMemberId, String type, UUID entityId);
 }
