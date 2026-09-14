@@ -1,4 +1,4 @@
-//this is a concrete Subject in the observer pattern
+// this is a concrete Subject in the observer pattern
 
 package timesheets.service;
 
