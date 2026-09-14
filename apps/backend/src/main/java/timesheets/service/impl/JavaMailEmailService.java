@@ -48,6 +48,15 @@ public class JavaMailEmailService implements EmailService {
     sendEmail(to, subject, htmlContent);
   }
 
+  @Override
+  public void sendLongRunningTimerEmail(String email, String firstName) {
+
+    String subject = "Your timer is still running - Timesheets AI";
+    String htmlContent = buildLongRunningTimerEmailHtml(firstName);
+
+    sendEmail(email, subject, htmlContent);
+  }
+
   private void sendEmail(String to, String subject, String htmlContent) {
     try {
       MimeMessage message = mailSender.createMimeMessage();
@@ -138,5 +147,41 @@ public class JavaMailEmailService implements EmailService {
             </html>
             """
         .formatted(firstName, resetLink);
+  }
+
+  private String buildLongRunningTimerEmailHtml(String firstName) {
+
+    return "<!DOCTYPE html>"
+        + "<html>"
+        + "<head>"
+        + "<style>"
+        + "body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }"
+        + ".container { max-width: 600px; margin: 0 auto; padding: 20px; }"
+        + ".header { background: #2563eb; color: white; padding: 20px; "
+        + "text-align: center; border-radius: 8px 8px 0 0; }"
+        + ".content { padding: 30px; background: #f9fafb; "
+        + "border-radius: 0 0 8px 8px; }"
+        + ".footer { text-align: center; color: #6b7280; "
+        + "font-size: 12px; margin-top: 20px; }"
+        + "</style>"
+        + "</head>"
+        + "<body>"
+        + "<div class=\"container\">"
+        + "<div class=\"header\">"
+        + "<h1>Timesheets AI</h1>"
+        + "</div>"
+        + "<div class=\"content\">"
+        + "<h2>Hello, "
+        + firstName
+        + "!</h2>"
+        + "<p>Your timer has been running for more than 8 hours.</p>"
+        + "<p>Please remember to stop your timer if you are no longer working.</p>"
+        + "</div>"
+        + "<div class=\"footer\">"
+        + "<p>&copy; 2026 Timesheets AI</p>"
+        + "</div>"
+        + "</div>"
+        + "</body>"
+        + "</html>";
   }
 }
