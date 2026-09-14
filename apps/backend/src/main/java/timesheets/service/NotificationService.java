@@ -38,17 +38,13 @@ public class NotificationService {
             .entityId(entityId)
             .isRead(false)
             .build();
-
     return notificationRepository.save(notification);
   }
 
-  /*
-   * Gets all notifications for the current workspace member.
-   */
+  // gets all notifications for the current workspace member
   public List<NotificationResponse> getMyNotifications() {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-
     return notificationRepository
         .findByWorkspaceMemberIdOrderByCreatedAtDesc(workspaceMemberId)
         .stream()
@@ -56,13 +52,10 @@ public class NotificationService {
         .toList();
   }
 
-  /*
-   * Gets unread notifications.
-   */
+  // this gets the unread notifications
   public List<NotificationResponse> getMyUnreadNotifications() {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-
     return notificationRepository
         .findByWorkspaceMemberIdAndIsReadFalseOrderByCreatedAtDesc(workspaceMemberId)
         .stream()
@@ -70,19 +63,14 @@ public class NotificationService {
         .toList();
   }
 
-  /*
-   * Gets the unread notification count for the notification badge.
-   */
+  // gets the unread notification for the notification badge
   public long getMyUnreadCount() {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-
     return notificationRepository.countByWorkspaceMemberIdAndIsReadFalse(workspaceMemberId);
   }
 
-  /*
-   * Marks a single notification as read.
-   */
+  // marks a notification as read
   @Transactional
   public NotificationResponse markAsRead(UUID notificationId) {
 
@@ -100,13 +88,10 @@ public class NotificationService {
     notification.setIsRead(true);
 
     Notification savedNotification = notificationRepository.save(notification);
-
     return NotificationResponse.from(savedNotification);
   }
 
-  /*
-   * Marks every unread notification for the current workspace member as read.
-   */
+  // marks all the unread notications for the current workspace member as read
   @Transactional
   public void markAllAsRead() {
 
@@ -116,7 +101,6 @@ public class NotificationService {
         notificationRepository.findByWorkspaceMemberIdAndIsReadFalse(workspaceMemberId);
 
     notifications.forEach(notification -> notification.setIsRead(true));
-
     notificationRepository.saveAll(notifications);
   }
 }
