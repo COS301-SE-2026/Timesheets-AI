@@ -9,12 +9,20 @@ import timesheets.domain.Notification;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
 
-    //gets all the notifications for a workspace member, with the newest first
-    List<Notification> findByWorkspaceMemberIdOrderByCreatedAtDesc(UUID workspaceMemberId);
+  // gets all the notifications for a workspace member, with the newest first
+  List<Notification> findByWorkspaceMemberIdOrderByCreatedAtDesc(UUID workspaceMemberId);
 
-    //gets all the unread notifications, with the newest first
-    List<Notification> findByWorkspaceMemberIdAndIsReadFalseOrderByCreatedAtDesc(UUID workspaceMemberId);
+  // gets all the unread notifications, with the newest first
+  List<Notification> findByWorkspaceMemberIdAndIsReadFalseOrderByCreatedAtDesc(
+      UUID workspaceMemberId);
 
-    //counts the unread notifications for the notifications badge
-    long countByWorkspaceMemberIdAndIsReadFalse(UUID workspaceMemberId);
+  // used when marking all notifications as read
+  List<Notification> findByWorkspaceMemberIdAndIsReadFalse(UUID workspaceMemberId);
+
+  // counts the unread notifications for the notifications badge
+  long countByWorkspaceMemberIdAndIsReadFalse(UUID workspaceMemberId);
+
+  // doing this so I can prevent duplicate notifications
+  boolean existsByWorkspaceMemberIdAndTypeAndEntityId(
+      UUID workspaceMemberId, String type, UUID entityId);
 }
