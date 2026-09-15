@@ -70,7 +70,7 @@ describe('SidebarCoponent', () => {
         ],
         [
             'ROLE_ADMIN',
-            ['Dashboard', 'Projects', 'Calendar', 'Leave Requests', 'Insights', 'Settings'],
+            ['Dashboard', 'Projects', 'Calendar', 'Leave Requests', 'Insights', 'Team', 'Settings'],
         ],
     ])('shows the correct navigation items for %s', (role, expectedLabels) => {
         currentUser.set({ firstName: 'John', lastName: 'Doe', roles: [role] });
