@@ -44,14 +44,11 @@ public class NotificationEventListenerService {
 
     UUID workspaceId = submitter.getWorkspaceId();
 
-    // when a timesheet is submitted it should notify the manager sna admins in the
-    // same workspace
-    List<WorkspaceMember> recipients = new ArrayList<>();
-
-    recipients.addAll(
-        workspaceMemberRepository.findAllByWorkspaceIdAndRole(workspaceId, WorkspaceRole.ADMIN));
-    recipients.addAll(
-        workspaceMemberRepository.findAllByWorkspaceIdAndRole(workspaceId, WorkspaceRole.MANAGER));
+    // when a timesheet is submitted it should notify the manager in the
+    // same workspace only managers review submitted timesheets
+    List<WorkspaceMember> recipients =
+        workspaceMemberRepository.findAllByWorkspaceIdAndRole(
+            workspaceId, WorkspaceRole.MANAGER);
 
     // each recipient should get their own notification so that when the read their
     // notification they do not mark other peoples notifications as read
