@@ -1,3 +1,5 @@
+// this is a concrete Subject in the observer pattern
+
 package timesheets.service;
 
 import exception.AccessDeniedException;
@@ -9,11 +11,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.domain.WorkspaceMember;
+import timesheets.domain.event.TimesheetApprovedEvent;
+import timesheets.domain.event.TimesheetRejectedEvent;
+import timesheets.domain.event.TimesheetSubmittedEvent;
 import timesheets.dto.request.TimesheetRequest;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.repository.TimesheetRepository;
@@ -28,6 +34,8 @@ public class TimesheetService {
   private final TimeEntryRepository timeEntryRepository;
   private final SecurityUtils securityUtils;
   private final WorkspaceMemberRepository workspaceMemberRepository;
+
+  private final ApplicationEventPublisher eventPublisher;
 
   // creates a new draft timesheet for the current user
   @Transactional
@@ -237,7 +245,13 @@ public class TimesheetService {
     }
     timeEntryRepository.saveAll(entries);
 
-    return timesheetRepository.save(timesheet);
+    Timesheet savedTimesheet = timesheetRepository.save(timesheet);
+
+    // this should notify all the observers that the timesheet was saved
+    eventPublisher.publishEvent(
+        new TimesheetSubmittedEvent(savedTimesheet.getId(), savedTimesheet.getWorkspaceMemberId()));
+
+    return savedTimesheet;
   }
 
   // approves a submitted timesheet
@@ -285,7 +299,12 @@ public class TimesheetService {
 
     lockEntries(timesheetId);
 
-    return timesheetRepository.save(timesheet);
+    Timesheet savedTimesheet = timesheetRepository.save(timesheet);
+
+    eventPublisher.publishEvent(
+        new TimesheetApprovedEvent(savedTimesheet.getId(), savedTimesheet.getWorkspaceMemberId()));
+
+    return savedTimesheet;
   }
 
   // rejects a submitted timesheet
@@ -335,7 +354,12 @@ public class TimesheetService {
     // since it is rejected all time entries should be unlocked
     unlockEntries(timesheetId);
 
-    return timesheetRepository.save(timesheet);
+    Timesheet savedTimesheet = timesheetRepository.save(timesheet);
+
+    eventPublisher.publishEvent(
+        new TimesheetRejectedEvent(savedTimesheet.getId(), savedTimesheet.getWorkspaceMemberId()));
+
+    return savedTimesheet;
   }
 
   /*

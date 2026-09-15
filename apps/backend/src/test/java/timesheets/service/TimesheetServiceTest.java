@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import timesheets.domain.Timesheet;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.TimesheetRequest;
@@ -40,6 +41,7 @@ class TimesheetServiceTest {
   @Mock private TimeEntryRepository timeEntryRepository;
   @Mock private SecurityUtils securityUtils;
   @Mock private WorkspaceMemberRepository workspaceMemberRepository;
+  @Mock private ApplicationEventPublisher eventPublisher;
 
   @InjectMocks private TimesheetService timesheetService;
 
