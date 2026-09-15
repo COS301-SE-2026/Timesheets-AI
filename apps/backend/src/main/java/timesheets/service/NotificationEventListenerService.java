@@ -2,7 +2,6 @@
 
 package timesheets.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +46,7 @@ public class NotificationEventListenerService {
     // when a timesheet is submitted it should notify the manager in the
     // same workspace only managers review submitted timesheets
     List<WorkspaceMember> recipients =
-        workspaceMemberRepository.findAllByWorkspaceIdAndRole(
-            workspaceId, WorkspaceRole.MANAGER);
+        workspaceMemberRepository.findAllByWorkspaceIdAndRole(workspaceId, WorkspaceRole.MANAGER);
 
     // each recipient should get their own notification so that when the read their
     // notification they do not mark other peoples notifications as read
