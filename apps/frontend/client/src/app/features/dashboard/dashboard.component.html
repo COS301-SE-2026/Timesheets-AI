@@ -1,0 +1,42 @@
+<main class="dashboard-page">
+
+    <header class="page-header">
+        <div class="page-header-content">
+
+            <div>
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Overview of activity/p>
+            </div>
+
+            <div class="header-actions">
+                <div class="notification-wrapper">
+                    <button type="button" class="notification-bell" aria-label="Notifications" [attr.aria-expanded]="showNotifications()" (click)="toggleNotifications()">
+                        <i class="fa-regular fa-bell" aria-hidden="true"></i>
+
+                        @if (unreadCount() > 0) {
+                            <span class="notification-badge"> {{ unreadCount() > 99 ? '99+' : unreadCount() }} </span>
+                        }
+                    </button>
+
+                    <!-- Notifications -->
+                    @if (showNotifications()) {
+                        <div class="notification-dropdown">
+                            <app-notification-panel (closePanel)="closeNotifications()"></app-notification-panel>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <section class="dashboard-content">
+        <div class="dashboard-placeholder">
+            <h2>Your workspace at a glance</h2>
+            <p>
+                Dashboard insights and activity will appear here.
+            </p>
+        </div>
+    </section>
+
+</main>
