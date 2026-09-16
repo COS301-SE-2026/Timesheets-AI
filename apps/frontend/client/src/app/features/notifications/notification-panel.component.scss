@@ -204,6 +204,11 @@
     color: #e07830;
 }
 
+.notification-icon.new-user {
+    background-color: var(--color-primary-surface);
+    color: var(--color-primary);
+}
+
 .notification-icon.default {
     background-color: var(--color-gray-light);
     color: var(--color-text-muted);

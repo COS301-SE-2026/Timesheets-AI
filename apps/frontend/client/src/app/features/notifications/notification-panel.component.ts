@@ -115,6 +115,9 @@ export class NotificationPanelComponent implements OnInit {
 
       case 'TIMER_LONG_RUNNING':
         return 'fa-regular fa-clock';
+      
+      case 'USER_WAITING_FOR_WORKSPACE':
+      return 'fa-solid fa-user-plus';
 
       default:
         return 'fa-solid fa-bell';
@@ -136,6 +139,9 @@ export class NotificationPanelComponent implements OnInit {
 
       case 'TIMER_LONG_RUNNING':
         return 'timer';
+      
+      case 'USER_WAITING_FOR_WORKSPACE':
+      return 'new-user';
 
       default:
         return 'default';
