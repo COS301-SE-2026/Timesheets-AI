@@ -10,7 +10,7 @@
 
             <div class="header-actions">
                 <div class="notification-wrapper">
-                    <button type="button" class="notification-bell" aria-label="Notifications" [attr.aria-expanded]="showNotifications()" (click)="toggleNotifications()">
+                    <button type="button" class="notification-bell" [attr.aria-expanded]="showNotifications()" (click)="toggleNotifications()">
                         <i class="fa-regular fa-bell" aria-hidden="true"></i>
 
                         @if (unreadCount() > 0) {
