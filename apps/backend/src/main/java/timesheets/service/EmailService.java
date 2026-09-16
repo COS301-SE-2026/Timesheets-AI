@@ -15,4 +15,12 @@ public interface EmailService {
 
   // tells a user that their timer has been running for over 8 hours
   void sendLongRunningTimerEmail(String email, String firstName);
+
+  // for notifying an admin when someone is ready to join a workspace
+  void sendNewWaitingUserEmail(
+      String adminEmail,
+      String adminFirstName,
+      String userFirstName,
+      String userLastName,
+      String userEmail);
 }

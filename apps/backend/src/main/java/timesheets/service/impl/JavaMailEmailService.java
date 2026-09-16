@@ -50,6 +50,21 @@ public class JavaMailEmailService implements EmailService {
     sendEmail(to, subject, htmlContent, false);
   }
 
+  @Override
+  public void sendNewWaitingUserEmail(
+      String adminEmail,
+      String adminFirstName,
+      String userFirstName,
+      String userLastName,
+      String userEmail) {
+    String subject = "New user waiting for workspace - Timesheets AI";
+
+    String htmlContent =
+        buildNewWaitingUserEmailHtml(adminFirstName, userFirstName, userLastName, userEmail);
+
+    sendEmail(adminEmail, subject, htmlContent, false);
+  }
+
   // this is what will send a reminder when a users timer has been running for more than 8 hours
   @Override
   public void sendLongRunningTimerEmail(String email, String firstName) {
@@ -295,6 +310,91 @@ public class JavaMailEmailService implements EmailService {
                 </html>
                 """
         .formatted(firstName, resetLink);
+  }
+
+  private String buildNewWaitingUserEmailHtml(
+      String adminFirstName, String userFirstName, String userLastName, String userEmail) {
+
+    String loginLink = baseUrl + "/login";
+
+    return """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                </head>
+
+                <body style="margin: 0; padding: 0; background-color: #E6F1FB; font-family: Arial, Helvetica, sans-serif; color: #444444;">
+
+                    <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" border="0" style="background-color: #E6F1FB; padding: 40px 16px;">
+                        <tr>
+                            <td align="center">
+
+                                <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" border="0" style="max-width: 560px; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #BFD4F4;">
+
+                                    <!-- Momently Name -->
+                                    <tr>
+                                        <td align="center" style="padding: 36px 32px 24px 32px;">
+                                            <img src="cid:momentlyName" alt="Momently" style="display: block; max-width: 180px; height: auto;">
+                                        </td>
+                                    </tr>
+
+                                    <!-- Main Content -->
+                                    <tr>
+                                        <td align="center" style="padding: 0 42px 36px 42px;">
+
+                                            <h1 style="margin: 8px 0 18px 0; color: #0F4C91; font-size: 28px; line-height: 36px; font-weight: 700;">
+                                                New user waiting for workspace
+                                            </h1>
+
+                                            <p style="margin: 0 0 12px 0; font-size: 15px; line-height: 24px; color: #444444;">
+                                                Hi %s,
+                                            </p>
+
+                                            <p style="margin: 0 auto 26px auto; max-width: 420px; font-size: 15px; line-height: 24px; color: #444444;">
+                                                A new user has verified their email address and is waiting to be added to a workspace.
+                                            </p>
+
+                                            <!-- OPEN MOMENTLY BUTTON -->
+                                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+                                                <tr>
+                                                    <td align="center" bgcolor="#0F4C91" style="border-radius: 8px;">
+                                                        <a href="%s" style="display: inline-block; padding: 14px 32px; color: #FFFFFF; font-size: 15px; font-weight: 700; text-decoration: none; background-color: #0F4C91; border-radius: 8px;">
+                                                            OPEN MOMENTLY
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+
+                                            <p style="margin: 26px 0 0 0; color: #6B7280; font-size: 13px; line-height: 20px;">
+                                                Sign in to Momently to review the waiting user and add them to the appropriate workspace.
+                                            </p>
+
+                                        </td>
+                                    </tr>
+
+                                    <!-- Footer -->
+                                    <tr>
+                                        <td align="center" style="background-color: #F8FBFF; border-top: 1px solid #E6F1FB; padding: 22px 30px;">
+                                            <p style="margin: 0; color: #6B7280; font-size: 11px; line-height: 18px;">
+                                                &copy; 2026 Momently
+                                                <br>
+                                                Time tracking that drives productivity, not paperwork.
+                                            </p>
+                                        </td>
+                                    </tr>
+
+                                </table>
+
+                            </td>
+                        </tr>
+                    </table>
+
+                </body>
+                </html>
+                """
+        .formatted(adminFirstName, userFirstName, userLastName, userEmail, loginLink);
   }
 
   private String buildLongRunningTimerEmailHtml(String firstName) {
