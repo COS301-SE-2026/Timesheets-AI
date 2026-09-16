@@ -101,10 +101,6 @@ export class SignupComponent implements AfterViewInit{
     });
   }
 
-  protected triggerGoogleSignUp(): void {
-    const hiddenGoogleButton = this.googleBtn.nativeElement.querySelector('div[role="button"]');
-    hiddenGoogleButton?.click();
-  }
 
   private handleGoogleCredential(idToken: string): void {
     this.loading = true;

@@ -125,11 +125,6 @@ export class LoginComponent implements AfterViewInit {
       width: 210,
     });
   }
-  protected triggerGoogleLogin(): void {
-    const hiddenGoogleButton =
-      this.googleBtn.nativeElement.querySelector('div[role="button"]');
-    hiddenGoogleButton?.click();
-  }
 
   //TODO: Fix the MFA thing, after it shows up in the UI
   private handleGoogleCredential(idToken: string): void {
