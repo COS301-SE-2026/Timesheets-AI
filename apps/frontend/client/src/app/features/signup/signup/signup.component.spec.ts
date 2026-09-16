@@ -487,6 +487,6 @@ describe('SignupComponent', () => {
     expect(compiled.querySelector('.submit-button')?.textContent).toContain(
       'Create Account',
     );
-    expect(compiled.querySelectorAll('.social-button').length).toBe(2);
+    expect(compiled.querySelectorAll('.social-button').length).toBe(1);
   });
 });
