@@ -30,3 +30,49 @@
   from { opacity: 0; transform: translateX(-50%) translateY(8px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+.social-grid {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.google-button {
+  width: 210px;
+  height: 40px;
+}
+
+.social-button {
+  width: 210px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 0 12px;
+  box-sizing: border-box;
+  background: #ffffff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.social-button:hover {
+  background: #f8faff;
+  border-color: #d2e3fc;
+}
+
+.social-logo {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
