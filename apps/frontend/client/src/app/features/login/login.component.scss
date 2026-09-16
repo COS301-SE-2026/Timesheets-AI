@@ -65,8 +65,9 @@
   cursor: pointer;
 }
 
-.social-button:hover {
-  background: #f8faff;
+.social-button:hover,
+.social-button:focus {
+  background: #f0f6ff;
   border-color: #d2e3fc;
 }
 
@@ -74,5 +75,10 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
+}
+
+.social-button:focus {
+  outline: 2px solid #1a73e8;
+  outline-offset: 2px;
 }
 
