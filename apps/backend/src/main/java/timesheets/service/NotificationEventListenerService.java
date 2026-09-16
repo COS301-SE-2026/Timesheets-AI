@@ -14,6 +14,7 @@ import timesheets.domain.event.LongRunningTimerEvent;
 import timesheets.domain.event.TimesheetApprovedEvent;
 import timesheets.domain.event.TimesheetRejectedEvent;
 import timesheets.domain.event.TimesheetSubmittedEvent;
+import timesheets.domain.event.UserWaitingForWorkspaceEvent;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
@@ -86,6 +87,58 @@ public class NotificationEventListenerService {
         "Your timesheet has been rejected. Please review it.",
         "TIMESHEET",
         event.timesheetId());
+  }
+
+  // to notify admins when a verified user is waiting to be added to a workspace
+  @EventListener
+  @Async
+  public void handleUserWaitingForWorkspace(UserWaitingForWorkspaceEvent event) {
+
+    // get the user who has just completed email verification
+    User user = userRepository.findById(event.userId()).orElse(null);
+
+    // stop if the user no longer exists
+    if (user == null) {
+      return;
+    }
+
+    // get the admins who are responsible for managing users in the waiting room
+    List<WorkspaceMember> admins = workspaceMemberRepository.findAllByRole(WorkspaceRole.ADMIN);
+
+    // each admin gets their own notification
+    for (WorkspaceMember admin : admins) {
+      notificationService.createNotification(
+          admin.getId(),
+          "USER_WAITING_FOR_WORKSPACE",
+          "New user waiting for workspace",
+          user.getFirstName()
+              + " "
+              + user.getLastName()
+              + " has verified their email and is waiting to be added to a workspace.",
+          "USER",
+          user.getId());
+
+      // get the user account belonging to the admin workspace member
+      User adminUser = userRepository.findById(admin.getUserId()).orElse(null);
+
+      // cannot send an email if the admin user no longer exists
+      if (adminUser == null) {
+        continue;
+      }
+
+      // cannot send an email if the admin does not have an email address
+      if (adminUser.getEmail() == null || adminUser.getEmail().isBlank()) {
+        continue;
+      }
+
+      // send the admin an email about the new waiting user
+      emailService.sendNewWaitingUserEmail(
+          adminUser.getEmail(),
+          adminUser.getFirstName(),
+          user.getFirstName(),
+          user.getLastName(),
+          user.getEmail());
+    }
   }
 
   // to tell someone that their timer has been running for longer than 8 hours
