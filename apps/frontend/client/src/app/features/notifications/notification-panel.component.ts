@@ -43,7 +43,7 @@ export class NotificationPanelComponent implements OnInit {
     this.loadError.set(false);
 
     this.notificationService.getNotifications().subscribe({
-      next: (notifications) => { this.notifications.set(notifications.slice(0,5)); this.isLoading.set(false); },
+      next: (notifications) => { this.notifications.set(notifications.slice(0,4)); this.isLoading.set(false); },
 
       error: (error) => {
         console.error( '[NotificationPanelComponent] Failed to load notifications:', error);
