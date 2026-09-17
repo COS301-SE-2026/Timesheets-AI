@@ -28,10 +28,10 @@ Related Requirements: N/A
                         [class.connected]="isConnected()">
                     </span>
                     <span>
-                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }}
+                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }} connected
                         {{ isConnected() ? 'connected' : 'not connected'}}
                     </span>
-                    @if(isConnected() && lastSyncedLabel()){
+                    @if (lastSyncedLabel()){
                         <span class="sync-meta">
                             &middot; {{ lastSyncedLabel() }}
                         </span>
@@ -41,13 +41,22 @@ Related Requirements: N/A
                 <!-- SYNCING AREA -->
                 <button 
                     class="sync-button"
-                    (click)="isConnected()? syncCalendar(): connectGoogleCalendar()"
+                    (click)="syncCalendar()"
                     [disabled]="isSyncing()">
                     <i 
                         class="fa-solid fa-rotate"
                         [class.fa-spin]="isSyncing()">
                     </i>
-                    {{ isSyncing()? 'Syncing...': (isConnected()? 'Sync now': 'Sync Google now') }}
+                    {{ isSyncing()? 'Syncing...': provider()=== 'outlook'? 'Sync Outlook now': 'Sync Google now' }}
+                </button>
+            }@else{
+                <!-- NO CALENDAR CONNECTED -->
+                <button 
+                    class="sync-button"
+                    (click)="connectCalendar()"
+                    [disabled]="isSyncing()">
+                    <i class="fa-solid fa-calendar-plus"></i>
+                    Connect calendar
                 </button>
             }
         </div>
