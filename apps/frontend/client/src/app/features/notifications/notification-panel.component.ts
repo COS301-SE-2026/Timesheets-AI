@@ -7,11 +7,12 @@
 import { Component, EventEmitter, HostListener, OnInit, Output, computed, inject, signal, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationResponse, NotificationService, } from '../../core/services/notification.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-notification-panel',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './notification-panel.component.html',
   styleUrl: './notification-panel.component.scss',
 })
