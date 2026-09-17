@@ -59,10 +59,6 @@ export class CalendarComponent implements OnInit{
       ).subscribe(
         {
           next: (events)=>{
-            this.isConnected.set(true);
-            this.lastSyncedLabel.set(
-              this.formatSyncedLabel(new Date().toISOString())
-            );
             successCallback(events);
           },
           error: (error)=>{
@@ -168,7 +164,7 @@ export class CalendarComponent implements OnInit{
     );
   }
 
-  connectGoogleCalendar():void{
+  connectCalendar():void{
     this.http.get('/api/integrations/google/calendar/connect',{
       responseType: 'text'
     }).subscribe(
