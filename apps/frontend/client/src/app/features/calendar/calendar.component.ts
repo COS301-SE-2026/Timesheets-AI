@@ -107,11 +107,15 @@ export class CalendarComponent implements OnInit{
 
   
   ngOnInit(): void{
+
+    this.loadCalendarStatus();
+
     // CHECKING IF COMING BACK FROM OAUTH REDIRECT
     this.route.queryParams.subscribe(
       params=>{
         if(params['connected']=== 'true'){
-          this.isConnected.set(true);
+          // this.isConnected.set(true);
+          this.loadCalendarStatus();
           this.syncCalendar();
 
           // CLEANING PARAM FROM BROWSER BAR
