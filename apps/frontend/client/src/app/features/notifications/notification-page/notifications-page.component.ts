@@ -1,6 +1,7 @@
 import { CommonModule, Location } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { NotificationResponse, NotificationService, } from '../../../core/services/notification.service';
+import { Router } from '@angular/router';
 
 type NotificationFilter = 'all' | 'unread';
 
@@ -16,6 +17,7 @@ export class NotificationsPageComponent implements OnInit {
 
 	private readonly notificationService = inject(NotificationService);
     private readonly location = inject(Location);
+    private readonly router = inject(Router);
 
 	public readonly notifications = signal<NotificationResponse[]>([]);
 	public readonly isLoading = signal<boolean>(false);
@@ -83,6 +85,32 @@ export class NotificationsPageComponent implements OnInit {
 			},
 		});
 	}
+
+    public handleNotificationClick(notification: NotificationResponse): void {
+
+        if (!notification.isRead) {
+            this.markAsRead(notification);
+        }
+
+        switch (notification.type) {
+            case 'TIMESHEET_APPROVED':
+            case 'TIMESHEET_REJECTED':
+            case 'TIMESHEET_SUBMITTED':
+                this.router.navigate(['/timesheets']);
+                break;
+
+            case 'TIMER_LONG_RUNNING':
+                this.router.navigate(['/log-time']);
+                break;
+
+            case 'USER_WAITING_FOR_WORKSPACE':
+                this.router.navigate(['/team']);
+                break;
+
+            default:
+                break;
+        }
+    }
 
 	public markAllAsRead(): void {
 		if (this.unreadCount() === 0) {

@@ -55,7 +55,7 @@
     @else {
       @for (notification of notifications(); track notification.id) {
 
-        <button type="button" class="notification-item" [class.unread]="!notification.isRead" (click)="markAsRead(notification)">
+        <button type="button" class="notification-item" [class.unread]="!notification.isRead" (click)="handleNotificationClick(notification)">
           <!-- Notification type icon -->
           <span class="notification-icon" [ngClass]="getNotificationClass(notification.type)">
             <i [class]="getNotificationIcon(notification.type)" aria-hidden="true"></i>

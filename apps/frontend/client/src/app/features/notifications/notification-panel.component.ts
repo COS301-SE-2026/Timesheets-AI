@@ -7,7 +7,7 @@
 import { Component, EventEmitter, HostListener, OnInit, Output, inject, signal, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationResponse, NotificationService, } from '../../core/services/notification.service';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 @Component({
   selector: 'app-notification-panel',
@@ -21,6 +21,7 @@ export class NotificationPanelComponent implements OnInit {
 
   //service for communicating with the notification backend
   private readonly notificationService = inject(NotificationService);
+  private readonly router = inject(Router);
 
   @Output() closePanel = new EventEmitter<void>();
 
@@ -74,6 +75,33 @@ export class NotificationPanelComponent implements OnInit {
         error: (error) => { console.error('[NotificationPanelComponent] Failed to mark notification as read:', error);
         },
       });
+  }
+
+  public handleNotificationClick(notification: NotificationResponse): void {
+
+    if (!notification.isRead) {
+      this.markAsRead(notification);
+    }
+
+    switch (notification.type) {
+
+      case 'TIMESHEET_APPROVED':
+      case 'TIMESHEET_REJECTED':
+      case 'TIMESHEET_SUBMITTED':
+        this.router.navigate(['/timesheets']);
+        break;
+
+      case 'TIMER_LONG_RUNNING':
+        this.router.navigate(['/log-time']);
+        break;
+
+      case 'USER_WAITING_FOR_WORKSPACE':
+        this.router.navigate(['/team']);
+        break;
+
+      default:
+        break;
+    }
   }
 
   // marks every notification as read
