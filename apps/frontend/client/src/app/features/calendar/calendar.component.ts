@@ -9,6 +9,7 @@ import { CalendarProvider, AppEvent } from './calendar.model';
 import { CalendarService } from './calendar.services';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router} from '@angular/router';
+import { error } from 'node:console';
 export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 @Component({
   selector: 'app-calendar',
@@ -132,6 +133,35 @@ export class CalendarComponent implements OnInit{
   changeView(view: CalendarView): void{
     this.activeView.set(view);
     this.calendarComponent.getApi().changeView(view);
+  }
+
+  private loadCalendarStatus():void{
+    this.calendarService.getCalendarStatus().subscribe(
+      {
+        next: (status)=> {
+          this.isConnected.set(status.connected);
+          this.provider.set(status.provider);
+
+          if (status.lastSyncedAt){
+            this.lastSyncedLabel.set(
+              this.formatSyncedLabel(status.lastSyncedAt)
+            );
+          }else{
+            this.lastSyncedLabel.set(null);
+          }
+        },
+
+        error:(error)=>{
+          console.error(
+            'Failed to load calendar connection statuts.'
+          );
+
+          this.isConnected.set(false);
+          this.provider.set(null);
+          this.lastSyncedLabel.set(null);
+        }
+      }
+    );
   }
 
   connectGoogleCalendar():void{
@@ -284,4 +314,5 @@ export class CalendarComponent implements OnInit{
     return `synced ${diffDays}d ago`;
     
   }
+
 }
