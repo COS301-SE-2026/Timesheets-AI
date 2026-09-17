@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import timesheets.domain.IntegrationToken;
 import timesheets.domain.Task;
 import timesheets.dto.request.CreateJiraIssueRequest;
-import timesheets.dto.response.JiraIssueResponse;
+import timesheets.dto.response.IssueResponse;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.repository.TaskRepository;
 
@@ -63,7 +63,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
   // get all Jira issues associated with the member
   @Override
-  public List<JiraIssueResponse> getIssues(UUID workspaceMemberId) {
+  public List<IssueResponse> getIssues(UUID workspaceMemberId) {
     // find the Jira integration token  for this workspace member
     IntegrationToken integrationToken =
         integrationTokenRepository
@@ -95,7 +95,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
       JsonNode root = objectMapper.readTree(response.getBody());
       JsonNode issues = root.get("issues");
 
-      List<JiraIssueResponse> result = new ArrayList<JiraIssueResponse>();
+      List<IssueResponse> result = new ArrayList<IssueResponse>();
 
       // issues must be a array to avoid unexpected JSON
       if (issues != null && issues.isArray()) {
@@ -111,7 +111,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
   }
 
   @Override
-  public JiraIssueResponse getIssue(UUID workspaceMemberId, String issueKey) {
+  public IssueResponse getIssue(UUID workspaceMemberId, String issueKey) {
     IntegrationToken token = getValidToken(workspaceMemberId);
     String cloudId = token.getProviderResourceId();
 
@@ -132,7 +132,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
   }
 
   @Override
-  public JiraIssueResponse createIssue(UUID workspaceMemberId, CreateJiraIssueRequest request) {
+  public IssueResponse createIssue(UUID workspaceMemberId, CreateJiraIssueRequest request) {
 
     IntegrationToken token = getValidToken(workspaceMemberId);
     String cloudId = token.getProviderResourceId();
@@ -200,11 +200,11 @@ public class JiraAdapter implements IssueTrackerAdapter {
     return headers;
   }
 
-  private JiraIssueResponse parseJiraIssue(JsonNode issue) {
+  private IssueResponse parseJiraIssue(JsonNode issue) {
     String key = issue.get("key").asText();
     JsonNode fields = issue.get("fields");
 
-    JiraIssueResponse dto = new JiraIssueResponse();
+    IssueResponse dto = new IssueResponse();
     dto.setKey(key);
     dto.setSummary(getString(fields, "summary"));
     dto.setStatus(getNestedString(fields, "status", "name"));
@@ -267,7 +267,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
         + escapeJson(request.getProjectKey())
         + "\"},"
         + "\"summary\":\""
-        + escapeJson(request.getSummary())
+        + escapeJson(request.getTitle())
         + "\","
         + "\"description\":"
         + (description != null ? description : "null")

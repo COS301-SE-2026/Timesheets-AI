@@ -11,10 +11,10 @@ public interface IssueTrackerAdapter {
 
   List<JiraIssueResponse> getIssues(UUID workspaceMemberId);
 
-  JiraIssueResponse getIssue(UUID workspaceMemberId, String issueKey);
+  IssueResponse getIssue(UUID workspaceMemberId, String issueKey);
 
   // the write operations
-  JiraIssueResponse createIssue(UUID workspaceMemberId, CreateJiraIssueRequest request);
+  IssueResponse createIssue(UUID workspaceMemberId, CreateIssueRequest request);
 
   // the link operations
   void linkTaskToIssue(UUID workspaceMemberId, UUID taskId, String issueKey);
