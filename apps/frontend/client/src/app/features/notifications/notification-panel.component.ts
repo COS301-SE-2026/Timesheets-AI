@@ -4,7 +4,7 @@
  * 
  */
 
-import { Component, EventEmitter, HostListener, OnInit, Output, computed, inject, signal, } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnInit, Output, inject, signal, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationResponse, NotificationService, } from '../../core/services/notification.service';
 import { RouterLink } from '@angular/router';
@@ -29,7 +29,7 @@ export class NotificationPanelComponent implements OnInit {
   public readonly loadError = signal<boolean>(false);
 
   //this will help to calculate the unread notifications from the current notification list
-  public readonly unreadCount = computed<number>(() => this.notifications().filter(notification => !notification.isRead).length);
+  public readonly unreadCount = this.notificationService.unreadCount;
 
   public ngOnInit(): void {
     this.loadNotifications();
@@ -42,7 +42,7 @@ export class NotificationPanelComponent implements OnInit {
     this.loadError.set(false);
 
     this.notificationService.getNotifications().subscribe({
-      next: (notifications) => { this.notifications.set(notifications); this.isLoading.set(false); },
+      next: (notifications) => { this.notifications.set(notifications.slice(0,5)); this.isLoading.set(false); },
 
       error: (error) => {
         console.error( '[NotificationPanelComponent] Failed to load notifications:', error);
