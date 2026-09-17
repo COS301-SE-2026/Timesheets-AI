@@ -21,7 +21,7 @@ Related Requirements: N/A
 
         <!-- CONNECTION PILL -->
         <div class="header-actions">
-            @if (isConnected()){
+            @if (isConnected() && provider()){
                 <div class="connection-status">
                     <span 
                         class="status-dot"
@@ -151,11 +151,17 @@ Related Requirements: N/A
 
             <div class="legend-readonly">
                 <i class="fa-solid fa-lock"></i>
+                @if(isConnected() && provider()){
+                    <span>
+                        This is a read-only calendar
+                        Events are imported from
+                        {{ provider() === 'outlook'? 'Outlook': 'Google Calendar'}}.
+                        To make changes, use your calendar provider.
+                    </span>         
+                }@else{
                     This is a read-only calendar
-                    Events are imported from
-                    {{ provider() === 'outlook'? 'Outlook': 'Google Calendar'}}.
-                    To make changes, use your calendar provider.
-            
+                    Connect to Google Calendar or Outlook to import your events.
+                }
             </div>
         </div>
         
