@@ -299,6 +299,31 @@
 	background-color: var(--color-primary-surface);
 }
 
+.back-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 16px;
+	padding: 6px 0;
+	border: none;
+	background: transparent;
+	color: var(--color-primary);
+	font: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.back-button:hover {
+	color: var(--color-primary-hover);
+}
+
+.back-button:focus-visible {
+	outline: 2px solid var(--color-primary);
+	outline-offset: 4px;
+	border-radius: 4px
+}
+
 @media (max-width: 768px) {
 
 	.notifications-page {

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { NotificationResponse, NotificationService, } from '../../../core/services/notification.service';
 
@@ -15,6 +15,7 @@ type NotificationFilter = 'all' | 'unread';
 export class NotificationsPageComponent implements OnInit {
 
 	private readonly notificationService = inject(NotificationService);
+    private readonly location = inject(Location);
 
 	public readonly notifications = signal<NotificationResponse[]>([]);
 	public readonly isLoading = signal<boolean>(false);
@@ -174,4 +175,8 @@ export class NotificationsPageComponent implements OnInit {
 
 		return `${days}d ago`;
 	}
+
+    public goBack(): void {
+        this.location.back();
+    }
 }
