@@ -30,7 +30,7 @@ export class CalendarComponent implements OnInit{
 
 
   activeView= signal<CalendarView>('dayGridMonth');
-  provider= signal<CalendarProvider>( 'google');
+  provider= signal<CalendarProvider | null>(null );
   isSyncing= signal<boolean>(false);
   selectedEvent= signal<AppEvent | null>(null);
   currentDateTitle= signal<string>('');
