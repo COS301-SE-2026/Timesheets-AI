@@ -59,6 +59,25 @@ describe('SidebarCoponent', () => {
         expect(component.navItems()).toHaveLength(10); //i removed report feild from nav bar so the test should affirm that
     });
 
+    it.each([
+        [
+            'ROLE_DEVELOPER',
+            ['Dashboard', 'Timesheets', 'Log Time', 'Projects', 'My Tasks', 'Calendar', 'Leave Requests', 'Insights', 'Settings'],
+        ],
+        [
+            'ROLE_MANAGER',
+            ['Dashboard', 'Timesheets', 'Log Time', 'Projects', 'My Tasks', 'Calendar', 'Leave Requests', 'Insights', 'Team', 'Settings'],
+        ],
+        [
+            'ROLE_ADMIN',
+            ['Dashboard', 'Projects', 'Calendar', 'Leave Requests', 'Insights', 'Team', 'Settings'],
+        ],
+    ])('shows the correct navigation items for %s', (role, expectedLabels) => {
+        currentUser.set({ firstName: 'John', lastName: 'Doe', roles: [role] });
+
+        expect(component.visibleNavItems().map((item) => item.label)).toEqual(expectedLabels);
+    });
+
     // should return the users full name
     it('should return the display name', () => {
         expect(component.displayName()).toBe('John Doe');
@@ -226,6 +245,5 @@ describe('SidebarCoponent', () => {
         currentUser.set({ firstName: 'A', lastName: 'B'} as unknown as MockUser);
         expect(component.initials()).toBe('AB')
     });
-
 
 });
