@@ -4,8 +4,4 @@
 // especially for which provider is connected
 package timesheets.integration.calendar;
 
-public record  CalendarStatus (
-    boolean connected,
-    String provider,
-    String lastSyncedAt
-){}
+public record CalendarStatus(boolean connected, String provider, String lastSyncedAt) {}
