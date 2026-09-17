@@ -1,0 +1,91 @@
+<main class="notifications-page">
+
+	<header class="page-header">
+		<div>
+			<h1>Notifications</h1>
+			<p>Stay up to date with your activities.</p>
+		</div>
+
+		<button type="button" class="mark-all-button" (click)="markAllAsRead()" [disabled]="unreadCount() === 0">
+			<i class="fa-solid fa-check-double" aria-hidden="true"></i>
+			<span>Mark all as read</span>
+		</button>
+	</header>
+
+	<section class="notifications-card" aria-label="Notifications">
+		<div class="notification-tabs">
+			<button type="button" class="notification-tab" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
+				<span>All</span>
+				<span class="tab-count">{{ notifications().length }}</span>
+			</button>
+
+			<button type="button" class="notification-tab" [class.active]="activeFilter() === 'unread'" (click)="setFilter('unread')">
+				<span>Unread</span>
+				<span class="tab-count">{{ unreadCount() }}</span>
+			</button>
+
+		</div>
+
+		<div class="notification-list">
+			@if (isLoading()) {
+				<div class="notification-state">
+					<i class="fa-solid fa-spinner fa-spin state-icon" aria-hidden="true"></i>
+					<p>Loading notifications...</p>
+				</div>
+			} 
+            @else if (loadError()) {
+
+				<div class="notification-state error-state">
+					<i class="fa-solid fa-circle-exclamation state-icon" aria-hidden="true"></i>
+					<h2>Unable to load notifications</h2>
+					<p>Please try again.</p>
+
+					<button type="button" class="retry-button" (click)="loadNotifications()"> Try again </button>
+				</div>
+
+			} @else if (filteredNotifications().length === 0) {
+
+				<div class="notification-state empty-state">
+					<div class="empty-icon">
+						<i class="fa-regular fa-bell" aria-hidden="true"></i>
+					</div>
+					@if (activeFilter() === 'unread') {
+						<h2>No unread notifications</h2>
+						<p>You have read all of your notifications.</p>
+					} 
+                    @else {
+						<h2>You are all caught up!</h2>
+						<p>You don't have any notifications yet.</p>
+					}
+				</div>
+			} 
+            @else {
+				@for (notification of filteredNotifications(); track notification.id) {
+
+					<button type="button" class="notification-item" [class.unread]="!notification.isRead" (click)="markAsRead(notification)">
+
+						<span class="notification-icon" [ngClass]="getNotificationClass(notification.type)">
+							<i [class]="getNotificationIcon(notification.type)" aria-hidden="true"></i>
+						</span>
+
+						<span class="notification-content">
+							<span class="notification-heading">
+								<span class="notification-title"> {{ notification.title }} </span>
+
+								<span class="notification-time"> {{ getTimeAgo(notification.createdAt) }} </span>
+							</span>
+
+							@if (notification.message) {
+								<span class="notification-message"> {{ notification.message }} </span>
+							}
+						</span>
+
+						@if (!notification.isRead) {
+							<span class="unread-dot" aria-hidden="true"></span>
+						}
+					</button>
+				}
+			}
+		</div>
+	</section>
+</main>
