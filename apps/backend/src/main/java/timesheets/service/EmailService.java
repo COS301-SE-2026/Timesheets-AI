@@ -12,4 +12,15 @@ public interface EmailService {
   public void sendPasswordResetEmail(String email, String firstName, String token);
 
   void sendGenericEmail(String to, String subject, String htmlContent);
+
+  // tells a user that their timer has been running for over 8 hours
+  void sendLongRunningTimerEmail(String email, String firstName);
+
+  // for notifying an admin when someone is ready to join a workspace
+  void sendNewWaitingUserEmail(
+      String adminEmail,
+      String adminFirstName,
+      String userFirstName,
+      String userLastName,
+      String userEmail);
 }
