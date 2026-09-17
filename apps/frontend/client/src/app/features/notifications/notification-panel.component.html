@@ -57,8 +57,8 @@
 
         <button type="button" class="notification-item" [class.unread]="!notification.isRead" (click)="handleNotificationClick(notification)">
           <!-- Notification type icon -->
-          <span class="notification-icon" [ngClass]="getNotificationClass(notification.type)">
-            <i [class]="getNotificationIcon(notification.type)" aria-hidden="true"></i>
+          <span class="notification-icon" [ngClass]="notificationService.getNotificationClass(notification.type)">
+            <i [class]="notificationService.getNotificationIcon(notification.type)" aria-hidden="true"></i>
           </span>
 
           <!-- Notification details -->
@@ -69,7 +69,7 @@
               <span class="notification-message"> {{ notification.message }} </span>
             }
 
-            <span class="notification-time"> {{ getTimeAgo(notification.createdAt) }} </span>
+            <span class="notification-time"> {{ notificationService.getTimeAgo(notification.createdAt) }} </span>
           </span>
 
           @if (!notification.isRead) {

@@ -19,8 +19,7 @@ import { RouterLink, Router } from '@angular/router';
 
 export class NotificationPanelComponent implements OnInit {
 
-  //service for communicating with the notification backend
-  private readonly notificationService = inject(NotificationService);
+  public readonly notificationService = inject(NotificationService);
   private readonly router = inject(Router);
 
   @Output() closePanel = new EventEmitter<void>();
@@ -83,25 +82,12 @@ export class NotificationPanelComponent implements OnInit {
       this.markAsRead(notification);
     }
 
-    switch (notification.type) {
+    const route = this.notificationService.getNotificationRoute( notification.type, );
 
-      case 'TIMESHEET_APPROVED':
-      case 'TIMESHEET_REJECTED':
-      case 'TIMESHEET_SUBMITTED':
-        this.router.navigate(['/timesheets']);
-        break;
-
-      case 'TIMER_LONG_RUNNING':
-        this.router.navigate(['/log-time']);
-        break;
-
-      case 'USER_WAITING_FOR_WORKSPACE':
-        this.router.navigate(['/team']);
-        break;
-
-      default:
-        break;
-    }
+		if (route) {
+			this.router.navigate(route);
+			this.closePanel.emit();
+		}
   }
 
   // marks every notification as read
@@ -123,91 +109,6 @@ export class NotificationPanelComponent implements OnInit {
         error: (error) => { console.error( '[NotificationPanelComponent] Failed to mark all notifications as read:', error);
         },
       });
-  }
-
-  /*
-  - I want a specific icon to be shown for the notification type
-  - the type of notification should look different straight from a glance
-   */
-  public getNotificationIcon(type: string): string {
-
-    switch (type) {
-
-      case 'TIMESHEET_APPROVED':
-        return 'fa-solid fa-circle-check';
-
-      case 'TIMESHEET_REJECTED':
-        return 'fa-solid fa-circle-xmark';
-
-      case 'TIMESHEET_SUBMITTED':
-        return 'fa-solid fa-file-lines';
-
-      case 'TIMER_LONG_RUNNING':
-        return 'fa-regular fa-clock';
-      
-      case 'USER_WAITING_FOR_WORKSPACE':
-      return 'fa-solid fa-user-plus';
-
-      default:
-        return 'fa-solid fa-bell';
-    }
-  }
-
-  public getNotificationClass(type: string): string {
-
-    switch (type) {
-
-      case 'TIMESHEET_APPROVED':
-        return 'approved';
-
-      case 'TIMESHEET_REJECTED':
-        return 'rejected';
-
-      case 'TIMESHEET_SUBMITTED':
-        return 'submitted';
-
-      case 'TIMER_LONG_RUNNING':
-        return 'timer';
-      
-      case 'USER_WAITING_FOR_WORKSPACE':
-      return 'new-user';
-
-      default:
-        return 'default';
-    }
-  }
-
-  // converts createdAt into things like 5m ago or 2hr ago
-  public getTimeAgo(createdAt: string): string {
-
-    const created = new Date(createdAt);
-    const now = new Date();
-
-    //calculate the diff since the notification was created so that the user has a clear understanding
-    const difference = now.getTime() - created.getTime();
-
-    // make the tome diff into minutes hours and dzaye so that I can display the times properly
-    const minutes = Math.floor(difference / 60000);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-
-    if (minutes < 1) {
-      return 'Just now';
-    }
-
-    if (minutes < 60) {
-      return `${minutes}m ago`;
-    }
-
-    if (hours < 24) {
-      return `${hours}h ago`;
-    }
-
-    if (days === 1) {
-      return 'Yesterday';
-    }
-
-    return `${days}d ago`;
   }
 
   //adding this for accessibility so that when a user presses the esc key or space then it closes

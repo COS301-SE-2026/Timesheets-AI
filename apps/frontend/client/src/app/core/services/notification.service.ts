@@ -13,11 +13,46 @@ export interface NotificationResponse {
     createdAt: string;
 }
 
+interface NotificationConfig {
+	icon: string;
+	cssClass: string;
+	route: string[] | null;
+}
+
 @Injectable({ providedIn: 'root',})
 export class NotificationService {
 
   private readonly http = inject(HttpClient);
   private readonly baseUrl = '/api/notifications';
+
+  private readonly notificationConfig: Record<string, NotificationConfig> = {
+
+		TIMESHEET_APPROVED: {
+			icon: 'fa-solid fa-circle-check',
+			cssClass: 'approved',
+			route: ['/timesheets'],
+		},
+		TIMESHEET_REJECTED: {
+			icon: 'fa-solid fa-circle-xmark',
+			cssClass: 'rejected',
+			route: ['/timesheets'],
+		},
+		TIMESHEET_SUBMITTED: {
+			icon: 'fa-solid fa-file-lines',
+			cssClass: 'submitted',
+			route: ['/timesheets'],
+		},
+		TIMER_LONG_RUNNING: {
+			icon: 'fa-regular fa-clock',
+			cssClass: 'timer',
+			route: ['/log-time'],
+		},
+		USER_WAITING_FOR_WORKSPACE: {
+			icon: 'fa-solid fa-user-plus',
+			cssClass: 'new-user',
+			route: ['/team'],
+		},
+	};
 
   // shared unread count used by the navbar notification badge
   public readonly unreadCount = signal<number>(0);
@@ -55,4 +90,48 @@ export class NotificationService {
   markAllAsRead(): Observable<void> {
     return this.http.patch<void>(`${this.baseUrl}/read-all`, {}) .pipe(tap(() => this.unreadCount.set(0)));
   }
+
+  public getNotificationIcon(type: string): string {
+		return this.notificationConfig[type]?.icon ?? 'fa-solid fa-bell';
+	}
+
+	// gets the CSS class for a notification type
+	public getNotificationClass(type: string): string {
+		return this.notificationConfig[type]?.cssClass ?? 'default';
+	}
+
+	// gets the page that should open when a notification is clicked
+	public getNotificationRoute(type: string): string[] | null {
+		return this.notificationConfig[type]?.route ?? null;
+	}
+
+	// converts createdAt into values such as 5m ago or @h ago
+	public getTimeAgo(createdAt: string): string {
+		const created = new Date(createdAt);
+		const now = new Date();
+
+		const difference = now.getTime() - created.getTime();
+
+		const minutes = Math.floor(difference / 60000);
+		const hours = Math.floor(minutes / 60);
+		const days = Math.floor(hours / 24);
+
+		if (minutes < 1) {
+			return 'Just now';
+		}
+
+		if (minutes < 60) {
+			return `${minutes}m ago`;
+		}
+
+		if (hours < 24) {
+			return `${hours}h ago`;
+		}
+
+		if (days === 1) {
+			return 'Yesterday';
+		}
+
+		return `${days}d ago`;
+	}
 }
