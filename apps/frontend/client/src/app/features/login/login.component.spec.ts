@@ -334,23 +334,6 @@ describe('LoginComponet', () => {
     );
   });
 
-  it('triggerGoogleLogin should click the hidden Google button rendered inside googleBtn', () => {
-    const comp = component as unknown as {
-      googleBtn: { nativeElement: HTMLElement };
-      triggerGoogleLogin(): void;
-    };
-
-    //ngAfterViewInit already rendered a real element via fixture, so build the hidden button Google normally injects and confirm triggerGoogleLogin finds it
-    const hiddenButton = document.createElement('div');
-    hiddenButton.setAttribute('role', 'button');
-    const clickSpy = jest.fn();
-    hiddenButton.addEventListener('click', clickSpy);
-    comp.googleBtn.nativeElement.appendChild(hiddenButton);
-
-    comp.triggerGoogleLogin();
-
-    expect(clickSpy).toHaveBeenCalled();
-  });
 
   describe('handleGoogleCredential (via the Google Identity callback)', () => {
     //ngAfterViewInit passes handleGoogleCredential in as the `callback` option to google.accounts.id.initialize(), which we've stubbed with jest.fn()

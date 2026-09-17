@@ -23,6 +23,9 @@ public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember
   // this will see if a user belongs to a specific workspace
   boolean existsByUserIdAndWorkspaceId(UUID userId, UUID workspaceId);
 
+  // finds all workspace members with a specific role across all workspaces
+  List<WorkspaceMember> findAllByRole(WorkspaceRole role);
+
   // this finds the members of a specific workspace, regardless of the role
   List<WorkspaceMember> findAllByWorkspaceIdAndRole(UUID workspaceId, WorkspaceRole role);
 
