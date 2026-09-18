@@ -66,6 +66,19 @@ export class DashboardComponent implements OnInit {
       p.myRole === 'MANAGER')
   ),);
 
+  readonly inProgressTaskCount = computed(
+    () =>
+      this.tasks().filter(
+      (t) => t.status === 'IN_PROGRESS' || t.status === 'TODO').length);
+  
+  readonly inProgressTasks = computed(() =>
+  this.tasks().filter((t) => t.status === 'IN_PROGRESS' || t.status === 'TODO').slice(0,3));
+
+
+  readonly todayEvents = computed(() =>
+  this.calendarEvents().filter(
+    (e) => this.dateKey(new Date(e.start)) === this.dateKey(new Date()),).slice(0, 4));
+
   public ngOnInit(): void {
     //this will load the number displayed on the notification bell
     this.notificationService.loadUnreadCount();
