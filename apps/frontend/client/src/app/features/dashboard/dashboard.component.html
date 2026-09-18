@@ -108,6 +108,21 @@
                     <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </article>
+            <!-- Tasks summary card -->
+            <article class="card tasks-card">
+                <div class="card-heading">
+                    <span  class="icon-orb light-blue">
+                    <i class="fa-solid fa-check"></i>
+                    </span>
+                    <div>
+                        <h2>My tasks in progress</h2>
+                        <p>Tasks you are currently working on.</p>
+                    </div>
+                    <span class="count-chip">
+                        {{ inProgressTaskCount() }} active
+                    </span>
+                </div>
+            </article>
         </section>
     }
 
