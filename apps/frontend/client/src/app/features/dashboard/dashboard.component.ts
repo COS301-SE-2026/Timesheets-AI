@@ -164,4 +164,19 @@ export class DashboardComponent implements OnInit {
       : this.timers.pauseTimer()
     ).subscribe({ next: (v) => this.activeTimer.set(v) });
   }
+
+  stopTimer(): void {
+    this.timers.stopTimer().subscribe({
+      next: () => {
+        this.activeTimer.set(null);
+        this.loadTimeTotals();
+        this.showTimerStoppedModal.set(true);
+      },
+    });
+  }
+
+  closeTimerStoppedModal(): void {
+    this.showTimerStoppedModal.set(false);
+  }
+
 }
