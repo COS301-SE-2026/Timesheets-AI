@@ -85,13 +85,39 @@
 
 .dashboard-page {
   min-height: calc(100vh - 80px);
-  padding: var(--space-6);
-  background-color: var(--color-background);
+  padding: var(--space-8);
+  background: #f7fbff;
+  color: var(--color-text-body);
 }
 
 
 .page-header {
-  margin-bottom: var(--space-6);
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--color-primary-hover);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: #102b61;
+  font-size: 28px;
+}
+
+.page-subtitle,
+.card-heading p,
+.summary-card p {
+  margin: 5px 0 0 ;
+  color: var(--color-text-muted);
+  font-size: 13px;
 }
 
 .page-header-content {
@@ -119,8 +145,7 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  margin-top: 2px;
+  gap: 12px;
 }
 
 
