@@ -206,6 +206,58 @@
                     </div>
                 </div>
             </article>
+            <!-- Deadlines summary card -->
+            <article class="card dealines-card">
+                <div class="card-heading">
+                    <span class="icon-orb blue">
+                        <i class="fa-regular fa-calendar-days"></i>
+                    </span>
+                    <div>
+                        <h2>Upcoming deadlines</h2>
+                        <p>Next {{ deadlineWindowDays() }} days</p>
+                    </div>
+                </div>
+                @if (upcomingDeadlines().length ){
+                    <div class="deadline-list">
+                        @for (deadline of upcomingDeadlines(); track deadline.id) {
+                            @if (deadline.type === "task"){
+                                <a class="deadline-row" routerLink="/my-tasks" [queryParams]="{taskId: deadline.targetId}">
+                                    <time>
+                                        <b> {{ deadline.dueDate | date: "MMM" }} </b>
+                                        <strong> {{deadline.dueDate | date: "dd" }} </strong>
+                                    </time>
+                                    <span>
+                                        <strong>{{ deadline.title }} </strong>
+                                        <small>
+                                            {{deadline.projectName }} ·
+                                            {{ deadline.dueDate | date: "EEE, d MMM"}}
+                                        </small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </a>
+                            } @else {
+                                <a class="deadline-row" [routerLink]="['/projects', deadline.targetId]">
+                                    <time>
+                                        <b>{{ deadline.dueDate | date:"MMM" }}</b>
+                                        <strong>{{ deadline.dueDate | date: "dd" }}</strong>
+                                    </time>
+                                    <span>
+                                        <strong> {{ deadline.title }}</strong>
+                                        <small>
+                                            {{ deadline.projectName }} · {{ deadline.dueDate | date: "EEE, d MMM"}}
+                                        </small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </a>
+                            }
+                        }
+                    </div>
+                } @else {
+                    <div class="list-empty">
+                        No deadlines in the next {{ deadlineWindowDays() }} days.
+                    </div>
+                }
+            </article>
         </section>
     }
 
