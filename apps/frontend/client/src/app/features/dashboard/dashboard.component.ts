@@ -27,6 +27,7 @@ export class DashboardComponent implements OnInit {
   private timers = inject(TimerService);
   private projectsApi = inject(ProjectService);
   private tasksApi = inject(TaskService);
+  private entriesApi = inject(TimeEntryService);
   private timesheetsApi = inject(TimesheetService);
   private calendarApi = inject(CalendarService);
   public readonly showNotifications = signal<boolean>(false);
@@ -203,6 +204,30 @@ export class DashboardComponent implements OnInit {
   initials(n: string | null): string {
     return (n || 'MY')
     .split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  private loadDashboard(): void {
+    const now = new Date(),
+    tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    forkJoin({
+      timer: this.timers.getActiveTimer().pipe(catchError(()=> of(null))),
+      projects: this.projectsApi.getProjects().pipe(catchError(() => of([]))),
+      myTasks: this.tasksApi.getMyTasks().pipe(catchError(() => of([]))),
+      entries: this.entriesApi.getMyEntries().pipe(catchError(() => of([]))),
+      events: this.calendarApi
+        .getEvents(this.dateKey(now), this.dateKey(tomorrow))
+        .pipe(catchError(() => of([]))),
+    })
+    .pipe(finalize(() => this.isLoading.set(false)))
+    .subscribe((data) => {
+      this.activeTimer.set(data.timer);
+      this.projects.set(data.projects);
+      this.calendarEvents.set(data.events);
+      this.setTimeTotals(data.entries);
+      this.tasks.set(data.myTasks);
+      if (this.isManagerView()) this.loadPendingApprovals();
+    });
   }
 
 }
