@@ -31,6 +31,25 @@
                 </div>
             </div>
     </header>
+    
+<!-- Show loading state while dashboard data is being fetched -->
+    @if (isLoading()) {
+        <section class="dashboard-state">
+            <i class="fa-solid fa-spinner fa-spin"></i> Loading your workspace...
+        </section>
+    } @else {
+        <section class="dashboard-grid" [class.manager-grid]="isManagerView()">
+            <article class="card timer-card">
+                <div class="card-heading">
+                    <span class="icon-orb blue"> <i class="fa-solid fa-stopwatch"></i> </span>
+                    <h2>Active timer</h2>
+                    <span class="timer-status" [class.running]="!!activeTimer() && !activeTimer()?.isPaused">
+                        {{ activeTimer()?.isPaused ? "Paused" : activeTimer() ? "Running" : "Not running" }}
+                    </span>
+                </div>
+            </article>
+        </section>
+    }
 
 
     <section class="dashboard-content">
