@@ -77,6 +77,22 @@
                     </div>
                 }
             </article>
+            <!-- Timesheet approval summary card -->
+            @if (isManagerView()){
+                <article class="card summary-card approval-card">
+                    <div class="card-heading">
+                        <span class="icon-orb amber">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </span>
+                        <h2>Pending approvals</h2>
+                    </div>
+                    <strong> {{ approvalCount() }}</strong>
+                    <a routerLink="/timesheets" [queryParams]="{ tab: 'review'}">
+                        Review approvals
+                        <i class="fa-slid fa-arrow-right"></i>
+                    </a>
+                </article>
+            }
         </section>
     }
 
