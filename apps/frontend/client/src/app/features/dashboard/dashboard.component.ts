@@ -20,7 +20,7 @@ import { NotificationPanelComponent } from '../notifications/notification-panel.
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
 
   private auth = inject(AuthService);
   private readonly notificationService = inject(NotificationService);
@@ -253,7 +253,7 @@ export class DashboardComponent implements OnInit {
     const end = new Date(week);
     end.setDate(week.getDate() + 7);
     this.todayMinutes.set(
-      entries.filter((e) => this.dataKey(new Date(e.startTime)) === this.dateKey(today))
+      entries.filter((e) => this.dateKey(new Date(e.startTime)) === this.dateKey(today))
       .reduce((n, e) => n + this.entryMinutes(e), 0),);
       this.weekMinutes.set(
         entries.filter((e) => {
