@@ -7,10 +7,19 @@ import { SettingsService } from './settings.services';
 import { CurrentUserService } from './current-user.services';
 import { UserSettings, UserRole, IntegrationStatus, NotificationType } from './settings.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatSlideToggleModule, MatSelectModule, MatFormFieldModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    MatSlideToggleModule, 
+    MatSelectModule, 
+    MatFormFieldModule,
+    MatDialogModule
+  ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss'
 })
@@ -18,6 +27,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 export class SettingsComponent {
   private settingsService= inject(SettingsService);
   private currentUserService= inject( CurrentUserService);
+  private dialog=inject(MatDialog);
 
   settings= signal<UserSettings | null>(null);
   role= signal<UserRole>('DEVELOPER');
@@ -65,6 +75,21 @@ export class SettingsComponent {
 
   changePassword():void{
     // i need the password change flow that our app uses
+    const dialogRef= this.open(
+      ChangePasswordDialogComponent,{
+        width:'450px',
+        maxWidth: '95vw',
+        disableClose: true
+      }
+    );
+
+    dialogRef.afterClosed().subscribe(
+      (changed)=>{
+        if (changed){
+          console.log('Password changed successfully.')
+        }
+      }
+    );
   }
 
   toggleMfa(enabled:boolean):void{
