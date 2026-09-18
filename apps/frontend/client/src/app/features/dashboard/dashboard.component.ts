@@ -134,9 +134,18 @@ export class DashboardComponent implements OnInit {
     Math.max(0, Math.floor((Date.now() - +new Date(t.startedAt)) / 1000) - elapsed,) : elapsed;
   });
 
+  readonly weekLabel = this.formatWeek(new Date());
+  constructor() {
+    this.loadDashboard();
+  }
+
   public ngOnInit(): void {
     //this will load the number displayed on the notification bell
     this.notificationService.loadUnreadCount();
+  }
+
+  ngOnDestroy(): void {
+    window.clearInterval(this.ticker);
   }
 
   public toggleNotifications(): void {
@@ -145,5 +154,14 @@ export class DashboardComponent implements OnInit {
 
   public closeNotifications(): void {
     this.showNotifications.set(false);
+  }
+
+  pauseOrResumeTimer(): void {
+    const t = this.activeTimer();
+    if (t)
+    (t.isPaused
+      ? this.timers.resumeTimer()
+      : this.timers.pauseTimer()
+    ).subscribe({ next: (v) => this.activeTimer.set(v) });
   }
 }
