@@ -95,7 +95,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       id: `task-${t.id}`,
       targetId: t.id,
       projectId: t.projectId,
-      type: t.title,
+      type: 'task' as const,
+      title: t.title,
       projectName: t.projectName || 'Project task',
       dueDate: t.dueDate!,
     }))

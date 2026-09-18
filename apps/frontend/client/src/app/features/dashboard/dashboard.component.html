@@ -6,7 +6,7 @@
                 <p class="page-subtitle">
                     {{
                         isManagerView()
-                        ? "Here's what needs your attentions across projects you manage."
+                        ? "Here's what needs your attention across projects you manage."
                         : "Here's your work at a glance for today."
                     }}
                 </p>
@@ -73,7 +73,7 @@
                 } @else {
                     <div class="list-empty">
                         <p>No timer is running.</p>
-                        <a class="start-timer-button" routerLink="/log-timer"><i class="fa-solid fa-paly"></i> Start timer </a>
+                        <a class="start-timer-button" routerLink="/log-timer"><i class="fa-solid fa-play"></i> Start timer </a>
                     </div>
                 }
             </article>
@@ -89,7 +89,7 @@
                     <strong> {{ approvalCount() }}</strong>
                     <a routerLink="/timesheets" [queryParams]="{ tab: 'review'}">
                         Review approvals
-                        <i class="fa-slid fa-arrow-right"></i>
+                        <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </article>
             }
@@ -184,7 +184,7 @@
                     </span>
                     <div>
                         <h2>Hours logged</h2>
-                        <p>Your logged hours for today and this this week.</p>
+                        <p>Your logged hours for today and this week.</p>
                     </div>
                 </div>
                 <div class="hours-metric">
@@ -207,7 +207,7 @@
                 </div>
             </article>
             <!-- Deadlines summary card -->
-            <article class="card dealines-card">
+            <article class="card deadlines-card">
                 <div class="card-heading">
                     <span class="icon-orb blue">
                         <i class="fa-regular fa-calendar-days"></i>
@@ -271,7 +271,7 @@
                 aria-modal="true"
                 (click)="$event.stopPropagation()">
                 
-            <span class="icon-obr green">
+            <span class="icon-orb green">
                 <i class="fa-solid fa-check"></i>
             </span>
             <h2>Timer stopped</h2>
