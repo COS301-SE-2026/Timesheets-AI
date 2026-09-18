@@ -27,6 +27,48 @@
   margin: 0;
 }
 
+.card .timer-status {
+  background: #e3f0ff;
+  color: #0877ed;
+}
+
+.card .timer-status.running {
+  background: #dcf6e4;
+  color: #158347;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: rgba(16, 43, 97, 0.38);
+  padding: 16px;
+}
+
+.success-modal {
+  width: min(390px, 100%);
+  padding: 32px;
+  text-align: center;
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--elevation-3);
+}
+
+.success-modal .icon-orb {
+  margin: 0 auto 16px;
+}
+
+.success-modal h2 {
+  margin: 0;
+  color: #102b61;
+}
+
+.success-modal p {
+  color: var(--color-text-muted);
+}
+
 .dashboard-page {
   min-height: calc(100vh - 80px);
   padding: var(--space-6);
