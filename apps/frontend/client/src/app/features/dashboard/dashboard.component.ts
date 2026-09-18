@@ -253,14 +253,20 @@ export class DashboardComponent implements OnInit {
     const end = new Date(week);
     end.setDate(week.getDate() + 7);
     this.todayMinutes.set(
-      entries.filter((e) => this.dataKey(new Date(e.startTime)) === this.dateKey(today),)
+      entries.filter((e) => this.dataKey(new Date(e.startTime)) === this.dateKey(today))
       .reduce((n, e) => n + this.entryMinutes(e), 0),);
       this.weekMinutes.set(
         entries.filter((e) => {
           const d = new Date(e.startTime);
-          return d>= week && d < end;
+          return d >= week && d < end;
         })
         .reduce((n, e) => n + this.entryMinutes(e), 0)
       );
+  }
+
+  private entryMinutes(entry: TimeEntryResponse): number {
+    const start = +new Date(entry.startTime),
+    end = +new Date(entry.endTime);
+    return Number.isFinite(start) && Number.isFinite(end) && end >= start ? Math.round((end - start) / 60000) : entry.durationMinutes;
   }
 }
