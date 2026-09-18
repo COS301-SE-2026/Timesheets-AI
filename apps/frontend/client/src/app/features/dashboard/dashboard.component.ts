@@ -44,7 +44,19 @@ export class DashboardComponent implements OnInit {
   private ticker = window.setInterval(
     () => this.tick.update((v) => v + 1), 1000);
 
+  readonly isManagerView = computed(() =>
+  (this.auth.currentUser()?.roles ?? []).some((role) =>
+  ['MANAGER', 'ROLE_MANAGER'].includes(role)),
+  );
 
+  readonly firstName = computed(
+    () => this.auth.currentUser()?.firstName || 'there',
+  );
+
+  readonly greeting = computed(() => {
+    const h = new Date().getHours();
+    return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  });
 
   public ngOnInit(): void {
     //this will load the number displayed on the notification bell
