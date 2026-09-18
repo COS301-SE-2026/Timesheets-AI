@@ -77,7 +77,46 @@ export class DashboardComponent implements OnInit {
 
   readonly todayEvents = computed(() =>
   this.calendarEvents().filter(
-    (e) => this.dateKey(new Date(e.start)) === this.dateKey(new Date()),).slice(0, 4));
+    (e) => this.dateKey(new Date(e.start)) === this.dateKey(new Date()),).slice(0, 4)
+  );
+
+  readonly deadlineWindowDays = computed(() => 7);
+
+  readonly upcomingDeadlines = computed(() => {
+    const today = this.startOfDay(new Date());
+    const end = new Date(today);
+    end.setDate(today.getDate() + this.deadlineWindowDays());
+    const taskDeadlines = this.tasks()
+    .filter(
+      (t) => t.dueDate && new Date(t.dueDate) >= today && new Date(t.dueDate) <= end && t.status !== 'DONE',
+    )
+    .map((t) => ({
+      id: `task-${t.id}`,
+      targetId: t.id,
+      projectId: t.projectId,
+      type: t.title,
+      projectName: t.projectName || 'Project task',
+      dueDate: t.dueDate!,
+    }))
+    const projectDeadlines = this.activeProjects()
+    .filter(
+      (p) =>
+        p.endDate &&
+        new Date(p.endDate) >= today &&
+        new Date(p.endDate) <= end,
+    )
+    .map((p) => ({
+      id: `project-${p.id}`,
+      targetId: p.id,
+      type: 'project' as const,
+      title: `${p.name} project due`,
+      projectName: 'Project deadline',
+      dueDate: p.endDate!
+    }));
+    return [...taskDeadlines, ...projectDeadlines]
+    .sort((a, b) => +new Date(a.dueDate) - +new Date(b.dueDate))
+    .slice(0, 4);
+  });
 
   public ngOnInit(): void {
     //this will load the number displayed on the notification bell
