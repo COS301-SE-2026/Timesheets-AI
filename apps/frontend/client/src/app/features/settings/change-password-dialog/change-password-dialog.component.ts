@@ -16,7 +16,7 @@ import { SettingsService } from '../settings.services';
 })
 
 export class ChangePasswordDialogComponent {
-  private settingsService= inject(this.settingsService);
+  private settingsService= inject(SettingsService);
   private dialogRef= inject(MatDialogRef<ChangePasswordDialogComponent>);
 
   currentPassword='';
