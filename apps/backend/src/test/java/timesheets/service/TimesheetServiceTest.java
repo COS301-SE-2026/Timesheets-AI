@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import timesheets.domain.Timesheet;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.TimesheetRequest;
@@ -40,6 +41,7 @@ class TimesheetServiceTest {
   @Mock private TimeEntryRepository timeEntryRepository;
   @Mock private SecurityUtils securityUtils;
   @Mock private WorkspaceMemberRepository workspaceMemberRepository;
+  @Mock private ApplicationEventPublisher eventPublisher;
 
   @InjectMocks private TimesheetService timesheetService;
 
@@ -204,7 +206,6 @@ class TimesheetServiceTest {
       // mocking a dev who owns the timesheet
       when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
       when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
-      when(securityUtils.isAdmin()).thenReturn(false);
       when(securityUtils.isManager()).thenReturn(false);
 
       // ARRANGE: a timesheet exists in the database, so looks for this timesheet in theDB
@@ -249,7 +250,6 @@ class TimesheetServiceTest {
 
       // mocking a developer who owns the timesheet
       when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
-      when(securityUtils.isAdmin()).thenReturn(false);
       when(securityUtils.isManager()).thenReturn(false);
 
       // this will simulate what a DB returns, a list of timesheets
@@ -281,7 +281,6 @@ class TimesheetServiceTest {
 
       // mocking a dev who owns the timesheet
       when(securityUtils.getDefaultWorkspaceMemberId()).thenReturn(workspaceMemberId);
-      when(securityUtils.isAdmin()).thenReturn(false);
       when(securityUtils.isManager()).thenReturn(false);
 
       // because you know nulls give unexpected results, so we need empty lists not null things
@@ -517,14 +516,13 @@ class TimesheetServiceTest {
       String rejectionReason = "Missing docs";
 
       // the person trying to reject the timesheets is neither a manager or an admin
-      when(securityUtils.isAdmin()).thenReturn(false);
       when(securityUtils.isManager()).thenReturn(false);
 
       // ACT and ASSERT
       assertThatThrownBy(
               () -> timesheetService.rejectTimesheet(timesheetId, reviewerId, rejectionReason))
           .isInstanceOf(AccessDeniedException.class)
-          .hasMessage("Only Admins and Managers can reject timesheets");
+          .hasMessage("Only Managers can reject timesheets");
 
       verify(timesheetRepository, never()).findById(any());
       verify(timesheetRepository, never()).save(any());
@@ -546,7 +544,7 @@ class TimesheetServiceTest {
       timesheet.setStatus("SUBMITTED");
 
       when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
-      when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.isManager()).thenReturn(true);
 
       when(workspaceMemberRepository.findById(workspaceMemberId))
           .thenReturn(Optional.of(workspaceMember));
@@ -622,7 +620,7 @@ class TimesheetServiceTest {
       UUID reviewerId = workspaceMemberId;
       timesheet.setStatus("SUBMITTED");
 
-      when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.isManager()).thenReturn(true);
       when(securityUtils.getCurrentWorkspaceId()).thenReturn(workspaceId);
 
       when(workspaceMemberRepository.findById(workspaceMemberId))

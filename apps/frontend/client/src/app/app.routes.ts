@@ -142,6 +142,21 @@ export const routes: Routes = [
       ),
   },
 
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component')
+        .then(m => m.DashboardComponent)
+  },
+
+  {
+    path: 'notifications',
+    canActivate: [authGuard, workspaceGuard],
+    loadComponent: () =>
+      import('./features/notifications/notification-page/notifications-page.component')
+        .then(m => m.NotificationsPageComponent),
+  },
+
   /* Catch-all wildcard (redirects to 404) */
   {
     path: '**',

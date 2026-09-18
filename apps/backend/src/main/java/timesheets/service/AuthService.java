@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import timesheets.domain.PasswordResetToken;
 import timesheets.domain.User;
 import timesheets.domain.UserIdentityProvider;
 import timesheets.domain.UserMfa;
+import timesheets.domain.event.UserWaitingForWorkspaceEvent;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.GoogleAuthRequest;
 import timesheets.dto.request.PasswordRequest;
@@ -63,6 +65,7 @@ public class AuthService {
   private final WorkspaceMemberRepository workspaceMemberRepository;
   private final UserIdentityProviderRepository userIdentityProviderRepository;
   private final PasswordEncoder passwordEncoder;
+  private final ApplicationEventPublisher eventPublisher;
 
   private final EmailService emailService;
 
@@ -199,6 +202,9 @@ public class AuthService {
 
     userRepository.save(user);
     // userRepository.saveAndFlush(user);
+
+    // when a user has verified their email and is waiting for an admin to let them in
+    eventPublisher.publishEvent(new UserWaitingForWorkspaceEvent(user.getId()));
 
     return new MessageResponse("Email verified successfully", "/dashboard");
   }
