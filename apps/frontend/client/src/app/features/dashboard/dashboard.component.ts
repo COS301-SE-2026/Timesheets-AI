@@ -118,6 +118,22 @@ export class DashboardComponent implements OnInit {
     .slice(0, 4);
   });
 
+  readonly approvalCount = computed(
+    () => this.pendingTimesheets().filter(
+      (timesheet) => timesheet.status === 'SUBMITTED',
+    ).length,
+  );
+
+  readonly timerSeconds = computed(() => {
+    this.tick();
+    const t = this.activeTimer();
+    if (!t) return 0;
+    const elapsed = t.elapsedSeconds ?? t.elapsedMinutes * 60;
+    return t.active && !t.isPaused
+    ? elapsed +
+    Math.max(0, Math.floor((Date.now() - +new Date(t.startedAt)) / 1000) - elapsed,) : elapsed;
+  });
+
   public ngOnInit(): void {
     //this will load the number displayed on the notification bell
     this.notificationService.loadUnreadCount();
