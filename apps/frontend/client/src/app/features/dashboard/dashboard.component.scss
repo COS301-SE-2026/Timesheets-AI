@@ -69,6 +69,20 @@
   color: var(--color-text-muted);
 }
 
+.primary-button {
+  border: 0;
+  border-radius: 8px;
+  padding: 11px 30px;
+  background: #0877ed;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+:host {
+  display: block;
+}
+
 .dashboard-page {
   min-height: calc(100vh - 80px);
   padding: var(--space-6);
