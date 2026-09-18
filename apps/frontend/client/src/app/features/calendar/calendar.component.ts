@@ -221,7 +221,7 @@ export class CalendarComponent implements OnInit{
       end: info.event.end?.toISOString() || '',
       description: rawProps['description'],
       location: rawProps['location'],
-      provider: this.provider(),
+      provider: this.provider()?? 'google',
       category: categoryKey,
       categoryLabel: rawProps['categoryLabel'] || this.getCategoryLabel(categoryKey),
       organizer: rawProps['organizer']
