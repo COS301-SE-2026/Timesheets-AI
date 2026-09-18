@@ -238,4 +238,11 @@ export class DashboardComponent implements OnInit {
           timesheets.filter((timesheet) => timesheet.status === 'SUBMITTED'),
         ),);
   }
+
+  private loadTimeTotals(): void {
+    this.entriesApi
+      .getMyEntries()
+      .pipe(catchError(() => of([])))
+      .subscribe((v) => this.setTimeTotals(v));
+  }
 }
