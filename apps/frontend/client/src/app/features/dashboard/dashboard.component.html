@@ -145,6 +145,37 @@
                     }
                 }
             </article>
+            <!-- Calendar summary card -->
+            <article class="card calendar-card">
+                <div class="card-heading">
+                    <span class="icon-orb purple">
+                        <i class="fa-regular fa-calendar"></i>
+                    </span>
+                    <div>
+                        <h2>Today's calendar</h2>
+                        <p>From your calendar integration</p>
+                    </div>
+                </div>
+                @if (todayEvents().length) {
+                    <div class="event-list">
+                        @for (event of todayEvents(); track event.id) {
+                            <a class="event-row" routerLink="/calendar">
+                                <time>
+                                    {{ event.start | date: "HH:mm"}} -
+                                    {{ event.end | date: "HH:mm"}}
+                                </time>
+                                <span>
+                                    <strong>{{ event.title }}</strong>
+                                    <small>{{ event.location || "Calendar event" }}</small>
+                                </span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        }
+                    </div>
+                } @else {
+                    <div class="list-empty">Nothing else scheduled for today.</div>
+                }
+            </article>
         </section>
     }
 
