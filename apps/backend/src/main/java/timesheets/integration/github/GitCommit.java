@@ -8,7 +8,7 @@ Author: Zamokuhle Zwane
 Date: 02/09/2026
 */
 
-package timesheets.domain;
+package timesheets.integration.github;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

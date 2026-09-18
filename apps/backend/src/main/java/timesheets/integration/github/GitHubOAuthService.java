@@ -8,7 +8,7 @@ Authr: Zamokuhle Zwane
 Date: 02/09/2026
 */
 
-package timesheets.auth;
+package timesheets.integration.github;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

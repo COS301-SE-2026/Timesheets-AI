@@ -5,22 +5,16 @@ Author: Zamokuhle Zwane
 Date: 02/09/2026
 */
 
-package timesheets.controller;
+package timesheets.integration.github;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import timesheets.auth.GitHubOAuthService;
-import timesheets.auth.GitHubTokenResponse;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
-import timesheets.domain.IntegrationToken;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.security.SecurityUtils;
-import timesheets.service.GitHubService;
 
 @RestController
 @RequestMapping("/api/integrations/github")
@@ -49,25 +43,7 @@ public class GitHubIntegrationController {
     OAuthState validatedState = oauthStateService.validateState(state);
     UUID workspaceMemberId = validatedState.getWorkspaceMemberId();
 
-    GitHubTokenResponse tokenResponse = gitHubOAuthService.exchangeCodeForToken(code);
-
-    Optional<IntegrationToken> existingToken =
-        integrationTokenRepository.findByWorkspaceMemberIdAndProvider(workspaceMemberId, "GITHUB");
-
-    IntegrationToken integrationToken = existingToken.orElseGet(IntegrationToken::new);
-
-    integrationToken.setWorkspaceMemberId(workspaceMemberId);
-    integrationToken.setProvider("GITHUB");
-    integrationToken.setAccessToken(tokenResponse.getAccessToken());
-
-    if (tokenResponse.getRefreshToken() != null) {
-      integrationToken.setRefreshToken(tokenResponse.getRefreshToken());
-    }
-    if (tokenResponse.getExpiresIn() != null) {
-      integrationToken.setExpiresAt(LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn()));
-    }
-
-    integrationTokenRepository.save(integrationToken);
+    gitHubService.exchangeAndsaveToken(workspaceMemberId, code);
 
     return ResponseEntity.ok("GitHub connected for workspace member: " + workspaceMemberId);
   }
