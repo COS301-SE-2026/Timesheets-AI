@@ -9,7 +9,6 @@ import { CalendarProvider, AppEvent } from './calendar.model';
 import { CalendarService } from './calendar.services';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router} from '@angular/router';
-import { error } from 'node:console';
 export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 @Component({
   selector: 'app-calendar',
