@@ -16,19 +16,35 @@ import { NotificationPanelComponent } from '../notifications/notification-panel.
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [
-    NotificationPanelComponent
-  ],
+  imports: [ NotificationPanelComponent, DatePipe, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
 
+  private auth = inject(AuthService);
   private readonly notificationService = inject(NotificationService);
-
+  private timers = inject(TimerService);
+  private projectsApi = inject(ProjectService);
+  private tasksApi = inject(TaskService);
+  private timesheetsApi = inject(TimesheetService);
+  private calendarApi = inject(CalendarService);
   public readonly showNotifications = signal<boolean>(false);
-
   public readonly unreadCount = this.notificationService.unreadCount;
+  readonly isLoading = signal(true);
+  readonly showTimerStoppedModal = signal(false);
+  readonly activeTimer = signal<ActiveTimerResponse | null>(null);
+  readonly projects = signal<ProjectResponse[]>([]);
+  readonly tasks = signal<TaskResponse[]>([]);
+  readonly calendarEvents = signal<AppEvent[]>([]);
+  readonly pendingTimesheets = signal<TimesheetResponse[]>([]);
+  readonly todayMinutes = signal(0);
+  readonly weekMinutes = signal(0);
+  private tick = signal(0);
+  private ticker = window.setInterval(
+    () => this.tick.update((v) => v + 1), 1000);
+
+
 
   public ngOnInit(): void {
     //this will load the number displayed on the notification bell
