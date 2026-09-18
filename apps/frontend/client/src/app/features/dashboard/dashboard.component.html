@@ -261,14 +261,26 @@
         </section>
     }
 
+    <!-- Timer stopped modal -->
 
-    <section class="dashboard-content">
-        <div class="dashboard-placeholder">
-            <h2>Your workspace at a glance</h2>
-            <p>
-                Dashboard insights and activity will appear here.
-            </p>
+    @if (showTimerStoppedModal()) {
+        <div class="modal-backdrop" (click)="closeTimerStoppedModal()">
+            <section
+                class="success-modal"
+                role="dialog"
+                aria-modal="true"
+                (click)="$event.stopPropagation()">
+                
+            <span class="icon-obr green">
+                <i class="fa-solid fa-check"></i>
+            </span>
+            <h2>Timer stopped</h2>
+            <p>Your time entry has been saved successfully.</p>
+            <button type="button" class="primary-button" (click)="closeTimerStoppedModal()">
+                Close
+            </button>
+            </section>
         </div>
-    </section>
+    }
 
 </main>
