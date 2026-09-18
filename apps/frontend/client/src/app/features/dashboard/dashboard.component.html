@@ -1,11 +1,15 @@
 <main class="dashboard-page">
 
     <header class="page-header">
-        <div class="page-header-content">
-
             <div>
-                <h1 class="page-title">Dashboard</h1>
-                <p class="page-subtitle">Overview of activity</p>
+                <h1>{{ greeting() }}, {{ firstName() }}</h1>
+                <p class="page-subtitle">
+                    {{
+                        isManagerView()
+                        ? "Here's what needs your attentions across projects you manage."
+                        : "Here's your work at a glance for today."
+                    }}
+                </p>
             </div>
 
             <div class="header-actions">
@@ -26,7 +30,6 @@
                     }
                 </div>
             </div>
-        </div>
     </header>
 
 
