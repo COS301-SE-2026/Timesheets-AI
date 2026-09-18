@@ -28,7 +28,7 @@ Related Requirements: N/A
                         [class.connected]="isConnected()">
                     </span>
                     <span>
-                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }} connected
+                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }}
                         {{ isConnected() ? 'connected' : 'not connected'}}
                     </span>
                     @if (lastSyncedLabel()){
