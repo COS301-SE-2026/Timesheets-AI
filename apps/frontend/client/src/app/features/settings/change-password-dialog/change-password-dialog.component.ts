@@ -6,6 +6,7 @@ import { MatButtonModule} from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatInputModule} from '@angular/material/input';
 import { SettingsService } from '../settings.services';
+import { error } from 'node:console';
 ;
 
 @Component({
@@ -38,7 +39,7 @@ export class ChangePasswordDialogComponent {
     }
 
     if(this.newPassword.length< 8){
-      this.errorMessage='New password must ne at least 8 characters.'
+      this.errorMessage='New password must be at least 8 characters.'
       return;
     }
 
@@ -54,13 +55,25 @@ export class ChangePasswordDialogComponent {
       {
         next: ()=>{
           this.isSubmitting= false;
+          this.dialogRef.close(true);
+        },
+
+        error:(error)=>{
+          this.isSubmitting=false;
+
+          if(error.status===401){
+            this.errorMessage= 'Current password is incorrect.';
+          }else if(error.status=== 400){
+            this.errorMessage= error.error?.message??
+            'Please check your password details.';
+          }else{
           this.errorMessage= 'Something went wrong. Please try again.'
         }
       }
-    );
+    });
   }
+
   cancel():void{
     this.dialogRef.close(false);
   }
-
 }
