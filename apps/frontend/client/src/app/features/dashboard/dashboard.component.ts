@@ -245,4 +245,22 @@ export class DashboardComponent implements OnInit {
       .pipe(catchError(() => of([])))
       .subscribe((v) => this.setTimeTotals(v));
   }
+
+  private setTimeTotals(entries: TimeEntryResponse[]): void {
+    const today = this.startOfDay(new Date()),
+      week = new Date(today);
+    week.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+    const end = new Date(week);
+    end.setDate(week.getDate() + 7);
+    this.todayMinutes.set(
+      entries.filter((e) => this.dataKey(new Date(e.startTime)) === this.dateKey(today),)
+      .reduce((n, e) => n + this.entryMinutes(e), 0),);
+      this.weekMinutes.set(
+        entries.filter((e) => {
+          const d = new Date(e.startTime);
+          return d>= week && d < end;
+        })
+        .reduce((n, e) => n + this.entryMinutes(e), 0)
+      );
+  }
 }
