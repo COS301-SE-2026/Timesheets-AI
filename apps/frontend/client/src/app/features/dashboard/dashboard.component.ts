@@ -179,4 +179,16 @@ export class DashboardComponent implements OnInit {
     this.showTimerStoppedModal.set(false);
   }
 
+  formatDuration(s: number): string {
+    return [Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60]
+    .map((v) => String(v).padStart(2, '0'))
+    .join(':');
+  }
+
+  formatHours(m: number): string {
+    return `${Math.floor(m / 60)}h ${m % 60}m`;
+  }
+
+  
+
 }
