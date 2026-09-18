@@ -31,7 +31,7 @@
                 </div>
             </div>
     </header>
-    
+
 <!-- Show loading state while dashboard data is being fetched -->
     @if (isLoading()) {
         <section class="dashboard-state">
@@ -47,6 +47,35 @@
                         {{ activeTimer()?.isPaused ? "Paused" : activeTimer() ? "Running" : "Not running" }}
                     </span>
                 </div>
+                <!-- Display active timer details and provide pause, resume and stop controls -->
+                @if (activeTimer(); as timer) {
+                    <strong class="timer-value">
+                        {{formatDuration(timerSeconds()) }}
+                    </strong>
+                    @if (timer.project?.name || timer.task?.title) {
+                        <p class="context">
+                            {{ timer.project?.name || "No project" }}
+                            {{ timer.task?.title || "No task selected" }}
+                        </p>
+                    }
+                    <div class="timer-actions">
+                        <button class="danger-button" (click)="stopTimer()">
+                            <i class="fa-solid fa-stop"></i> Stop
+                        </button>
+                        <button class="secondary-button" (click)="pauseOrResumeTimer()">
+                            @if (timer.isPaused){
+                                <i class="fa-solid fa-play"></i>Resume
+                            } @else {
+                                <i class="fa-solid fa-pause"></i>Pause
+                            }
+                        </button>
+                    </div>
+                } @else {
+                    <div class="list-empty">
+                        <p>No timer is running.</p>
+                        <a class="start-timer-button" routerLink="/log-timer"><i class="fa-solid fa-paly"></i> Start timer </a>
+                    </div>
+                }
             </article>
         </section>
     }
