@@ -230,4 +230,12 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  private loadPendingApprovals(): void {
+    this.timesheetsApi
+      .getPendingWorkspaceTimesheets()
+      .subscribe((timesheets) =>
+        this.pendingTimesheets.set(
+          timesheets.filter((timesheet) => timesheet.status === 'SUBMITTED'),
+        ),);
+  }
 }
