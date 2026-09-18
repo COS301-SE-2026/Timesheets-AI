@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import timesheets.domain.IntegrationToken;
 import timesheets.domain.Task;
-import timesheets.dto.request.CreateJiraIssueRequest;
+import timesheets.dto.request.CreateIssueRequest;
 import timesheets.dto.response.IssueResponse;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.repository.TaskRepository;
@@ -132,7 +132,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
   }
 
   @Override
-  public IssueResponse createIssue(UUID workspaceMemberId, CreateJiraIssueRequest request) {
+  public IssueResponse createIssue(UUID workspaceMemberId, CreateIssueRequest request) {
 
     IntegrationToken token = getValidToken(workspaceMemberId);
     String cloudId = token.getProviderResourceId();
@@ -206,7 +206,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
     IssueResponse dto = new IssueResponse();
     dto.setKey(key);
-    dto.setSummary(getString(fields, "summary"));
+    dto.setTitle(getString(fields, "summary"));
     dto.setStatus(getNestedString(fields, "status", "name"));
     dto.setIssueType(getNestedString(fields, "issuetype", "name"));
     dto.setDescription(getString(fields, "description"));
@@ -240,7 +240,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
     return null;
   }
 
-  private String buildCreatePayload(CreateJiraIssueRequest request) {
+  private String buildCreatePayload(CreateIssueRequest request) {
     String description =
         request.getDescription() != null
             ? "{"
