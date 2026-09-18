@@ -122,6 +122,28 @@
                         {{ inProgressTaskCount() }} active
                     </span>
                 </div>
+                <!-- Tasks in progress -->
+                @if (inProgressTasks().length) {
+                    <div class="task-list">
+                        @for (task of inProgressTasks(); track task.id){
+                            <a class="task-row" routerLink="/my-tasks" [queryParams]="{ taskId: task.id}">
+                                <span class="avatar">{{ initials(task.assignedToName)}} </span>
+                                <span class="task-copy">
+                                    <strong>{{ task.title }}</strong>
+                                    <small>{{ task.projectName || "Project task" }}</small>
+                                </span>
+                                <span class="status-chip">{{ taskStatus(task.status) }}</span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        }
+                    </div>
+                    @if (inProgressTaskCount() > inProgressTasks().length){
+                        <a class="view-more-tasks" routerLink="/my-tasks">
+                            View more tasks
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    }
+                }
             </article>
         </section>
     }
