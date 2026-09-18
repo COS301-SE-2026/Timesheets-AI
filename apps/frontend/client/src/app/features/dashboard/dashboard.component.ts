@@ -189,6 +189,20 @@ export class DashboardComponent implements OnInit {
     return `${Math.floor(m / 60)}h ${m % 60}m`;
   }
 
-  
+  progress(m: number, target: number): number {
+    return Math.min(100, Math.round((m / target) * 100));
+  }
+
+  taskStatus(s: TaskResponse['status']): string {
+    return s
+    .replace('_', ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  initials(n: string | null): string {
+    return (n || 'MY')
+    .split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase();
+  }
 
 }
