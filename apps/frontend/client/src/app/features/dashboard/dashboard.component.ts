@@ -269,4 +269,20 @@ export class DashboardComponent implements OnInit {
     end = +new Date(entry.endTime);
     return Number.isFinite(start) && Number.isFinite(end) && end >= start ? Math.round((end - start) / 60000) : entry.durationMinutes;
   }
+
+  private startOfDay(d: Date): Date {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  private dateKey(d: Date): string {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  private formatWeek(d: Date): string {
+    const mon = new Date(d);
+    mon.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    const sun = new Date(mon);
+    sun.setDate(mon.getDate() + 6);
+    return `${mon.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })} - ${sun.toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+  }
 }
