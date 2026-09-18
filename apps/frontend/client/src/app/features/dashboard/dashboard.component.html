@@ -176,6 +176,36 @@
                     <div class="list-empty">Nothing else scheduled for today.</div>
                 }
             </article>
+            <!-- Hours logged summary card -->
+            <article class="card hours-card">
+                <div class="card-heading">
+                    <span class="icon-orb blue">
+                        <i class="fa-regular fa-clock"></i>
+                    </span>
+                    <div>
+                        <h2>Hours logged</h2>
+                        <p>Your logged hours for today and this this week.</p>
+                    </div>
+                </div>
+                <div class="hours-metric">
+                    <div class="metric">
+                        <span>Today</span>
+                        <strong>{{ formatHours(todayMinutes()) }}</strong>
+                        <small>of 8h</small>
+                        <div class="progress">
+                            <i [style.width.%]="progress(todayMinutes(), 480)"></i>
+                        </div>
+                    </div>
+                    <div class="metric">
+                        <span>This week</span>
+                        <strong> {{ formatHours(weekMinutes()) }}</strong>
+                        <small>of 40h</small>
+                        <div class="progress">
+                            <i [style.width.%]="progress(weekMinutes(), 2400)"></i>
+                        </div>
+                    </div>
+                </div>
+            </article>
         </section>
     }
 
