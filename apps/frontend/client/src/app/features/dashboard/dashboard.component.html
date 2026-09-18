@@ -93,6 +93,21 @@
                     </a>
                 </article>
             }
+            <!-- Total projects summary card -->
+            <article class="card summary-card project-card">
+                <div class="card-heading">
+                    <span class="icon-orb green">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </span>
+                    <h2>Active projects</h2>
+                </div>
+                <strong> {{ activeProjects().length }}</strong>
+                <p>Projects you contribute to</p>
+                <a routerLink="/projects">
+                    View projects
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </article>
         </section>
     }
 
