@@ -1,3 +1,32 @@
+@use "../../shared/styles/index" as tokens;
+
+.view-more-tasks {
+  display: inline-block;
+  margin-top: 16px;
+  color: #0877ed;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.start-timer-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #0877ed;
+  color: white;
+  font-size: 13px;
+  font-weight: 700px;
+  text-decoration: none;
+}
+
+.list-empty p {
+  margin: 0;
+}
+
 .dashboard-page {
   min-height: calc(100vh - 80px);
   padding: var(--space-6);
