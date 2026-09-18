@@ -58,6 +58,14 @@ export class DashboardComponent implements OnInit {
     return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   });
 
+  readonly activeProjects = computed(() =>
+  this.projects().filter(
+    (p) => 
+      p.status === 'ACTIVE' &&
+      (!this.isManagerView() ||
+      p.myRole === 'MANAGER')
+  ),);
+
   public ngOnInit(): void {
     //this will load the number displayed on the notification bell
     this.notificationService.loadUnreadCount();
