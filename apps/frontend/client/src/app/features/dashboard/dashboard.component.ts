@@ -1,6 +1,17 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { NotificationPanelComponent } from '../notifications/notification-panel.component';
+import { DatePipe } from '@angular/common';
+import { Component, OnDestroy, OnInit, computed, inject, signal, } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ProjectResponse, ProjectService, } from '../../core/services/project.service';
+import { TaskResponse, TaskService } from '../../core/services/task.service';
+import { ActiveTimerResponse, TimerService } from '../../core/services/timer.service';
+import { TimeEntryResponse, TimeEntryService, } from '../../core/services/time-entry.service';
+import { TimesheetResponse,TimesheetService } from '../../core/services/timesheet.service';
+import { AppEvent } from '../calendar/calendar.model';
+import { CalendarService } from '../calendar/calendar.services';
+import { NotificationPanelComponent } from '../notifications/notification-panel.component';
 
 @Component({
   selector: 'app-dashboard',
