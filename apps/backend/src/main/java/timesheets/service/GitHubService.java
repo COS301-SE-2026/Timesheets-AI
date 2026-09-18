@@ -131,9 +131,11 @@ public class GitHubService {
                 .authorName((String) author.get("name"))
                 .authorEmail((String) author.get("email"))
                 .githubAuthorLogin(githubLogin)
-                // NOTE: github's line-level stats need a separate, more expensive per-commit api call,
+                // NOTE: github's line-level stats need a separate, more expensive per-commit api
+                // call,
                 // skipping for the first sync pass
-                // need to be careful here because we dont want EvidenceEngine assume the developer did not change anything 
+                // need to be careful here because we dont want EvidenceEngine assume the developer
+                // did not change anything
                 // we need to get changedFiles
                 .linesAdded(0)
                 .linesRemoved(0)

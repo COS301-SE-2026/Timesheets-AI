@@ -12,45 +12,46 @@ import timesheets.domain.GitCommit;
 import timesheets.repository.GitCommitRepository;
 
 @Component
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class GitHubEvidenceCollector implements EvidenceCollector {
-    private final GitCommitRepository gitCommitRepository;
+  private final GitCommitRepository gitCommitRepository;
 
-    @Override 
-    public List<EvidenceEvent> collect (UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime){
-        
-        List<GitCommit> commits = gitCommitRepository.findByWorkspaceMemberIdAndCommitTimeBetween(workspaceMemberId, startTime, endTime){
+  @Override
+  public List<EvidenceEvent> collect(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
-        List<EvidenceEvent> evidenceEvents = new ArrayList<>();
+    List<GitCommit> commits =
+        gitCommitRepository.findByWorkspaceMemberIdAndCommitTimeBetween(
+            workspaceMemberId, startTime, endTime);
 
-        for (GitCommit commit : commits){
-            EvidenceEvent evidenceEvent = new EvidenceEvent();
+    List<EvidenceEvent> evidenceEvents = new ArrayList<>();
 
-            evidenceEvent.setId(UUID.randomUUID());
-            evidenceEvent.setSource("GITHUB");
-            evidenceEvent.setTimestamp(commit.getCommitTime());
-            evidenceEvent.setWorkspaceMemberId(workspaceMemberId);
-            evidenceEvent.setProjectId(commit.getProjectId());
-            evidenceEvent.setActivityType("COMMIT");
-            evidenceEvent.setDescription(commit.getCommitMessage());
+    for (GitCommit commit : commits) {
+      EvidenceEvent evidenceEvent = new EvidenceEvent();
 
-            Map<String, Object> metadata = new HashMap<>();
+      evidenceEvent.setId(UUID.randomUUID());
+      evidenceEvent.setSource("GITHUB");
+      evidenceEvent.setTimestamp(commit.getCommitTime());
+      evidenceEvent.setWorkspaceMemberId(workspaceMemberId);
+      evidenceEvent.setProjectId(commit.getProjectId());
+      evidenceEvent.setActivityType("COMMIT");
+      evidenceEvent.setDescription(commit.getCommitMessage());
 
-            metadata.put("commitHash", commit.getCommitHash());
-            metadata.put("repositoryName", commit.getRepositoryName());
-            metadata.put("repositoryUrl", commit.getRepositoryUrl());
-            metadata.put("authorName", commit.getAuthorName());
-            metadata.put("githubAuthorLogin", commit.getGitHubAuthorLogin());
-            metadata.put("changedFiles", commit.getChangedFiles());
-            metadata.put("linesAdded", commit.getLinesAdded());
-            metadata.put("linesRemoved", commit.getLinesRemoved());
+      Map<String, Object> metadata = new HashMap<>();
 
-            evidenceEvent.setMetadata(metadata);
-            evidenceEvents.add(evidenceEvent);
-        }
+      metadata.put("commitHash", commit.getCommitHash());
+      metadata.put("repositoryName", commit.getRepositoryName());
+      metadata.put("repositoryUrl", commit.getRepositoryUrl());
+      metadata.put("authorName", commit.getAuthorName());
+      metadata.put("githubAuthorLogin", commit.getGithubAuthorLogin());
+      metadata.put("changedFiles", commit.getChangedFiles());
+      metadata.put("linesAdded", commit.getLinesAdded());
+      metadata.put("linesRemoved", commit.getLinesRemoved());
 
-        return evidenceEvents;
-
-        }
+      evidenceEvent.setMetadata(metadata);
+      evidenceEvents.add(evidenceEvent);
     }
+
+    return evidenceEvents;
+  }
 }

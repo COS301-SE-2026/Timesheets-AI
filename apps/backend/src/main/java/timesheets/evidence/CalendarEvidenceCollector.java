@@ -12,37 +12,38 @@ import timesheets.integration.calendar.CalendarAdapter;
 import timesheets.integration.calendar.CalendarEvent;
 
 @Component
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 public class CalendarEvidenceCollector implements EvidenceCollector {
-    private final CalendarAdapter calendarAdapter;
+  private final CalendarAdapter calendarAdapter;
 
-    @Override
-    public List<EvidenceEvent> collect(UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime){
-        
-        // Collect events
-        List<CalendarEvent> calendarEvents = calendarAdapter.getEvents(workspaceMemberId, startTime, endTime);
+  @Override
+  public List<EvidenceEvent> collect(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
-        List<EvidenceEvent> evidenceEvents = new ArrayList<>();
+    // Collect events
+    List<CalendarEvent> calendarEvents =
+        calendarAdapter.getEvents(workspaceMemberId, startTime, endTime);
 
-        for (CalendarEvent calendarEvent : calendarEvents){
-            Evidence evidenceEvent = new EvidenceEvent();
+    List<EvidenceEvent> evidenceEvents = new ArrayList<>();
 
-            evidenceEvent.setId(UUID.randomUUID());
-            evidenceEvent.setSource("CALENDAR");
-            evidenceEvent.setTimestamp(calendarEvent.getStartTime());
-            evidenceEvent.setWorkspaceMemberId(workspaceMemberId);
-            evidenceEvent.setActivityType("MEETING");
-            evidenceEvent.setDescription(calendarEvent.getTitle());
+    for (CalendarEvent calendarEvent : calendarEvents) {
+      EvidenceEvent evidenceEvent = new EvidenceEvent();
 
-            Map<String, Object> metadata = new HashMap<>();
-            metadata.put("externalEventId", calendarEvent.getExternalEventId());
-            metadata.put("endTime", calendarEvent.getEndTime());
+      evidenceEvent.setId(UUID.randomUUID());
+      evidenceEvent.setSource("CALENDAR");
+      evidenceEvent.setTimestamp(calendarEvent.getStartTime());
+      evidenceEvent.setWorkspaceMemberId(workspaceMemberId);
+      evidenceEvent.setActivityType("MEETING");
+      evidenceEvent.setDescription(calendarEvent.getTitle());
 
-            evidenceEvent.setMetadata(metadata);
-            evidenceEvents.add(evidenceEvent);
-        }
+      Map<String, Object> metadata = new HashMap<>();
+      metadata.put("externalEventId", calendarEvent.getExternalEventId());
+      metadata.put("endTime", calendarEvent.getEndTime());
 
-
-        return evidenceEvents;
+      evidenceEvent.setMetadata(metadata);
+      evidenceEvents.add(evidenceEvent);
     }
+
+    return evidenceEvents;
+  }
 }
