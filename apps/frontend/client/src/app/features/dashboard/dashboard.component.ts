@@ -208,16 +208,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private loadDashboard(): void {
-    const now = new Date(),
-    tomorrow = new Date(now);
-    tomorrow.setDate(now.getDate() + 1);
+    const today = this.startOfDay( new Date()),
+    tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
     forkJoin({
       timer: this.timers.getActiveTimer().pipe(catchError(()=> of(null))),
       projects: this.projectsApi.getProjects().pipe(catchError(() => of([]))),
       myTasks: this.tasksApi.getMyTasks().pipe(catchError(() => of([]))),
       entries: this.entriesApi.getMyEntries().pipe(catchError(() => of([]))),
       events: this.calendarApi
-        .getEvents(this.dateKey(now), this.dateKey(tomorrow))
+        .getEvents(this.dateTimeKey(today), this.dateTimeKey(tomorrow))
         .pipe(catchError(() => of([]))),
     })
     .pipe(finalize(() => this.isLoading.set(false)))
@@ -277,6 +277,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private dateKey(d: Date): string {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  private dateTimeKey(d: Date): string {
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const seconds = String(d.getSeconds()).padStart(2, '0');
+    return `${this.dateKey(d)}T${hours}:${minutes}:${seconds}`;
   }
 
   private formatWeek(d: Date): string {
