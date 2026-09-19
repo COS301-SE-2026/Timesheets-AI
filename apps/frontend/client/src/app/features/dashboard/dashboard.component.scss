@@ -19,8 +19,14 @@
   background: #0877ed;
   color: white;
   font-size: 13px;
-  font-weight: 700px;
+  font-weight: 700;
   text-decoration: none;
+}
+
+.card-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .list-empty p {
@@ -346,12 +352,18 @@
   font-weight: 700;
 }
 
-.manager-grid .task-card,
+.manager-grid .tasks-card,
 .manager-grid .hours-card {
   grid-column: span 2;
 }
 
-.task-list, .event-list, .deadline-row {
+.task-list,
+.event-list,
+.deadline-list {
+  margin-top: 15px;
+}
+
+.task-row, .event-row, .deadline-row {
   display: grid;
   align-items: center;
   gap: 12px;
@@ -423,7 +435,7 @@
   font-weight: 700;
 }
 
-.hours-metrics {
+.hours-metric {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
