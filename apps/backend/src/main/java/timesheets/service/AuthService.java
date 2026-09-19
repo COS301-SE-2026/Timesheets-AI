@@ -1,23 +1,17 @@
 package timesheets.service;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import exception.AuthException;
 import exception.AuthException.ErrorCode;
 import exception.BadRequestException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,6 +24,7 @@ import timesheets.domain.UserMfa;
 import timesheets.domain.event.UserWaitingForWorkspaceEvent;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.GoogleAuthRequest;
+import timesheets.dto.request.MicrosoftAuthRequest;
 import timesheets.dto.request.PasswordRequest;
 import timesheets.dto.request.RegisterRequest;
 import timesheets.dto.response.AuthResponse;
@@ -43,6 +38,8 @@ import timesheets.repository.UserMfaRepository;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
 import timesheets.security.SecurityUtils;
+import timesheets.service.strategy.SsoAuthenticationStrategy;
+import timesheets.service.strategy.SsoUserInfo;
 import timesheets.util.TotpUtils;
 
 // import timesheets.dto.request.ForgotPasswordRequest;
@@ -77,11 +74,10 @@ public class AuthService {
   private final SecurityUtils securityUtils;
   private final TimerService timerService;
 
+  private final List<SsoAuthenticationStrategy> ssoStrategies;
+
   // private final OtpService otpService;
   private final PasswordResetTokenRepository passwordResetTokenRepository;
-
-  @Value("${app.google.sso.client-id}")
-  private String googleClientId;
 
   private static final String[] ACCEPTED_DOMAINS = {
     "momentum.co.za", "momentum.com", "gmail.com", "cs.up.ac.za", "outlook.com"
@@ -222,16 +218,13 @@ public class AuthService {
 
     // check if the user is an SSO user(this means that they have no password)
     if (user.getPasswordHash() == null) {
-      boolean hasGoogleProvider =
-          userIdentityProviderRepository
-              .findByProviderAndUserId("GOOGLE", user.getId())
-              .isPresent();
+      boolean hasSsoProvider = userIdentityProviderRepository.existsByUserId(user.getId());
 
-      if (hasGoogleProvider) {
+      if (hasSsoProvider) {
         throw new AuthException(ErrorCode.SSO_USER);
-      } else {
-        throw new AuthException(ErrorCode.ACCOUNT_NOT_CONFIGURED);
       }
+
+      throw new AuthException(ErrorCode.ACCOUNT_NOT_CONFIGURED);
     }
     // check if the account is locked, and for how long
     if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())) {
@@ -425,44 +418,10 @@ public class AuthService {
 
   @Transactional
   public AuthResponse googleAuth(GoogleAuthRequest request) {
-    // first need to see if Google ID token is valif
 
-    GoogleIdToken.Payload payload = verifyGoogleToken(request.getIdToken());
-
-    String googleId = payload.getSubject();
-    String email = payload.getEmail();
-    String firstName = (String) payload.get("given_name");
-    String lastName = (String) payload.get("family_name");
-    String avatarUrl = (String) payload.get("picture");
-    Boolean emailVerified = payload.getEmailVerified();
-
-    // see if the identity provider exists
-    return userIdentityProviderRepository
-        .findByProviderAndProviderUserId("GOOGLE", googleId)
-        .map(
-            identity -> {
-              User user =
-                  userRepository
-                      .findById(identity.getUserId())
-                      .orElseThrow(() -> new AuthException(ErrorCode.USER_NOT_FOUND));
-              return generateAuthResponse(user, false);
-            })
-        .orElseGet(
-            () -> {
-              return userRepository
-                  .findByEmail(email)
-                  .map(
-                      user -> {
-                        linkGoogleIdentity(user, googleId);
-                        return generateAuthResponse(user, false);
-                      })
-                  .orElseGet(
-                      () -> {
-                        User newUser = createUserFromGoogle(payload);
-                        linkGoogleIdentity(newUser, googleId);
-                        return generateAuthResponse(newUser, false);
-                      });
-            });
+    SsoAuthenticationStrategy strategy = getSsoStrategy("GOOGLE");
+    SsoUserInfo ssoUser = strategy.authenticate(request.getIdToken());
+    return handleSsoUser(ssoUser);
   }
 
   // ! helper functions
@@ -522,54 +481,96 @@ public class AuthService {
         .build();
   }
 
-  // helper func to see if the google token is valid
-  private GoogleIdToken.Payload verifyGoogleToken(String idToken) {
+  @Transactional
+  public AuthResponse microsoftAuth(MicrosoftAuthRequest request) {
 
-    // FOR DEVELOPMENT
-    if ("swagger-test".equals(idToken)) {
-      GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
-
-      payload.setSubject("google-test-user-123");
-      payload.setEmail("thabang.siduke@momentum.co.za");
-      payload.put("given_name", "Thabang");
-      payload.put("family_name", "Siduke");
-      payload.put("picture", "https://www.magnific.com/free-photos-vectors/avatar-logo");
-
-      return payload;
-    }
-
-    // this will be what the actual google verification will be ACTUAL PRODUCTION
-    try {
-      GoogleIdTokenVerifier verifier =
-          new GoogleIdTokenVerifier.Builder(
-                  new NetHttpTransport(), GsonFactory.getDefaultInstance())
-              .setAudience(Collections.singletonList(googleClientId))
-              .build();
-
-      GoogleIdToken idTokenObj = verifier.verify(idToken);
-      if (idTokenObj == null) {
-        throw new AuthException(ErrorCode.INVALID_CREDENTIALS);
-      }
-      return idTokenObj.getPayload();
-    } catch (Exception e) {
-      throw new AuthException(ErrorCode.INVALID_CREDENTIALS);
-    }
+    SsoAuthenticationStrategy strategy = getSsoStrategy("MICROSOFT");
+    SsoUserInfo ssoUser = strategy.authenticate(request.getIdToken());
+    return handleSsoUser(ssoUser);
   }
 
-  // helper func that creates a user from a google token
-  private User createUserFromGoogle(GoogleIdToken.Payload payload) {
-    String firstName =
-        payload.get("given_name") != null ? (String) payload.get("given_name") : "Google User";
-    String lastName =
-        payload.get("family_name") != null ? (String) payload.get("family_name") : "Unknown";
+  // this will get the stratgy for the requested provider
+  private SsoAuthenticationStrategy getSsoStrategy(String provider) {
+
+    return ssoStrategies.stream()
+        .filter(strategy -> strategy.getProvider().equalsIgnoreCase(provider))
+        .findFirst()
+        .orElseThrow(() -> new AuthException(ErrorCode.INVALID_CREDENTIALS));
+  }
+
+  /*
+  - this happens after a user has been authenticated
+  - it makes sure that there is no other account that this SSO account belongs to
+  - if there is none then a new account is created
+   */
+  private AuthResponse handleSsoUser(SsoUserInfo ssoUser) {
+
+    String email = ssoUser.email();
+
+    // if there is no email, how was that user created so SSO cannot verify anything
+    if (email == null || email.isBlank()) {
+      throw new AuthException(ErrorCode.INVALID_CREDENTIALS);
+    }
+
+    if (!isAcceptedDomain(email)) {
+      throw new AuthException(ErrorCode.EMAIL_DOMAIN);
+    }
+
+    // need to check if the user is already linked to a Momently user
+    return userIdentityProviderRepository
+        .findByProviderAndProviderUserId(ssoUser.provider(), ssoUser.providerUserId())
+        .map(
+            identity -> {
+              User user =
+                  userRepository
+                      .findById(identity.getUserId())
+                      .orElseThrow(() -> new AuthException(ErrorCode.USER_NOT_FOUND));
+              return generateAuthResponse(user, false);
+            })
+        .orElseGet(
+            () ->
+                userRepository
+                    .findByEmail(email)
+                    .map(
+                        user -> {
+                          // if the account already exists then link the SSO identity to it
+                          linkSsoIdentity(user, ssoUser);
+                          return generateAuthResponse(user, false);
+                        })
+                    .orElseGet(
+                        () -> {
+                          User newUser = createUserFromSso(ssoUser);
+
+                          linkSsoIdentity(newUser, ssoUser);
+                          eventPublisher.publishEvent(
+                              new UserWaitingForWorkspaceEvent(newUser.getId()));
+                          return generateAuthResponse(newUser, false);
+                        }));
+  }
+
+  // the reason I am doing this is because existing users should be able to choose to add Google or
+  // Microsoft as another sign-in method
+
+  private User createUserFromSso(SsoUserInfo ssoUser) {
+
+    String firstName = ssoUser.firstName();
+    String lastName = ssoUser.lastName();
+
+    if (firstName == null || firstName.isBlank()) {
+      firstName = "SSO User";
+    }
+
+    if (lastName == null || lastName.isBlank()) {
+      lastName = "Unknown";
+    }
 
     User user =
         User.builder()
-            .email(payload.getEmail())
+            .email(ssoUser.email())
             .firstName(firstName)
             .lastName(lastName)
-            .avatarUrl((String) payload.get("picture"))
-            .emailVerified(Boolean.TRUE.equals(payload.getEmailVerified()))
+            .avatarUrl(ssoUser.avatarUrl())
+            .emailVerified(ssoUser.emailVerified())
             .passwordHash(null)
             .status(UserStatus.ACTIVE)
             .build();
@@ -577,15 +578,15 @@ public class AuthService {
     return userRepository.save(user);
   }
 
-  private void linkGoogleIdentity(User user, String googleId) {
+  private void linkSsoIdentity(User user, SsoUserInfo ssoUser) {
+
     UserIdentityProvider identity =
         UserIdentityProvider.builder()
             .userId(user.getId())
-            .provider("GOOGLE")
-            .providerUserId(googleId)
+            .provider(ssoUser.provider())
+            .providerUserId(ssoUser.providerUserId())
             .email(user.getEmail())
             .build();
-
     userIdentityProviderRepository.save(identity);
   }
 }
