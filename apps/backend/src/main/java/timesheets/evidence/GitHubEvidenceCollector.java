@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import timesheets.domain.GitCommit;
-import timesheets.repository.GitCommitRepository;
+import timesheets.integration.github.GitCommit;
+import timesheets.integration.github.GitCommitRepository;
 
 @Component
 @RequiredArgsConstructor
