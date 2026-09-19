@@ -120,6 +120,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/settings/settings.component')
         .then(m => m.SettingsComponent)
+  },
 
   {
     path: 'insights',
