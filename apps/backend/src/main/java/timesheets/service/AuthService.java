@@ -7,6 +7,7 @@ import exception.ResourceNotFoundException;
 import exception.StateConflictException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -88,13 +89,15 @@ public class AuthService {
   @Transactional
   public RegisterResponse register(RegisterRequest request) {
 
+    String email = normalizeEmail(request.getEmail());
+
     // validate email domain
-    if (!isAcceptedDomain(request.getEmail())) {
+    if (!isAcceptedDomain(email)) {
       throw new AuthException(ErrorCode.EMAIL_DOMAIN);
     }
 
     // this should check if the user exists
-    Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+    Optional<User> existingUser = userRepository.findByEmailIgnoreCase(email);
 
     // checks to see if the user exists
     if (existingUser.isPresent()) {
@@ -135,7 +138,7 @@ public class AuthService {
     // create user
     User user =
         User.builder()
-            .email(request.getEmail())
+            .email(email)
             .firstName(request.getFirstName())
             .lastName(request.getLastName())
             .passwordHash(passwordEncoder.encode(request.getPassword()))
@@ -211,9 +214,11 @@ public class AuthService {
    */
   @Transactional(noRollbackFor = {AuthException.class})
   public AuthResponse login(AuthRequest request) {
+    String email = normalizeEmail(request.getEmail());
+
     User user =
         userRepository
-            .findByEmail(request.getEmail())
+            .findByEmailIgnoreCase(email)
             .orElseThrow(() -> new AuthException(ErrorCode.INVALID_CREDENTIALS));
 
     // check if the user is an SSO user(this means that they have no password)
@@ -318,7 +323,7 @@ public class AuthService {
   @Transactional
   public MessageResponse forgotPassword(PasswordRequest.Forgot request) {
     userRepository
-        .findByEmail(request.getEmail())
+        .findByEmailIgnoreCase(normalizeEmail(request.getEmail()))
         .ifPresent(
             user -> {
               String token = UUID.randomUUID().toString();
@@ -344,7 +349,7 @@ public class AuthService {
   public void sendPasswordResetEmail(String email) {
     User user =
         userRepository
-            .findByEmail(email)
+            .findByEmailIgnoreCase(normalizeEmail(email))
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
     String token = UUID.randomUUID().toString();
@@ -436,6 +441,15 @@ public class AuthService {
     return false;
   }
 
+  // email addresses are stored in one form, caps and space do not make seperate accounts
+  private String normalizeEmail(String email) {
+    if (email == null) {
+      return null;
+    }
+
+    return email.trim().toLowerCase(Locale.ROOT);
+  }
+
   // helper function that helps generate the authorisation response
   private AuthResponse generateAuthResponse(User user, boolean requiresMfa) {
     // need to see if Mfa is enabled
@@ -505,7 +519,7 @@ public class AuthService {
    */
   private AuthResponse handleSsoUser(SsoUserInfo ssoUser) {
 
-    String email = ssoUser.email();
+    String email = normalizeEmail(ssoUser.email());
 
     // if there is no email, how was that user created so SSO cannot verify anything
     if (email == null || email.isBlank()) {
@@ -530,7 +544,7 @@ public class AuthService {
         .orElseGet(
             () ->
                 userRepository
-                    .findByEmail(email)
+                    .findByEmailIgnoreCase(email)
                     .map(
                         user -> {
                           // if the account already exists then link the SSO identity to it
@@ -566,7 +580,7 @@ public class AuthService {
 
     User user =
         User.builder()
-            .email(ssoUser.email())
+            .email(normalizeEmail(ssoUser.email()))
             .firstName(firstName)
             .lastName(lastName)
             .avatarUrl(ssoUser.avatarUrl())
