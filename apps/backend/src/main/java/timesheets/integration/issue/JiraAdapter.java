@@ -20,6 +20,7 @@ import timesheets.domain.IntegrationToken;
 import timesheets.domain.Task;
 import timesheets.dto.request.CreateIssueRequest;
 import timesheets.dto.response.IssueResponse;
+import timesheets.dto.response.WorklogResponse;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.repository.TaskRepository;
 
@@ -218,6 +219,81 @@ public class JiraAdapter implements IssueTrackerAdapter {
     }
 
     return filteredIssues;
+  }
+
+  @Override
+  public List<WorklogResponse> getWorklogs(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+
+    List<IssueResponse> issues = getIssues(workspaceMemberId);
+
+    List<WorklogResponse> worklogs = new ArrayList<WorklogResponse>();
+
+    IntegrationToken token = getValidToken(workspaceMemberId);
+
+    String cloudId = token.getProviderResourceId();
+
+    for (IssueResponse issue : issues) {
+      String url =
+          "https://api.atlassian.com/ex/jira"
+              + cloudId
+              + "/rest/api/3/issue/"
+              + issue.getKey()
+              + "/worklog";
+
+      HttpEntity<Void> request = new HttpEntity<Void>(createAuthHeaders(token.getAccessToken()));
+
+      ResponseEntity<String> response =
+          restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
+      try {
+        JsonNode root = objectMapper.readTree(response.getBody());
+
+        JsonNode worklogNodes = root.get("worklogs");
+
+        if (worklogNodes == null || !worklogNodes.isArray()) {
+          continue;
+        }
+
+        for (JsonNode worklogNode : worklogNodes) {
+          String started = getString(worklogNode, "started");
+
+          LocalDateTime startedAt = parseJiraTimestamp(started);
+
+          if (startedAt == null) {
+            continue;
+          }
+
+          boolean withinRange = !startedAt.isBefore(startTime) && !startedAt.isAfter(endTime);
+
+          if (!withinRange) {
+            continue;
+          }
+
+          WorklogResponse worklog = new WorklogResponse();
+          worklog.setIssueKey(issue.getKey());
+          worklog.setWorklogId(getString(worklogNode, "id"));
+          worklog.setStartedAt(startedAt);
+          worklog.setTimeSpentSeconds(
+              worklogNode.has("timeSpentSeconds")
+                  ? worklogNode.get("timeSpentSeconds").asInt()
+                  : 0);
+          worklog.setDescription(getString(worklogNode, "comment"));
+
+          JsonNode author = worklogNode.get("author");
+          if (author != null && !author.isNull()) {
+            worklog.setAuthorDisplayName(getString(author, "displayName"));
+            worklog.setAuthorEmail(getString(author, "emailAddress"));
+          }
+
+          worklogs.add(worklog);
+        }
+      } catch (Exception e) {
+        log.error("Failed to parse Jira worklogs for the issue:" + issue.getKey(), e);
+      }
+    }
+
+    return worklogs;
   }
 
   // ! helper functions
