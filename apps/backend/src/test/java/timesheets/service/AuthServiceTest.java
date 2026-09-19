@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import timesheets.domain.EmailVerificationToken;
@@ -38,6 +39,8 @@ import timesheets.repository.UserIdentityProviderRepository;
 import timesheets.repository.UserMfaRepository;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
+import timesheets.service.strategy.SsoAuthenticationStrategy;
+import timesheets.service.strategy.SsoUserInfo;
 
 /*
 -following the principle from the coding handbook of Arrange, Act, Assert
@@ -58,11 +61,14 @@ class AuthServiceTest {
   @Mock private UserMfaRepository userMfaRepository;
   @Mock private JwtService jwtService;
   @Mock private UserIdentityProviderRepository userIdentityProviderRepository;
+  @Mock private SsoAuthenticationStrategy googleSsoStrategy;
+  @Mock private List<SsoAuthenticationStrategy> ssoStrategies;
+  @Mock private ApplicationEventPublisher eventPublisher;
 
   @InjectMocks private AuthService authService;
 
   private final UUID testUserId = UUID.randomUUID();
-  private final String testEmail = "testEmail@momentum.co.za";
+  private final String testEmail = "testemail@momentum.co.za";
   private final String testPassword = "testPass123@";
   private final String testFirstName = "Test";
   private final String testLastName = "User";
@@ -273,6 +279,17 @@ class AuthServiceTest {
   @DisplayName("Google Auth Tests")
   class GoogleAuthTests {
 
+    @BeforeEach
+    void setUpGoogleStrategy() {
+      when(ssoStrategies.stream()).thenReturn(List.of(googleSsoStrategy).stream());
+      when(googleSsoStrategy.getProvider()).thenReturn("GOOGLE");
+    }
+
+    private SsoUserInfo createGoogleSsoUserInfo() {
+      return new SsoUserInfo(
+          "GOOGLE", "google-test-user-123", testEmail, testFirstName, testLastName, null, true);
+    }
+
     @Test
     @DisplayName("existing user should login with google")
     void loginWithGoogle() {
@@ -280,6 +297,8 @@ class AuthServiceTest {
       // ARRANGE
       GoogleAuthRequest request = new GoogleAuthRequest();
       request.setIdToken("swagger-test");
+
+      when(googleSsoStrategy.authenticate("swagger-test")).thenReturn(createGoogleSsoUserInfo());
 
       UserIdentityProvider identityProvider =
           UserIdentityProvider.builder()
@@ -314,12 +333,13 @@ class AuthServiceTest {
       GoogleAuthRequest request = new GoogleAuthRequest();
       request.setIdToken("swagger-test");
 
+      when(googleSsoStrategy.authenticate("swagger-test")).thenReturn(createGoogleSsoUserInfo());
+
       // it's empty to simulate the user never having used googl before
       when(userIdentityProviderRepository.findByProviderAndProviderUserId(
               "GOOGLE", "google-test-user-123"))
           .thenReturn(Optional.empty());
-      when(userRepository.findByEmailIgnoreCase("thabang.siduke@momentum.co.za"))
-          .thenReturn(Optional.empty());
+      when(userRepository.findByEmailIgnoreCase(testEmail)).thenReturn(Optional.empty());
       when(userRepository.save(any(User.class)))
           .thenAnswer(
               invocation -> {
