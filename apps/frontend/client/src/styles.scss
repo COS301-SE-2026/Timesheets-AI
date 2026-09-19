@@ -12,17 +12,74 @@ MOMENTLY DESIGN SYSTEM
 @import '@fortawesome/fontawesome-free/css/all.min.css';
 
 /*The "as *" means all forwarded tokens are available globally without needing to prefix them*/
+// $momently-primary:(
+//   0:#000000,
+//   10: #001b3d,
+//   20: #003263,
+//   25: #003e79,
+//   30: #004b91,
+//   35: #0056a5,
+//   40: #0f4c91,
+//   50: #2765a8,
+//   60: #437dbe,
+//   70: #5f96d4,
+//   80: #7bafea,
+//   90: #a9c8ee,
+//   95: #d8eafb,
+//   98: #eef6ff,
+//   99: #f8fbff,
+//   100: #ffffff
+// );
+// ANGULAR MATERIAL. THEME IVE BEEN FIGHTING WITH
 
-html, body {
+html{
   @include mat.theme(
     (
-      color: mat.$violet-palette,
-      typography: Roboto,
+      color:(
+        theme-type: light,
+        primary: mat.$blue-palette,
+      ),
+      typography: (
+        plain-family: (-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif),
+        brand-family: (-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif),
+        bold-weight: 700,
+        medium-weight:600,
+      ),
       density: 0
     )
   );
+
+  --mat-sys-primary: #0f4c91;
+  --mat-sys-on-primary: #ffffff;
+
+  --mat-sys-primary-container: #d8eafb;
+  --mat-sys-on-primary-container: #0f4c91;
+}
+
+// GLOBAL STYLES OF THE OTHER PAGES
+html, body {
+  // @include mat.theme(
+    // (
+      // color:( 
+      //   primary: $momently-primary,
+      // ),
+  //     color: mat.$blue-palette,
+  //     typography: (
+  //       plain-family: (-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif),
+  //       brand-family: (-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif),
+  //       bold-weight: 700,
+  //       medium-weight:600,
+  //     ),
+  //     density: 0
+  //   )
+  // );
   height: 100%;
   margin: 0;
+}
+body{
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  background-color: #ffffff;
+  color: #1a1a2e;
 }
 
 app-root {
