@@ -9,6 +9,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import timesheets.dto.response.IssueResponse;
+import timesheets.dto.response.WorklogResponse;
 import timesheets.integration.issue.IssueTrackerAdapter;
 
 @Component
@@ -23,7 +24,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
 
     List<IssueResponse> issues =
         issueTrackerAdapter.getIssues(workspaceMemberId, startTime, endTime);
-    List<EvidenceEvent> evidenceEvents = new ArrayList<>();
+    List<EvidenceEvent> evidenceEvents = new ArrayList<EvidenceEvent>();
 
     for (IssueResponse issue : issues) {
       EvidenceEvent evidenceEvent = new EvidenceEvent();
@@ -36,7 +37,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       evidenceEvent.setTimestamp(timestamp);
       evidenceEvent.setDescription(issue.getTitle());
 
-      Map<String, Object> metadata = new HashMap<>();
+      Map<String, Object> metadata = new HashMap<String, Object>();
 
       metadata.put("issueKey", issue.getKey());
       metadata.put("status", issue.getStatus());
@@ -56,6 +57,9 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       evidenceEvents.add(evidenceEvent);
     }
 
+    // collect Jira worklog evidence
+    evidenceEvents.addAll(collectWorklogEvidence(workspaceMemberId, startTime, endTime));
+
     return evidenceEvents;
   }
 
@@ -67,5 +71,36 @@ public class JiraEvidenceCollector implements EvidenceCollector {
     return LocalDateTime.parse(timestamp.substring(0, 19));
   }
 
-  
+  private List<EvidenceEvent> collectWorklogEvidence(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+    List<WorklogResponse> worklogs =
+        issueTrackerAdapter.getWorklogs(workspaceMemberId, startTime, endTime);
+
+    List<EvidenceEvent> evidenceEvents = new ArrayList<EvidenceEvent>();
+
+    for (WorklogResponse worklog : worklogs) {
+      EvidenceEvent evidenceEvent = new EvidenceEvent();
+
+      evidenceEvent.setId(UUID.randomUUID());
+      evidenceEvent.setSource("JIRA");
+      evidenceEvent.setWorkspaceMemberId(workspaceMemberId);
+      evidenceEvent.setTimestamp(worklog.getStartedAt());
+      evidenceEvent.setActivityType("WORKLOG");
+      evidenceEvent.setDescription(worklog.getDescription());
+
+      Map<String, Object> metadata = new HashMap<String, Object>();
+      metadata.put("issueKey", worklog.getIssueKey());
+      metadata.put("worklogId", worklog.getWorklogId());
+      metadata.put("authorDisplayName", worklog.getAuthorDisplayName());
+      metadata.put("authorEmail", worklog.getAuthorEmail());
+      metadata.put("startedAt", worklog.getStartedAt());
+      metadata.put("timeSpentSeconds", worklog.getTimeSpentSeconds());
+      metadata.put("timeSpentMinutes", worklog.getTimeSpentSeconds() / 60);
+
+      evidenceEvent.setMetadata(metadata);
+      evidenceEvents.add(evidenceEvent);
+    }
+
+    return evidenceEvents;
+  }
 }
