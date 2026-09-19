@@ -67,7 +67,7 @@ def _model_based_check(entries_to_check: list[TimeEntry], history: list[TimeEntr
     model = IsolationForest(contamination=CONTAMINATION, random_state=42)
     model.fit(features)
 
-    scores = model.score_sample(features)
+    scores = model.score_samples(features)
     history_scores = scores[: len(history)]
 
     check_start_index = len(history)
