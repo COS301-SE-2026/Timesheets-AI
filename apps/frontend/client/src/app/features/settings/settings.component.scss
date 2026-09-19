@@ -467,7 +467,7 @@ $red-bg: #fdecec;
     .settings-card{
         padding: 16px;
 
-        grid-template-columns: 48px minmax(0,1f);
+        grid-template-columns: 48px minmax(0,1fr);
         column-gap: 12px;
 
         .card-icon{

@@ -75,7 +75,7 @@ export class SettingsComponent {
 
   changePassword():void{
     // i need the password change flow that our app uses
-    const dialogRef= this.open(
+    const dialogRef= this.dialog.open(
       ChangePasswordDialogComponent,{
         width:'450px',
         maxWidth: '95vw',
