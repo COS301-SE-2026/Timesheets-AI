@@ -3,6 +3,8 @@ import { CalendarService } from './calendar.services';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
+import { connect } from 'node:http2';
+import { lstatSync } from 'node:fs';
 
 jest.mock('@fullcalendar/angular', ()=>{
   const angular= require('@angular/core');
@@ -11,7 +13,6 @@ jest.mock('@fullcalendar/angular', ()=>{
     getApi(){
         return{
           changeView: jest.fn(),
-          refetchEvents: jest.fn(),
           prev: jest.fn(),
           next: jest.fn(),
           today: jest.fn(),
@@ -53,7 +54,17 @@ describe('CalendarComponent', () => {
 
   beforeEach(async () => {
     mockCalendarService={
-      getEvents: jest.fn().mockReturnValue(of([]))
+      getEvents: jest.fn().mockReturnValue(of([])),
+
+      getCalendarStatus: jest.fn().mockReturnValue(
+        of(
+          {
+            connected: false,
+            provider: null,
+            lastSyncedAt: null,
+          }
+        )
+      ),
     }; 
 
     await TestBed.configureTestingModule({
@@ -79,8 +90,8 @@ describe('CalendarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should use Google as default provider',()=>{
-    expect(component.provider()).toBe('google');
+  it('should initially have no calendar provider',()=>{
+    expect(component.provider()).toBeNull();
   });
 
   it('should initially be disconnected', ()=>{
