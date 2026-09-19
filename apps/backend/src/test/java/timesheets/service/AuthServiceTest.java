@@ -136,7 +136,7 @@ class AuthServiceTest {
       User savedUser = createTestUser(); // creating the valid user to be returned
 
       // repo return empty if the user exists
-      when(userRepository.findByEmail(testEmail)).thenReturn(Optional.empty());
+      when(userRepository.findByEmailIgnoreCase(testEmail)).thenReturn(Optional.empty());
       when(passwordEncoder.encode(testPassword)).thenReturn("hashedPassword");
       when(userRepository.save(any(User.class))).thenReturn(savedUser);
       when(emailVerificationTokenRepository.save(any(EmailVerificationToken.class)))
@@ -173,7 +173,8 @@ class AuthServiceTest {
     //   User existingUser = createUnverifiedTestUser();
 
     //   // the user already exists in DB but is unverified
-    //   when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(existingUser));
+    //
+    // when(userRepository.findByEmailIgnoreCase(testEmail)).thenReturn(Optional.of(existingUser));
     //   when(emailVerificationTokenRepository.save(any(EmailVerificationToken.class)))
     //       .thenReturn(EmailVerificationToken.builder().build());
 
@@ -207,7 +208,7 @@ class AuthServiceTest {
 
     existingUser.setEmailVerified(true);
 
-    when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(existingUser));
+    when(userRepository.findByEmailIgnoreCase(testEmail)).thenReturn(Optional.of(existingUser));
 
     // ACT and ASSERT: an exception should be thrown
     assertThatThrownBy(() -> authService.register(request))
@@ -226,7 +227,7 @@ class AuthServiceTest {
       AuthRequest request = createValidAuthRequest();
       User user = createTestUser();
 
-      when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(user));
+      when(userRepository.findByEmailIgnoreCase(testEmail)).thenReturn(Optional.of(user));
 
       // the passwords should match
       when(passwordEncoder.matches(testPassword, user.getPasswordHash())).thenReturn(true);
@@ -259,7 +260,7 @@ class AuthServiceTest {
       // ARRANGE: set up with an invalid email, cause I did not set up that user with email
       AuthRequest request = createValidAuthRequest();
 
-      when(userRepository.findByEmail(testEmail)).thenReturn(Optional.empty());
+      when(userRepository.findByEmailIgnoreCase(testEmail)).thenReturn(Optional.empty());
 
       // ACT and ASSERT
       assertThatThrownBy(() -> authService.login(request))
@@ -317,7 +318,7 @@ class AuthServiceTest {
       when(userIdentityProviderRepository.findByProviderAndProviderUserId(
               "GOOGLE", "google-test-user-123"))
           .thenReturn(Optional.empty());
-      when(userRepository.findByEmail("thabang.siduke@momentum.co.za"))
+      when(userRepository.findByEmailIgnoreCase("thabang.siduke@momentum.co.za"))
           .thenReturn(Optional.empty());
       when(userRepository.save(any(User.class)))
           .thenAnswer(
