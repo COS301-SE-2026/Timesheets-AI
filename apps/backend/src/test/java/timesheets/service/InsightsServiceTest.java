@@ -23,6 +23,7 @@ import timesheets.domain.User;
 import timesheets.dto.request.ProductivityReportRequest;
 import timesheets.dto.response.PersonalInsightsResponse;
 import timesheets.enums.UserStatus;
+import timesheets.repository.ProjectRepository;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.security.SecurityUtils;
 
@@ -31,6 +32,7 @@ class InsightsServiceTest {
 
   @Mock TimeEntryRepository timeEntryRepository;
   @Mock private SecurityUtils securityUtils;
+  @Mock private ProjectRepository projectRepository;
   @InjectMocks InsightsService insightsService;
 
   private User user;
@@ -57,6 +59,8 @@ class InsightsServiceTest {
 
     projectId = UUID.fromString("00000000-0000-0000-0004-000000000001");
     taskId = UUID.fromString("00000000-0000-0000-0006-000000000001");
+
+    when(projectRepository.findAllById(any())).thenReturn(Collections.emptyList());
   }
 
   // !helper functions
@@ -120,7 +124,7 @@ class InsightsServiceTest {
     // ARRANGE: returning two entries of the same project and those should be grouped together
     LocalDateTime start = LocalDateTime.of(2026, 5, 14, 9, 0); // May 14 at 09:00
     when(timeEntryRepository.findByUserIdAndDateRange(any(), any(), any()))
-        .thenReturn(List.of(entry(120, start), entry(60, start.plusHours(3))));
+        .thenReturn(List.of(entry(7200, start), entry(3600, start.plusHours(3))));
 
     // ACT: calling the insights summary function
     PersonalInsightsResponse response = insightsService.getInsightsSummary(request);
@@ -137,7 +141,7 @@ class InsightsServiceTest {
     // ARRANGE: creating the entries of a specific task
     LocalDateTime start = LocalDateTime.of(2026, 5, 14, 9, 0);
     when(timeEntryRepository.findByUserIdAndDateRange(any(), any(), any()))
-        .thenReturn(List.of(entry(120, start)));
+        .thenReturn(List.of(entry(7200, start)));
 
     // ACT: calling the actual method I am testing
     PersonalInsightsResponse response = insightsService.getInsightsSummary(request);

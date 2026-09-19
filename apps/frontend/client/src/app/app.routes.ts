@@ -8,6 +8,7 @@ import { Routes } from '@angular/router';
 import { LandingPageComponent } from './features/landing/landing-page/landing-page.component';
 import { authGuard } from './core/guards/auth.guard';
 import { workspaceGuard } from './core/guards/workspace.guard'; 
+import { teamGuard } from './core/guards/team.guard'
 
 export const routes: Routes = [
   /* Default redirect */
@@ -89,6 +90,15 @@ export const routes: Routes = [
         .then(m => m.LeaveRequestsComponent)
   },
 
+  // Team page
+
+  {
+    path: 'team',
+    canActivate: [authGuard, workspaceGuard, teamGuard ],
+    loadComponent: () =>
+      import('./features/teams/teams.component').then((m) => m.TeamsComponent),
+  },
+
   //waiting-for-workspace
   {
     path: 'waiting-for-workspace',
@@ -110,6 +120,23 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/settings/settings.component')
         .then(m => m.SettingsComponent)
+
+  {
+    path: 'insights',
+    canActivate: [authGuard, workspaceGuard],
+    loadComponent: () =>
+      import('./features/insights/insights.component').then(
+        (m) => m.InsightsComponent,
+      ),
+  },
+
+  {
+    path: 'verify-email',
+    data: { layout: 'auth' },
+    loadComponent: () =>
+      import('./pages/verify-email/verify-email.component').then(
+        (m) => m.VerifyEmailComponent,
+      ),
   },
 
   /* 404 fallback */
@@ -120,6 +147,21 @@ export const routes: Routes = [
       import('./pages/not-found/not-found.component').then(
         (m) => m.NotFoundComponent,
       ),
+  },
+
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component')
+        .then(m => m.DashboardComponent)
+  },
+
+  {
+    path: 'notifications',
+    canActivate: [authGuard, workspaceGuard],
+    loadComponent: () =>
+      import('./features/notifications/notification-page/notifications-page.component')
+        .then(m => m.NotificationsPageComponent),
   },
 
   /* Catch-all wildcard (redirects to 404) */

@@ -1,12 +1,14 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, inject, signal, OnInit, ViewChild} from '@angular/core';
+import { Component, inject, signal, ViewChild, OnInit} from '@angular/core';
 import {  EventClickArg, CalendarOptions} from '@fullcalendar/core';
-import { FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular'
+import { FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular';
 import  dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { CalendarProvider, AppEvent } from './calendar.model';
 import { CalendarService } from './calendar.services';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router} from '@angular/router';
 export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 @Component({
   selector: 'app-calendar',
@@ -17,21 +19,25 @@ export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 })
 
 
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit{
   @ViewChild('calendar')
   calendarComponent!: FullCalendarComponent;
 
-  private calendarService= inject(CalendarService);
+  private readonly calendarService= inject(CalendarService);
+  private readonly http= inject(HttpClient);
+  private readonly route= inject(ActivatedRoute);
+  private readonly router= inject(Router);
+
 
   activeView= signal<CalendarView>('dayGridMonth');
-  provider= signal<CalendarProvider>( 'outlook');
+  provider= signal<CalendarProvider | null>(null );
   isSyncing= signal<boolean>(false);
   selectedEvent= signal<AppEvent | null>(null);
   currentDateTitle= signal<string>('');
 
   // HEADER PILL STUFF
   isConnected= signal<boolean>(false);
-  lastSyncedLabel= signal<string | null>('synced just now');
+  lastSyncedLabel= signal<string | null>(null);
 
   calendarOptions: CalendarOptions={
     plugins:[
@@ -45,13 +51,30 @@ export class CalendarComponent implements OnInit {
     height: 'auto',
     editable: false,
     selectable: false,
-    events: [],
+    events: (fetchInfo, successCallback, failureCallback)=>{
+      this.calendarService.getEvents(
+        this.formatCalendarDate(fetchInfo.start),
+        this.formatCalendarDate(fetchInfo.end)
+      ).subscribe(
+        {
+          next: (events)=>{
+            successCallback(events);
+          },
+          error: (error)=>{
+            console.error('Failed to load calendar evemts.', error);
+            this.isConnected.set(false);
+            failureCallback(error);
+          }
+        }
+      );
+    },
+
     eventClick: (info: EventClickArg)=> this.handleEventClick(info),
 
     // ADDING THE FC COLOURS
     eventClassNames:(arg)=>{
-      const category= arg.event.extendedProps['category'];
-      return category ? [`fc-event-${category}`]: [];
+      const category= arg.event.extendedProps['category'] || 'meetings';
+      return [`fc-event-${category}`];
     },
 
     eventContent:(arg)=> this.renderEventContent(arg),
@@ -79,39 +102,91 @@ export class CalendarComponent implements OnInit {
 
   
   ngOnInit(): void{
-    this.loadEvents();
-  }
 
-  loadEvents(): void{
-    this.calendarService.getEvents(this.provider(), '', '').subscribe(
-    {
-      next: (events)=>{
-        const api= this.calendarComponent?.getApi();
-        if(api){
-          api.removeAllEventSources();
-          api.addEventSource(events);
-        }else{
-          this.calendarOptions.events= events;
+    this.loadCalendarStatus();
+
+    // CHECKING IF COMING BACK FROM OAUTH REDIRECT
+    this.route.queryParams.subscribe(
+      params=>{
+        if(params['connected']=== 'true'){
+          // this.isConnected.set(true);
+          this.loadCalendarStatus();
+          this.syncCalendar();
+
+          // CLEANING PARAM FROM BROWSER BAR
+          this.router.navigate(
+            [], {
+              queryParams: {connected: null},
+              queryParamsHandling: 'merge'
+            }
+          );
         }
-
-        this.isConnected.set(true);
-
-        this.lastSyncedLabel.set(
-          this.formatSyncedLabel(
-            new Date().toISOString()
-          )
-        );
-      },
-
-      error:()=>{
-        this.isConnected.set(false);
       }
-    });
+    );
+    // const urlParams= new URLSearchParams(window.location.search);
+    // if(urlParams.has('code') && urlParams.has('state')){
+    //   this.isConnected.set(true);
+    // }
   }
 
   changeView(view: CalendarView): void{
     this.activeView.set(view);
     this.calendarComponent.getApi().changeView(view);
+  }
+
+  private loadCalendarStatus():void{
+    this.calendarService.getCalendarStatus().subscribe(
+      {
+        next: (status)=> {
+          this.isConnected.set(status.connected);
+          this.provider.set(status.provider);
+
+          if (status.lastSyncedAt){
+            this.lastSyncedLabel.set(
+              this.formatSyncedLabel(status.lastSyncedAt)
+            );
+          }else{
+            this.lastSyncedLabel.set(null);
+          }
+        },
+
+        error:(error)=>{
+          console.error(
+            'Failed to load calendar connection statuts.'
+          );
+
+          this.isConnected.set(false);
+          this.provider.set(null);
+          this.lastSyncedLabel.set(null);
+        }
+      }
+    );
+  }
+
+  connectCalendar():void{
+    this.http.get('/api/integrations/google/calendar/connect',{
+      responseType: 'text'
+    }).subscribe(
+      {
+        next:(authUrl: string)=>{
+          window.location.href= authUrl;
+        },
+        error:(error)=>{
+          console.error('Failed to connect Google Calendar', error);
+        }
+      }
+    );
+  }
+
+  private formatCalendarDate(date: Date): string{
+    const year= date.getFullYear();
+    const month= String(date.getMonth()+1).padStart(2, '0');
+    const day= String(date.getDate()).padStart(2, '0');
+    const hours= String(date.getHours()).padStart(2, '0');
+    const minutes= String(date.getMinutes()).padStart(2, '0');
+    const seconds= String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   }
 
   navigate(direction: 'prev' | 'next' | 'today'):void{
@@ -125,27 +200,13 @@ export class CalendarComponent implements OnInit {
   syncCalendar(): void{
     this.isSyncing.set(true);
 
-    this.calendarService.getEvents(this.provider(),'', '').subscribe({
-      next: (events)=>{
-        const api= this.calendarComponent?.getApi();
-        if(api){
-          api.removeAllEventSources();
-          api.addEventSource(events);
-        }
-          this.isSyncing.set(false);
-          this.isConnected.set(true);
+    const api= this.calendarComponent?.getApi();
 
-          this.lastSyncedLabel.set(
-            this.formatSyncedLabel(
-              new Date().toISOString()
-            )
-          );
-        },
-        error:()=> {
-          this.isSyncing.set(false);
-          this.isConnected.set(false);
-        }
-    });
+    if(api){
+      api.refetchEvents();
+    }
+
+    this.isSyncing.set(false);
   }
 
   handleEventClick(info: EventClickArg): void{
@@ -159,7 +220,7 @@ export class CalendarComponent implements OnInit {
       end: info.event.end?.toISOString() || '',
       description: rawProps['description'],
       location: rawProps['location'],
-      provider: this.provider(),
+      provider: this.provider()?? 'google',
       category: categoryKey,
       categoryLabel: rawProps['categoryLabel'] || this.getCategoryLabel(categoryKey),
       organizer: rawProps['organizer']
@@ -252,4 +313,5 @@ export class CalendarComponent implements OnInit {
     return `synced ${diffDays}d ago`;
     
   }
+
 }

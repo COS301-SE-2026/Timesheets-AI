@@ -1,8 +1,12 @@
 package timesheets.repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import timesheets.domain.EmailVerificationToken;
 
@@ -16,4 +20,15 @@ public interface EmailVerificationTokenRepository
   Optional<EmailVerificationToken> findByToken(String token);
 
   void deleteByUserId(UUID userId);
+
+  // mark token as verified
+  @Modifying
+  @Query(
+      "UPDATE EmailVerificationToken evt SET evt.verifiedAt = :verifiedAt WHERE evt.token = :token")
+  void markAsVerified(@Param("token") String token, @Param("verifiedAt") LocalDateTime verifiedAt);
+
+  // delete expired tokens
+  @Modifying
+  @Query("DELETE FROM EmailVerificationToken evt WHERE evt.expiresAt < :now")
+  void deleteExpiredTokens(@Param("now") LocalDateTime now);
 }

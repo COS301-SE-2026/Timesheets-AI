@@ -97,14 +97,10 @@ export class SignupComponent implements AfterViewInit{
     google.accounts.id.renderButton(this.googleBtn.nativeElement, {
       theme: 'outline',
       size: 'large',
-      width: 320,
+      width: 210,
     });
   }
 
-  protected triggerGoogleSignUp(): void {
-    const hiddenGoogleButton = this.googleBtn.nativeElement.querySelector('div[role="button"]');
-    hiddenGoogleButton?.click();
-  }
 
   private handleGoogleCredential(idToken: string): void {
     this.loading = true;

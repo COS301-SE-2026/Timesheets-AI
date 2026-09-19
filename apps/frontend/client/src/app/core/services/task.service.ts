@@ -50,6 +50,8 @@ export class TaskService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = '/api/tasks';
 
+  private readonly apiUrl = '/api'; 
+
   //gets a projects task
   getTasksForProject(projectId: string): Observable<TaskResponse[]> {
     return this.http
@@ -87,5 +89,29 @@ export class TaskService {
       });
       return throwError(() => error);
     };
+  }
+
+  linkTaskToJira(taskId: string, issueKey: string): Observable<void> {
+      return this.http.post<void>(
+          `${this.apiUrl}/integrations/jira/tasks/${taskId}/link/${issueKey}`,
+          {}
+      );
+  }
+
+  syncTaskFromJira(taskId: string): Observable<TaskResponse> {
+      return this.http.post<TaskResponse>(
+          `${this.apiUrl}/integrations/jira/tasks/${taskId}/sync`,
+          {}
+      );
+  }
+
+  checkJiraConnection(): Observable<{ connected: boolean }> {
+      return this.http.get<{ connected: boolean }>(`${this.apiUrl}/integrations/jira/status`)
+          .pipe(catchError(this.handleError('checkJiraConnection')));
+  }
+
+  connectJira(): Observable<string> {
+      return this.http.get(`${this.apiUrl}/integrations/jira/connect`, { responseType: 'text' })
+          .pipe(catchError(this.handleError('connectJira')));
   }
 }

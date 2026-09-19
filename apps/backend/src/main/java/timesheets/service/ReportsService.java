@@ -74,15 +74,15 @@ public class ReportsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 3600.0)
                           .sum();
 
                   // TimeEntry sample = entry.getValue().get(0);
 
                   return ProductivityReportResponse.TaskBreakdown.builder()
                       .taskId(entry.getKey())
-                      .taskTitle("Task " + entry.getKey()) // TODO: join with tasks table
-                      .projectName("Project") // TODO: join with projects table
+                      .taskTitle("Task " + entry.getKey())
+                      .projectName("Project")
                       .hoursLogged(hours)
                       .entryCount(entry.getValue().size())
                       .build();
@@ -113,7 +113,7 @@ public class ReportsService {
                 entry -> {
                   double hours =
                       entry.getValue().stream()
-                          .mapToDouble(e -> e.getDurationSeconds() / 60.0)
+                          .mapToDouble(e -> e.getDurationSeconds() / 3600.0)
                           .sum();
 
                   return ProductivityReportResponse.WeeklyBreakdown.builder()

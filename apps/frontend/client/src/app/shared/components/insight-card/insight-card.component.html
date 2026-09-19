@@ -1,0 +1,32 @@
+<div
+  class="card"
+  [class.raw]="variant === 'raw'"
+  [class.insight]="variant === 'insight'"
+  [class.summary]="variant === 'summary'"
+  [class]="'c-' + span"
+>
+  @if (title || badge !== 'none') {
+    <div class="card-head">
+      <div>
+        @if (title) {
+          <h3>{{ title }}</h3>
+        }
+        @if (subtitle) {
+          <div class="sub">{{ subtitle }}</div>
+        }
+      </div>
+
+      @if (badge === 'ai') {
+        <span class="badge badge-ai"><i class="fa-solid fa-sparkles"></i> AI</span>
+      }
+      @if (badge === 'raw') {
+        <span class="badge badge-raw">Raw</span>
+      }
+      @if (badge === 'comparison') {
+        <span class="badge badge-raw">Comparison</span>
+      }
+    </div>
+  }
+
+  <ng-content></ng-content>
+</div>

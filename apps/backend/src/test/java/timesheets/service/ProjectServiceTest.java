@@ -231,7 +231,7 @@ public class ProjectServiceTest {
 
       when(securityUtils.isAdmin()).thenReturn(false);
       when(securityUtils.isManager()).thenReturn(false);
-      when(projectMemberRepository.findByWorkspaceMemberId(testWorkspaceMemberId))
+      when(projectMemberRepository.findByWorkspaceMemberIdAndIsActiveTrue(testWorkspaceMemberId))
           .thenReturn(List.of(projectMember));
       when(projectRepository.findAllById(List.of(testProjectId))).thenReturn(projects);
 
@@ -253,7 +253,7 @@ public class ProjectServiceTest {
     void returnEmptyListWhenDeveloperHasNoProjects() {
       when(securityUtils.isAdmin()).thenReturn(false);
       when(securityUtils.isManager()).thenReturn(false);
-      when(projectMemberRepository.findByWorkspaceMemberId(testWorkspaceMemberId))
+      when(projectMemberRepository.findByWorkspaceMemberIdAndIsActiveTrue(testWorkspaceMemberId))
           .thenReturn(List.of());
 
       List<ProjectResponse> responses =
@@ -432,7 +432,7 @@ public class ProjectServiceTest {
       // I want for the project to be returned when searched by ID
       when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(projectMemberRepository.findByProjectId(testProjectId))
+      when(projectMemberRepository.findByProjectIdAndIsActiveTrue(testProjectId))
           .thenReturn(List.of(projectMember));
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(workspaceMember));

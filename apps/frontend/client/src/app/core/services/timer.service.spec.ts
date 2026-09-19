@@ -101,7 +101,7 @@ describe('TimerService', () => {
 
   it('should log and rethrow via the shared error handler when a request fails', () => {
     //this covers the handleError() closure body, one failure is enough since every method routes through the same handler
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     let caught: unknown;
 
     service.getActiveTimer().subscribe({ error: (err) => (caught = err) });

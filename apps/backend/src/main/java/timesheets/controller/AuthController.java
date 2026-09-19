@@ -4,13 +4,21 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.GoogleAuthRequest;
+import timesheets.dto.request.PasswordRequest;
 import timesheets.dto.request.RegisterRequest;
 import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
+import timesheets.security.CustomUserDetails;
 import timesheets.service.AuthService;
 
 // import timesheets.dto.request.GoogleAuthRequest;
@@ -48,21 +56,34 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
-  /*
-    @PostMapping("/forgot-password")
-    public ResponseEntity<MessageResponse> forgotPassword(
-        @Valid @RequestBody ForgotPasswordRequest request) {
-      MessageResponse response = authService.forgotPassword(request);
-      return ResponseEntity.ok(response);
-    }
+  @PostMapping("/forgot-password")
+  public ResponseEntity<MessageResponse> forgotPassword(
+      @Valid @RequestBody PasswordRequest.Forgot request) {
+    MessageResponse response = authService.forgotPassword(request);
+    return ResponseEntity.ok(response);
+  }
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<MessageResponse> resetPassword(
-        @Valid @RequestBody ResetPasswordRequest request) {
-      MessageResponse response = authService.resetPassword(request);
-      return ResponseEntity.ok(response);
-    }
-  */
+  @PostMapping("/reset-password")
+  public ResponseEntity<MessageResponse> resetPassword(
+      @Valid @RequestBody PasswordRequest.Reset request) {
+    MessageResponse response = authService.resetPassword(request);
+    return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/change-password")
+  public ResponseEntity<MessageResponse> changePassword(
+      Authentication authentication, @Valid @RequestBody PasswordRequest.Change request) {
+
+    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+    MessageResponse response =
+        authService.changePassword(
+            userDetails.getUserId(),
+            request.getCurrentPassword(),
+            request.getNewPassword(),
+            request.getConfirmPassword());
+    return ResponseEntity.ok(response);
+  }
 
   @PostMapping("/logout")
   public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorization) {

@@ -9,6 +9,9 @@
  * 
  * patched: Zamokuhle Zwane,  03 August 2026
  * I fixed the problem with my tasks page not showing up on the sidebar. I added a new route for my tasks and updated the navItems array to include it. I also added a new icon for my tasks.
+ * 
+ * added: Lerato Sibanda
+ * I added routing to the  teams page
  */
 
 import { Component, signal, inject, computed} from '@angular/core'; // UI componenet and signal store state, uodate UI changes automatically 
@@ -22,6 +25,7 @@ interface NavItem {
   icon: string, // CSS class or shared icon
   route: string; // Navigation URL 
   requiresWorkspace?: boolean;
+  allowedRoles?: string[];
 }
 
 @Component({
@@ -38,19 +42,25 @@ export class SidebarComponent {
 
   // create reactive state variable so it stores state, update UI automatically when changed 
   navItems = signal<NavItem[]>([
-    { label: 'Dashboard', icon:'dashboard', route:'/dashboard', requiresWorkspace: true}, 
-    { label: 'Timesheets', icon: 'description', route: '/timesheets', requiresWorkspace: true}, 
-    { label: 'Log Time', icon: 'schedule', route: '/log-time', requiresWorkspace: true},
-    { label: 'Projects', icon: 'folder', route: '/projects', requiresWorkspace: true},
-    { label: 'My Tasks', icon: 'task', route: '/my-tasks', requiresWorkspace: true},
-    { label: 'Calendar', icon: 'calendar_month', route: '/calendar', requiresWorkspace: true},
-    { label: 'Leave Requests', icon: 'business_center', route: '/leave-requests', requiresWorkspace: true},
-    { label: 'Reports', icon: 'bar_chart', route: '/reports', requiresWorkspace: true},
-    { label: 'Insights', icon: 'trending_up', route: '/insights', requiresWorkspace: true},
-    { label: 'Team', icon: 'groups', route: '/team', requiresWorkspace: true},
-    { label: 'Settings', icon: 'settings', route: '/settings' }
+    { label: 'Dashboard', icon:'dashboard', route:'/dashboard', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']}, 
+    { label: 'Timesheets', icon: 'description', route: '/timesheets', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER']}, 
+    { label: 'Log Time', icon: 'schedule', route: '/log-time', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER']},
+    { label: 'Projects', icon: 'folder', route: '/projects', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
+    { label: 'My Tasks', icon: 'task', route: '/my-tasks', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER']},
+    { label: 'Calendar', icon: 'calendar_month', route: '/calendar', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
+    { label: 'Leave Requests', icon: 'business_center', route: '/leave-requests', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
+    //{ label: 'Reports', icon: 'bar_chart', route: '/reports', requiresWorkspace: true},
+    { label: 'Insights', icon: 'trending_up', route: '/insights', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
+    { label: 'Team', icon: 'groups', route: '/team', requiresWorkspace: true, allowedRoles: ['ROLE_ADMIN', 'ROLE_MANAGER']},
+    { label: 'Settings', icon: 'settings', route: '/settings', allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN'] }
   ]);
 
+  readonly visibleNavItems = computed(() => {
+    const roles = this.authService.currentUser()?.roles ?? [];
+    return this.navItems().filter((item) =>
+    !item.allowedRoles || item.allowedRoles.some((role) => roles.includes(role)),
+  );
+  });
   // Temporary mock tracking for active link styling until full router links are added 
   // Stores the currently selected navigation item.
   // activeRoute = signal<string>('Timesheets');

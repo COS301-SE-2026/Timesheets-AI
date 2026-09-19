@@ -73,6 +73,25 @@ def calculate_productivity_score(
     }
 
 
+def get_projects_with_tasks_in_period(
+    db: Session, workspace_member_id: uuid.UUID, period_start: date, period_end: date
+) -> list[uuid.UUID]:
+    rows = (
+        db.query(Task.project_id)
+        .filter(
+            and_(
+                Task.assigned_workspace_member_id == workspace_member_id,
+                Task.due_date >= period_start,
+                Task.due_date <= period_end,
+                Task.is_deleted.is_(False),
+            )
+        )
+        .distinct()
+        .all()
+    )
+    return [row[0] for row in rows]
+
+
 def save_productivity_insight(
     db: Session, workspace_member_id: uuid.UUID, result: dict
 ) -> AIInsight:

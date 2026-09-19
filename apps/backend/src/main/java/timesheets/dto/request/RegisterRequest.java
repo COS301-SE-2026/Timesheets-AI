@@ -20,9 +20,9 @@ public class RegisterRequest {
   @NotBlank(message = "Email is required")
   @Pattern(
       regexp =
-          "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@(momentum\\.co\\.za|momentum\\.com)$",
+          "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@(momentum\\.co\\.za|momentum\\.com|gmail\\.com|cs\\.up\\.ac\\.za|outlook\\.com)$",
       message =
-          "Email must be from the accepted domain") // should be momentum.co.za or momentum.com
+          "Email must be from an accepted domain: momentum.co.za, momentum.com, gmail.com, cs.up.ac.za, or outlook.com")
   private String email;
 
   @NotBlank(message = "Password is required")

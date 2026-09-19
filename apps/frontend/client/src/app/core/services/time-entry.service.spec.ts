@@ -108,7 +108,7 @@ describe('TimeEntryService', () => {
   });
 
   it('should log and rethrow via the shared error handler when a request fails', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     let caught: unknown;
 
     service.getMyEntries().subscribe({ error: (err) => (caught = err) });

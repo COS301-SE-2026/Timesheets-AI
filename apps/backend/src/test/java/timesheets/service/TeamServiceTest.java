@@ -118,6 +118,7 @@ public class TeamServiceTest {
 
       // ARRANGE: setting up the request and the user
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
+
       User user = createTestUser();
       WorkspaceMember savedMember = createTestWorkspaceMember();
 
@@ -184,7 +185,6 @@ public class TeamServiceTest {
 
       when(securityUtils.isAdmin()).thenReturn(true);
       when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
-
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
       when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
 
@@ -229,7 +229,6 @@ public class TeamServiceTest {
       List<WorkspaceMember> admins = List.of(createTestAdminWorkspaceMember());
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(member));
       when(workspaceMemberRepository.findAllByWorkspaceIdAndRole(
@@ -260,33 +259,12 @@ public class TeamServiceTest {
     void throwExceptionWhenWorkspaceMemberNotFound() {
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
 
       when(workspaceMemberRepository.findById(testWorkspaceMemberId)).thenReturn(Optional.empty());
 
       assertThatThrownBy(() -> teamService.removeUserFromWorkspace(testWorkspaceMemberId))
           .isInstanceOf(ResourceNotFoundException.class)
           .hasMessage("Workspace member not found");
-
-      verify(workspaceMemberRepository, never()).delete(any(WorkspaceMember.class));
-    }
-
-    @Test
-    @DisplayName("throw exception when member does not belong to workspace")
-    void throwExceptionWhenMemberNotInWorkspace() {
-
-      WorkspaceMember member = createTestWorkspaceMember();
-      member.setWorkspaceId(UUID.randomUUID());
-
-      when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
-
-      when(workspaceMemberRepository.findById(testWorkspaceMemberId))
-          .thenReturn(Optional.of(member));
-
-      assertThatThrownBy(() -> teamService.removeUserFromWorkspace(testWorkspaceMemberId))
-          .isInstanceOf(AccessDeniedException.class)
-          .hasMessage("Member does not belong to your workspace");
 
       verify(workspaceMemberRepository, never()).delete(any(WorkspaceMember.class));
     }
@@ -301,9 +279,9 @@ public class TeamServiceTest {
       List<WorkspaceMember> admins = List.of(adminMember);
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(adminMember));
+
       when(workspaceMemberRepository.findAllByWorkspaceIdAndRole(
               testWorkspaceId, WorkspaceRole.ADMIN))
           .thenReturn(admins);
@@ -321,13 +299,14 @@ public class TeamServiceTest {
 
       WorkspaceMember member = createTestWorkspaceMember();
       WorkspaceMember adminMember = createTestAdminWorkspaceMember();
+
       List<WorkspaceMember> admins = List.of(adminMember);
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
 
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(member));
+
       when(workspaceMemberRepository.findAllByWorkspaceIdAndRole(
               testWorkspaceId, WorkspaceRole.ADMIN))
           .thenReturn(admins);

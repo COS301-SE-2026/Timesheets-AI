@@ -21,32 +21,44 @@ Related Requirements: N/A
 
         <!-- CONNECTION PILL -->
         <div class="header-actions">
-            @if (isConnected()){
+            @if (isConnected() && provider()){
                 <div class="connection-status">
-                    <span class="status-dot">
+                    <span 
+                        class="status-dot"
+                        [class.connected]="isConnected()">
                     </span>
                     <span>
-                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }} connected
+                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }}
+                        {{ isConnected() ? 'connected' : 'not connected'}}
                     </span>
-                    @if(lastSyncedLabel()){
+                    @if (lastSyncedLabel()){
                         <span class="sync-meta">
                             &middot; {{ lastSyncedLabel() }}
                         </span>
                     }
                 </div>
-            }
 
-            <!-- SYNCING AREA -->
-            <button 
-                class="sync-button"
-                (click)="syncCalendar()"
-                [disabled]="isSyncing()">
-                <i 
-                    class="fa-solid fa-rotate"
-                    [class.fa-spin]="isSyncing()">
-                </i>
-                {{ isSyncing()? 'Syncing...': ('Sync ' + (provider()=== 'outlook'? 'Outlook': 'Google') +' now') }}
-            </button>
+                <!-- SYNCING AREA -->
+                <button 
+                    class="sync-button"
+                    (click)="syncCalendar()"
+                    [disabled]="isSyncing()">
+                    <i 
+                        class="fa-solid fa-rotate"
+                        [class.fa-spin]="isSyncing()">
+                    </i>
+                    {{ isSyncing()? 'Syncing...': provider()=== 'outlook'? 'Sync Outlook now': 'Sync Google now' }}
+                </button>
+            }@else{
+                <!-- NO CALENDAR CONNECTED -->
+                <button 
+                    class="sync-button"
+                    (click)="connectCalendar()"
+                    [disabled]="isSyncing()">
+                    <i class="fa-solid fa-calendar-plus"></i>
+                    Connect calendar
+                </button>
+            }
         </div>
     </header>
 
@@ -139,11 +151,17 @@ Related Requirements: N/A
 
             <div class="legend-readonly">
                 <i class="fa-solid fa-lock"></i>
+                @if(isConnected() && provider()){
+                    <span>
+                        This is a read-only calendar
+                        Events are imported from
+                        {{ provider() === 'outlook'? 'Outlook': 'Google Calendar'}}.
+                        To make changes, use your calendar provider.
+                    </span>         
+                }@else{
                     This is a read-only calendar
-                    Events are imported from
-                    {{ provider() === 'outlook'? 'Outlook': 'Google Calendar'}}.
-                    To make changes, use your calendar provider.
-            
+                    Connect to Google Calendar or Outlook to import your events.
+                }
             </div>
         </div>
         
@@ -151,14 +169,13 @@ Related Requirements: N/A
 
     <!-- POP UP OF THE CLICKED EVENT  -->
     @if(selectedEvent(); as event){
-        <div 
+        <button 
             class="modal-backdrop"
             (click)="closeEventDetails()">
-        </div>
+        </button>
 
-        <div 
+        <dialog 
             class="event-details-card"
-            role="dialog"
             aria-modal="true">
             <button 
                 class="close-button"
@@ -245,6 +262,6 @@ Related Requirements: N/A
 
                 
             </div>    
-        </div>
+        </dialog>
     }
 </div>

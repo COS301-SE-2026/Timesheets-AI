@@ -16,12 +16,19 @@ from app.config import settings
 
 # In this file, I am setting up the db connection and session managing
 # it will be used in the health endpoint
-engine = create_engine(
-    settings.database_url,
-    pool_pre_ping=True,
-    pool_size=5,
-    max_overflow=10,
-)
+# if part is to fix the CI/test fix
+# the production will use else path
+if settings.database_url.startswith("sqlite"):
+    engine = create_engine(
+        settings.database_url,
+    )
+else:
+    engine = create_engine(
+        settings.database_url,
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=10,
+    )
 
 logger = logging.getLogger(__name__)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -47,3 +54,6 @@ def check_connection():
     except Exception:
         logger.exception("Database connection error: %s")
         return False
+
+
+from app import models  # noqa: F401,E402 — registers all model tables with Base.metadata

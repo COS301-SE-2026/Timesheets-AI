@@ -1,7 +1,20 @@
 package timesheets.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -67,11 +80,28 @@ public class User {
   @Builder.Default
   private UserStatus status = UserStatus.ACTIVE;
 
+  @Column(name = "deletion_requested_at")
+  private LocalDateTime deletionRequestedAt;
+
+  @Column(name = "deletion_reason")
+  private String deletionReason;
+
+  @Column(name = "deletion_processed_at")
+  private LocalDateTime deletionProcessedAt;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
   @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
+
+  @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
+  @Builder.Default
+  private List<WorkspaceMember> workspaceMembers = new ArrayList<>();
+
+  @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
+  @Builder.Default
+  private List<UserIdentityProvider> identityProviders = new ArrayList<>();
 
   @PrePersist
   protected void onCreate() {

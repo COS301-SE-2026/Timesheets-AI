@@ -23,6 +23,7 @@ public class AuthException extends RuntimeException {
     SSO_USER("This account uses Google SSO. Please sign in with Google."),
     EMAIL_EXISTS("Email already exists. Please login or use a different email."),
     EMAIL_DOMAIN("Email domain not accepted. Please use a valid company email."),
+    EMAIL_NOT_VERIFIED("This email not verified."),
 
     TOKEN_NOT_FOUND("Invalid verification token"),
     TOKEN_EXPIRED("Verification token has expired"),
