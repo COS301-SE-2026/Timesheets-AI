@@ -58,16 +58,7 @@ export class AuthService {
   // this approach works correctly with Nginx reverse proxy 
   private readonly baseUrl = `${environment.apiUrl}/auth`;
 
-  private readonly msalInstance = new PublicClientApplication({
-    auth: {
-      clientId: environment.microsoftClientId,
-      authority: `https://login.microsoftonline.com/${environment.microsoftTenantId}`,
-      redirectUri: window.location.origin,
-    },
-    cache: {
-      cacheLocation: 'sessionStorage',
-    },
-  });
+  private msalInstance: PublicClientApplication | null = null;
 
   private msalInitialized = false;
 
@@ -97,8 +88,27 @@ export class AuthService {
       return;
     }
 
-    await this.msalInstance.initialize();
+    const msalInstance = this.getMsalInstance();
+    await msalInstance.initialize();
+
     this.msalInitialized = true;
+  }
+
+  private getMsalInstance(): PublicClientApplication {
+    if (!this.msalInstance) {
+      this.msalInstance = new PublicClientApplication({
+        auth: {
+          clientId: environment.microsoftClientId,
+          authority: 'https://login.microsoftonline.com/common',
+          redirectUri: `${window.location.origin}/auth/microsoft-redirect`,
+        },
+        cache: {
+          cacheLocation: 'sessionStorage',
+        },
+      });
+    }
+
+    return this.msalInstance;
   }
 
   register(payload: RegisterRequest): Observable<RegisterResponse> {
@@ -128,34 +138,30 @@ export class AuthService {
   googleAuth(idToken: string): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/google`, { idToken })
-      .pipe(
-        tap((res) => this.persistSession(res)),
-        catchError(this.handleError),
-      );
+      .pipe(tap((res) => this.persistSession(res)),catchError(this.handleError),);
   }
 
   async microsoftAuth(): Promise<AuthResponse> {
-  await this.initializeMsal();
+    await this.initializeMsal();
 
-  const microsoftResult: AuthenticationResult =
-    await this.msalInstance.loginPopup({
-      scopes: ['openid', 'profile', 'email'],
-      prompt: 'select_account',
-    });
+    const msalInstance = this.getMsalInstance();
 
-  if (!microsoftResult.idToken) {
-    throw new Error('Microsoft did not return an ID token.');
-  }
+    const microsoftResult: AuthenticationResult =
+      await msalInstance.loginPopup({
+        scopes: ['openid', 'profile', 'email'],
+        prompt: 'select_account',
+      });
 
-  return new Promise<AuthResponse>((resolve, reject) => {
+    if (!microsoftResult.idToken) {
+      throw new Error('Microsoft did not return an ID token.');
+    }
+
+    return new Promise<AuthResponse>((resolve, reject) => {
       this.http
         .post<AuthResponse>(`${this.baseUrl}/microsoft`, {
           idToken: microsoftResult.idToken,
         })
-        .pipe(
-          tap((res) => this.persistSession(res)),
-          catchError(this.handleError),
-        )
+        .pipe(tap((res) => this.persistSession(res)), catchError(this.handleError),)
         .subscribe({
           next: resolve,
           error: reject,
