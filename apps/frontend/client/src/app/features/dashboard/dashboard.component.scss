@@ -351,6 +351,49 @@
   grid-column: span 2;
 }
 
+.task-list, .event-list, .deadline-row {
+  display: grid;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #e5eef9;
+  color: inherit;
+  text-decoration: none;
+}
+
+.task-row {
+  grid-template-columns: 40px minmax(0, 1fr) auto 14px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #147cf5;
+  color: white;
+  font-size: 12px;
+}
+
+.task-copy, .event-row span, .deadline-row span {
+  min-width: 0;
+  display:grid;
+  gap: 4px;
+}
+
+.task-copy strong, .event-row strong, .deadline-row span > strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.task-copy small, .event-row small, .deadline-row small {
+  color: var(--color-text-muted);
+  font-size: 12px;
+} 
+
 .dashboard-content {
   width: 100%;
 }
