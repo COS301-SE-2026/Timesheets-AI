@@ -3,6 +3,8 @@ package timesheets.integration.issue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -193,6 +195,31 @@ public class JiraAdapter implements IssueTrackerAdapter {
     log.info("Linked task {} to Jira issue: {}", taskId, issueKey);
   }
 
+  @Override
+  public List<IssueResponse> getIssues(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+    List<IssueResponse> issues = getIssues(workspaceMemberId);
+    List<IssueResponse> filteredIssues = new ArrayList<IssueResponse>();
+
+    for (IssueResponse issue : issues) {
+
+      LocalDateTime createdAt = parseJiraTimestamp(issue.getCreatedAt());
+      LocalDateTime updatedAt = parseJiraTimestamp(issue.getUpdatedAt());
+
+      boolean createdInRange =
+          createdAt != null && !createdAt.isBefore(startTime) && !createdAt.isAfter(endTime);
+
+      boolean updatedInRange =
+          updatedAt != null && !updatedAt.isBefore(startTime) && !updatedAt.isAfter(endTime);
+
+      if (createdInRange || updatedInRange) {
+        filteredIssues.add(issue);
+      }
+    }
+
+    return filteredIssues;
+  }
+
   // ! helper functions
   private HttpHeaders createAuthHeaders(String accessToken) {
     HttpHeaders headers = new HttpHeaders();
@@ -224,6 +251,33 @@ public class JiraAdapter implements IssueTrackerAdapter {
     }
 
     return dto;
+  }
+
+  private LocalDateTime parseJiraTimestamp(String timestamp) {
+
+    if (timestamp == null || timestamp.isBlank()) {
+      return null;
+    }
+
+    try {
+
+      return java.time.OffsetDateTime.parse(timestamp).toLocalDateTime();
+
+    } catch (Exception e) {
+
+      try {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+
+        return OffsetDateTime.parse(timestamp, formatter).toLocalDateTime();
+
+      } catch (Exception secondException) {
+
+        log.warn("Could not parse Jira timestamp", timestamp);
+
+        return null;
+      }
+    }
   }
 
   private String getString(JsonNode node, String field) {
