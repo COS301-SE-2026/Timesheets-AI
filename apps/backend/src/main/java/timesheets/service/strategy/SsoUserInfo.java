@@ -11,5 +11,4 @@ public record SsoUserInfo(
     String firstName,
     String lastName,
     String avatarUrl,
-    boolean emailVerified) 
-{}
+    boolean emailVerified) {}

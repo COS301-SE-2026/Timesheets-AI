@@ -10,7 +10,6 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-
 /*
 - the concrete strategy for Google
 - it will only know about google, not how to create users or how to access the DB
@@ -32,9 +31,11 @@ public class GoogleSsoStrategy implements SsoAuthenticationStrategy {
 
     GoogleIdToken.Payload payload = verifyToken(idToken);
 
-    String firstName = payload.get("given_name") != null ? (String) payload.get("given_name") : "Google User";
+    String firstName =
+        payload.get("given_name") != null ? (String) payload.get("given_name") : "Google User";
 
-    String lastName =payload.get("family_name") != null ? (String) payload.get("family_name") : "Unknown";
+    String lastName =
+        payload.get("family_name") != null ? (String) payload.get("family_name") : "Unknown";
 
     return new SsoUserInfo(
         getProvider(),
@@ -48,7 +49,7 @@ public class GoogleSsoStrategy implements SsoAuthenticationStrategy {
 
   private GoogleIdToken.Payload verifyToken(String idToken) {
 
-    //dev token for testing
+    // dev token for testing
     if ("swagger-test".equals(idToken)) {
 
       GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
@@ -65,7 +66,10 @@ public class GoogleSsoStrategy implements SsoAuthenticationStrategy {
     try {
 
       GoogleIdTokenVerifier verifier =
-          new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance()).setAudience(Collections.singletonList(googleClientId)).build();
+          new GoogleIdTokenVerifier.Builder(
+                  new NetHttpTransport(), GsonFactory.getDefaultInstance())
+              .setAudience(Collections.singletonList(googleClientId))
+              .build();
 
       GoogleIdToken googleToken = verifier.verify(idToken);
 
@@ -74,8 +78,7 @@ public class GoogleSsoStrategy implements SsoAuthenticationStrategy {
       }
       return googleToken.getPayload();
 
-    } 
-    catch (Exception exception) {
+    } catch (Exception exception) {
       throw new AuthException(ErrorCode.INVALID_CREDENTIALS);
     }
   }
