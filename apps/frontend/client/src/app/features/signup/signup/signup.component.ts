@@ -172,7 +172,7 @@ export class SignupComponent implements AfterViewInit{
         this.loading = false;
         //no token comes back here, they still need to verify email then log in
 
-        this.router.navigate(['/dashboard'], {
+        this.router.navigate(['/login'], {
           queryParams: {registered: 'true'}
         });
       },

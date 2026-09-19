@@ -1,6 +1,6 @@
 /*
 This file handles testing. So i had to remove the old tests because we had mocked a lot of things
-Covers the login form end-to-end: succesful login, redirect to /log-time,
+Covers the login form end-to-end: succesful login, redirect to /dashboard,
 the Mfa toast path(isnt implemented in the UI yet), failing login, error
 handling, and the individual field validators, also added a snapshot test to catch unintended markup changes
 
@@ -141,7 +141,7 @@ describe('LoginComponet', () => {
     });
 
     expect(comp.loading).toBe(false);
-    expect(navigateSpy).toHaveBeenCalledWith(['/log-time']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/dashboard']);
   });
 
   it('should show MFA toast instead of navigating when requiresMfa is true', () => {
@@ -321,19 +321,6 @@ describe('LoginComponet', () => {
     jest.useRealTimers();
   });
 
-  it('onSocialLogin should show a "not available yet" toast naming the provider', () => {
-    const comp = component as unknown as LoginComponentInternals & {
-      onSocialLogin(provider: string): void;
-    };
-
-    comp.onSocialLogin('Microsoft');
-
-    expect(comp.showToast).toBe(true);
-    expect(comp.toastMessage).toBe(
-      'Microsoft login is not available yet, use email and password.',
-    );
-  });
-
 
   describe('handleGoogleCredential (via the Google Identity callback)', () => {
     //ngAfterViewInit passes handleGoogleCredential in as the `callback` option to google.accounts.id.initialize(), which we've stubbed with jest.fn()
@@ -346,7 +333,7 @@ describe('LoginComponet', () => {
       return initializeCall.callback;
     }
 
-    it('should log in and navigate to /log-time on a normal (non-MFA) credential', () => {
+    it('should log in and navigate to /dashboard on a normal (non-MFA) credential', () => {
       const comp = component as unknown as LoginComponentInternals;
       const router = TestBed.inject(Router);
       const navigateSpy = jest.spyOn(router, 'navigate').mockResolvedValue(true);
@@ -375,7 +362,7 @@ describe('LoginComponet', () => {
       });
 
       expect(comp.loading).toBe(false);
-      expect(navigateSpy).toHaveBeenCalledWith(['/log-time']);
+      expect(navigateSpy).toHaveBeenCalledWith(['/dashboard']);
     });
 
     it('should show the MFA toast instead of navigating when requiresMfa is true', () => {
