@@ -73,7 +73,7 @@
                 } @else {
                     <div class="list-empty">
                         <p>No timer is running.</p>
-                        <a class="start-timer-button" routerLink="/log-timer"><i class="fa-solid fa-play"></i> Start timer </a>
+                        <a class="start-timer-button" routerLink="/log-time"><i class="fa-solid fa-play"></i> Start timer </a>
                     </div>
                 }
             </article>
@@ -97,12 +97,15 @@
             <article class="card summary-card project-card">
                 <div class="card-heading">
                     <span class="icon-orb green">
-                        <i class="fa-solid fa-circle-check"></i>
+                        <i class="fa-solid fa-folder"></i>
                     </span>
+                    <div>
                     <h2>Active projects</h2>
+                    <p>Projects you contribute to</p>
+                    </div>
                 </div>
                 <strong> {{ activeProjects().length }}</strong>
-                <p>Projects you contribute to</p>
+                
                 <a routerLink="/projects">
                     View projects
                     <i class="fa-solid fa-arrow-right"></i>
@@ -143,6 +146,19 @@
                             <i class="fa-solid fa-arrow-right"></i>
                         </a>
                     }
+                } @else {
+                    <div class="tasks-empty">
+                        <span class="empty-task-icon" aria-hidden="true">
+                            <span class="task-sheet">
+                                <i class="fa-solid fa-check"></i><b></b>
+                                <i class="fa-solid fa-check"></i><b></b>
+                                <i class="fa-solid fa-check"></i><b></b>
+                            </span>
+                            <i class="fa-solid fa-check empty-task-check"></i>
+                        </span>
+                        <strong>No active tasks</strong>
+                        <p>You're all caught up!</p>
+                    </div>
                 }
             </article>
             <!-- Calendar summary card -->
