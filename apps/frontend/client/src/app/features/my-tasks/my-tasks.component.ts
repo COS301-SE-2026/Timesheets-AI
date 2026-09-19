@@ -299,7 +299,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     this.loadTasks();
     this.loadProjects();
     this.checkJiraConnection();
-    const taskId = this.route.snapshot.queryParams.get('taskId');
+    const taskId = this.route.snapshot.queryParamMap.get('taskId');
     if (taskId) {
       this.openTaskDetail(taskId);
     }
