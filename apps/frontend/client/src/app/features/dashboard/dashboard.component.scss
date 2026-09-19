@@ -276,6 +276,44 @@
   color: #7c3aed;
 }
 
+.timer-status {
+  margin-left: auto;
+  padding: 7px 11px;
+  border-radius: 99px;
+  background: #dcf6e4;
+  color: #158347;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.timer-value {
+  display: block;
+  margin: 16px 0 3px;
+  color: #102b61;
+  font-size: 34px;
+}
+
+.context {
+  margin: 0 0 16px;
+  color: #5875aa;
+  font-size: 13px;
+}
+
+.timer-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.timer-actions button,
+.link-button {
+  border: 0;
+  border-radius: 7px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .dashboard-content {
   width: 100%;
 }
