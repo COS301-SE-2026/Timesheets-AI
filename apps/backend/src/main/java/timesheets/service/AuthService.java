@@ -206,8 +206,8 @@ public class AuthService {
   }
 
   /*
-   * I am using no rollback such that there is no rollback for login failures.
-   * I want the login attempts to still register in the DB
+  - I am using no rollback such that there is no rollback for login failures.
+  - I want the login attempts to still register in the DB
    */
   @Transactional(noRollbackFor = {AuthException.class})
   public AuthResponse login(AuthRequest request) {
