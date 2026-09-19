@@ -314,6 +314,43 @@
   cursor: pointer;
 }
 
+.danger-button {
+  background: #e93445;
+  color: white;
+}
+
+.secondary-button {
+  border: 1px solid var(--color-input-border) !important;
+  background: white;
+  color: #173b78;
+}
+
+.link-button,
+.summary-card a {
+  background: none;
+  color: #0877ed;
+  text-decoration: none;
+}
+
+.summary-card > strong {
+  display: block;
+  margin: 16px 0 0;
+  font-size: 31px;
+  color: #102b61;
+}
+
+.summary-card a {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.manager-grid .task-card,
+.manager-grid .hours-card {
+  grid-column: span 2;
+}
+
 .dashboard-content {
   width: 100%;
 }
