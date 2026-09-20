@@ -10,7 +10,7 @@ import { CurrentUser } from "./settings.model";
 
 @Injectable({ providedIn: 'root'})
 export class CurrentUserService{
-    private http= inject(HttpClient);
+    private readonly http= inject(HttpClient);
     private readonly apiUrl='api/users/me';
 
     private readonly mockUser: CurrentUser= {
