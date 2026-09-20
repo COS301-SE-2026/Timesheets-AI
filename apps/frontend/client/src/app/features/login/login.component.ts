@@ -138,7 +138,7 @@ export class LoginComponent implements AfterViewInit {
           this.showDemoToast('MFA is not supported in the UI yet');
           return;
         }
-        this.router.navigate(['/log-time']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.loading = false;
@@ -173,7 +173,7 @@ export class LoginComponent implements AfterViewInit {
           this.showDemoToast('MFA is not supported in the UI yet.');
           return;
         }
-        this.router.navigate(['/log-time']);
+        this.router.navigate(['/dashboard']);
       },
 
       error: (err) => {
