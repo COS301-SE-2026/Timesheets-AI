@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import timesheets.domain.IntegrationToken;
 import timesheets.domain.Task;
 import timesheets.dto.request.CreateIssueRequest;
+import timesheets.dto.response.CommentResponse;
 import timesheets.dto.response.IssueResponse;
 import timesheets.dto.response.WorklogResponse;
 import timesheets.repository.IntegrationTokenRepository;
@@ -294,6 +295,74 @@ public class JiraAdapter implements IssueTrackerAdapter {
     }
 
     return worklogs;
+  }
+
+  @Override
+  public List<CommentResponse> getComments(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+    List<IssueResponse> issues = getIssues(workspaceMemberId);
+    List<CommentResponse> comments = new ArrayList<CommentResponse>();
+    IntegrationToken token = getValidToken(workspaceMemberId);
+    String cloudId = token.getProviderResourceId();
+
+    for (IssueResponse issue : issues) {
+      String url =
+          "https://api.atlassian.com/ex/jira"
+              + cloudId
+              + "/rest/api/3/issue/"
+              + issue.getKey()
+              + "/comment";
+
+      HttpEntity<Void> request = new HttpEntity<Void>(createAuthHeaders(token.getAccessToken()));
+
+      ResponseEntity<String> response =
+          restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
+      try {
+        JsonNode root = objectMapper.readTree(response.getBody());
+        JsonNode commentNodes = root.get("comments");
+
+        if (commentNodes == null || !commentNodes.isArray()) {
+          continue;
+        }
+
+        for (JsonNode commentNode : commentNodes) {
+          String created = getString(commentNode, "created");
+
+          LocalDateTime createdAt = parseJiraTimestamp(created);
+
+          if (createdAt == null) {
+            continue;
+          }
+
+          boolean withinRange = !createdAt.isBefore(startTime) && !createdAt.isAfter(endTime);
+
+          if (!withinRange) {
+            continue;
+          }
+
+          CommentResponse comment = new CommentResponse();
+
+          comment.setIssueKey(issue.getKey());
+          comment.setCommentId(getString(commentNode, "id"));
+          comment.setUpdatedAt(parseJiraTimestamp(getString(commentNode, "updated")));
+          comment.setBody(getString(commentNode, "body"));
+
+          JsonNode author = commentNode.get("author");
+
+          if (author != null && !author.isNull()) {
+            comment.setAuthorDisplayName(getString(author, "displayName"));
+            comment.setAuthorEmail(getString(author, "emailAddress"));
+          }
+
+          comments.add(comment);
+        }
+      } catch (Exception e) {
+        log.error("Failed to parse the comments for this issue" + issue.getKey(), e);
+      }
+    }
+
+    return comments;
   }
 
   // ! helper functions
