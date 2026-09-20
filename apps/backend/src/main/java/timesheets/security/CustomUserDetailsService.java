@@ -30,7 +30,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   public UserDetails loadUserByUsername(String email) {
     User user =
         userRepository
-            .findByEmail(email)
+            .findByEmailIgnoreCase(email)
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
     List<GrantedAuthority> authorities = new ArrayList<>();
