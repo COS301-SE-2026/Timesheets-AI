@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import timesheets.dto.request.CreateIssueRequest;
+import timesheets.dto.response.CommentResponse;
 import timesheets.dto.response.IssueResponse;
 import timesheets.dto.response.WorklogResponse;
 
@@ -16,9 +17,14 @@ public interface IssueTrackerAdapter {
   IssueResponse getIssue(UUID workspaceMemberId, String issueKey);
 
   // getting issue within time window
-  List<IssueResponse> getIssues(UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
+  List<IssueResponse> getIssues(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
 
-  List<WorklogResponse> getWorklogs(UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
+  List<WorklogResponse> getWorklogs(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
+
+  List<CommentResponse> getComments(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
 
   // the write operations
   IssueResponse createIssue(UUID workspaceMemberId, CreateIssueRequest request);
