@@ -14,4 +14,5 @@ public class OAuthState {
 
   private UUID workspaceMemberId;
   private String provider;
+  private String returnPath;
 }
