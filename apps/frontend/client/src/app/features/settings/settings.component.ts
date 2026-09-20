@@ -25,8 +25,8 @@ import { ChangePasswordDialogComponent } from './change-password-dialog/change-p
 })
 
 export class SettingsComponent implements OnInit{
-  private settingsService= inject(SettingsService);
-  private currentUserService= inject( CurrentUserService);
+  private readonly settingsService= inject(SettingsService);
+  private readonly currentUserService= inject( CurrentUserService);
   private dialog=inject(MatDialog);
 
   settings= signal<UserSettings | null>(null);
