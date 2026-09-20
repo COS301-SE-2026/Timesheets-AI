@@ -106,6 +106,17 @@ export class SettingsComponent implements OnInit{
     );
   }
 
+  toggleDoNotDisturb(enabled:boolean):void{
+        this.settings.update(
+          (s)=>(
+            s? {...s, notifications:{
+              ...s.notifications, doNotDisturbEnabled:enabled
+            }}: s
+          )
+        );
+  }
+  
+
   toggleIntegration(integration: IntegrationStatus, enabled:boolean):void{
     if(!this.canToggleIntegrations()){
       return;
