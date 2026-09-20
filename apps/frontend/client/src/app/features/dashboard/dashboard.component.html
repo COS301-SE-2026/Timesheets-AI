@@ -115,7 +115,7 @@
             <article class="card tasks-card">
                 <div class="card-heading">
                     <span  class="icon-orb light-blue">
-                    <i class="fa-solid fa-check"></i>
+                     <i class="fa-regular fa-square-check"></i>
                     </span>
                     <div>
                         <h2>My tasks in progress</h2>
@@ -147,17 +147,8 @@
                         </a>
                     }
                 } @else {
-                    <div class="tasks-empty">
-                        <span class="empty-task-icon" aria-hidden="true">
-                            <span class="task-sheet">
-                                <i class="fa-solid fa-check"></i><b></b>
-                                <i class="fa-solid fa-check"></i><b></b>
-                                <i class="fa-solid fa-check"></i><b></b>
-                            </span>
-                            <i class="fa-solid fa-check empty-task-check"></i>
-                        </span>
-                        <strong>No active tasks</strong>
-                        <p>You're all caught up!</p>
+                    <div class="list-empty">
+                        No task in progress.
                     </div>
                 }
             </article>
@@ -189,7 +180,9 @@
                         }
                     </div>
                 } @else {
-                    <div class="list-empty">Nothing else scheduled for today.</div>
+                    <div class="list-empty">
+                        Nothing else scheduled for today.
+                    </div>
                 }
             </article>
             <!-- Hours logged summary card -->
