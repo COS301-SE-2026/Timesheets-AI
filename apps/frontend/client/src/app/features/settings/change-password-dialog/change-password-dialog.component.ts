@@ -17,8 +17,8 @@ import { error } from 'node:console';
 })
 
 export class ChangePasswordDialogComponent {
-  private settingsService= inject(SettingsService);
-  private dialogRef= inject(MatDialogRef<ChangePasswordDialogComponent>);
+  private readonly settingsService= inject(SettingsService);
+  private readonly dialogRef= inject(MatDialogRef<ChangePasswordDialogComponent>);
 
   currentPassword='';
   newPassword='';
