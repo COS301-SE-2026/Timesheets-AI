@@ -92,7 +92,7 @@
 .dashboard-page {
   min-height: calc(100vh - 80px);
   padding: var(--space-8);
-  background: #f7fbff;
+  background: #ffffff;
   color: var(--color-text-body);
 }
 
@@ -242,8 +242,10 @@
   min-width: 0;
   padding: 22px;
   background: white;
+  border: 1px solid #c9e1fa;
   border-radius: 12px;
   box-shadow: var(--elevation-1);
+  box-shadow: 0 12px 28px rgba(8, 119, 237, 0.28);
 }
 
 .card-heading h2 {
@@ -339,10 +341,19 @@
 }
 
 .summary-card > strong {
-  display: block;
-  margin: 16px 0 0;
+  // display: block;
+  // margin: 16px 0 0;
+  display: grid;
+  flex: 1;
+  place-items: center;
+  margin: 16px 0;
   font-size: 31px;
   color: #102b61;
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
 }
 
 .summary-card a {
