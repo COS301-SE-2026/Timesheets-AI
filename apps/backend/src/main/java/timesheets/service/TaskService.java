@@ -19,7 +19,7 @@ import timesheets.domain.ProjectMember;
 import timesheets.domain.Task;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateTaskRequest;
-import timesheets.dto.response.JiraIssueResponse;
+import timesheets.dto.response.IssueResponse;
 import timesheets.dto.response.TaskResponse;
 import timesheets.integration.issue.JiraAdapter;
 import timesheets.repository.ProjectMemberRepository;
@@ -211,7 +211,7 @@ public class TaskService {
         }
 
         // going to be using the adapter to create the issue
-        JiraIssueResponse jiraIssue =
+        IssueResponse jiraIssue =
             jiraAdapter.createIssue(workspaceMemberId, request.getJiraDetails());
 
         // the jira ticket will be stored here, so that it is stored in the system
@@ -277,7 +277,7 @@ public class TaskService {
   // had to do research on how to extract in this way
   private String getDefaultJiraProject(UUID workspaceMemberId) {
     try {
-      List<JiraIssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
+      List<IssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
 
       if (issues != null && !issues.isEmpty()) {
         // the project key can be taken from the first issue

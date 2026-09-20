@@ -53,5 +53,5 @@ public class CreateTaskRequest {
 
   @Builder.Default private boolean createJiraIssue = false;
 
-  private CreateJiraIssueRequest jiraDetails;
+  private CreateIssueRequest jiraDetails;
 }

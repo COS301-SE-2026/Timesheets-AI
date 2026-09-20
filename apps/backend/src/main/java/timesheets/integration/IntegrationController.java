@@ -19,6 +19,7 @@ import timesheets.domain.IntegrationToken;
 import timesheets.domain.Task;
 import timesheets.domain.TimeEntry;
 import timesheets.dto.response.JiraIssueResponse;
+import timesheets.dto.response.IssueResponse;
 import timesheets.integration.issue.JiraAdapter;
 import timesheets.integration.issue.JiraOAuthService;
 import timesheets.repository.IntegrationTokenRepository;
@@ -251,17 +252,17 @@ public class IntegrationController {
 
   // this will get all the current issues for the user
   @GetMapping("/jira/issues")
-  public ResponseEntity<List<JiraIssueResponse>> getJiraIssues() {
+  public ResponseEntity<List<IssueResponse>> getJiraIssues() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    List<JiraIssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
+    List<IssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
     return ResponseEntity.ok(issues);
   }
 
   // this will get a specific Jira issue by it's key
   @GetMapping("/jira/issues/{issueKey}")
-  public ResponseEntity<JiraIssueResponse> getJiraIssue(@PathVariable String issueKey) {
+  public ResponseEntity<IssueResponse> getJiraIssue(@PathVariable String issueKey) {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    JiraIssueResponse issue = jiraAdapter.getIssue(workspaceMemberId, issueKey);
+    IssueResponse issue = jiraAdapter.getIssue(workspaceMemberId, issueKey);
     return ResponseEntity.ok(issue);
   }
 
