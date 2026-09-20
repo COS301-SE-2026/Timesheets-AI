@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import timesheets.dto.response.CommentResponse;
 import timesheets.dto.response.IssueResponse;
 import timesheets.dto.response.WorklogResponse;
 import timesheets.integration.issue.IssueTrackerAdapter;
@@ -59,7 +60,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
 
     // collect Jira worklog evidence
     evidenceEvents.addAll(collectWorklogEvidence(workspaceMemberId, startTime, endTime));
-
+    evidenceEvents.addAll(collectCommentEvidence(workspaceMemberId, startTime, endTime));
     return evidenceEvents;
   }
 
@@ -98,6 +99,52 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       metadata.put("timeSpentMinutes", worklog.getTimeSpentSeconds() / 60);
 
       evidenceEvent.setMetadata(metadata);
+      evidenceEvents.add(evidenceEvent);
+    }
+
+    return evidenceEvents;
+  }
+
+  private List<EvidenceEvent> collectCommentEvidence(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+
+    List<CommentResponse> comments =
+        issueTrackerAdapter.getComments(workspaceMemberId, startTime, endTime);
+
+    List<EvidenceEvent> evidenceEvents = new ArrayList<EvidenceEvent>();
+
+    for (CommentResponse comment : comments) {
+
+      EvidenceEvent evidenceEvent = new EvidenceEvent();
+
+      evidenceEvent.setId(UUID.randomUUID());
+      evidenceEvent.setSource("JIRA");
+      evidenceEvent.setWorkspaceMemberId(workspaceMemberId);
+
+      evidenceEvent.setTimestamp(comment.getCreatedAt());
+
+      evidenceEvent.setActivityType("COMMENT");
+
+      evidenceEvent.setDescription(comment.getBody());
+
+      Map<String, Object> metadata = new HashMap<String, Object>();
+
+      metadata.put("issueKey", comment.getIssueKey());
+
+      metadata.put("commentId", comment.getCommentId());
+
+      metadata.put("authorDisplayName", comment.getAuthorDisplayName());
+
+      metadata.put("authorEmail", comment.getAuthorEmail());
+
+      metadata.put("createdAt", comment.getCreatedAt());
+
+      metadata.put("updatedAt", comment.getUpdatedAt());
+
+      metadata.put("body", comment.getBody());
+
+      evidenceEvent.setMetadata(metadata);
+
       evidenceEvents.add(evidenceEvent);
     }
 
