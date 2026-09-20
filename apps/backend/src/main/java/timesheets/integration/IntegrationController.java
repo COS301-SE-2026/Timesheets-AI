@@ -18,7 +18,6 @@ import timesheets.auth.OAuthStateService;
 import timesheets.domain.IntegrationToken;
 import timesheets.domain.Task;
 import timesheets.domain.TimeEntry;
-import timesheets.dto.response.JiraIssueResponse;
 import timesheets.dto.response.IssueResponse;
 import timesheets.integration.issue.JiraAdapter;
 import timesheets.integration.issue.JiraOAuthService;
