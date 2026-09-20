@@ -17,6 +17,13 @@ export const routes: Routes = [
     component: LandingPageComponent,
   },
 
+  {
+    path: 'auth/microsoft-redirect',
+    loadComponent: () =>
+      import('./features/microsoft-redirect/microsoft-redirect.component')
+        .then((m) => m.MicrosoftRedirectComponent),
+  },
+
   /* Log Time page */
   {
     path: 'log-time',

@@ -102,6 +102,12 @@
         <p class="form-subtitle">Start tracking with intelligence today.</p>
       </header>
 
+      @if (errorMessage) {
+        <p class="form-error" role="alert">
+          {{ errorMessage }}
+        </p>
+      }
+
       <!-- Signup form -->
       <form [formGroup]="signupForm" (ngSubmit)="createAccount()" novalidate>
 
@@ -242,7 +248,13 @@
         </div>
 
         <!-- Submit button -->
-        <button class="submit-button" type="submit">Create Account</button>
+        <button class="submit-button" type="submit" [disabled]="loading">
+          @if (loading) {
+            Please wait...
+          } @else {
+            Create Account
+          }
+        </button>
       </form>
 
       <!-- Social login divider -->
@@ -256,14 +268,14 @@
       <div class="social-grid">
         <div #googleBtn class="google-button"></div>
 
-        <button class="social-button" type="button" aria-label="Sign up with Microsoft" (click)="onSocialLogin('Microsoft')">
+        <button class="social-button" type="button" aria-label="Sign up with Microsoft" (click)="signupWithMicrosoft()" [disabled]="loading">          
           <svg class="social-logo" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#f25022" d="M1 1h10v10H1z"/>
             <path fill="#00a4ef" d="M13 1h10v10H13z"/>
             <path fill="#7fba00" d="M1 13h10v10H1z"/>
             <path fill="#ffb900" d="M13 13h10v10H13z"/>
           </svg>
-          Sign in with Microsoft
+          Sign up with Microsoft
         </button>
 
       </div>
