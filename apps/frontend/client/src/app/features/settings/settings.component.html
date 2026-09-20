@@ -151,6 +151,8 @@ Realated Requirement: N/A
                 }
             </div>
         </section>
+
+        <!-- WHAT IT LOOKS LIKE(LIKE CUSTOMIZATIONS) -->
         
         <!-- NOTIFICATIONS AREA -->
         <section class="settings-card">
@@ -177,6 +179,7 @@ Realated Requirement: N/A
                             Choose how you want to be notified.
                         </p>
                     </div>
+
                     <mat-form-field
                         appearance="outline"
                         class="settings-select">
@@ -198,9 +201,9 @@ Realated Requirement: N/A
                             </mat-option> -->
                         </mat-select>
                     </mat-form-field>
-                    
                 </div>
 
+                <div class="setting-row">
                     <div class="setting-label">
                         <span class="label-title">
                             Do Not Disturb
@@ -209,16 +212,18 @@ Realated Requirement: N/A
                             Pause all non-urgent notifications during a selected time.
                         </p>
                     </div>
+                    
                     <div class="settings-control">
                         <span class="dnd-range">
                             {{ s.notifications.doNotDisturbStart }} - {{ s.notifications.doNotDisturbEnd}}
                         </span>
-                    </div>
-                    <mat-slide-toggle
-                        [checked]="s.notifications.doNotDisturbEnabled"
-                        (change)="toggleDoNotDisturb($event.checked)">
-                    </mat-slide-toggle>
-                </div> -->
+                
+                        <mat-slide-toggle
+                            [checked]="s.notifications.doNotDisturbEnabled"
+                            (change)="toggleDoNotDisturb($event.checked)">
+                        </mat-slide-toggle>
+                    </div> 
+                </div>
             </div>
         </section>
 
