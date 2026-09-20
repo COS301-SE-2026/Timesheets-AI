@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatFormField, MatSelectModule} from '@angular/material/select';
+import { MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from './settings.services';
 import { CurrentUserService } from './current-user.services';
@@ -27,7 +27,7 @@ import { ChangePasswordDialogComponent } from './change-password-dialog/change-p
 export class SettingsComponent implements OnInit{
   private readonly settingsService= inject(SettingsService);
   private readonly currentUserService= inject( CurrentUserService);
-  private dialog=inject(MatDialog);
+  private readonly dialog=inject(MatDialog);
 
   settings= signal<UserSettings | null>(null);
   role= signal<UserRole>('DEVELOPER');
