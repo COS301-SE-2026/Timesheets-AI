@@ -32,3 +32,4 @@ public interface IssueTrackerAdapter {
   // the link operations
   void linkTaskToIssue(UUID workspaceMemberId, UUID taskId, String issueKey);
 }
+z
