@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatFormField, MatSelectModule} from '@angular/material/select';
@@ -24,7 +24,7 @@ import { ChangePasswordDialogComponent } from './change-password-dialog/change-p
   styleUrl: './settings.component.scss'
 })
 
-export class SettingsComponent {
+export class SettingsComponent implements OnInit{
   private settingsService= inject(SettingsService);
   private currentUserService= inject( CurrentUserService);
   private dialog=inject(MatDialog);
