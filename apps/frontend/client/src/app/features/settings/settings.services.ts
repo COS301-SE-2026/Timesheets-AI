@@ -12,7 +12,7 @@ import { UserSettings, IntegrationStatus, AppearanceSettings, NotificationSettin
 
 @Injectable({ providedIn: 'root'})
 export class SettingsService{
-    private http= inject(HttpClient);
+    private readonly http= inject(HttpClient);
     private readonly apiUrl= 'api/settings';
     private readonly authUrl= 'api/auth';
 
