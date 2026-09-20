@@ -6,8 +6,7 @@
 
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable, of } from "rxjs";
-import { delay } from "rxjs";
+import { Observable, of, delay } from "rxjs";
 import { UserSettings, IntegrationStatus, AppearanceSettings, NotificationSettings, ChangePasswordRequest, ChangePasswordResponse } from "./settings.model";
 
 @Injectable({ providedIn: 'root'})
