@@ -210,7 +210,8 @@ class TaskServiceTest {
       - fetches the prject name
       - also get the name for display
       */
-      when(taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId))
+      when(taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(
+              workspaceMemberId))
           .thenReturn(List.of(task));
 
       when(securityUtils.isAdmin()).thenReturn(false);
@@ -239,7 +240,7 @@ class TaskServiceTest {
 
       // ensuring that the repo was called correctly
       verify(taskRepository, times(1))
-          .findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId);
+          .findByAssignedWorkspaceMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(workspaceMemberId);
     }
   }
 

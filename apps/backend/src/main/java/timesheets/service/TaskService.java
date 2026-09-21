@@ -101,7 +101,8 @@ public class TaskService {
   @Transactional(readOnly = true)
   public List<TaskResponse> getMyTasks(UUID workspaceMemberId) {
     List<Task> tasks =
-        taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId);
+        taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(
+            workspaceMemberId);
 
     return tasks.stream()
         // just because a user got access again, it does not mean they get access to projects they

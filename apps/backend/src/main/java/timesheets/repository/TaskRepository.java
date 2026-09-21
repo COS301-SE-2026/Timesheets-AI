@@ -22,7 +22,8 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
   List<Task> findByProjectIdAndIsDeletedFalse(UUID projectId);
 
   // finds all the tasks for a specific member, and the tasks are active - think showing "my tasks"
-  List<Task> findByAssignedWorkspaceMemberIdAndIsDeletedFalse(UUID workspaceMemberId);
+  List<Task> findByAssignedWorkspaceMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(
+      UUID workspaceMemberId);
 
   // this checks if a project has any active tasks
   boolean existsByProjectIdAndIsDeletedFalse(UUID projectId);
@@ -81,6 +82,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
       "SELECT t FROM Task t "
           + "JOIN Project p ON t.projectId = p.id "
           + "WHERE p.workspaceId = :workspaceId "
-          + "AND t.isDeleted = false")
+          + "AND t.isDeleted = false"
+          + " ORDER BY t.createdAt DESC")
   List<Task> findActiveTasksByWorkspaceId(@Param("workspaceId") UUID workspaceId);
 }
