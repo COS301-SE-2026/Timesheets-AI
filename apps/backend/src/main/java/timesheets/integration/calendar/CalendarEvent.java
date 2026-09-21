@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 // CalendarAdapter uses CalendarEvent
 @Data
@@ -14,4 +15,5 @@ public class CalendarEvent {
   private LocalDateTime startTime;
   private LocalDateTime endTime;
   private String externalEventId;
+  private List<String> participants;
 }

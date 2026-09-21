@@ -38,7 +38,11 @@ public class CalendarEvidenceCollector implements EvidenceCollector {
 
       Map<String, Object> metadata = new HashMap<>();
       metadata.put("externalEventId", calendarEvent.getExternalEventId());
+      metadata.put("title", calendarEvent.getTitle());
+      metadata.put("startTime", calendarEvent.getStartTime());
       metadata.put("endTime", calendarEvent.getEndTime());
+      metadata.put("participants", calendarEvent.getParticipants());
+      metadata.put("externalEventId", calendarEvent.getExternalEventId());
 
       evidenceEvent.setMetadata(metadata);
       evidenceEvents.add(evidenceEvent);
