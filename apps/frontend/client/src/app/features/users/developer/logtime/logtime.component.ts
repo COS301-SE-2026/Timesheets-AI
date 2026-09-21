@@ -1292,16 +1292,23 @@ export class LogtimeComponent implements OnDestroy {
       this.pausedElapsedSeconds.set(response.elapsedSeconds ?? 0);
       this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
     } else {
-      this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
-      this.timerIntervalId = setInterval(() => {
-        this.elapsedSeconds.set(
-          Math.floor((Date.now() - timer.startedAt.getTime()) / 1000),
-        );
-      }, 1000);
+     this.startElapsedInterval(response.elapsedSeconds ?? 0);
     }
   }
 
   //helper function to force the string timestamp into a valid ISO format for Date parsing, appending 'Z' if no timezone is present
+
+  private startElapsedInterval(elapsed: number): void {
+    this.clearTimerInterval();
+    this.elapsedSeconds.set(elapsed);
+    const clientStartTime = Date.now() - elapsed * 1000;
+    this.timerIntervalId = setInterval(() => {
+      this.elapsedSeconds.set(
+        Math.max(0, Math.floor((Date.now() - clientStartTime) / 1000)),
+      );
+    }, 1000)
+  }
+
   private parseServerTimestamp(value: string): Date {
     const hasTimeZone = /Z$|[+-]\d{2}:\d{2}$/.test(value);
     return new Date(hasTimeZone ? value : `${value}Z`); // Append 'Z' if no timezone is present
