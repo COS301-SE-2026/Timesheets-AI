@@ -209,7 +209,7 @@
       <div class="social-grid">
         <div #googleBtn class="google-button"></div>
 
-        <button type="button" class="social-button" aria-label="Sign in with Microsoft" (click)="onSocialLogin('Microsoft')">
+        <button type="button" class="social-button" aria-label="Sign in with Microsoft" (click)="loginWithMicrosoft()" [disabled]="loading">
           <svg class="social-logo" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="#F25022" d="M1 1h10v10H1z"/>
             <path fill="#7FBA00" d="M13 1h10v10H13z"/>
