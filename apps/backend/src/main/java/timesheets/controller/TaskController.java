@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import timesheets.dto.request.CreateTaskRequest;
+import timesheets.dto.request.UpdateTaskRequest;
 import timesheets.dto.response.TaskResponse;
 import timesheets.security.SecurityUtils;
 import timesheets.service.TaskService;
@@ -63,5 +64,16 @@ public class TaskController {
   @GetMapping("/team-tasks")
   public ResponseEntity<List<TaskResponse>> getTeamTasks() {
     return ResponseEntity.ok(taskService.getTeamTasks());
+  }
+
+  // to update the editbale fields in the task
+  @PatchMapping("/{taskId}")
+  public ResponseEntity<TaskResponse> updateTask(
+      @PathVariable UUID taskId, @Valid @RequestBody UpdateTaskRequest.UpdateTask request) {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+    TaskResponse response = taskService.updateTask(taskId, request, workspaceMemberId);
+
+    return ResponseEntity.ok(response);
   }
 }
