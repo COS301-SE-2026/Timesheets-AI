@@ -104,6 +104,8 @@ public class TaskService {
         taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId);
 
     return tasks.stream()
+        //just because a user got access again, it does not mean they get access to projects they are no longer members of
+        .filter(task -> userHasAccessToProject(task.getProjectId(), workspaceMemberId))
         .map(
             task -> {
               String projectName =
@@ -111,7 +113,9 @@ public class TaskService {
                       .findById(task.getProjectId())
                       .map(Project::getName)
                       .orElse("Unknown Project");
+
               String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
+
               return TaskResponse.fromWithDetails(task, projectName, assignedToName);
             })
         .collect(Collectors.toList());
@@ -165,6 +169,14 @@ public class TaskService {
       if (!parentTask.getProjectId().equals(projectId)) {
         throw new BadRequestException("Parent task does not belong to this project");
       }
+    }
+
+    // tasks can only be assigned to active members of this project
+    if (request.getAssignedWorkspaceMemberId() != null
+        && !projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
+            projectId, request.getAssignedWorkspaceMemberId())) {
+      throw new BadRequestException(
+          "Task can only be assigned to an active member of this project");
     }
 
     // builds the task
@@ -237,7 +249,7 @@ public class TaskService {
 
   // ! helper functions
   // checks if the user has access to the project
-  private boolean userHasAccessToProject(UUID projectId, UUID workspaceMemeberId) {
+  private boolean userHasAccessToProject(UUID projectId, UUID workspaceMemberId) {
 
     boolean isAdmin = securityUtils.isAdmin();
     boolean isManager = securityUtils.isManager();
@@ -248,8 +260,8 @@ public class TaskService {
     }
 
     // the dev must be a member of the project in order to see it
-    return projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
-        projectId, workspaceMemeberId);
+    return projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
+        projectId, workspaceMemberId);
   }
 
   // gets the name of the user assigned to that task
@@ -269,7 +281,7 @@ public class TaskService {
   // checks if the user is a project manager for a particular project
   private boolean isProjectManager(UUID projectId, UUID workspaceMemberId) {
     return projectMemberRepository
-        .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
+        .findByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(projectId, workspaceMemberId)
         .map(ProjectMember::getIsProjectManager)
         .orElse(false);
   }
