@@ -21,6 +21,7 @@ import timesheets.domain.Task;
 import timesheets.dto.request.CreateIssueRequest;
 import timesheets.dto.response.CommentResponse;
 import timesheets.dto.response.IssueResponse;
+import timesheets.dto.response.StatusChangeResponse;
 import timesheets.dto.response.WorklogResponse;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.repository.TaskRepository;
@@ -363,6 +364,92 @@ public class JiraAdapter implements IssueTrackerAdapter {
     }
 
     return comments;
+  }
+
+  @Override
+  public List<StatusChangeResponse> getStatusChanges(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+    List<IssueResponse> issues = getIssues(workspaceMemberId);
+
+    List<StatusChangeResponse> statusChanges = new ArrayList<StatusChangeResponse>();
+    IntegrationToken token = getValidToken(workspaceMemberId);
+    String cloudId = token.getProviderResourceId();
+
+    for (IssueResponse issue : issues) {
+      String url =
+          "https://api.atlassian.com/ex/jira"
+              + cloudId
+              + "/rest/api/3/issue/"
+              + issue.getKey()
+              + "/changelog"
+              + "?startAt=0"
+              + "&maxResults=100";
+
+      HttpEntity<Void> request = new HttpEntity<Void>(createAuthHeaders(token.getAccessToken()));
+
+      try {
+        ResponseEntity<String> response =
+            restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+        JsonNode root = objectMapper.readTree(response.getBody());
+        JsonNode histories = root.get("values");
+
+        if (histories == null || !histories.isArray()) {
+          continue;
+        }
+
+        for (JsonNode history : histories) {
+          LocalDateTime changedAt = parseJiraTimestamp(getString(history, "created"));
+
+          if (changedAt == null) {
+            continue;
+          }
+
+          boolean withinRange = !changedAt.isBefore(startTime) && !changedAt.isAfter(endTime);
+
+          if (!withinRange) {
+            continue;
+          }
+
+          JsonNode items = history.get("items");
+
+          if (items == null || !items.isArray()) {
+            continue;
+          }
+
+          for (JsonNode item : items) {
+            String field = getString(item, "field");
+
+            if (!"status".equalsIgnoreCase(field)) {
+              continue;
+            }
+
+            StatusChangeResponse statusChange = new StatusChangeResponse();
+            statusChange.setIssueKey(issue.getKey());
+
+            statusChange.setChangeLogId(getString(history, "id"));
+
+            statusChange.setChangedAt(changedAt);
+
+            statusChange.setFromStatus(getString(item, "fromString"));
+
+            statusChange.setToStatus(getString(item, "toString"));
+
+            JsonNode author = history.get("author");
+
+            if (author != null && !author.isNull()) {
+              statusChange.setAuthorDisplayName(getString(author, "displayName"));
+              statusChange.setAuthorEmail(getString(author, "emailAddress"));
+            }
+
+            statusChanges.add(statusChange);
+          }
+        }
+      } catch (Exception e) {
+        log.error("Failed to parse the Jira status changes for this issue:" + issue.getKey(), e);
+      }
+    }
+
+    return statusChanges;
   }
 
   // ! helper functions
