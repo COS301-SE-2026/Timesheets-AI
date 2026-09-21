@@ -80,6 +80,10 @@ export class TaskService {
       .pipe(catchError(this.handleError('createTask')));
   }
 
+  getTeamTasks(): Observable<TaskResponse[]> {
+    return this.http.get<TaskResponse[]>(`${this.baseUrl}/team-tasks`);
+  }
+
   private handleError(operation: string) {
     return (error: HttpErrorResponse) => {
       console.error(`[TaskService] ${operation} failed:`, {
