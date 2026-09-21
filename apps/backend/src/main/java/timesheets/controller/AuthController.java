@@ -1,6 +1,8 @@
 package timesheets.controller;
 
+import excepyions.BadRequestException;
 import java.util.UUID;
+import timesheets.domain.User;
 import timesheets.dto.request.MfaDisableRequest;
 import timesheets.dto.request.MfaVerifyRequest;
 import timesheets.dto.response.MfaSetupResponse;
@@ -21,12 +23,18 @@ import timesheets.dto.request.GoogleAuthRequest;
 import timesheets.dto.request.MicrosoftAuthRequest;
 import timesheets.dto.request.PasswordRequest;
 import timesheets.dto.request.RegisterRequest;
+import timesheets.dto.request.MfaVerifyRequest;
+import timesheets.dto.request.MfaDisableRequest;
+import timesheets.dto.request.MfaLoginVerifyRequest;
 import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
+import timesheets.dto.response.MfaSetupResponse;
 import timesheets.security.CustomUserDetails;
 import timesheets.service.AuthService;
+import timesheets.service.JwtService;
 import timesheets.service.MfaService;
+
 
 // import timesheets.dto.request.GoogleAuthRequest;
 // import timesheets.dto.request.MfaVerifyRequest;
@@ -43,6 +51,7 @@ import timesheets.service.MfaService;
 public class AuthController {
 
   private final AuthService authService;
+  private final JwtService jwtService;
   private final MfaService mfaService;
 
   @GetMapping("/mfa/setup")
@@ -76,6 +85,24 @@ public class AuthController {
       return ResponseEntity.ok(
         new MessageResponse("MFA disabled successfully")
       );
+    }
+
+  @PostMapping("/mfa/login/verify")
+  public ResponseEntity<AuthResponse> verifyMfaLogin(
+    @Valid @RequestBody MfaLoginVerifyRequest request){
+      String challengeToken= request.getChallengeToken();
+
+      if(!jwtService.isMfaChallengeToken(challengeToken) || jwtService.isTokenExpired(challengeToken)){
+        thrown new BadReqquestException("MFA challenge is invalid or expired");
+      }
+
+      UUID userId= jwtService.extractUserId(challengeToken);
+
+      User user=mfaService.veriyLogin(userId, request.getTotpCode());
+
+      AuthResponse response= authService.completeMfaLogin(user);
+
+      return ResponseEntity.ok(response);
     }
 
   @PostMapping("/register")
