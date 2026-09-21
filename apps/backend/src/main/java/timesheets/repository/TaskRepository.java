@@ -36,9 +36,9 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
   // this will find all the tasks linked to Jira issues that are not deleted
   List<Task> findByJiraTicketKeyIsNotNullAndIsDeletedFalse();
 
-
-  //when a member leaves their workspace, the unfinished tasks get unassigned so they can be reassigned 
-  //completed tasks will still have the assignee so we can see who completed what task
+  // when a member leaves their workspace, the unfinished tasks get unassigned so they can be
+  // reassigned
+  // completed tasks will still have the assignee so we can see who completed what task
   @Modifying
   @Query(
       "UPDATE Task t "
@@ -50,8 +50,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
       @Param("workspaceMemberId") UUID workspaceMemberId,
       @Param("updatedAt") LocalDateTime updatedAt);
 
-
-    //when a member leaves a project, their unfinished tasks are unassigned
+  // when a member leaves a project, their unfinished tasks are unassigned
   @Modifying
   @Query(
       "UPDATE Task t "
@@ -65,7 +64,7 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
       @Param("workspaceMemberId") UUID workspaceMemberId,
       @Param("updatedAt") LocalDateTime updatedAt);
 
-      //when a Jira issue changes, this will update the local task with the latest details from Jira
+  // when a Jira issue changes, this will update the local task with the latest details from Jira
   @Modifying
   @Query(
       "UPDATE Task t SET t.status = :status, t.title = :title, t.description = :description, t.dueDate = :dueDate, t.updatedAt = :updatedAt WHERE t.id = :taskId")

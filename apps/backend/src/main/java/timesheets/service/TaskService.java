@@ -104,7 +104,8 @@ public class TaskService {
         taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId);
 
     return tasks.stream()
-        //just because a user got access again, it does not mean they get access to projects they are no longer members of
+        // just because a user got access again, it does not mean they get access to projects they
+        // are no longer members of
         .filter(task -> userHasAccessToProject(task.getProjectId(), workspaceMemberId))
         .map(
             task -> {

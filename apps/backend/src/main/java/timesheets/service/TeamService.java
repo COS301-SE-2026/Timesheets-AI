@@ -64,8 +64,10 @@ public class TeamService {
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
     // only one user should belong to a workspace to prevent duplicate info
-    // check all memberships including the historic ones as well because a user may have previously left this workspace
-    Optional<WorkspaceMember> existingMembership = workspaceMemberRepository.findByUserIdAndWorkspaceId(request.getUserId(), workspaceId);
+    // check all memberships including the historic ones as well because a user may have previously
+    // left this workspace
+    Optional<WorkspaceMember> existingMembership =
+        workspaceMemberRepository.findByUserIdAndWorkspaceId(request.getUserId(), workspaceId);
 
     WorkspaceMember saved;
 
@@ -88,10 +90,10 @@ public class TeamService {
 
       saved = workspaceMemberRepository.save(member);
 
-    } 
-    else {
+    } else {
 
-      //a new membership gets created only if the user is a part of the workspace for the first time
+      // a new membership gets created only if the user is a part of the workspace for the first
+      // time
       WorkspaceMember member = new WorkspaceMember();
       member.setWorkspaceId(workspaceId);
       member.setUserId(request.getUserId());
@@ -145,7 +147,8 @@ public class TeamService {
 
     LocalDateTime removedAt = LocalDateTime.now();
 
-    // a removed member should not leave an active timer running in the workspace, because then who will remove it?
+    // a removed member should not leave an active timer running in the workspace, because then who
+    // will remove it?
     timerService.discardTimerForWorkspaceRemoval(workspaceMemberId);
 
     // deactivate the workspace membership while preserving the records

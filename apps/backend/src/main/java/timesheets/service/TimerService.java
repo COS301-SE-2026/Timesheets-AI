@@ -280,13 +280,14 @@ public class TimerService {
         .orElse(null);
   }
 
-
   // discards a running timer when a member is removed from a workspace
   @Transactional
   public void discardTimerForWorkspaceRemoval(UUID workspaceMemberId) {
 
     // no time entry should have been created
-    timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId).ifPresent(timerSessionRepository::delete);
+    timerSessionRepository
+        .findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId)
+        .ifPresent(timerSessionRepository::delete);
   }
 
   // ! we want our users to be able to discard a timer without without it creating a time entry

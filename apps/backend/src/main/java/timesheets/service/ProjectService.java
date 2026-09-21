@@ -333,7 +333,8 @@ public class ProjectService {
             .findById(workspaceMemberId)
             .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
-    // project access can only be given to a current workspace member, and they should not be soft-deleted
+    // project access can only be given to a current workspace member, and they should not be
+    // soft-deleted
     if (!Boolean.TRUE.equals(member.getIsActive())) {
       throw new StateConflictException(
           "Member must be active in the workspace before being assigned to a project");
@@ -363,7 +364,7 @@ public class ProjectService {
     }
 
     // reuse an existing historical project membership instead of creating a duplicate
-    //they'll get assigned a new one if they don't have project membership already
+    // they'll get assigned a new one if they don't have project membership already
     ProjectMember saved =
         projectMemberRepository
             .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
@@ -378,7 +379,8 @@ public class ProjectService {
                   existingMember.setIsProjectManager(isProjectManager != null && isProjectManager);
 
                   return projectMemberRepository.save(existingMember);
-                }).orElseGet(
+                })
+            .orElseGet(
                 () -> {
                   ProjectMember newMember = new ProjectMember();
                   newMember.setProjectId(projectId);
