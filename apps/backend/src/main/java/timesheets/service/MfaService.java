@@ -7,18 +7,20 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import timesheets.domain.User;
 import timesheets.domain.UserMfa;
 import timesheets.dto.response.MfaSetupResponse;
 import timesheets.repository.UserMfaRepository;
 import timesheets.repository.UserRepository;
-import timesheets.util.TopUtils;
+import timesheets.util.TotpUtils;
 
 @Service
 @RequiredArgsConstructor
 public class MfaService {
     private final UserRepository userRepository;
     private final UserMfaRepository userMfaRepository;
+    private final PasswordEncoder;
     private final TotpUtils totpUtils; 
 
     @Transactional
@@ -127,5 +129,34 @@ public class MfaService {
 
         userMfa.setIsEnabled(false);
         userMfaRepository.save(userMfa);
+    }
+
+    @Transactional(readonly= true)
+    public User verifyLogin(UUID userId, String totpCode){
+
+        User user=userRepository
+                    .findById(userId)
+                    .orElseThrow(
+                        ()-> new ResourceNotFoundException("User not found.")
+                    );
+
+        UserMfa userMfa= userMfaRepository
+                        .findByUserId(userId)
+                        .orElseThrow(
+                            ()-> new BadRequestException("MFA is not configured.")
+                        );
+
+        if(!Boolean.TRUE.equals(userMfa.getIsEnabled())){
+            throw new StateConflictException("MFA is not enabled.");
+        }
+        boolean valid= totpUtils.verifyCode(userMfa.getSecretKey(), totpCode);
+
+        if(!valid){
+            throw new BadRequestException(
+                "Invalid authentication code"
+            );
+        }
+
+        return user;
     }
 }
