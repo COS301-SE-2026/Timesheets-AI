@@ -634,9 +634,24 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   pauseTimer(): void {
-    this.clearTimerInterval();
-    this.isTimerPaused.set(true);
-    this.pausedElapsedSeconds.set(this.elapsedSeconds());
+    if (!this.activeTimer() || this.isTimerPaused()){
+      return;
+    }
+
+    this.timerService.pauseTimer().subscribe({
+      next: (response) => {
+        const elapsed = response.elapsedSeconds ?? this.elapsedSeconds();
+        this.clearTimerInterval();
+        this.elapsedSeconds.set(elapsed);
+        this.pausedElapsedSeconds.set(elapsed);
+        this.isTimerPaused.set(response.isPaused ?? true);
+      },
+      error: (error) =>
+        this.conflictMessage.set(
+          error.error?.message ?? 'Unable to pause the timer'
+        ),
+    })
+
   }
 
   resumeTimer(): void {
