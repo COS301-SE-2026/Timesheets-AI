@@ -41,12 +41,15 @@
             <div class="summary-card-icon">
                 <i class="fa-solid fa-list-check"></i>
             </div>
+
             <div class="summary-card-content">
-            <div class="summary-card-value" aria-live="polite">
-                {{ activeCount() }}
-            </div>
-            <div class="summary-card-label text-caption"> Active</div>
-            <div class="summary-card-subtitle text-caption"> Includes To Do &amp; In progress</div>
+                <div class="summary-card-value" aria-live="polite">
+                    {{ totalCount() }}
+                </div>
+
+                <div class="summary-card-label text-caption">
+                    Total Tasks
+                </div>
             </div>
         </div>
 
@@ -62,7 +65,7 @@
             </div>
             <div class="summary-card-label text-caption"> Active </div>
             <div class="summary-card-subtitle text-caption"> Includes To Do &amp; In progress</div>
-             </div>
+            </div>
         </div>
 
         <!-- Completed Tasks -->
@@ -135,6 +138,22 @@
              </label>
           </div>
       </section>
+
+      <!-- Task tabs -->
+      @if (isManager()) {
+        <div class="task-tabs" role="tablist" aria-label="Task view">
+
+          <button type="button" role="tab" [attr.aria-selected]="activeTab() === 'my-tasks'" [class.active]="activeTab() === 'my-tasks'" (click)="setActiveTab('my-tasks')">
+            My Tasks
+            <span>{{ myTasksCount() }}</span>
+          </button>
+
+          <button type="button" role="tab" [attr.aria-selected]="activeTab() === 'team-tasks'" [class.active]="activeTab() === 'team-tasks'" (click)="setActiveTab('team-tasks')">
+            Team Tasks
+            <span>{{ teamTasksCount() }}</span>
+          </button>
+        </div>
+      }
 
       <!-- Task Table -->
 
