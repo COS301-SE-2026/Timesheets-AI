@@ -676,7 +676,7 @@ export class LogtimeComponent implements OnDestroy {
         this.conflictMessage.set(
           error.error?.message ?? 'Unable to resume timer.'
         ),
-    }, 1000);
+    });
   }
 
   //Evaluates the active time tracking segment and builds a concrete log entry
