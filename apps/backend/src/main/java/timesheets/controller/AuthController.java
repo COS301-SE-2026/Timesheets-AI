@@ -26,6 +26,7 @@ import timesheets.dto.response.MessageResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.security.CustomUserDetails;
 import timesheets.service.AuthService;
+import timesheets.service.MfaService;
 
 // import timesheets.dto.request.GoogleAuthRequest;
 // import timesheets.dto.request.MfaVerifyRequest;
@@ -52,6 +53,30 @@ public class AuthController {
 
     return ResponseEntity.ok(response);
   }
+
+  @PostMapping("/mfa/verify")
+  public ResponseEntity<MessageResponse> verifyMfa(
+    Authentication authentiation, @Valid @RequestBody MfaVerifyRequest request){
+      CustomUserDetails userDetails= (CustomUserDetails) authentication.getPrincipal();
+
+      mfaService.verfySetup(userDetails.getUserId(), request.getTotpCode());
+
+      return ResponseEntity.ok(
+        new MessageResponse("MFA enabled successfully")
+      );
+    }
+
+  @PostMapping("/mfa/disable")
+  public ResponseEntity<MessageResponse> disableMfa(
+    Authentication authentiation, @Valid @RequestBody MfaDisableRequest request){
+      CustomUserDetails userDetails= (CustomUserDetails) authentication.getPrincipal();
+
+      mfaService.disable(userDetails.getUserId(), request.getPassword());
+
+      return ResponseEntity.ok(
+        new MessageResponse("MFA disabled successfully")
+      );
+    }
 
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
