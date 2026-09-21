@@ -469,8 +469,12 @@ public class AuthService {
     String token = null;
     LocalDateTime expiresAt = null;
 
-    if (!requiresMfa) {
-      int expirationDays = 1;
+    if (requiresMfa) {
+      token = jwtService.generateMfaChallengeToken(user);
+      expiresAt = LocalDateTime.now().plusMinutes(5);
+    }else{
+      int expirationDays= 1;
+
       token = jwtService.generateToken(user, expirationDays);
       expiresAt = LocalDateTime.now().plusDays(expirationDays);
     }
