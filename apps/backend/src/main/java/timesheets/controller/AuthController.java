@@ -1,11 +1,16 @@
 package timesheets.controller;
 
+import java.util.UUID;
+import timesheets.dto.request.MfaDisableRequest;
+import timesheets.dto.request.MfaVerifyRequest;
+import timesheets.dto.response.MfaSetupResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +42,16 @@ import timesheets.service.AuthService;
 public class AuthController {
 
   private final AuthService authService;
+  private final MfaService mfaService;
+
+  @GetMapping("/mfa/setup")
+  public ResponseEntity<MfaSetupResponse> setupMfa(Authenticaton authentication){
+    CustomUserDetails userDetails= (CustomUserDetails) authentication.getPrincipal();
+
+    MfaSetupResponse response= mfaService.setup(userDetails.getUserId());
+
+    return ResponseEntity.ok(response);
+  }
 
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
