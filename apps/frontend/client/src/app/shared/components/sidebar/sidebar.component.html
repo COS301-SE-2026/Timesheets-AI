@@ -37,6 +37,7 @@
     <div class="avatar">{{ initials() }}</div>
     <div class="user-info">
       <span class="user-name">{{ displayName() }}</span>
+      <span class="user-email">{{ currentUser()?.email }}</span>
       <span class="user-role">{{ displayRole() }}</span>
     </div>
     <span class="dropdown-arrow" [class.open]="isMenuOpen()">⌄</span>
