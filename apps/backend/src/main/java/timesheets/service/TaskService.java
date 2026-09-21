@@ -248,6 +248,42 @@ public class TaskService {
     return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName);
   }
 
+  @Transactional(readOnly = true)
+  public List<TaskResponse> getTeamTasks() {
+
+    if (!securityUtils.isManager()) {
+      throw new AccessDeniedException("Only managers can view team tasks");
+    }
+
+    // get the currently logged-in manager's workspace member
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    WorkspaceMember workspaceMember =
+        workspaceMemberRepository
+            .findById(workspaceMemberId)
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
+
+    UUID workspaceId = workspaceMember.getWorkspaceId();
+
+    // get all active tasks belonging to this workspace
+    List<Task> tasks = taskRepository.findActiveTasksByWorkspaceId(workspaceId);
+
+    return tasks.stream()
+        .map(
+            task -> {
+              String projectName =
+                  projectRepository
+                      .findById(task.getProjectId())
+                      .map(Project::getName)
+                      .orElse("Unknown Project");
+
+              String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
+
+              return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+            })
+        .collect(Collectors.toList());
+  }
+
   // ! helper functions
   // checks if the user has access to the project
   private boolean userHasAccessToProject(UUID projectId, UUID workspaceMemberId) {

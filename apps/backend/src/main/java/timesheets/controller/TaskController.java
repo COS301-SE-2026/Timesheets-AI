@@ -58,4 +58,10 @@ public class TaskController {
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
+
+  // gets all the tasks for the team
+  @GetMapping("/team-tasks")
+  public ResponseEntity<List<TaskResponse>> getTeamTasks() {
+    return ResponseEntity.ok(taskService.getTeamTasks());
+  }
 }
