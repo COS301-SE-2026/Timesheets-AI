@@ -6,6 +6,7 @@ import java.util.UUID;
 import timesheets.dto.request.CreateIssueRequest;
 import timesheets.dto.response.CommentResponse;
 import timesheets.dto.response.IssueResponse;
+import timesheets.dto.response.StatusChangeResponse;
 import timesheets.dto.response.WorklogResponse;
 
 public interface IssueTrackerAdapter {
@@ -26,10 +27,12 @@ public interface IssueTrackerAdapter {
   List<CommentResponse> getComments(
       UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
 
+  List<StatusChangeResponse> getStatusChanges(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
+
   // the write operations
   IssueResponse createIssue(UUID workspaceMemberId, CreateIssueRequest request);
 
   // the link operations
   void linkTaskToIssue(UUID workspaceMemberId, UUID taskId, String issueKey);
 }
-z

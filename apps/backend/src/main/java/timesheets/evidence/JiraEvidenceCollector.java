@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import timesheets.dto.response.CommentResponse;
 import timesheets.dto.response.IssueResponse;
+import timesheets.dto.response.StatusChangeResponse;
 import timesheets.dto.response.WorklogResponse;
 import timesheets.integration.issue.IssueTrackerAdapter;
 
@@ -61,6 +62,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
     // collect Jira worklog evidence
     evidenceEvents.addAll(collectWorklogEvidence(workspaceMemberId, startTime, endTime));
     evidenceEvents.addAll(collectCommentEvidence(workspaceMemberId, startTime, endTime));
+    evidenceEvents.addAll(collectStatusChangeEvidence(workspaceMemberId, startTime, endTime));
     return evidenceEvents;
   }
 
@@ -142,6 +144,53 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       metadata.put("updatedAt", comment.getUpdatedAt());
 
       metadata.put("body", comment.getBody());
+
+      evidenceEvent.setMetadata(metadata);
+
+      evidenceEvents.add(evidenceEvent);
+    }
+
+    return evidenceEvents;
+  }
+
+  private List<EvidenceEvent> collectStatusChangeEvidence(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+
+    List<StatusChangeResponse> statusChanges =
+        issueTrackerAdapter.getStatusChanges(workspaceMemberId, startTime, endTime);
+
+    List<EvidenceEvent> evidenceEvents = new ArrayList<EvidenceEvent>();
+
+    for (StatusChangeResponse statusChange : statusChanges) {
+
+      EvidenceEvent evidenceEvent = new EvidenceEvent();
+
+      evidenceEvent.setId(UUID.randomUUID());
+      evidenceEvent.setSource("JIRA");
+      evidenceEvent.setWorkspaceMemberId(workspaceMemberId);
+
+      evidenceEvent.setTimestamp(statusChange.getChangedAt());
+
+      evidenceEvent.setActivityType("STATUS_CHANGE");
+
+      evidenceEvent.setDescription(
+          statusChange.getFromStatus() + " -> " + statusChange.getToStatus());
+
+      Map<String, Object> metadata = new HashMap<String, Object>();
+
+      metadata.put("issueKey", statusChange.getIssueKey());
+
+      metadata.put("changelogId", statusChange.getChangeLogId());
+
+      metadata.put("fromStatus", statusChange.getFromStatus());
+
+      metadata.put("toStatus", statusChange.getToStatus());
+
+      metadata.put("changedAt", statusChange.getChangedAt());
+
+      metadata.put("authorDisplayName", statusChange.getAuthorDisplayName());
+
+      metadata.put("authorEmail", statusChange.getAuthorEmail());
 
       evidenceEvent.setMetadata(metadata);
 
