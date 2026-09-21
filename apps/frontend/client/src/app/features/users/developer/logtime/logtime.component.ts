@@ -1310,8 +1310,7 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   private parseServerTimestamp(value: string): Date {
-    const hasTimeZone = /Z$|[+-]\d{2}:\d{2}$/.test(value);
-    return new Date(hasTimeZone ? value : `${value}Z`); // Append 'Z' if no timezone is present
+    return new Date(value);
   }
 
   /*
