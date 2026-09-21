@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.models.ai_insight import AIInsight
 from app.models.time_entry import TimeEntry
+from app.models.workspace_member import WorkspaceMember
 
 LONG_DAY_HOURS = 10.0  # two hours longer than the typical work day
 CONSECUTIVE_LONG_DAYS_THRESHOLD = 3  # this can be changed to maybe 6 days
@@ -65,15 +66,18 @@ def calculate_burnout_risk(
 
 
 def save_burnout_insight(db: Session, workspace_member_id: uuid.UUID, result: dict) -> AIInsight:
+    member = db.query(WorkspaceMember).filter(WorkspaceMember.id == workspace_member_id).first()
+
     insight = AIInsight(
         workspace_member_id=workspace_member_id,
+        workspace_id=member.workspace_id if member else None,
         insight_type="BURNOUT",
         scope="TEAM",
         description=result["reason"],
         recommendation=(
-            "Check in befire assigning further overtime."
+            "Check in before assigning further overtime."
             if result["risk_level"] == "HIGH"
-            else None,
+            else None
         ),
     )
     db.add(insight)
