@@ -61,7 +61,7 @@ public class TimerService {
             .getUserId(); // gets the ID of the user
 
     List<WorkspaceMember> userMemberships =
-        workspaceMemberRepository.findByUserId(
+        workspaceMemberRepository.findByUserIdAndIsActiveTrue(
             userId); // to find all the workspace memberships for this user
 
     // finds all the workspace member IDs
@@ -96,7 +96,7 @@ public class TimerService {
             .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
 
     boolean isMember =
-        projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+        projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
             project.getId(), workspaceMemberId);
     if (!isMember) {
       throw new AccessDeniedException(
@@ -130,7 +130,7 @@ public class TimerService {
   }
 
   /*
-  -- this should pause the current running timer
+  this should pause the current running timer
   - I added the timer pause and stuff such that the timer can be resumed later
    */
   @Transactional
@@ -280,8 +280,14 @@ public class TimerService {
         .orElse(null);
   }
 
-  // okay so when the page is refreshed it should still have their timer running, so that is how I
-  // am doing it
+
+  // discards a running timer when a member is removed from a workspace
+  @Transactional
+  public void discardTimerForWorkspaceRemoval(UUID workspaceMemberId) {
+
+    // no time entry should have been created
+    timerSessionRepository.findByWorkspaceMemberIdAndIsRunningTrue(workspaceMemberId).ifPresent(timerSessionRepository::delete);
+  }
 
   // ! we want our users to be able to discard a timer without without it creating a time entry
   @Transactional
