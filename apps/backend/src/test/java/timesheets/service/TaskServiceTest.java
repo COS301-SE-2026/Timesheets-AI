@@ -99,7 +99,7 @@ class TaskServiceTest {
 
       // ARRANGE
       // need to verify that the user has access to these projects
-      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
               projectId, workspaceMemberId))
           .thenReturn(true);
       when(taskRepository.findByProjectIdAndIsDeletedFalse(projectId)).thenReturn(List.of(task));
@@ -134,7 +134,7 @@ class TaskServiceTest {
 
       // I want to confirm it checked access, fetched the tasks, and got the project details.
       verify(projectMemberRepository)
-          .existsByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId);
+          .existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(projectId, workspaceMemberId);
       verify(taskRepository).findByProjectIdAndIsDeletedFalse(projectId);
       verify(projectRepository).findById(projectId);
       verify(workspaceMemberRepository).findById(assignedWorkspaceMemberId);
@@ -162,7 +162,7 @@ class TaskServiceTest {
       when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
 
       // the user has access to the project
-      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
               projectId, workspaceMemberId))
           .thenReturn(true);
 
@@ -190,7 +190,7 @@ class TaskServiceTest {
 
       // checked the users access to the project, the number of calls should be 1
       verify(projectMemberRepository, times(1))
-          .existsByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId);
+          .existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(projectId, workspaceMemberId);
       verify(projectRepository, times(1)).findById(projectId); // project name retrieved
       verify(workspaceMemberRepository, times(1)).findById(assignedWorkspaceMemberId);
       verify(userRepository, times(1)).findById(userId);
@@ -212,6 +212,13 @@ class TaskServiceTest {
       */
       when(taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId))
           .thenReturn(List.of(task));
+
+      when(securityUtils.isAdmin()).thenReturn(false);
+      when(securityUtils.isManager()).thenReturn(false);
+
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
+              projectId, workspaceMemberId))
+          .thenReturn(true);
 
       // the task also needs the project name and assigness full name
       when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
@@ -269,12 +276,16 @@ class TaskServiceTest {
       when(securityUtils.isManager()).thenReturn(false);
 
       // the user has access to the project, but they are not a manager
-      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
               projectId, workspaceMemberId))
           .thenReturn(true);
-      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
               projectId, workspaceMemberId))
           .thenReturn(Optional.of(new ProjectMember()));
+
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
+              projectId, workspaceMemberId))
+          .thenReturn(true);
 
       // the project exists but is not archived
       when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
