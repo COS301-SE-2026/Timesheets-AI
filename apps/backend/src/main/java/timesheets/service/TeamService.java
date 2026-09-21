@@ -5,6 +5,7 @@ import exception.ResourceNotFoundException;
 import exception.StateConflictException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import timesheets.dto.response.WorkspaceMemberResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
+import timesheets.repository.TaskRepository;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
 import timesheets.repository.WorkspaceRepository;
@@ -33,6 +35,8 @@ public class TeamService {
   private final ProjectRepository projectRepository;
   private final WorkspaceRepository workspaceRepository;
   private final SecurityUtils securityUtils;
+  private final TaskRepository taskRepository;
+  private final TimerService timerService;
 
   /*
   - this is to assign members to a workspace
@@ -60,19 +64,42 @@ public class TeamService {
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
     // only one user should belong to a workspace to prevent duplicate info
-    if (workspaceMemberRepository.existsByUserIdAndWorkspaceId(request.getUserId(), workspaceId)) {
-      throw new StateConflictException("User is already a member of this workspace");
+    // check all memberships including the historic ones as well because a user may have previously left this workspace
+    Optional<WorkspaceMember> existingMembership = workspaceMemberRepository.findByUserIdAndWorkspaceId(request.getUserId(), workspaceId);
+
+    WorkspaceMember saved;
+
+    if (existingMembership.isPresent()) {
+
+      WorkspaceMember member = existingMembership.get();
+
+      if (Boolean.TRUE.equals(member.getIsActive())) {
+        throw new StateConflictException("User is already a member of this workspace");
+      }
+
+      /*
+      - this will reactivate the soft deleted so a user keeps the same workspace member identity
+      - this is so that I can keep all the workspace activity linked to the same membership
+      */
+      member.setIsActive(true);
+      member.setRemovedAt(null);
+      member.setRole(request.getRole());
+      member.setJoinedAt(LocalDateTime.now());
+
+      saved = workspaceMemberRepository.save(member);
+
+    } 
+    else {
+
+      //a new membership gets created only if the user is a part of the workspace for the first time
+      WorkspaceMember member = new WorkspaceMember();
+      member.setWorkspaceId(workspaceId);
+      member.setUserId(request.getUserId());
+      member.setRole(request.getRole());
+      member.setJoinedAt(LocalDateTime.now());
+
+      saved = workspaceMemberRepository.save(member);
     }
-
-    WorkspaceMember member = new WorkspaceMember();
-    member.setWorkspaceId(workspaceId);
-    member.setUserId(request.getUserId());
-    member.setRole(request.getRole());
-    member.setJoinedAt(LocalDateTime.now());
-    member.setCreatedAt(LocalDateTime.now());
-    member.setUpdatedAt(LocalDateTime.now());
-
-    WorkspaceMember saved = workspaceMemberRepository.save(member);
 
     return WorkspaceMemberResponse.builder()
         .workspaceMemberId(saved.getId())
@@ -99,18 +126,38 @@ public class TeamService {
             .findById(workspaceMemberId)
             .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
-    UUID workspaceId = securityUtils.getCurrentWorkspaceId();
+    // use the member's workspace because admins can remove members from any workspace
+    UUID workspaceId = member.getWorkspaceId();
+
+    if (!Boolean.TRUE.equals(member.getIsActive())) {
+      throw new StateConflictException("Workspace member has already been removed");
+    }
 
     // I want to make sure that workspace admins do not go below 1 cause there should always be
     // someone who has access to them
     List<WorkspaceMember> admins =
-        workspaceMemberRepository.findAllByWorkspaceIdAndRole(workspaceId, WorkspaceRole.ADMIN);
+        workspaceMemberRepository.findAllByWorkspaceIdAndRoleAndIsActiveTrue(
+            workspaceId, WorkspaceRole.ADMIN);
 
     if (admins.size() <= 1 && member.getRole() == WorkspaceRole.ADMIN) {
       throw new StateConflictException("Cannot remove the last Admin from the workspace");
     }
 
-    workspaceMemberRepository.delete(member); // deleting them
+    LocalDateTime removedAt = LocalDateTime.now();
+
+    // a removed member should not leave an active timer running in the workspace, because then who will remove it?
+    timerService.discardTimerForWorkspaceRemoval(workspaceMemberId);
+
+    // deactivate the workspace membership while preserving the records
+    member.setIsActive(false);
+    member.setRemovedAt(removedAt);
+    workspaceMemberRepository.save(member);
+
+    // removing someone from the workspace also removes their current project access
+    projectMemberRepository.deactivateAllByWorkspaceMemberId(workspaceMemberId, removedAt);
+
+    // tasks remain in the system but should no longer be assigned to the removed member
+    taskRepository.unassignActiveTasksFromWorkspaceMember(workspaceMemberId, removedAt);
   }
 
   /*
@@ -127,7 +174,7 @@ public class TeamService {
     }
 
     List<UUID> userIdsInWorkspace =
-        workspaceMemberRepository.findByWorkspaceId(workspaceId).stream()
+        workspaceMemberRepository.findByWorkspaceIdAndIsActiveTrue(workspaceId).stream()
             .map(WorkspaceMember::getUserId)
             .collect(Collectors.toList());
 
