@@ -660,15 +660,22 @@ export class LogtimeComponent implements OnDestroy {
       return;
     }
 
-    this.isTimerPaused.set(false);
-    this.clearTimerInterval();
+   if (!this.isTimerPaused()) {
+    return;
+   }
 
-    // Calculate the offset to continue from paused time
-    const pausedSeconds = this.pausedElapsedSeconds();
-    const startTime = Date.now() - pausedSeconds * 1000;
-
-    this.timerIntervalId = setInterval(() => {
-      this.elapsedSeconds.set(Math.floor((Date.now() - startTime) / 1000));
+    this.timerService.resumeTimer().subscribe({
+      next: (response) => {
+        const elapsed = response.elapsedSeconds ?? this.pausedElapsedSeconds();
+        this.isTimerPaused.set(response.isPaused ?? false);
+        this.elapsedSeconds.set(elapsed);
+        this.pausedElapsedSeconds.set(elapsed);
+        this.startElapsedInterval(elapsed);
+      },
+      error: (error) => 
+        this.conflictMessage.set(
+          error.error?.message ?? 'Unable to resume timer.'
+        ),
     }, 1000);
   }
 
