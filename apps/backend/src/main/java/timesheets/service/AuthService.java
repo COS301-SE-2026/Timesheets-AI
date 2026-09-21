@@ -103,6 +103,8 @@ public class AuthService {
     if (existingUser.isPresent()) {
       User user = existingUser.get();
 
+      ensureAccountIsActive(user);
+
       // if the email already exists then they cannot register again
       if (Boolean.TRUE.equals(user.getEmailVerified())) {
         throw new AuthException(ErrorCode.EMAIL_EXISTS);
@@ -197,6 +199,7 @@ public class AuthService {
             .findById(verificationToken.getUserId())
             .orElseThrow(() -> new AuthException(ErrorCode.USER_NOT_FOUND));
 
+    ensureAccountIsActive(user);
     user.setEmailVerified(true);
 
     userRepository.save(user);
@@ -220,6 +223,8 @@ public class AuthService {
         userRepository
             .findByEmailIgnoreCase(email)
             .orElseThrow(() -> new AuthException(ErrorCode.INVALID_CREDENTIALS));
+
+    ensureAccountIsActive(user);
 
     // check if the user is an SSO user(this means that they have no password)
     if (user.getPasswordHash() == null) {
@@ -285,6 +290,8 @@ public class AuthService {
             .findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
+    ensureAccountIsActive(user);
+
     // if a user uses SSO then they cannot change their pasword
     if (user.getPasswordHash() == null) {
       throw new StateConflictException("This account uses SSO. Cannot change password.");
@@ -326,6 +333,9 @@ public class AuthService {
         .findByEmailIgnoreCase(normalizeEmail(request.getEmail()))
         .ifPresent(
             user -> {
+              if (user.getStatus() != UserStatus.ACTIVE || user.getDeletedAt() != null) {
+                return;
+              }
               String token = UUID.randomUUID().toString();
 
               // for safety I want the reset token to expire after an hour
@@ -351,6 +361,8 @@ public class AuthService {
         userRepository
             .findByEmailIgnoreCase(normalizeEmail(email))
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+    ensureAccountIsActive(user);
 
     String token = UUID.randomUUID().toString();
 
@@ -385,6 +397,8 @@ public class AuthService {
         userRepository
             .findById(resetToken.getUserId())
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    ensureAccountIsActive(user);
 
     if (passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
       throw new BadRequestException("New password cannot be the same as the current password");
@@ -430,6 +444,14 @@ public class AuthService {
   }
 
   // ! helper functions
+
+  // inactive or deleted accounts must not be allowed to authenticate
+  private void ensureAccountIsActive(User user) {
+    if (user.getStatus() != UserStatus.ACTIVE || user.getDeletedAt() != null) {
+      throw new AuthException(ErrorCode.ACCOUNT_INACTIVE);
+    }
+  }
+
   // helper func to see if the email is in the accepted domain
   private boolean isAcceptedDomain(String email) {
     String domain = email.substring(email.indexOf("@") + 1);
@@ -458,7 +480,7 @@ public class AuthService {
 
     // the workspace roles are taken from memberships
     List<String> roles =
-        workspaceMemberRepository.findByUserId(user.getId()).stream()
+        workspaceMemberRepository.findByUserIdAndIsActiveTrue(user.getId()).stream()
             .map(membership -> "ROLE_" + membership.getRole().name())
             .collect(Collectors.toList());
     if (roles.isEmpty()) {
@@ -539,6 +561,9 @@ public class AuthService {
                   userRepository
                       .findById(identity.getUserId())
                       .orElseThrow(() -> new AuthException(ErrorCode.USER_NOT_FOUND));
+
+              ensureAccountIsActive(user);
+
               return generateAuthResponse(user, false);
             })
         .orElseGet(
@@ -547,6 +572,8 @@ public class AuthService {
                     .findByEmailIgnoreCase(email)
                     .map(
                         user -> {
+                          ensureAccountIsActive(user);
+
                           // if the account already exists then link the SSO identity to it
                           linkSsoIdentity(user, ssoUser);
                           return generateAuthResponse(user, false);
