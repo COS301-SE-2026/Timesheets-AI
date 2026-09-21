@@ -75,4 +75,12 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
       @Param("description") String description,
       @Param("dueDate") java.time.LocalDate dueDate,
       @Param("updatedAt") java.time.LocalDateTime updatedAt);
+
+  // finds all non-deleted tasks belonging to projects in a specific workspace
+  @Query(
+      "SELECT t FROM Task t "
+          + "JOIN Project p ON t.projectId = p.id "
+          + "WHERE p.workspaceId = :workspaceId "
+          + "AND t.isDeleted = false")
+  List<Task> findActiveTasksByWorkspaceId(@Param("workspaceId") UUID workspaceId);
 }
