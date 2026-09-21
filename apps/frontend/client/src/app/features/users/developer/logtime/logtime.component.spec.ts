@@ -484,7 +484,7 @@ describe('LogtimeComponent', () => {
     expect(component.elapsedSeconds()).toBe(10); //frozen while paused
 
     component.resumeTimer();
-    httpMock.expectOne('/api/timers/resume').flush({ elapsedSeconds: 10, isPaused: true });
+    httpMock.expectOne('/api/timers/resume').flush({ elapsedSeconds: 10, isPaused: false });
     jest.advanceTimersByTime(5_000);
 
     expect(component.isTimerPaused()).toBe(false);
