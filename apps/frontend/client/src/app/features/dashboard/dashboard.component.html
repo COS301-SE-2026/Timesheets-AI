@@ -38,7 +38,8 @@
             <i class="fa-solid fa-spinner fa-spin"></i> Loading your workspace...
         </section>
     } @else {
-        <section class="dashboard-grid" [class.manager-grid]="isManagerView()">
+        <section class="dashboard-grid" [class.manager-grid]="isManagerView()" [class.admin-grid]="isAdminView()">
+            @if (!isAdminView()) {
             <article class="card timer-card">
                 <div class="card-heading">
                     <span class="icon-orb blue"> <i class="fa-solid fa-stopwatch"></i> </span>
@@ -77,8 +78,9 @@
                     </div>
                 }
             </article>
+        }
             <!-- Timesheet approval summary card -->
-            @if (isManagerView()){
+            @if (isManagerView() && !isAdminView()){
                 <article class="card summary-card approval-card">
                     <div class="card-heading">
                         <span class="icon-orb amber">
@@ -101,7 +103,7 @@
                     </span>
                     <div>
                     <h2>Active projects</h2>
-                    <p>Projects you contribute to</p>
+                    <p>{{ isAdminView() ? 'Active projects in this workspace' : 'Projects you contribute to' }}</p>
                     </div>
                 </div>
                 <strong> {{ activeProjects().length }}</strong>
@@ -111,7 +113,26 @@
                     <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </article>
+            @if (isAdminView()) {
+                <article class="card sumamry-card waiting-room-card">
+                    <div class="card-heading">
+                        <span class="icon-orb amber">
+                            <i class="fa-solid fa-user-clock"></i>
+                        </span>
+                        <div>
+                            <h2>Waiting for worskapce</h2>
+                            <p>Members awaiting workspace access</p>
+                        </div>
+                    </div>
+                    <strong>{{ waitingForWorkspaceCount() }}</strong>
+                    <a routerLink="/team" [queryParams]="{ tab: 'waiting'}">
+                        Open waiting room
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </article>
+            }
             <!-- Tasks summary card -->
+             @if (!isAdminView()) {
             <article class="card tasks-card">
                 <div class="card-heading">
                     <span  class="icon-orb light-blue">
@@ -152,6 +173,7 @@
                     </div>
                 }
             </article>
+        }
             <!-- Calendar summary card -->
             <article class="card calendar-card">
                 <div class="card-heading">
@@ -186,6 +208,7 @@
                 }
             </article>
             <!-- Hours logged summary card -->
+             @if (!isAdminView()) {
             <article class="card hours-card">
                 <div class="card-heading">
                     <span class="icon-orb blue">
@@ -215,6 +238,7 @@
                     </div>
                 </div>
             </article>
+        }
             <!-- Deadlines summary card -->
             <article class="card deadlines-card">
                 <div class="card-heading">
