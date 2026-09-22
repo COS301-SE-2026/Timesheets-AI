@@ -38,7 +38,6 @@ import timesheets.repository.UserIdentityProviderRepository;
 import timesheets.repository.UserMfaRepository;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
-import timesheets.security.SecurityUtils;
 import timesheets.service.strategy.SsoAuthenticationStrategy;
 import timesheets.service.strategy.SsoUserInfo;
 import timesheets.util.TotpUtils;
@@ -72,8 +71,6 @@ public class AuthService {
 
   private final TokenBlacklistService tokenBlacklistService;
   private final JwtService jwtService;
-  private final SecurityUtils securityUtils;
-  private final TimerService timerService;
 
   private final List<SsoAuthenticationStrategy> ssoStrategies;
 
@@ -426,13 +423,6 @@ public class AuthService {
     }
 
     tokenBlacklistService.blacklistToken(token);
-
-    try {
-      UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-      timerService.pauseTimerForLogout(workspaceMemberId);
-    } catch (Exception e) {
-      log.debug("No active timer to pause during logout");
-    }
   }
 
   @Transactional
