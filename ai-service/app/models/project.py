@@ -10,7 +10,7 @@ Date: 22/09/2026
 """
 
 import uuid
-from datetime import datetime, date
+from datetime import date, datetime
 
 from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import UUID
