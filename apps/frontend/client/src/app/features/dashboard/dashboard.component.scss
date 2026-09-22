@@ -275,6 +275,62 @@
   text-decoration: none;
 }
 
+.active-projects-carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 2px 2px 14px;
+  scroll-snap-type: x proximity;
+}
+
+.active-project-card {
+  display: flex;
+  flex: 0 0 min(330px, 86vw);
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 174px;
+  padding: 20px;
+  border: 1px solid #dceafa;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 8px 22px rgba(8, 119, 237, 0.12);
+  color: inherit;
+  scroll-snap-type: start;
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.active-project-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(8, 119, 237, 0.2);
+}
+
+.active-project-card:focus-visible {
+  outline: 3px solid #0877ed;
+  outline-offset: 3px;
+}
+
+.project-card-copy {
+  min-width: 0;
+}
+
+.project-card-label {
+  color: #5875aa;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.project-card-copy h3 {
+  margin: 5px 0 16px;
+  overflow: hidden;
+  color: #102b61;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .card {
   min-width: 0;
   padding: 22px;
