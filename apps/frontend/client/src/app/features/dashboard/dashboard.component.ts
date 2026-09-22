@@ -9,6 +9,7 @@ import { TaskResponse, TaskService } from '../../core/services/task.service';
 import { ActiveTimerResponse, TimerService } from '../../core/services/timer.service';
 import { TimeEntryResponse, TimeEntryService, } from '../../core/services/time-entry.service';
 import { TimesheetResponse,TimesheetService } from '../../core/services/timesheet.service';
+import { AvailableTeamUser, TeamService } from '../../core/services/team.service';
 import { AppEvent } from '../calendar/calendar.model';
 import { CalendarService } from '../calendar/calendar.services';
 import { NotificationPanelComponent } from '../notifications/notification-panel.component';
@@ -30,6 +31,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private entriesApi = inject(TimeEntryService);
   private timesheetsApi = inject(TimesheetService);
   private calendarApi = inject(CalendarService);
+  private teamApi = inject(TeamService);
   public readonly showNotifications = signal<boolean>(false);
   public readonly unreadCount = this.notificationService.unreadCount;
   readonly isLoading = signal(true);
@@ -39,6 +41,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly tasks = signal<TaskResponse[]>([]);
   readonly calendarEvents = signal<AppEvent[]>([]);
   readonly pendingTimesheets = signal<TimesheetResponse[]>([]);
+  readonly availableUsers = signal<AvailableTeamUser[]>([]);
   readonly todayMinutes = signal(0);
   readonly weekMinutes = signal(0);
   private tick = signal(0);
@@ -49,6 +52,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   (this.auth.currentUser()?.roles ?? []).some((role) =>
   ['MANAGER', 'ROLE_MANAGER'].includes(role)),
   );
+
+  readonly isAdminView = computed(() => 
+  (this.auth.currentUser()?.roles ?? []).some((role) => 
+  ['ADMIN', 'ROLE_ADMIN'].includes(role)),
+);
 
   readonly firstName = computed(
     () => this.auth.currentUser()?.firstName || 'there',
