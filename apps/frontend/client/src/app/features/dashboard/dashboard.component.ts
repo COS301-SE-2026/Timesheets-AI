@@ -13,6 +13,7 @@ import { AvailableTeamUser, TeamService } from '../../core/services/team.service
 import { AppEvent } from '../calendar/calendar.model';
 import { CalendarService } from '../calendar/calendar.services';
 import { NotificationPanelComponent } from '../notifications/notification-panel.component';
+import { Project } from '../projects/models/project.model';
 
 interface ActiveProjectCard {
   id: string;
@@ -273,14 +274,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private toActiveProjectCard(project: ProjectDetailResponse): ActiveProjectCard {
-   const teamLeads = project.members.filter((member) => member.isProjectManager).map((member) => `${member.firstName} ${member.lastName}`);
+   const teamLeads = project.members.filter((member) => member.isProjectManager || member.role === 'MANAGER' ).map((member) => `${member.firstName} ${member.lastName}`);
+    
 
     return {
       id: project.id,
       name: project.name,
       teamLeads: teamLeads.length ? teamLeads : ['No team lead assigned'],
       memberCount: project.members.length,
-      completionPercentage: Math.max(0, Math.min(100, Math.round(project.progressPercentage ?? 0))),
+      completionPercentage: this.calculateProjectCompletion(project),
     };
   }
 
@@ -292,6 +294,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       memberCount: 0,
       completionPercentage: 0,
     };
+  }
+
+  private calculateProjectCompletion(project: ProjectDetailResponse): number {
+    if (project.status === 'COMPLETED') return 100;
+    if (!project.budgetHours || project.budgetHours <= 0) return 0;
+
+    const loggedHours = project.hoursLogged / 60;
+    return Math.max(0, Math.min(100, Math.round((loggedHours / project.budgetHours) * 100)));
   }
 
   private loadPendingApprovals(): void {
