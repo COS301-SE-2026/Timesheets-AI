@@ -9,6 +9,12 @@
  * i fixed errors with the total duration and daily totals, they were showing up as 0hr 0m even when there were entries
  * I fixed the logic to calculate the totals correctly
  * Patched: Lerato Sibanda, 18/08/2026 - manager review Timesheets tab + modal
+ * 
+ * Patched: Zamokuhle Zwane, 20/09/2026
+ * added the Manager Assistant Engine "AI Review" flow, hooks into the
+ * existing reviewTarget/showRejectReason/onApproveTimesheet flow rather than
+ * building a parallel approve/reject path, this is just a new entry point
+ * into the same actions
  */
 
 import { Component, computed, inject, signal } from '@angular/core';
@@ -27,7 +33,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {forkJoin, Observable, of, catchError, tap, map, switchMap } from 'rxjs';
 import { TimeEntryResponse } from '../../core/services/time-entry.service';
-
+import { ManagerAssistantReview } from '../../core/services/timesheet.service';
+import { EvidenceReviewModalComponent } from '../evidence-review-modal/evidence-review-modal.component';
 type StatusFilter = 'ALL' | TimesheetStatus;
 type ReviewStatusFilter = 'ALL' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
 type PageTab = 'mine' | 'review';
@@ -128,7 +135,7 @@ function hashId(id: string): number {
 @Component({
   selector: 'app-timesheets',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [EvidenceReviewModalComponent, FormsModule, RouterLink],
   templateUrl: './timesheets.component.html',
   styleUrl: './timesheets.component.scss',
 })
@@ -137,7 +144,7 @@ export class TimesheetsComponent {
   private readonly projectService = inject(ProjectService);
   private readonly taskService = inject(TaskService);
   private readonly router = inject(Router);
-
+  
   // INTEGRATION : Set from auth/session
   // Managers see Approve / Reject when status is submitted
 
@@ -267,6 +274,11 @@ export class TimesheetsComponent {
     this.loadTimesheets();
   }
 
+  readonly showEvidenceModal = signal(false);
+  readonly evidenceReview = signal<ManagerAssistantReview | null>(null);
+  readonly evidenceLoading = signal(false);
+  readonly evidenceError = signal<string | null>(null);
+
   setPageTab(tab: PageTab): void {
     this.pageTab.set(tab);
     if (tab === 'review' && this.isManager()) {
@@ -293,8 +305,7 @@ export class TimesheetsComponent {
         this.rawProjects.set(projects);
         this.rawTasks.set(tasks);
 
-        //build lightweight summaries only, no entries yet, it keeps this to a 3
-        //request total instead of n+1 per timesheet
+        //build lightweight summaries only, no entries yet, it keeps this to a 3 request total instead of n+1 per timesheet
 
         const summaries = timesheets.map((ts) => this.toSummary(ts)).sort((a,b) => a.periodStart.localeCompare(b.periodStart));
         this.allTimesheets.set(
@@ -333,6 +344,53 @@ export class TimesheetsComponent {
         this.errorMessage.set('Failed to load timesheets. Please try again');
       },
     });
+  }
+  //only fires on click, nothing runs automatically, no queue, no background scoring
+  onAiReview(row: ReviewRow): void {
+    this.showEvidenceModal.set(true);
+    this.evidenceLoading.set(true);
+    this.evidenceError.set(null);
+    this.evidenceReview.set(null);
+
+    this.timesheetService.generateManagerAssistantReview(row.summary.id).subscribe({
+      next: (review) => {
+        this.evidenceReview.set(review);
+        this.evidenceLoading.set(false);
+      },
+      error: () => {
+        this.evidenceError.set('Could not generate the evidence review. Try again.');
+        this.evidenceLoading.set(false);
+      },
+    });
+  }
+
+  onEvidenceModalClose(): void {
+    this.showEvidenceModal.set(false);
+    this.evidenceReview.set(null);
+  }
+
+  //reuses the existing onApproveTimesheet, which reads reviewTarget() internally and takes no args, so set reviewTarget first then call it,
+  //checked this against the actual method signature before writing it this way
+  onEvidenceApprove(): void {
+    const review = this.evidenceReview();
+    if (!review) return;
+    const target = this.reviewRows().find(r => r.summary.id === review.timesheetId);
+    if (!target) return;
+    this.reviewTarget.set(target);
+    this.onApproveTimesheet();
+    this.onEvidenceModalClose();
+  }
+
+  //same deal, enableRejectReason checks canApproveOrReject() before opening the reason box, so calling that instead of setting showRejectReason
+  //directly, keeps the existing guard intact
+  onEvidenceReject(): void {
+    const review = this.evidenceReview();
+    if (!review) return;
+    const target = this.reviewRows().find(r => r.summary.id === review.timesheetId);
+    if (!target) return;
+    this.reviewTarget.set(target);
+    this.enableRejectReason();
+    this.onEvidenceModalClose();
   }
 
   loadReviewQueue(): void {
