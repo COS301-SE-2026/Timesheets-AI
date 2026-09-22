@@ -314,7 +314,6 @@
                         @for (project of activeProjectCards(); track project.id) {
                             <a class="active-project-card" [routerLink]="['/projects', project.id]">
                                 <div class="project-card-copy">
-                                    <span class="project-card-label">Project</span>
                                     <h3>{{ project.name }}</h3>
                                     <p class="project-leads">
                                         <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
@@ -326,8 +325,10 @@
                                     </p>
                                 </div>
                                 <div class="project-completion" [style.--project-progress]="project.completionPercentage + '%'">
-                                    <strong>{{ project.completionPercentage }}%</strong>
-                                    <span>complete</span>
+                                    <div class="project-completion-content">
+                                        <strong>{{ project.completionPercentage }}%</strong>
+                                        <span>complete</span>
+                                    </div>
                                 </div>
                             </a>
                         }
