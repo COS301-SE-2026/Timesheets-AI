@@ -1,10 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, inject, signal, } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of, map } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { ProjectResponse, ProjectService, } from '../../core/services/project.service';
+import { ProjectDetailResponse, ProjectResponse, ProjectService, } from '../../core/services/project.service';
 import { TaskResponse, TaskService } from '../../core/services/task.service';
 import { ActiveTimerResponse, TimerService } from '../../core/services/timer.service';
 import { TimeEntryResponse, TimeEntryService, } from '../../core/services/time-entry.service';
@@ -13,6 +13,14 @@ import { AvailableTeamUser, TeamService } from '../../core/services/team.service
 import { AppEvent } from '../calendar/calendar.model';
 import { CalendarService } from '../calendar/calendar.services';
 import { NotificationPanelComponent } from '../notifications/notification-panel.component';
+
+interface ActiveProjectCard {
+  id: string;
+  name: string;
+  teamLeads: string[];
+  memberCount: number;
+  completionPercentage: number;
+}
 
 @Component({
   selector: 'app-dashboard',
