@@ -38,6 +38,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       LocalDateTime timestamp = parseTimestamp(issue.getCreatedAt());
       evidenceEvent.setTimestamp(timestamp);
       evidenceEvent.setDescription(issue.getTitle());
+      evidenceEvent.setTaskId(issue.getLocalTaskId());
 
       Map<String, Object> metadata = new HashMap<String, Object>();
 
@@ -53,7 +54,6 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       metadata.put("createdAt", issue.getCreatedAt());
       metadata.put("updatedAt", issue.getUpdatedAt());
       metadata.put("dueDate", issue.getDueDate());
-      metadata.put("localTaskId", issue.getLocalTaskId());
 
       evidenceEvent.setMetadata(metadata);
       evidenceEvents.add(evidenceEvent);
