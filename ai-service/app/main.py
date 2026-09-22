@@ -31,7 +31,7 @@ from app.api.productivity import router as productivity_router
 from app.api.task_switching import router as task_switching_router
 from app.api.weekly_summary import router as weekly_summary_router
 from app.scheduler import start_scheduler, stop_scheduler
-
+from app.api.manager_assistant import router as manager_assistant_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -64,7 +64,7 @@ app.include_router(task_switching_router)
 app.include_router(weekly_summary_router)
 app.include_router(dashboard_router)
 app.include_router(dev_trigger_router)
-
+app.include_router(manager_assistant_router)
 
 @app.get("/health", tags=["Health"])
 def health():
