@@ -66,6 +66,7 @@ app.include_router(dashboard_router)
 app.include_router(dev_trigger_router)
 app.include_router(manager_assistant_router)
 
+
 @app.get("/health", tags=["Health"])
 def health():
     return {"status": "ok", "service": "momently-ai"}

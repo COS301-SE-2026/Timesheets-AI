@@ -4,6 +4,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.Events;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
@@ -134,9 +135,20 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
 
     for (Event googleEvent : googleEvents) {
       CalendarEvent calendarEvent = new CalendarEvent();
-
       calendarEvent.setTitle(googleEvent.getSummary());
       calendarEvent.setExternalEventId(googleEvent.getId());
+
+      List<String> participants = new ArrayList<>();
+
+      if (googleEvent.getAttendees() != null) {
+        for (EventAttendee attendee : googleEvent.getAttendees()) {
+          if (attendee.getEmail() != null) {
+            participants.add(attendee.getEmail());
+          }
+        }
+      }
+
+      calendarEvent.setParticipants(participants);
 
       // The times is stored differently in Google
       // google stores as googlevent - getStart() and getEnd(): EventDateTime objects
