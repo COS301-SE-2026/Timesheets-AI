@@ -64,12 +64,6 @@ export class SettingsService{
         return of(this.mockSettings).pipe(delay(200));
     }
 
-    toggleMfa(enabled: boolean): Observable<void>{
-        this.mockSettings.security.mfaEnabled= enabled;
-        
-        return of(void 0).pipe(delay(150));
-    }
-
     toggleIntegration(integrationId: string, enabled: boolean): Observable<IntegrationStatus>{
         const integration=this.mockSettings.integrations.find(
             (i)=> i.id=== integrationId
