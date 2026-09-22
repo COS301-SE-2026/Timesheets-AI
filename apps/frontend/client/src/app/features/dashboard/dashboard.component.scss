@@ -331,6 +331,68 @@
   white-space: nowrap;
 }
 
+.project-leads,
+.project-members {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin: 7px 0 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.project-leads i,
+.project-members i {
+  width: 14px;
+  margin-top: 1px;
+  color: #0877ed;
+}
+
+.project-completion {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: conic-gradient(#159b57 var(--project-progress), #e6eef7 0);
+  position: relative;
+  text-align: center;
+}
+
+.project-completion::before {
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: white;
+  content: '';
+}
+
+.project-completion strong,
+.project-completion span {
+  position: relative;
+  z-index: 1;
+}
+
+.project-completion strong {
+  color: #102b61;
+  font-size: 19px;
+}
+
+.project-completion span {
+  color: var(--color-text-muted);
+  font-size: 10px;
+}
+
+.active-projects-empty {
+  padding: 28px;
+  border: 1px dashed #b8cbe3;
+  border-radius: 12px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
 .card {
   min-width: 0;
   padding: 22px;
@@ -650,6 +712,12 @@
   .admin-grid {
     grid-template-columns: 1fr;
   }
+
+  .active-projects-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .manager-grid .tasks-card,
   .manager-grid .hours-card {
     grid-column: span 1;
