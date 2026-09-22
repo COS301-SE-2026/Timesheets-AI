@@ -245,6 +245,11 @@
 .active-projects-section {
   max-width: 1400px;
   margin-top: 28px;
+  padding: 22px;
+  border: 1px solid #dceafa;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 12px 28px rgba(8, 119, 237, 0.12);
 }
 
 .active-projects-header {
@@ -315,15 +320,8 @@
   min-width: 0;
 }
 
-.project-card-label {
-  color: #5875aa;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
 .project-card-copy h3 {
-  margin: 5px 0 16px;
+  margin: 0 0 16px;
   overflow: hidden;
   color: #102b61;
   font-size: 16px;
@@ -367,20 +365,30 @@
   border-radius: 50%;
   background: white;
   content: '';
+  z-index: 0;
 }
 
-.project-completion strong,
-.project-completion span {
+.project-completion-content {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
 }
 
-.project-completion strong {
+.project-completion-content strong,
+.project-completion-content span {
+  position: relative;
+}
+
+.project-completion-content strong {
   color: #102b61;
   font-size: 19px;
 }
 
-.project-completion span {
+.project-completion-content span {
   color: var(--color-text-muted);
   font-size: 10px;
 }
