@@ -113,4 +113,101 @@ public class WorkSessionInferenceService {
     return (int) minutes;
   }
 
+  private double calculateConfidence(EvidenceGroup group) {
+
+    int evidenceCount = group.getEvidenceEvents().size();
+
+    boolean hasGitHub = false;
+    boolean hasJira = false;
+    boolean hasCalendar = false;
+
+    for (EvidenceEvent event : group.getEvidenceEvents()) {
+
+      if ("GITHUB".equals(event.getSource())) {
+        hasGitHub = true;
+      }
+
+      if ("JIRA".equals(event.getSource())) {
+        hasJira = true;
+      }
+
+      if ("CALENDAR".equals(event.getSource())) {
+        hasCalendar = true;
+      }
+    }
+
+    double score = 0.0;
+
+    if (hasGitHub) {
+      score += 0.30;
+    }
+
+    if (hasJira) {
+      score += 0.30;
+    }
+
+    if (hasCalendar) {
+      score += 0.15;
+    }
+
+    if (evidenceCount >= 2) {
+      score += 0.10;
+    }
+
+    if (evidenceCount >= 4) {
+      score += 0.10;
+    }
+
+    score += group.getCorrelationScore() * 0.05;
+
+    if (score > 1.0) {
+      score = 1.0;
+    }
+
+    return Math.round(score * 100.0) / 100.0;
+  }
+
+  private String generateExplanation(EvidenceGroup group, double confidence) {
+
+    int githubCount = 0;
+    int jiraCount = 0;
+    int calendarCount = 0;
+
+    for (EvidenceEvent event : group.getEvidenceEvents()) {
+
+      if ("GITHUB".equals(event.getSource())) {
+        githubCount++;
+      }
+
+      if ("JIRA".equals(event.getSource())) {
+        jiraCount++;
+      }
+
+      if ("CALENDAR".equals(event.getSource())) {
+        calendarCount++;
+      }
+    }
+
+    StringBuilder explanation = new StringBuilder();
+
+    explanation.append("Hey, Here is the suggested from ");
+    explanation.append(group.getEvidenceEvents().size());
+    explanation.append(" pieces of evidence");
+
+    if (githubCount > 0) {
+      explanation.append(", including ").append(githubCount).append(" GitHub activity");
+    }
+
+    if (jiraCount > 0) {
+      explanation.append(", ").append(jiraCount).append(" Jira activity");
+    }
+
+    if (calendarCount > 0) {
+      explanation.append(", and ").append(calendarCount).append(" Calendar activity");
+    }
+
+    explanation.append(". Confidence: ").append(confidence);
+
+    return explanation.toString();
+  }
 }
