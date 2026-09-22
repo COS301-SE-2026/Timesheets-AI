@@ -3,6 +3,8 @@ package timesheets.integration.issue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +19,10 @@ import org.springframework.web.client.RestTemplate;
 import timesheets.domain.IntegrationToken;
 import timesheets.domain.Task;
 import timesheets.dto.request.CreateIssueRequest;
+import timesheets.dto.response.CommentResponse;
 import timesheets.dto.response.IssueResponse;
+import timesheets.dto.response.StatusChangeResponse;
+import timesheets.dto.response.WorklogResponse;
 import timesheets.repository.IntegrationTokenRepository;
 import timesheets.repository.TaskRepository;
 
@@ -193,6 +198,260 @@ public class JiraAdapter implements IssueTrackerAdapter {
     log.info("Linked task {} to Jira issue: {}", taskId, issueKey);
   }
 
+  @Override
+  public List<IssueResponse> getIssues(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+    List<IssueResponse> issues = getIssues(workspaceMemberId);
+    List<IssueResponse> filteredIssues = new ArrayList<IssueResponse>();
+
+    for (IssueResponse issue : issues) {
+
+      LocalDateTime createdAt = parseJiraTimestamp(issue.getCreatedAt());
+      LocalDateTime updatedAt = parseJiraTimestamp(issue.getUpdatedAt());
+
+      boolean createdInRange =
+          createdAt != null && !createdAt.isBefore(startTime) && !createdAt.isAfter(endTime);
+
+      boolean updatedInRange =
+          updatedAt != null && !updatedAt.isBefore(startTime) && !updatedAt.isAfter(endTime);
+
+      if (createdInRange || updatedInRange) {
+        filteredIssues.add(issue);
+      }
+    }
+
+    return filteredIssues;
+  }
+
+  @Override
+  public List<WorklogResponse> getWorklogs(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+
+    List<IssueResponse> issues = getIssues(workspaceMemberId);
+
+    List<WorklogResponse> worklogs = new ArrayList<WorklogResponse>();
+
+    IntegrationToken token = getValidToken(workspaceMemberId);
+
+    String cloudId = token.getProviderResourceId();
+
+    for (IssueResponse issue : issues) {
+      String url =
+          "https://api.atlassian.com/ex/jira"
+              + cloudId
+              + "/rest/api/3/issue/"
+              + issue.getKey()
+              + "/worklog";
+
+      HttpEntity<Void> request = new HttpEntity<Void>(createAuthHeaders(token.getAccessToken()));
+
+      ResponseEntity<String> response =
+          restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
+      try {
+        JsonNode root = objectMapper.readTree(response.getBody());
+
+        JsonNode worklogNodes = root.get("worklogs");
+
+        if (worklogNodes == null || !worklogNodes.isArray()) {
+          continue;
+        }
+
+        for (JsonNode worklogNode : worklogNodes) {
+          String started = getString(worklogNode, "started");
+
+          LocalDateTime startedAt = parseJiraTimestamp(started);
+
+          if (startedAt == null) {
+            continue;
+          }
+
+          boolean withinRange = !startedAt.isBefore(startTime) && !startedAt.isAfter(endTime);
+
+          if (!withinRange) {
+            continue;
+          }
+
+          WorklogResponse worklog = new WorklogResponse();
+          worklog.setIssueKey(issue.getKey());
+          worklog.setWorklogId(getString(worklogNode, "id"));
+          worklog.setStartedAt(startedAt);
+          worklog.setTimeSpentSeconds(
+              worklogNode.has("timeSpentSeconds")
+                  ? worklogNode.get("timeSpentSeconds").asInt()
+                  : 0);
+          worklog.setDescription(getString(worklogNode, "comment"));
+
+          JsonNode author = worklogNode.get("author");
+          if (author != null && !author.isNull()) {
+            worklog.setAuthorDisplayName(getString(author, "displayName"));
+            worklog.setAuthorEmail(getString(author, "emailAddress"));
+          }
+
+          worklogs.add(worklog);
+        }
+      } catch (Exception e) {
+        log.error("Failed to parse Jira worklogs for the issue:" + issue.getKey(), e);
+      }
+    }
+
+    return worklogs;
+  }
+
+  @Override
+  public List<CommentResponse> getComments(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+    List<IssueResponse> issues = getIssues(workspaceMemberId);
+    List<CommentResponse> comments = new ArrayList<CommentResponse>();
+    IntegrationToken token = getValidToken(workspaceMemberId);
+    String cloudId = token.getProviderResourceId();
+
+    for (IssueResponse issue : issues) {
+      String url =
+          "https://api.atlassian.com/ex/jira"
+              + cloudId
+              + "/rest/api/3/issue/"
+              + issue.getKey()
+              + "/comment";
+
+      HttpEntity<Void> request = new HttpEntity<Void>(createAuthHeaders(token.getAccessToken()));
+
+      ResponseEntity<String> response =
+          restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
+      try {
+        JsonNode root = objectMapper.readTree(response.getBody());
+        JsonNode commentNodes = root.get("comments");
+
+        if (commentNodes == null || !commentNodes.isArray()) {
+          continue;
+        }
+
+        for (JsonNode commentNode : commentNodes) {
+          String created = getString(commentNode, "created");
+
+          LocalDateTime createdAt = parseJiraTimestamp(created);
+
+          if (createdAt == null) {
+            continue;
+          }
+
+          boolean withinRange = !createdAt.isBefore(startTime) && !createdAt.isAfter(endTime);
+
+          if (!withinRange) {
+            continue;
+          }
+
+          CommentResponse comment = new CommentResponse();
+
+          comment.setIssueKey(issue.getKey());
+          comment.setCommentId(getString(commentNode, "id"));
+          comment.setUpdatedAt(parseJiraTimestamp(getString(commentNode, "updated")));
+          comment.setBody(getString(commentNode, "body"));
+
+          JsonNode author = commentNode.get("author");
+
+          if (author != null && !author.isNull()) {
+            comment.setAuthorDisplayName(getString(author, "displayName"));
+            comment.setAuthorEmail(getString(author, "emailAddress"));
+          }
+
+          comments.add(comment);
+        }
+      } catch (Exception e) {
+        log.error("Failed to parse the comments for this issue" + issue.getKey(), e);
+      }
+    }
+
+    return comments;
+  }
+
+  @Override
+  public List<StatusChangeResponse> getStatusChanges(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+    List<IssueResponse> issues = getIssues(workspaceMemberId);
+
+    List<StatusChangeResponse> statusChanges = new ArrayList<StatusChangeResponse>();
+    IntegrationToken token = getValidToken(workspaceMemberId);
+    String cloudId = token.getProviderResourceId();
+
+    for (IssueResponse issue : issues) {
+      String url =
+          "https://api.atlassian.com/ex/jira"
+              + cloudId
+              + "/rest/api/3/issue/"
+              + issue.getKey()
+              + "/changelog"
+              + "?startAt=0"
+              + "&maxResults=100";
+
+      HttpEntity<Void> request = new HttpEntity<Void>(createAuthHeaders(token.getAccessToken()));
+
+      try {
+        ResponseEntity<String> response =
+            restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+        JsonNode root = objectMapper.readTree(response.getBody());
+        JsonNode histories = root.get("values");
+
+        if (histories == null || !histories.isArray()) {
+          continue;
+        }
+
+        for (JsonNode history : histories) {
+          LocalDateTime changedAt = parseJiraTimestamp(getString(history, "created"));
+
+          if (changedAt == null) {
+            continue;
+          }
+
+          boolean withinRange = !changedAt.isBefore(startTime) && !changedAt.isAfter(endTime);
+
+          if (!withinRange) {
+            continue;
+          }
+
+          JsonNode items = history.get("items");
+
+          if (items == null || !items.isArray()) {
+            continue;
+          }
+
+          for (JsonNode item : items) {
+            String field = getString(item, "field");
+
+            if (!"status".equalsIgnoreCase(field)) {
+              continue;
+            }
+
+            StatusChangeResponse statusChange = new StatusChangeResponse();
+            statusChange.setIssueKey(issue.getKey());
+
+            statusChange.setChangeLogId(getString(history, "id"));
+
+            statusChange.setChangedAt(changedAt);
+
+            statusChange.setFromStatus(getString(item, "fromString"));
+
+            statusChange.setToStatus(getString(item, "toString"));
+
+            JsonNode author = history.get("author");
+
+            if (author != null && !author.isNull()) {
+              statusChange.setAuthorDisplayName(getString(author, "displayName"));
+              statusChange.setAuthorEmail(getString(author, "emailAddress"));
+            }
+
+            statusChanges.add(statusChange);
+          }
+        }
+      } catch (Exception e) {
+        log.error("Failed to parse the Jira status changes for this issue:" + issue.getKey(), e);
+      }
+    }
+
+    return statusChanges;
+  }
+
   // ! helper functions
   private HttpHeaders createAuthHeaders(String accessToken) {
     HttpHeaders headers = new HttpHeaders();
@@ -224,6 +483,33 @@ public class JiraAdapter implements IssueTrackerAdapter {
     }
 
     return dto;
+  }
+
+  private LocalDateTime parseJiraTimestamp(String timestamp) {
+
+    if (timestamp == null || timestamp.isBlank()) {
+      return null;
+    }
+
+    try {
+
+      return java.time.OffsetDateTime.parse(timestamp).toLocalDateTime();
+
+    } catch (Exception e) {
+
+      try {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+
+        return OffsetDateTime.parse(timestamp, formatter).toLocalDateTime();
+
+      } catch (Exception secondException) {
+
+        log.warn("Could not parse Jira timestamp", timestamp);
+
+        return null;
+      }
+    }
   }
 
   private String getString(JsonNode node, String field) {
