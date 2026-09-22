@@ -295,6 +295,48 @@
                 }
             </article>
         </section>
+
+        @if (isAdminView()) {
+            <section class="active-projects-section" aria-labelledby="active-projects-heading">
+                <div class="active-projects-header">
+                    <div>
+                        <h2 id="active-projects-heading">Active projects</h2>
+                        <p>Project progress and team ownership at a glance.</p>
+                    </div>
+                    <a routerLink="/projects">
+                        View all projects
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+
+                @if (activeProjectCards().length) {
+                    <div class="active-projects-carousel" aria-label="Avtive project cards">
+                        @for (project of activeProjectCards(); track project.id) {
+                            <a class="active-project-card" [routerLink]="['/projects', project.id]">
+                                <div class="project-card-copy">
+                                    <span class="project-card-label">Project</span>
+                                    <h3>{{ project.name }}</h3>
+                                    <p class="project-leads">
+                                        <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
+                                        {{ project.teamLeads.join(', ')}}
+                                    </p>
+                                    <p class="project-members">
+                                        <i class="fa-solid fa-user" aria-hidden="true"></i>
+                                        {{ project.memberCount }} {{ project.memberCount === 1 ? 'member' : 'members'}}
+                                    </p>
+                                </div>
+                                <div class="project-completion" [style.--project-progress]="project.completionPercentage + '%'">
+                                    <strong>{{ project.completionPercentage }}%</strong>
+                                    <span>complete</span>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                } @else {
+                    <div class="active-projects-empty">No active projects are available.</div>
+                }
+            </section>
+        }
     }
 
     <!-- Timer stopped modal -->
