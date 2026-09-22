@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, of } from 'rxjs';
@@ -40,6 +41,7 @@ export class TeamsComponent implements OnInit {
   private readonly teamService = inject(TeamService);
   private readonly projectService = inject(ProjectService);
   private readonly authService = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
 
     protected members: TeamMember[] = [];
     protected projects: TeamProject[] = [];
@@ -64,10 +66,14 @@ export class TeamsComponent implements OnInit {
     protected readonly workspaceRolesByUser = new Map<string, WorkspaceRole>();
 
     protected get isAdmin(): boolean {
-      return this.authService.currentUser()?.roles.includes('ROLE_ADMIN') ?? false;
+      const roles = this.authService.currentUser()?.roles ?? [];
+      return roles.some((role) => ['ADMIN', 'ROLE_ADMIN'].includes(role));
     }
     
     ngOnInit(): void {
+      if (this.isAdmin && this.route.snapshot.queryParamMap.get('tab') === 'waiting') {
+        this.activeTab = 'waiting';
+      }
       this.loadTeam();
     }
 
