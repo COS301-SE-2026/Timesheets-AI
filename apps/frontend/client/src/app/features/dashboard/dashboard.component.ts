@@ -272,6 +272,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ).subscribe((cards) => this.activeProjectCards.set(cards));
   }
 
+  private toActivateProjectCard(project: ProjectDetailResponse): ActiveProjectCard {
+    const teamLeads = project.members.filter((member) => member.isProjectManager).map((member) => `${member.firstName} ${member.lastName}`);
+
+    return {
+      id: project.id,
+      name: project.name,
+      teamLeads: teamLeads.length ? teamLeads : ['No team lead assigned'],
+      memberCount: project.members.length,
+      completionPercentage: Math.max(0, Math.min(100, Math.round(project.progressPercentage ?? 0))),
+    };
+  }
+
   private loadPendingApprovals(): void {
     this.timesheetsApi
       .getPendingWorkspaceTimesheets()
