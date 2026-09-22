@@ -7,6 +7,7 @@ Date: 03/09/2026
 
 import { Component, inject, computed, signal } from '@angular/core';
 import { ChartConfiguration } from 'chart.js';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { InsightCardComponent } from '../../../shared/components/insight-card/insight-card.component';
 import { ScopeSwitcherComponent, ScopeOption } from '../../../shared/components/scope-switcher/scope-switcher.component';
@@ -31,6 +32,10 @@ export class DeveloperInsightsComponent {
   private readonly adapter = inject(InsightsAdapterService);
   private readonly githubService = inject(GithubIntegrationService);
   readonly personalHours = signal<PersonalInsightsResponse | null>(null);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  readonly githubConnected = signal(false);
+  private static readonly PERCENT = 100;
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
@@ -44,27 +49,55 @@ export class DeveloperInsightsComponent {
 
   ngOnInit(): void {
     this.loadInsights();
+    this.githubService.status().subscribe({
+      next: connected => this.githubConnected.set(connected),
+      error: () => this.githubConnected.set(false)
+    });
+
+    if (this.route.snapshot.queryParamMap.get('github') === 'connected') {
+      this.githubConnected.set(true);
+      this.syncGitHub();
+      this.router.navigate([], { queryParams: {} });
+    }
   }
 
   loadInsights(): void {
-    this.loading.set(true);
-    this.insightsService.getAiDashboard().subscribe({
-      next: response => {
-        this.data.set(this.adapter.toDeveloperInsights(response));
-        this.loading.set(false);
-      },
-      error: () => {
-        this.error.set('unable to load ai insights right now.');
-        this.loading.set(false);
-      }
-    });
+  this.loading.set(true);
+  const { from, to } = this.currentWeekRange();
 
-    const {from, to} = this.currentWeekRange();
-    this.insightsService.getInsightsSummary(from, to).subscribe({
-      next: summary => this.personalHours.set(summary),
-      error: () => this.personalHours.set(null)
-    });
-  }
+  this.insightsService.getAiDashboard().subscribe({
+    next: response => {
+      const base = this.adapter.toDeveloperInsights(response);
+      this.data.set(base);
+      this.loading.set(false);
+
+      this.insightsService.getCalendarVsTracked(from, to).subscribe({
+        next: cal => this.data.update(d => d && ({
+          ...d,
+          overall: { ...d.overall, calendarVsTracked: cal }
+        })),
+        error: () => {}
+      });
+
+      this.insightsService.getJiraVsLogged().subscribe({
+        next: jira => this.data.update(d => d && ({
+          ...d,
+          overall: { ...d.overall, jiraVsLogged: jira }
+        })),
+        error: () => {}
+      });
+    },
+    error: () => {
+      this.error.set('unable to load ai insights right now.');
+      this.loading.set(false);
+    }
+  });
+
+  this.insightsService.getInsightsSummary(from, to).subscribe({
+    next: summary => this.personalHours.set(summary),
+    error: () => this.personalHours.set(null)
+  });
+}
 
   private currentWeekRange(): {from: string; to: string }{
     const now = new Date();
@@ -105,7 +138,22 @@ export class DeveloperInsightsComponent {
   }
 
   // ---- chart configs, colours resolved from the design tokens at build time ----
+  // the bigger of calendar/tracked is the full bar, the other scales against it
+  readonly calendarBars = computed(() => {
+    const cvt = this.data()?.overall.calendarVsTracked;
+    if (!cvt) return { calendar: 0, tracked: 0 };
 
+    const max = Math.max(cvt.calendarHours, cvt.trackedHours);
+    // 0 / 0 is NaN and a NaN width silently does nothing, so bail out
+    if (max === 0) return { calendar: 0, tracked: 0 };
+
+    const pct = DeveloperInsightsComponent.PERCENT;
+    return {
+      calendar: (cvt.calendarHours / max) * pct,
+      tracked: (cvt.trackedHours / max) * pct,
+    };
+  });
+  
     readonly trendChart = computed<ChartConfiguration>(() => ({
     type: 'line',
     data: {
