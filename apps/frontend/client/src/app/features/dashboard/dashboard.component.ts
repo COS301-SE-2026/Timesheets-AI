@@ -264,16 +264,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     forkJoin(
       activeProjects.map((project) =>
-      this.projectsApi.getProjectDetail(projects.id).pipe(
+      this.projectsApi.getProjectDetail(project.id).pipe(
         map((detail) => this.toActiveProjectCard(detail)),
-        catchError(() => of(this.toFallbsckActiveProjectCard(project))),
+        catchError(() => of(this.toFallbackActiveProjectCard(project))),
       ),
     ),
     ).subscribe((cards) => this.activeProjectCards.set(cards));
   }
 
-  private toActivateProjectCard(project: ProjectDetailResponse): ActiveProjectCard {
-    const teamLeads = project.members.filter((member) => member.isProjectManager).map((member) => `${member.firstName} ${member.lastName}`);
+  private toActiveProjectCard(project: ProjectDetailResponse): ActiveProjectCard {
+   const teamLeads = project.members.filter((member) => member.isProjectManager).map((member) => `${member.firstName} ${member.lastName}`);
 
     return {
       id: project.id,
@@ -281,6 +281,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
       teamLeads: teamLeads.length ? teamLeads : ['No team lead assigned'],
       memberCount: project.members.length,
       completionPercentage: Math.max(0, Math.min(100, Math.round(project.progressPercentage ?? 0))),
+    };
+  }
+
+  private toFallbackActiveProjectCard(project: ProjectResponse): ActiveProjectCard {
+    return {
+      id: project.id,
+      name: project.name,
+      teamLeads: ['No team lead assigned'],
+      memberCount: 0,
+      completionPercentage: 0,
     };
   }
 
