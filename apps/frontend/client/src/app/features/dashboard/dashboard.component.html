@@ -95,6 +95,26 @@
                     </a>
                 </article>
             }
+
+               @if (isAdminView()) {
+                <article class="card summary-card waiting-room-card">
+                    <div class="card-heading">
+                        <span class="icon-orb amber">
+                            <i class="fa-solid fa-user-clock"></i>
+                        </span>
+                        <div>
+                            <h2>Waiting for worskapce</h2>
+                            <p>Members awaiting workspace access</p>
+                        </div>
+                    </div>
+                    <strong>{{ waitingForWorkspaceCount() }}</strong>
+                    <a routerLink="/team" [queryParams]="{ tab: 'waiting'}">
+                        Open waiting room
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </article>
+            }
+
             <!-- Total projects summary card -->
             <article class="card summary-card project-card">
                 <div class="card-heading">
@@ -113,24 +133,7 @@
                     <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </article>
-            @if (isAdminView()) {
-                <article class="card sumamry-card waiting-room-card">
-                    <div class="card-heading">
-                        <span class="icon-orb amber">
-                            <i class="fa-solid fa-user-clock"></i>
-                        </span>
-                        <div>
-                            <h2>Waiting for worskapce</h2>
-                            <p>Members awaiting workspace access</p>
-                        </div>
-                    </div>
-                    <strong>{{ waitingForWorkspaceCount() }}</strong>
-                    <a routerLink="/team" [queryParams]="{ tab: 'waiting'}">
-                        Open waiting room
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </article>
-            }
+         
             <!-- Tasks summary card -->
              @if (!isAdminView()) {
             <article class="card tasks-card">
