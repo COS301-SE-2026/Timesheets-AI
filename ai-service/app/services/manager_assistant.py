@@ -58,7 +58,8 @@ def _call_gemini_with_retry(prompt: str) -> str:
         try:
             response = model.generate_content(prompt)
             return response.text.strip()
-        except Exception as e:  # noqa: BLE001 - retrying regardless of error shape, same as weekly_summary
+        # retrying regardless of error shape, same as weekly_summary
+        except Exception as e:  # noqa: BLE001
             last_error = e
             time.sleep(RETRY_BACKOFF_SECONDS * (2**attempt))
 
