@@ -27,7 +27,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
-import { TaskService, TaskResponse } from '../../core/services/task.service';
+import { TaskService, TaskResponse, UpdateTaskRequest, } from '../../core/services/task.service';
 import { ProjectService, ProjectResponse } from '../../core/services/project.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ReplacePipe } from '../../shared/pipes/replace.pipe';
@@ -211,6 +211,14 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   //will track if a manager is looking at their own tasks or team tasks
   public readonly activeTab = signal<'my-tasks' | 'team-tasks'>('my-tasks');
 
+  // tracks whether the task detail modal is currently in edit mode
+  public readonly isEditingTask = signal<boolean>(false);
+  public readonly isUpdatingTask = signal<boolean>(false);
+  public readonly updateError = signal<string | null>(null);
+
+  //has the copy that can be edited
+  public editTask: UpdateTaskRequest = {};
+
 
   //the create task modal
   public newTask: CreateTaskRequest = {
@@ -383,6 +391,115 @@ export class MyTasksComponent implements OnInit, OnDestroy {
         console.error('[MyTasksComponent] failed to load my-tasks:', error);
         this.isLoading.set(false);
         this.loadError.set(true);
+      },
+    });
+  }
+
+  // switches the task detail modal into edit mode
+  public startEditingTask(): void {
+    const task = this.selectedTask();
+
+    if (!task) {
+      return;
+    }
+
+    this.updateError.set(null);
+
+    // create a separate editable copy so cancelling does not change the displayed task
+    this.editTask = {
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      priority: task.priority,
+      estimatedHours: task.estimatedHours,
+      dueDate: task.dueDate,
+      assignedWorkspaceMemberId: task.assignedWorkspaceMemberId,
+    };
+
+    if (this.canAssignTasks()) {
+      this.loadProjectMembers(task.projectId);
+    }
+
+    this.isEditingTask.set(true);
+  }
+
+  // leaves edit mode without saving any changes
+  public cancelEditingTask(): void {
+    this.isEditingTask.set(false);
+    this.updateError.set(null);
+    this.editTask = {};
+  }
+
+  public saveTaskChanges(): void {
+    const task = this.selectedTask();
+
+    if (!task) {
+      return;
+    }
+
+
+    //I am only making sure that fields that are changed are the ones that will be sent to backend, for efficiency
+    const changes: UpdateTaskRequest = {};
+
+    if (this.editTask.title !== task.title) {
+      changes.title = this.editTask.title;
+    }
+
+    if (this.editTask.description !== task.description) {
+      changes.description = this.editTask.description;
+    }
+
+    if (this.editTask.status !== task.status) {
+      changes.status = this.editTask.status;
+    }
+
+    if (this.editTask.priority !== task.priority) {
+      changes.priority = this.editTask.priority;
+    }
+
+    if (this.editTask.estimatedHours !== task.estimatedHours) {
+      changes.estimatedHours = this.editTask.estimatedHours;
+    }
+
+    if (this.editTask.dueDate !== task.dueDate) {
+      changes.dueDate = this.editTask.dueDate;
+    }
+
+    if (this.editTask.assignedWorkspaceMemberId !== task.assignedWorkspaceMemberId) {
+      changes.assignedWorkspaceMemberId = this.editTask.assignedWorkspaceMemberId;
+    }
+
+    //if there is nothing that was changed, then there is no reason for a patch request
+    if (Object.keys(changes).length === 0) {
+
+      this.isEditingTask.set(false);
+      this.updateError.set(null);
+      this.editTask = {};
+
+      return;
+    }
+
+    this.isUpdatingTask.set(true);
+    this.updateError.set(null);
+
+    this.taskService.updateTask(task.id, changes).subscribe({
+      next: (response: TaskResponse) => {
+        const updatedTask = this.mapToTask(response);
+
+        this.selectedTask.set(updatedTask);
+
+        this.updateTaskInTaskList(updatedTask);
+
+        this.isUpdatingTask.set(false);
+        this.isEditingTask.set(false);
+        this.editTask = {};
+      },
+
+      error: (error) => {
+        console.error('[MyTasksComponent] failed to update task:', error );
+
+        this.isUpdatingTask.set(false);
+        this.updateError.set(error.error?.message || 'Failed to update task. Please try again.' );
       },
     });
   }
@@ -675,10 +792,27 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     return `priority-badge ${PRIORITY_CLASSES[priority]}`;
   }
 
-  //there's no status field on the GET, i've flagged this with backend, so for now its local
   public onStatusChange(task: Task, newStatus: string): void {
     const status = newStatus as TaskStatus;
-    this.updateTaskInTaskList({ ...task, status });
+
+    this.taskService.updateTask(task.id, { status }).subscribe({
+      next: (response: TaskResponse) => {
+
+        const updatedTask = this.mapToTask(response);
+        this.updateTaskInTaskList(updatedTask);
+
+        if (this.selectedTask()?.id === updatedTask.id) {
+          this.selectedTask.set(updatedTask);
+        }
+      },
+
+      error: (error) => {
+        console.error('[MyTasksComponent] failed to update task status:', error);
+
+        // reapply the current data so what was returned by backend comes back
+        this.applyFilters();
+      },
+    });
   }
 
   //navigate to project
@@ -742,36 +876,36 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     return icons[status];
   }
 
-  //update tasks in the task list after a status change
+  // updates the task in both task lists after a change
   private updateTaskInTaskList(updatedTask: Task): void {
 
-    if (this.activeTab() === 'team-tasks' && this.isManager()) {
-      const currentTeamTasks = this.teamTasks();
+    // update My Tasks if the task exists there
+    const currentMyTasks = this.tasks();
 
-      const index = currentTeamTasks.findIndex((task: Task) => task.id === updatedTask.id);
+    const myTaskIndex = currentMyTasks.findIndex((task: Task) => task.id === updatedTask.id);
 
-      if (index !== -1) {
-        const updatedTeamTasks = [...currentTeamTasks];
+    if (myTaskIndex !== -1) {
+      const updatedMyTasks = [...currentMyTasks];
+      updatedMyTasks[myTaskIndex] = updatedTask;
 
-        updatedTeamTasks[index] = updatedTask;
-        this.teamTasks.set(updatedTeamTasks);
-      }
-    } 
-    else {
-      const currentMyTasks = this.tasks();
-
-      const index = currentMyTasks.findIndex((task: Task) => task.id === updatedTask.id);
-
-      if (index !== -1) {
-
-        const updatedMyTasks = [...currentMyTasks];
-        updatedMyTasks[index] = updatedTask;
-
-        this.tasks.set(updatedMyTasks);
-      }
+      this.tasks.set(updatedMyTasks);
     }
 
-    //this will replay the filters so the task is shown in the table
+    // update Team Tasks if the task exists there
+    const currentTeamTasks = this.teamTasks();
+
+    const teamTaskIndex = currentTeamTasks.findIndex(
+      (task: Task) => task.id === updatedTask.id
+    );
+
+    if (teamTaskIndex !== -1) {
+      const updatedTeamTasks = [...currentTeamTasks];
+      updatedTeamTasks[teamTaskIndex] = updatedTask;
+
+      this.teamTasks.set(updatedTeamTasks);
+    }
+
+    // reapply the filters to the currently selected task view
     this.applyFilters();
   }
 
@@ -798,6 +932,12 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     this.isDetailOpen.set(false);
     this.selectedTask.set(null);
     this.detailError.set(null);
+
+    // reset the edit state whenever the modal closes
+    this.isEditingTask.set(false);
+    this.isUpdatingTask.set(false);
+    this.updateError.set(null);
+    this.editTask = {};
   }
 
   //this will close modal on escape
