@@ -19,6 +19,7 @@ import timesheets.domain.ProjectMember;
 import timesheets.domain.Task;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateTaskRequest;
+import timesheets.dto.request.UpdateTaskRequest;
 import timesheets.dto.response.IssueResponse;
 import timesheets.dto.response.TaskResponse;
 import timesheets.integration.issue.JiraAdapter;
@@ -244,6 +245,87 @@ public class TaskService {
     Task savedTask = taskRepository.save(task);
 
     String projectName = project.getName();
+    String assignedToName = getAssignedToName(savedTask.getAssignedWorkspaceMemberId());
+
+    return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName);
+  }
+
+  // updates the editable fields of an existing task
+  @Transactional
+  public TaskResponse updateTask(UUID taskId, UpdateTaskRequest.UpdateTask request, UUID workspaceMemberId) {
+
+    Task task = getTaskById(taskId);
+
+    // deleted tasks cannot be edited
+    if (Boolean.TRUE.equals(task.getIsDeleted())) {
+      throw new ResourceNotFoundException("Task has been deleted");
+    }
+
+    if (!userHasAccessToProject(task.getProjectId(), workspaceMemberId)) {
+      throw new AccessDeniedException("You do not have permission to update this task");
+    }
+
+    // developers can only edit tasks assigned to themselves
+    boolean canEditOtherTasks = isProjectManager(task.getProjectId(), workspaceMemberId) || securityUtils.isManager() || securityUtils.isAdmin();
+
+    if (!canEditOtherTasks && !workspaceMemberId.equals(task.getAssignedWorkspaceMemberId())) {
+      throw new AccessDeniedException("You can only update tasks assigned to yourself");
+    }
+
+    // only update fields that were included in the PATCH request
+    //for effiecieny I only want the fields that were updated to be included in the PATCH request 
+    if (request.getTitle() != null) {
+      task.setTitle(request.getTitle());
+    }
+
+    if (request.getDescription() != null) {
+      task.setDescription(request.getDescription());
+    }
+
+    if (request.getPriority() != null) {
+      task.setPriority(request.getPriority());
+    }
+
+    if (request.getEstimatedHours() != null) {
+      task.setEstimatedHours(request.getEstimatedHours());
+    }
+
+    if (request.getDueDate() != null) {
+      task.setDueDate(request.getDueDate());
+    }
+
+    if (request.getStatus() != null) {
+      task.setStatus(request.getStatus());
+
+      // record when the task is completed
+      if ("DONE".equals(request.getStatus())) {
+        if (task.getCompletedAt() == null) {
+          task.setCompletedAt(LocalDateTime.now());
+        }
+      } else {
+        task.setCompletedAt(null);
+      }
+    }
+
+    if (request.getAssignedWorkspaceMemberId() != null) {
+
+      // only managers, admins or project managers can reassign tasks
+      if (!canEditOtherTasks) {
+        throw new AccessDeniedException("You do not have permission to reassign tasks");
+      }
+
+      // assigned user must be an active member of the task's project
+      if (!projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(task.getProjectId(), request.getAssignedWorkspaceMemberId())) {
+
+        throw new BadRequestException("Task can only be assigned to an active member of this project");
+      }
+
+      task.setAssignedWorkspaceMemberId(request.getAssignedWorkspaceMemberId());
+    }
+
+    Task savedTask = taskRepository.save(task);
+
+    String projectName = projectRepository.findById(savedTask.getProjectId()).map(Project::getName).orElse("Unknown Project");
     String assignedToName = getAssignedToName(savedTask.getAssignedWorkspaceMemberId());
 
     return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName);
