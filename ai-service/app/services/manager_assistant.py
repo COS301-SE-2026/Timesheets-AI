@@ -30,9 +30,7 @@ def generate_manager_assistant_narrative(review: ManagerAssistantReviewRequest) 
 
 
 def _build_prompt(review: ManagerAssistantReviewRequest) -> str:
-    evidence_lines = "\n".join(
-        f"- {e.source_name}: {e.detail}" for e in review.evidence_sources
-    )
+    evidence_lines = "\n".join(f"- {e.source_name}: {e.detail}" for e in review.evidence_sources)
 
     return (
         f"You are writing one short paragraph (2 sentences max) for a manager "
@@ -50,8 +48,8 @@ def _build_prompt(review: ManagerAssistantReviewRequest) -> str:
 
 
 def _call_gemini_with_retry(prompt: str) -> str:
-    #same model/config pattern as weekly_summary, genai.configure() called here not at module level, avoids the pytest collection KeyError this
-    #codebase already hit once before
+    # same model/config pattern as weekly_summary, genai.configure() called here not at module level, avoids the pytest collection KeyError this
+    # codebase already hit once before
     model = genai.GenerativeModel("gemini-3.5-flash-lite")
     genai.configure(api_key=settings.gemini_api_key)
 
