@@ -58,6 +58,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ['ADMIN', 'ROLE_ADMIN'].includes(role)),
 );
 
+  readonly waitingForWorkspaceCount = computed(() =>
+  this.availableUsers().filter((user) => !user.isInWorkspace).length);
+
   readonly firstName = computed(
     () => this.auth.currentUser()?.firstName || 'there',
   );
@@ -71,7 +74,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   this.projects().filter(
     (p) => 
       p.status === 'ACTIVE' &&
-      (!this.isManagerView() ||
+      (this.isAdminView() || 
+      !this.isManagerView() ||
       p.myRole === 'MANAGER')
   ),);
 
@@ -227,12 +231,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       events: this.calendarApi
         .getEvents(this.dateTimeKey(today), this.dateTimeKey(tomorrow))
         .pipe(catchError(() => of([]))),
+        availableUsers: this.teamApi.getAvailableUsers().pipe(catchError(() => of([]))),
     })
     .pipe(finalize(() => this.isLoading.set(false)))
     .subscribe((data) => {
       this.activeTimer.set(data.timer);
       this.projects.set(data.projects);
       this.calendarEvents.set(data.events);
+      this.availableUsers.set(data.availableUsers);
       this.setTimeTotals(data.entries);
       this.tasks.set(data.myTasks);
       if (this.isManagerView()) this.loadPendingApprovals();
