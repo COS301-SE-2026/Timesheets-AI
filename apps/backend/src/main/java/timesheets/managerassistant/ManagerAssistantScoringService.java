@@ -113,8 +113,18 @@ public class ManagerAssistantScoringService {
         missingEvidence);
   }
 
+  private final GitHubService gitHubService;
+
   private ManagerAssistantEvidenceResult scoreGithub(
       UUID memberId, LocalDateTime start, LocalDateTime end) {
+    try {
+      gitHubService.syncRecentCommits(memberId);
+    } catch (IllegalStateException e) {
+      // "GitHub is not connected", same treat-as-normal pattern as jira/calendar
+      log.debug("github not connected for member {}, treating as 0 evidence", memberId);
+      return new ManagerAssistantEvidenceResult("GITHUB", 0, 0.0, "github not connected");
+    }
+
     // db backed via GitHubService, not a live api call, cheap to hit
     List<GitCommitActivity> commits = gitHubAdapter.getCommits(memberId, start, end);
 
