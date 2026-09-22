@@ -50,6 +50,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly calendarEvents = signal<AppEvent[]>([]);
   readonly pendingTimesheets = signal<TimesheetResponse[]>([]);
   readonly availableUsers = signal<AvailableTeamUser[]>([]);
+  readonly activeProjectCards = signal<ActiveProjectCard[]>([]);
   readonly todayMinutes = signal(0);
   readonly weekMinutes = signal(0);
   private tick = signal(0);
@@ -249,8 +250,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.availableUsers.set(data.availableUsers);
       this.setTimeTotals(data.entries);
       this.tasks.set(data.myTasks);
+      if (this.isAdminView()) this.loadActiveProjectCards(data.projects);
       if (this.isManagerView()) this.loadPendingApprovals();
     });
+  }
+
+  private loadActiveProjectCards(projects: ProjectResponse[]): void {
+    const activeProjects = projects.filter((project) => project.status === 'ACTIVE');
+    if (!activeProjects.length) {
+      this.activeProjectCards.set([]);
+      return;
+    }
+
+    forkJoin(
+      activeProjects.map((project) =>
+      this.projectsApi.getProjectDetail(projects.id).pipe(
+        map((detail) => this.toActiveProjectCard(detail)),
+        catchError(() => of(this.toFallbsckActiveProjectCard(project))),
+      ),
+    ),
+    ).subscribe((cards) => this.activeProjectCards.set(cards));
   }
 
   private loadPendingApprovals(): void {
