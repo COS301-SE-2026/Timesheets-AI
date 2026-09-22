@@ -7,7 +7,8 @@
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, of, delay } from "rxjs";
-import { UserSettings, IntegrationStatus, NotificationSettings, ChangePasswordRequest, ChangePasswordResponse } from "./settings.model";
+import { UserSettings, IntegrationStatus, NotificationSettings, ChangePasswordRequest, ChangePasswordResponse, MessageResponse, MfaSetupResponse } from "./settings.model";
+
 
 @Injectable({ providedIn: 'root'})
 export class SettingsService{
@@ -62,6 +63,26 @@ export class SettingsService{
 
     getSettings(): Observable<UserSettings>{
         return of(this.mockSettings).pipe(delay(200));
+    }
+
+    getMfaSetup(): Observable<MfaSetupResponse>{
+        return this.http.get<MfaSetupResponse>(
+            `${this.authUrl}/mfa/setup`
+        );
+    }
+
+    verifyMfa(totpCode: string): Observable<MessageResponse>{
+        return this.http.post<MessageResponse>(
+            `${this.authUrl}/mfa/verify`,
+            { totpCode }
+        );
+    }
+
+    disableMfa(password: string): Observable<MessageResponse>{
+        return this.http.post<MessageResponse>(
+            `${this.authUrl}/mfa/disable`,
+            { password }
+        );
     }
 
     toggleIntegration(integrationId: string, enabled: boolean): Observable<IntegrationStatus>{
