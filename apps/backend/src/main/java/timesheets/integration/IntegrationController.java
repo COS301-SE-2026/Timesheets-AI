@@ -288,7 +288,7 @@ public class IntegrationController {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     List<Task> jiraTasks =
-        taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId).stream()
+        taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(workspaceMemberId).stream()
             .filter(t -> t.getJiraTicketKey() != null)
             .toList();
 
