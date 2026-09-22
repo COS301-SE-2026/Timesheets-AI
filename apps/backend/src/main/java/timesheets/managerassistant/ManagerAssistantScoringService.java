@@ -43,6 +43,7 @@ import timesheets.integration.calendar.CalendarEvent;
 import timesheets.integration.calendar.CalendarNotConnectedException;
 import timesheets.integration.github.GitCommitActivity;
 import timesheets.integration.github.GitHubAdapter;
+import timesheets.integration.github.GitHubService;
 import timesheets.integration.issue.IssueTrackerAdapter;
 import timesheets.repository.TimeEntryRepository;
 
