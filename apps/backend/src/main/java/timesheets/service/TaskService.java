@@ -252,7 +252,8 @@ public class TaskService {
 
   // updates the editable fields of an existing task
   @Transactional
-  public TaskResponse updateTask(UUID taskId, UpdateTaskRequest.UpdateTask request, UUID workspaceMemberId) {
+  public TaskResponse updateTask(
+      UUID taskId, UpdateTaskRequest.UpdateTask request, UUID workspaceMemberId) {
 
     Task task = getTaskById(taskId);
 
@@ -266,14 +267,17 @@ public class TaskService {
     }
 
     // developers can only edit tasks assigned to themselves
-    boolean canEditOtherTasks = isProjectManager(task.getProjectId(), workspaceMemberId) || securityUtils.isManager() || securityUtils.isAdmin();
+    boolean canEditOtherTasks =
+        isProjectManager(task.getProjectId(), workspaceMemberId)
+            || securityUtils.isManager()
+            || securityUtils.isAdmin();
 
     if (!canEditOtherTasks && !workspaceMemberId.equals(task.getAssignedWorkspaceMemberId())) {
       throw new AccessDeniedException("You can only update tasks assigned to yourself");
     }
 
     // only update fields that were included in the PATCH request
-    //for effiecieny I only want the fields that were updated to be included in the PATCH request 
+    // for effiecieny I only want the fields that were updated to be included in the PATCH request
     if (request.getTitle() != null) {
       task.setTitle(request.getTitle());
     }
@@ -315,9 +319,11 @@ public class TaskService {
       }
 
       // assigned user must be an active member of the task's project
-      if (!projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(task.getProjectId(), request.getAssignedWorkspaceMemberId())) {
+      if (!projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
+          task.getProjectId(), request.getAssignedWorkspaceMemberId())) {
 
-        throw new BadRequestException("Task can only be assigned to an active member of this project");
+        throw new BadRequestException(
+            "Task can only be assigned to an active member of this project");
       }
 
       task.setAssignedWorkspaceMemberId(request.getAssignedWorkspaceMemberId());
@@ -325,7 +331,11 @@ public class TaskService {
 
     Task savedTask = taskRepository.save(task);
 
-    String projectName = projectRepository.findById(savedTask.getProjectId()).map(Project::getName).orElse("Unknown Project");
+    String projectName =
+        projectRepository
+            .findById(savedTask.getProjectId())
+            .map(Project::getName)
+            .orElse("Unknown Project");
     String assignedToName = getAssignedToName(savedTask.getAssignedWorkspaceMemberId());
 
     return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName);
