@@ -1,7 +1,5 @@
-// Evidence Review modal — styled to the three wireframe states:
 //   Likely reject (low confidence, red)  |  Unsure (needs review, blue)  |  Likely approve (green)
-// Brand tokens per Brand Style Kit v2.0. Wireframe-specific state accents
-// (red / green strokes) are declared once in the state blocks below.
+// Brand tokens per Brand Style Kit v2.0, wireframe-specific state accents (red / green strokes) are declared once in the state blocks below
 :host {
   --color-steel-azure: #0f4c91;
   --color-tech-blue: #1a65bf;
@@ -20,7 +18,6 @@
   --ev-danger: #c62828;
 }
 
-// ─── Backdrop + shell ───────────────────────────────────────────────────────
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -47,14 +44,13 @@
   background: #fff;
   color: var(--color-deep-navy);
   border: none;
-  border-radius: 12px; // radius-lg
+  border-radius: 12px;
   box-shadow:
     0 10px 15px -3px rgb(0 0 0 / 0.1),
-    0 4px 6px -4px rgb(0 0 0 / 0.1); // shadow-lg
+    0 4px 6px -4px rgb(0 0 0 / 0.1); 
   font-family: "Inter", sans-serif;
 }
 
-// ─── Header ─────────────────────────────────────────────────────────────────
 .evidence-modal-header {
   display: flex;
   align-items: flex-start;
@@ -124,7 +120,6 @@
   }
 }
 
-// ─── Loading / error ────────────────────────────────────────────────────────
 .state-panel {
   display: flex;
   flex-direction: column;
@@ -153,9 +148,8 @@
   }
 }
 
-// ─── Score banner ───────────────────────────────────────────────────────────
 .score-banner {
-  // Default = "needs review / unsure" (blue)
+  //default = "needs review / unsure" (blue)
   --state-tint: #eef3fb;
   --state-border: var(--color-steel-azure-light);
   --state-accent: var(--color-steel-azure);
@@ -170,7 +164,7 @@
   margin-bottom: 24px;
   background: var(--state-tint);
   border: 1px solid var(--state-border);
-  border-radius: 8px; // radius-md
+  border-radius: 8px;
 
   &.banner-reject {
     --state-tint: #fdeef0;
@@ -263,7 +257,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  border-radius: 9999px; // radius-full
+  border-radius: 9999px;
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
@@ -272,7 +266,6 @@
   border: none;
 }
 
-// ─── Evidence found ─────────────────────────────────────────────────────────
 .evidence-grid {
   margin-bottom: 20px;
 
@@ -290,7 +283,6 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
-  // Icon left, label beside it, detail underneath the label
   .evidence-card {
     display: grid;
     grid-template-columns: 32px 1fr;
@@ -330,7 +322,6 @@
       color: var(--ev-text-muted);
     }
 
-    // Third-party brand colours (not momently palette, by design)
     &.source-github .evidence-icon {
       color: #171515;
     }
@@ -341,7 +332,6 @@
       color: #5b3fd0;
     }
 
-    // e.g. "Not connected" — add `is-unavailable` to the card
     &.is-unavailable {
       .evidence-icon {
         color: var(--ev-text-faint);
@@ -354,14 +344,13 @@
   }
 }
 
-// ─── Narrative ──────────────────────────────────────────────────────────────
 .narrative-box {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   padding: 16px;
   margin-bottom: 24px;
-  border-radius: 8px; // radius-md
+  border-radius: 8px;
   font-size: 14px;
   line-height: 1.5;
 
@@ -398,13 +387,12 @@
   color: var(--color-steel-azure);
 }
 
-// ─── Buttons ────────────────────────────────────────────────────────────────
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 44px; // touch target per accessibility standards
+  min-height: 44px;
   padding: 10px 24px;
   border: 1px solid transparent;
   border-radius: 4px;
@@ -439,7 +427,6 @@
   }
 }
 
-// "View details" / "Close": white, light-blue hairline, Steel Azure text
 .btn--secondary {
   background: #fff;
   border-color: var(--color-steel-azure-light);
@@ -467,7 +454,7 @@
   gap: 12px;
 }
 
-// ─── Small screens ──────────────────────────────────────────────────────────
+
 @media (max-width: 640px) {
   .modal {
     padding: 20px;
@@ -477,7 +464,7 @@
     flex-wrap: wrap;
     .verdict-badge {
       margin-left: 92px;
-    } // align under the copy, past the ring
+    } 
   }
 
   .evidence-grid .evidence-cards {
