@@ -19,7 +19,7 @@ import timesheets.domain.User;
 @Service
 @RequiredArgsConstructor
 public class JwtService {
-  private static final String MFA_CHALLENGE= "MFA_CHALLENGE";
+  private static final String MFA_CHALLENGE = "MFA_CHALLENGE";
 
   @Value("${app.jwt.secret}")
   private String secret;
@@ -42,31 +42,29 @@ public class JwtService {
   }
 
   // generates the mfa token
-  public String generateMfaChallengeToken(User user){
-    long expirationMillis= TimeUnit.MINUTES.toMillis(5);
+  public String generateMfaChallengeToken(User user) {
+    long expirationMillis = TimeUnit.MINUTES.toMillis(5);
 
     return Jwts.builder()
-              .subject(user.getEmail())
-              .claim("userId", user.getId().toString())
-              .claim("purpose", MFA_CHALLENGE)
-              .issuedAt(new Date())
-              .expiration(new Date(System.currentTimeMillis()+ expirationMillis))
-              .signWith(getSigningKey())
-              .compact();
+        .subject(user.getEmail())
+        .claim("userId", user.getId().toString())
+        .claim("purpose", MFA_CHALLENGE)
+        .issuedAt(new Date())
+        .expiration(new Date(System.currentTimeMillis() + expirationMillis))
+        .signWith(getSigningKey())
+        .compact();
   }
 
-  public Boolean isMfaChallengeToken(String token){
-    try{
-      return MFA_CHALLENGE.equals(
-        extractClaims(token).get("purpose", String.class)
-      );
-    }catch(Exception e){
+  public Boolean isMfaChallengeToken(String token) {
+    try {
+      return MFA_CHALLENGE.equals(extractClaims(token).get("purpose", String.class));
+    } catch (Exception e) {
       return false;
     }
   }
 
-  public UUID extractUserId(String token){
-    String userId= extractClaims(token).get("userId", String.class);
+  public UUID extractUserId(String token) {
+    String userId = extractClaims(token).get("userId", String.class);
     return UUID.fromString(userId);
   }
 

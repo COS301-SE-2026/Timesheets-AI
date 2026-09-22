@@ -57,11 +57,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       return;
     }
 
-    if(jwtService.isMfaChallengeToken(token)){
+    if (jwtService.isMfaChallengeToken(token)) {
       filterChain.doFilter(request, response);
       return;
     }
-    
+
     // validate token and set authentication if valid
     try {
       String email = jwtService.extractEmail(token);
