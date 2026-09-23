@@ -1,3 +1,5 @@
+// this is a concrete Subject in the observer pattern
+
 package timesheets.service;
 
 import exception.AccessDeniedException;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.Project;
@@ -16,7 +19,10 @@ import timesheets.domain.ProjectMember;
 import timesheets.domain.Task;
 import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateTaskRequest;
+import timesheets.dto.request.UpdateTaskRequest;
+import timesheets.dto.response.IssueResponse;
 import timesheets.dto.response.TaskResponse;
+import timesheets.integration.issue.JiraAdapter;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
 import timesheets.repository.TaskRepository;
@@ -26,6 +32,7 @@ import timesheets.security.SecurityUtils;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TaskService {
 
   private final SecurityUtils securityUtils;
@@ -34,6 +41,7 @@ public class TaskService {
   private final ProjectMemberRepository projectMemberRepository;
   private final WorkspaceMemberRepository workspaceMemberRepository;
   private final UserRepository userRepository;
+  private final JiraAdapter jiraAdapter;
 
   // this gets all the active tasks of a project - only if the user has access to
   // that project
@@ -94,9 +102,13 @@ public class TaskService {
   @Transactional(readOnly = true)
   public List<TaskResponse> getMyTasks(UUID workspaceMemberId) {
     List<Task> tasks =
-        taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId);
+        taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(
+            workspaceMemberId);
 
     return tasks.stream()
+        // just because a user got access again, it does not mean they get access to projects they
+        // are no longer members of
+        .filter(task -> userHasAccessToProject(task.getProjectId(), workspaceMemberId))
         .map(
             task -> {
               String projectName =
@@ -104,7 +116,9 @@ public class TaskService {
                       .findById(task.getProjectId())
                       .map(Project::getName)
                       .orElse("Unknown Project");
+
               String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
+
               return TaskResponse.fromWithDetails(task, projectName, assignedToName);
             })
         .collect(Collectors.toList());
@@ -160,12 +174,19 @@ public class TaskService {
       }
     }
 
+    // tasks can only be assigned to active members of this project
+    if (request.getAssignedWorkspaceMemberId() != null
+        && !projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
+            projectId, request.getAssignedWorkspaceMemberId())) {
+      throw new BadRequestException(
+          "Task can only be assigned to an active member of this project");
+    }
+
     // builds the task
     Task task = new Task();
     task.setProjectId(projectId);
     task.setTitle(request.getTitle());
     task.setDescription(request.getDescription());
-    task.setJiraTicketKey(request.getJiraTicketKey());
     task.setParentTaskId(request.getParentTaskId());
     task.setEstimatedHours(request.getEstimatedHours());
 
@@ -185,6 +206,42 @@ public class TaskService {
       task.setCompletedAt(LocalDateTime.now());
     }
 
+    // if the user wants to create a Jira issue then this is requested, want to make this optional
+    // for the user
+    if (request.isCreateJiraIssue() && request.getJiraDetails() != null) {
+      try {
+        // when there is no project key, the default is what will be use
+        if (request.getJiraDetails().getProjectKey() == null
+            || request.getJiraDetails().getProjectKey().isEmpty()) {
+
+          String defaultProjectKey = getDefaultJiraProject(workspaceMemberId);
+
+          if (defaultProjectKey != null) {
+            request.getJiraDetails().setProjectKey(defaultProjectKey);
+            log.info("Using default Jira project: {}", defaultProjectKey);
+          } else {
+            throw new RuntimeException(
+                "No default Jira project found. Please specify a project key.");
+          }
+        }
+
+        // going to be using the adapter to create the issue
+        IssueResponse jiraIssue =
+            jiraAdapter.createIssue(workspaceMemberId, request.getJiraDetails());
+
+        // the jira ticket will be stored here, so that it is stored in the system
+        task.setJiraTicketKey(jiraIssue.getKey());
+
+        log.info("Created Jira issue {} for task '{}'", jiraIssue.getKey(), request.getTitle());
+
+      } catch (Exception e) {
+        log.error(
+            "Failed to create Jira issue for task '{}': {}", request.getTitle(), e.getMessage());
+
+        throw new RuntimeException("Failed to create Jira issue: " + e.getMessage(), e);
+      }
+    }
+
     Task savedTask = taskRepository.save(task);
 
     String projectName = project.getName();
@@ -193,9 +250,136 @@ public class TaskService {
     return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName);
   }
 
+  // updates the editable fields of an existing task
+  @Transactional
+  public TaskResponse updateTask(
+      UUID taskId, UpdateTaskRequest.UpdateTask request, UUID workspaceMemberId) {
+
+    Task task = getTaskById(taskId);
+
+    // deleted tasks cannot be edited
+    if (Boolean.TRUE.equals(task.getIsDeleted())) {
+      throw new ResourceNotFoundException("Task has been deleted");
+    }
+
+    if (!userHasAccessToProject(task.getProjectId(), workspaceMemberId)) {
+      throw new AccessDeniedException("You do not have permission to update this task");
+    }
+
+    // developers can only edit tasks assigned to themselves
+    boolean canEditOtherTasks =
+        isProjectManager(task.getProjectId(), workspaceMemberId)
+            || securityUtils.isManager()
+            || securityUtils.isAdmin();
+
+    if (!canEditOtherTasks && !workspaceMemberId.equals(task.getAssignedWorkspaceMemberId())) {
+      throw new AccessDeniedException("You can only update tasks assigned to yourself");
+    }
+
+    // only update fields that were included in the PATCH request
+    // for effiecieny I only want the fields that were updated to be included in the PATCH request
+    if (request.getTitle() != null) {
+      task.setTitle(request.getTitle());
+    }
+
+    if (request.getDescription() != null) {
+      task.setDescription(request.getDescription());
+    }
+
+    if (request.getPriority() != null) {
+      task.setPriority(request.getPriority());
+    }
+
+    if (request.getEstimatedHours() != null) {
+      task.setEstimatedHours(request.getEstimatedHours());
+    }
+
+    if (request.getDueDate() != null) {
+      task.setDueDate(request.getDueDate());
+    }
+
+    if (request.getStatus() != null) {
+      task.setStatus(request.getStatus());
+
+      // record when the task is completed
+      if ("DONE".equals(request.getStatus())) {
+        if (task.getCompletedAt() == null) {
+          task.setCompletedAt(LocalDateTime.now());
+        }
+      } else {
+        task.setCompletedAt(null);
+      }
+    }
+
+    if (request.getAssignedWorkspaceMemberId() != null) {
+
+      // only managers, admins or project managers can reassign tasks
+      if (!canEditOtherTasks) {
+        throw new AccessDeniedException("You do not have permission to reassign tasks");
+      }
+
+      // assigned user must be an active member of the task's project
+      if (!projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
+          task.getProjectId(), request.getAssignedWorkspaceMemberId())) {
+
+        throw new BadRequestException(
+            "Task can only be assigned to an active member of this project");
+      }
+
+      task.setAssignedWorkspaceMemberId(request.getAssignedWorkspaceMemberId());
+    }
+
+    Task savedTask = taskRepository.save(task);
+
+    String projectName =
+        projectRepository
+            .findById(savedTask.getProjectId())
+            .map(Project::getName)
+            .orElse("Unknown Project");
+    String assignedToName = getAssignedToName(savedTask.getAssignedWorkspaceMemberId());
+
+    return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName);
+  }
+
+  @Transactional(readOnly = true)
+  public List<TaskResponse> getTeamTasks() {
+
+    if (!securityUtils.isManager()) {
+      throw new AccessDeniedException("Only managers can view team tasks");
+    }
+
+    // get the currently logged-in manager's workspace member
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    WorkspaceMember workspaceMember =
+        workspaceMemberRepository
+            .findById(workspaceMemberId)
+            .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
+
+    UUID workspaceId = workspaceMember.getWorkspaceId();
+
+    // get all active tasks belonging to this workspace
+    List<Task> tasks = taskRepository.findActiveTasksByWorkspaceId(workspaceId);
+
+    return tasks.stream()
+        .map(
+            task -> {
+              String projectName =
+                  projectRepository
+                      .findById(task.getProjectId())
+                      .map(Project::getName)
+                      .orElse("Unknown Project");
+
+              String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
+
+              return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+            })
+        .collect(Collectors.toList());
+  }
+
   // ! helper functions
   // checks if the user has access to the project
-  private boolean userHasAccessToProject(UUID projectId, UUID workspaceMemeberId) {
+  private boolean userHasAccessToProject(UUID projectId, UUID workspaceMemberId) {
 
     boolean isAdmin = securityUtils.isAdmin();
     boolean isManager = securityUtils.isManager();
@@ -206,8 +390,8 @@ public class TaskService {
     }
 
     // the dev must be a member of the project in order to see it
-    return projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
-        projectId, workspaceMemeberId);
+    return projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
+        projectId, workspaceMemberId);
   }
 
   // gets the name of the user assigned to that task
@@ -227,8 +411,32 @@ public class TaskService {
   // checks if the user is a project manager for a particular project
   private boolean isProjectManager(UUID projectId, UUID workspaceMemberId) {
     return projectMemberRepository
-        .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
+        .findByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(projectId, workspaceMemberId)
         .map(ProjectMember::getIsProjectManager)
         .orElse(false);
+  }
+
+  // had to do research on how to extract in this way
+  private String getDefaultJiraProject(UUID workspaceMemberId) {
+    try {
+      List<IssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
+
+      if (issues != null && !issues.isEmpty()) {
+        // the project key can be taken from the first issue
+        String projectKey = issues.get(0).getProjectKey();
+
+        if (projectKey != null && !projectKey.isEmpty()) {
+          log.debug("Using default Jira project from first issue: {}", projectKey);
+          return projectKey;
+        }
+      }
+
+      log.debug("No existing Jira issues found to determine default project");
+      return null;
+
+    } catch (Exception e) {
+      log.warn("Could not determine default Jira project: {}", e.getMessage());
+      return null;
+    }
   }
 }

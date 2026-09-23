@@ -1,0 +1,82 @@
+:host {
+  display: contents; // let .card (which carries .c-N) be the real grid item, not this host tag
+}
+
+.card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+  min-width: 0; // stop chart/text min-content from blowing out the grid track
+  box-shadow: 0 2px 8px rgba(15, 76, 145, 0.04); // same shadow recipe as stats-card
+}
+
+// raw / model-output split, the whole point of the Dashboard vs Insights
+// design: navy border = pulled straight from the data, amber border = AI output
+.card.raw { border-left: 3px solid var(--color-primary); }
+.card.insight { border-left: 3px solid var(--color-secondary); }
+
+.card.summary {
+  background: var(--color-white);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+
+  ::ng-deep .card-head h3 { color: var(--color-primary); }
+  ::ng-deep .sub { color: var(--color-text-muted); }
+}
+
+.c-4  { grid-column: span 4; }
+.c-5  { grid-column: span 5; }
+.c-6  { grid-column: span 6; }
+.c-7  { grid-column: span 7; }
+.c-8  { grid-column: span 8; }
+.c-12 { grid-column: span 12; }
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.card-head h3 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  margin: 0;
+}
+.card-head .sub {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.badge {
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  transform: scale(0.8);
+  transform-origin: right center;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.badge-ai {
+  background: var(--color-secondary-surface);
+  color: var(--color-secondary);
+}
+.badge-ai i { font-size: 0.85em; }
+.badge-raw {
+  background: var(--color-gray-light);
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 900px) {
+  .c-4, .c-5, .c-6, .c-7, .c-8 { grid-column: span 12; }
+}

@@ -97,14 +97,10 @@ export class SignupComponent implements AfterViewInit{
     google.accounts.id.renderButton(this.googleBtn.nativeElement, {
       theme: 'outline',
       size: 'large',
-      width: 320,
+      width: 210,
     });
   }
 
-  protected triggerGoogleSignUp(): void {
-    const hiddenGoogleButton = this.googleBtn.nativeElement.querySelector('div[role="button"]');
-    hiddenGoogleButton?.click();
-  }
 
   private handleGoogleCredential(idToken: string): void {
     this.loading = true;
@@ -117,13 +113,38 @@ export class SignupComponent implements AfterViewInit{
           this.router.navigate(['/login'], { queryParams: { mfa: 'required' } });          
           return;
         }
-        this.router.navigate(['/log-time']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.loading = false;
         this.errorMessage = err.message;
       },
     });
+  }
+
+  protected async signupWithMicrosoft(): Promise<void> {
+    this.loading = true;
+    this.errorMessage = '';
+
+    try {
+      const res = await this.authService.microsoftAuth();
+
+      this.loading = false;
+
+      if (res.requiresMfa) {
+        this.router.navigate(['/login'], {
+          queryParams: { mfa: 'required' },
+        });
+        return;
+      }
+
+      this.router.navigate(['/dashboard']);
+    }
+    catch (error) {
+      this.loading = false;
+
+      this.errorMessage = error instanceof Error ? error.message : 'Microsoft sign up failed.';
+    }
   }
 
   // Toggles password visibility in the input field
@@ -232,7 +253,7 @@ export class SignupComponent implements AfterViewInit{
     if (control.hasError('required')) {
       return 'Password is required.';
     }
-    if (control.hasError('minlength') || control.hasError('pattern')) {
+    if (control.hasError('minlength')) {
       return 'Password must be at least 8 characters long with a mix of letters and numbers.';
     }
     if (control.hasError('pattern')){
@@ -260,12 +281,5 @@ export class SignupComponent implements AfterViewInit{
     this.toastMessage = message;
     this.showToast = true;
     setTimeout(() => { this.showToast = false; }, 4000);
-  }
-
-  /* Social login handler */
-  protected onSocialLogin(provider: string): void {
-    this.showDemoToast(
-      `${provider} sign up is not available in Demo 1. Please use the email form.`
-    );
   }
 }

@@ -37,7 +37,9 @@ public class AiDashboardResponse {
     private String recommendation;
     private String narrative;
     private UUID projectId;
+    private String projectName;
     private UUID workspaceMemberId;
+    private String memberName;
     private UUID workspaceId;
     private LocalDateTime createdAt;
   }

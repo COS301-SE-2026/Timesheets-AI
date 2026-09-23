@@ -6,7 +6,7 @@ Author: Zamokuhle Zwane
 Date: 02/09/2026
 */
 
-package timesheets.service;
+package timesheets.integration.github;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -18,17 +18,80 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
-import timesheets.domain.GitCommit;
 import timesheets.domain.IntegrationToken;
-import timesheets.repository.GitCommitRepository;
 import timesheets.repository.IntegrationTokenRepository;
 
 @Service
 @RequiredArgsConstructor
-public class GitHubService {
+public class GitHubService implements GitHubAdapter {
   private final IntegrationTokenRepository integrationTokenRepository;
   private final GitCommitRepository gitCommitRepository;
+  private final GitHubOAuthService gitHubOAuthService;
   private final RestClient restClient = RestClient.create();
+
+  // IntegrationAdapter contract
+
+  @Override
+  public String getProvider() {
+    return "GITHUB";
+  }
+
+  // moved here from GitHubIntegrationController.callback(), controller now just delegates to this
+  // so the real logic lives in one place, same spot
+  // any future caller (evidence engine, a reconnect job, whatever) expects it via the
+  // IntegrationAdapter contract
+  @Override
+  public void exchangeAndsaveToken(UUID workspaceMemberId, String code) {
+    GitHubTokenResponse tokenResponse = gitHubOAuthService.exchangeCodeForToken(code);
+
+    IntegrationToken token =
+        integrationTokenRepository
+            .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "GITHUB")
+            .orElseGet(IntegrationToken::new);
+
+    token.setWorkspaceMemberId(workspaceMemberId);
+    token.setProvider("GITHUB");
+    token.setAccessToken(tokenResponse.getAccessToken());
+
+    if (tokenResponse.getRefreshToken() != null) {
+      token.setRefreshToken(tokenResponse.getRefreshToken());
+    }
+    if (tokenResponse.getExpiresIn() != null) {
+      token.setExpiresAt(LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn()));
+    }
+
+    integrationTokenRepository.save(token);
+  }
+
+  // GitHubAdapter contract, for the Evidence Engine
+
+  @Override
+  public List<GitCommitActivity> getCommits(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+    return gitCommitRepository
+        .findByWorkspaceMemberIdAndCommitTimeBetween(workspaceMemberId, startTime, endTime)
+        .stream()
+        .map(this::toActivity)
+        .toList();
+  }
+
+  private GitCommitActivity toActivity(GitCommit commit) {
+    return GitCommitActivity.builder()
+        .workspaceMemberId(commit.getWorkspaceMemberId())
+        .projectId(commit.getProjectId())
+        .commitHash(commit.getCommitHash())
+        .repositoryName(commit.getRepositoryName())
+        .repositoryUrl(commit.getRepositoryUrl())
+        .commitMessage(commit.getCommitMessage())
+        .commitTime(commit.getCommitTime())
+        .linesAdded(commit.getLinesAdded())
+        .linesRemoved(commit.getLinesRemoved())
+        .authorName(commit.getAuthorName())
+        .authorEmail(commit.getAuthorEmail())
+        .githubAuthorLogin(commit.getGithubAuthorLogin())
+        .changedFiles(commit.getChangedFiles())
+        .build();
+  }
 
   @Transactional
   public int syncRecentCommits(UUID workspaceMemberId) {
@@ -131,8 +194,12 @@ public class GitHubService {
                 .authorName((String) author.get("name"))
                 .authorEmail((String) author.get("email"))
                 .githubAuthorLogin(githubLogin)
-                // github's line-level stats need a separate, more expensive per-commit api call,
+                // NOTE: github's line-level stats need a separate, more expensive per-commit api
+                // call,
                 // skipping for the first sync pass
+                // need to be careful here because we dont want EvidenceEngine assume the developer
+                // did not change anything
+                // we need to get changedFiles
                 .linesAdded(0)
                 .linesRemoved(0)
                 .createdAt(LocalDateTime.now())
@@ -145,5 +212,12 @@ public class GitHubService {
     }
 
     return saved;
+  }
+
+  // returns true when the member has finished the oauth flow and a token row exists
+  public boolean isConnected(UUID workspaceMemberId) {
+    return integrationTokenRepository
+        .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "GITHUB")
+        .isPresent();
   }
 }

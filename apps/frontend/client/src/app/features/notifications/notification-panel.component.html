@@ -1,0 +1,92 @@
+<section class="notification-panel" aria-label="Notifications">
+
+  <header class="notification-header">
+    <h2>Notifications</h2>
+
+    <button type="button" class="mark-all-button" (click)="markAllAsRead()" [disabled]="unreadCount() === 0">
+      <i class="fa-solid fa-check-double" aria-hidden="true"></i>
+      <span>Mark all as read</span>
+    </button>
+  </header>
+
+  <!-- All notifications tab -->
+  <div class="notification-tabs">
+    <button type="button" class="notification-tab active">
+      All
+      <span class="tab-count">{{ notifications().length }}</span>
+    </button>
+  </div>
+
+  <!-- Notification list -->
+  <div class="notification-list">
+
+    @if (isLoading()) {
+      <div class="notification-state">
+        <i class="fa-solid fa-spinner fa-spin state-icon" aria-hidden="true"></i>
+        <p>Loading notifications...</p>
+      </div>
+    }
+
+    <!-- Error -->
+    @else if (loadError()) {
+      <div class="notification-state error-state">
+        <i class="fa-solid fa-circle-exclamation state-icon" aria-hidden="true"></i>
+
+        <h3>Unable to load notifications</h3>
+        <p>Please try again.</p>
+
+        <button type="button" class="retry-button" (click)="loadNotifications()"> Try again </button>
+      </div>
+    }
+
+    <!-- Empty -->
+    @else if (notifications().length === 0) {
+      <div class="notification-state empty-state">
+
+        <div class="empty-icon">
+          <i class="fa-regular fa-bell" aria-hidden="true"></i>
+        </div>
+
+        <h3>You are all caught up! </h3>
+        <p>You don't have any notifications yet.</p>
+      </div>
+    }
+
+    @else {
+      @for (notification of notifications(); track notification.id) {
+
+        <button type="button" class="notification-item" [class.unread]="!notification.isRead" (click)="handleNotificationClick(notification)">
+          <!-- Notification type icon -->
+          <span class="notification-icon" [ngClass]="notificationService.getNotificationClass(notification.type)">
+            <i [class]="notificationService.getNotificationIcon(notification.type)" aria-hidden="true"></i>
+          </span>
+
+          <!-- Notification details -->
+          <span class="notification-content">
+            <span class="notification-title"> {{ notification.title }} </span>
+
+            @if (notification.message) {
+              <span class="notification-message"> {{ notification.message }} </span>
+            }
+
+            <span class="notification-time"> {{ notificationService.getTimeAgo(notification.createdAt) }} </span>
+          </span>
+
+          @if (!notification.isRead) {
+            <span class="unread-dot" aria-label="Unread notification" ></span>
+          }
+        </button>
+      }
+    }
+
+  </div>
+
+  @if (!isLoading() && !loadError() && notifications().length > 0) {
+    <footer class="notification-footer">
+      <button type="button" class="view-all-button" routerLink="/notifications" (click)="closePanel.emit()">
+        <span>View all notifications</span>
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </button>
+    </footer>
+  }
+</section>

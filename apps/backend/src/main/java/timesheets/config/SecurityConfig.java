@@ -74,10 +74,12 @@ public class SecurityConfig {
                         "/api/auth/register",
                         "/api/auth/login",
                         "/api/auth/google",
+                        "/api/auth/microsoft",
                         "/api/auth/verify/**",
                         "/api/auth/forgot-password",
                         "/api/auth/reset-password",
                         "/api/integrations/google/calendar/callback",
+                        "/api/integrations/jira/callback",
                         "/api/integrations/github/callback",
                         "/actuator/**")
                     .permitAll()

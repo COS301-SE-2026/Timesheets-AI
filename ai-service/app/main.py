@@ -1,6 +1,6 @@
 """
 Momently AI Service
-FastAPI application Demo 1 scaffold
+FastAPI application Demo 4 scaffold
 
 Endpoints:
   GET  /health         liveness probe
@@ -23,8 +23,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.anomaly import router as anomaly_router
 from app.api.burnout import router as burnout_router
+from app.api.dashboard import router as dashboard_router
 from app.api.delivery_forecast import router as delivery_forecast_router
+from app.api.dev_trigger import router as dev_trigger_router
 from app.api.health import router as health_router
+from app.api.manager_assistant import router as manager_assistant_router
 from app.api.productivity import router as productivity_router
 from app.api.task_switching import router as task_switching_router
 from app.api.weekly_summary import router as weekly_summary_router
@@ -60,6 +63,9 @@ app.include_router(burnout_router)
 app.include_router(delivery_forecast_router)
 app.include_router(task_switching_router)
 app.include_router(weekly_summary_router)
+app.include_router(dashboard_router)
+app.include_router(dev_trigger_router)
+app.include_router(manager_assistant_router)
 
 
 @app.get("/health", tags=["Health"])

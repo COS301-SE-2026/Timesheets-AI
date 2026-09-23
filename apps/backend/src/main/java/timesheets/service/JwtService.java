@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import timesheets.domain.User;
 @Service
 @RequiredArgsConstructor
 public class JwtService {
+  private static final String MFA_CHALLENGE = "MFA_CHALLENGE";
 
   @Value("${app.jwt.secret}")
   private String secret;
@@ -37,6 +39,33 @@ public class JwtService {
   // extracts the email (subject) from a token
   public String extractEmail(String token) {
     return extractClaims(token).getSubject();
+  }
+
+  // generates the mfa token
+  public String generateMfaChallengeToken(User user) {
+    long expirationMillis = TimeUnit.MINUTES.toMillis(5);
+
+    return Jwts.builder()
+        .subject(user.getEmail())
+        .claim("userId", user.getId().toString())
+        .claim("purpose", MFA_CHALLENGE)
+        .issuedAt(new Date())
+        .expiration(new Date(System.currentTimeMillis() + expirationMillis))
+        .signWith(getSigningKey())
+        .compact();
+  }
+
+  public Boolean isMfaChallengeToken(String token) {
+    try {
+      return MFA_CHALLENGE.equals(extractClaims(token).get("purpose", String.class));
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public UUID extractUserId(String token) {
+    String userId = extractClaims(token).get("userId", String.class);
+    return UUID.fromString(userId);
   }
 
   // checks if the token has expired

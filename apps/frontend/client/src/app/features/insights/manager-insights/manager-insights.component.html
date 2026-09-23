@@ -1,0 +1,136 @@
+<div class="page-header">
+  <div class="page-header-row">
+    <h1 class="page-title">Insights</h1>
+    <button class="export-btn"><i class="fa-solid fa-file-export"></i> Export insights</button>
+  </div>
+</div>
+
+@if (loading()) {
+  <p class="note">Loading team insights…</p>
+} @else if (error()) {
+  <p class="note">{{ error() }}</p>
+} @else {
+  @if (data(); as data) {
+
+    <app-insight-card
+      variant="summary"
+      title="Weekly summary"
+      [subtitle]="data.weeklySummary.weekLabel + ' · ' + data.weeklySummary.generatedNote"
+      badge="ai"
+      [span]="12"
+    >
+      <p class="summary" [innerHTML]="data.weeklySummary.narrative"></p>
+    </app-insight-card>
+    <br>
+
+    <app-scope-switcher [options]="scopeOptions" [value]="scope()" (valueChange)="setScope($event)"></app-scope-switcher>
+
+    <!-- ============================= OVERALL ============================= -->
+    @if (scope() === 'overall') {
+      <div class="grid">
+
+        <app-insight-card title="Burnout risk" subtitle="Team, this week" variant="insight" badge="ai" [span]="5">
+          <div class="list">
+            @for (b of data.overall.burnoutRisk; track b.id) {
+              <div class="list-row" [class.risk-high]="b.level === 'high'" [class.risk-medium]="b.level === 'medium'">
+                <div class="l-main">
+                  <span class="l-title">{{ b.name }}</span>
+                  <span class="l-sub">{{ b.reason }}</span>
+                </div>
+                <span class="chip"
+                  [class.chip-risk-high]="b.level === 'high'"
+                  [class.chip-risk-med]="b.level === 'medium'"
+                  [class.chip-risk-low]="b.level === 'low'"
+                >
+                  {{ b.level === 'high' ? 'High' : b.level === 'medium' ? 'Medium' : 'Low' }}
+                </span>
+              </div>
+            } @empty {
+              <div class="note">No burnout flags this week.</div>
+            }
+          </div>
+        </app-insight-card>
+
+        <app-insight-card title="Delivery forecast" subtitle="Active projects vs planned dates" variant="insight" badge="ai" [span]="7">
+          <div class="list">
+            @for (f of data.overall.deliveryForecast; track f.id) {
+              <div class="list-row delivery-forecast-row">
+                <div class="l-main">
+                  <span class="l-title">{{ f.project }}</span>
+                  <span class="l-sub">Planned: {{ f.planned }}</span>
+                </div>
+                <span class="l-val" [class.good]="f.onTrack" [class.bad]="!f.onTrack">Forecast: {{ f.forecast }}</span>
+              </div>
+            } @empty {
+              <div class="note">No delivery forecasts yet.</div>
+            }
+          </div>
+        </app-insight-card>
+
+        <app-insight-card title="Git commits vs effort" subtitle="This week, commits vs logged hours by member" variant="raw" badge="comparison" [span]="12">
+          <div class="git-effort-layout">
+            <div>
+              <div class="metric">{{ data.overall.gitEffort.correlation }}</div>
+              <div class="metric-label">Team correlation, down from {{ data.overall.gitEffort.correlationPrevWeek }} last week</div>
+            </div>
+            <app-insight-chart [config]="gitEffortChart()" [height]="170"></app-insight-chart>
+          </div>
+          <div class="list" style="margin-top: var(--space-4);">
+            @for (c of data.overall.gitEffort.callouts; track c.name) {
+              <div class="list-row" [class.risk-medium]="c.tag === 'review'">
+                <div class="l-main">
+                  <span class="l-title">{{ c.name }}</span>
+                  <span class="l-sub">{{ c.note }}</span>
+                </div>
+                <span class="chip" [class.chip-review]="c.tag === 'review'" [class.chip-done]="c.tag === 'expected'">
+                  {{ c.tag === 'review' ? 'Worth a check-in' : 'Expected' }}
+                </span>
+              </div>
+            }
+          </div>
+          <div class="note">{{ data.overall.gitEffort.note }}</div>
+        </app-insight-card>
+
+        <app-insight-card title="Productivity trend" subtitle="Team average, last 6 weeks" variant="insight" badge="ai" [span]="12">
+          <app-insight-chart [config]="trendChart()" [height]="180"></app-insight-chart>
+        </app-insight-card>
+
+      </div>
+    }
+
+    <!-- ============================= BY PROJECT ============================= -->
+    @if (scope() === 'project') {
+      @if (projectOptions().length) {
+        <app-scope-switcher [options]="projectOptions()" [value]="selectedProjectKey()" (valueChange)="setProject($event)"></app-scope-switcher>
+      }
+
+      @if (selectedProject(); as project) {
+        <div class="grid">
+
+          <app-insight-card [title]="project.title" subtitle="Team productivity on this project" variant="insight" badge="ai" [span]="6">
+            <div class="compare-bars">
+              @for (m of project.compare; track m.name) {
+                <div class="compare-row">
+                  <span class="name">{{ m.name }}</span>
+                  <div class="compare-track"><div class="compare-fill" [class.you]="m.isYou" [style.width.%]="m.score"></div></div>
+                  <span class="val">{{ m.score }}</span>
+                </div>
+              }
+            </div>
+          </app-insight-card>
+
+          <app-insight-card title="Hours logged" subtitle="This week, by member" variant="raw" badge="raw" [span]="6">
+            <app-insight-chart [config]="projectHoursChart()" [height]="150"></app-insight-chart>
+          </app-insight-card>
+
+          <app-insight-card title="Project read" subtitle="Delivery, risk and Jira alignment for this project" variant="insight" badge="ai" [span]="12">
+            <p class="project-read-note">{{ project.note }}</p>
+          </app-insight-card>
+
+        </div>
+      } @else {
+        <p class="note">No per-project breakdown yet, check back once there's more logged activity.</p>
+      }
+    }
+  }
+}

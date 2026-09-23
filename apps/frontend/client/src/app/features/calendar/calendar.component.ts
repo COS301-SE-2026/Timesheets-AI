@@ -30,7 +30,7 @@ export class CalendarComponent implements OnInit{
 
 
   activeView= signal<CalendarView>('dayGridMonth');
-  provider= signal<CalendarProvider>( 'google');
+  provider= signal<CalendarProvider | null>(null );
   isSyncing= signal<boolean>(false);
   selectedEvent= signal<AppEvent | null>(null);
   currentDateTitle= signal<string>('');
@@ -58,10 +58,6 @@ export class CalendarComponent implements OnInit{
       ).subscribe(
         {
           next: (events)=>{
-            this.isConnected.set(true);
-            this.lastSyncedLabel.set(
-              this.formatSyncedLabel(new Date().toISOString())
-            );
             successCallback(events);
           },
           error: (error)=>{
@@ -106,11 +102,15 @@ export class CalendarComponent implements OnInit{
 
   
   ngOnInit(): void{
+
+    this.loadCalendarStatus();
+
     // CHECKING IF COMING BACK FROM OAUTH REDIRECT
     this.route.queryParams.subscribe(
       params=>{
         if(params['connected']=== 'true'){
-          this.isConnected.set(true);
+          // this.isConnected.set(true);
+          this.loadCalendarStatus();
           this.syncCalendar();
 
           // CLEANING PARAM FROM BROWSER BAR
@@ -134,7 +134,36 @@ export class CalendarComponent implements OnInit{
     this.calendarComponent.getApi().changeView(view);
   }
 
-  connectGoogleCalendar():void{
+  private loadCalendarStatus():void{
+    this.calendarService.getCalendarStatus().subscribe(
+      {
+        next: (status)=> {
+          this.isConnected.set(status.connected);
+          this.provider.set(status.provider);
+
+          if (status.lastSyncedAt){
+            this.lastSyncedLabel.set(
+              this.formatSyncedLabel(status.lastSyncedAt)
+            );
+          }else{
+            this.lastSyncedLabel.set(null);
+          }
+        },
+
+        error:(error)=>{
+          console.error(
+            'Failed to load calendar connection statuts.'
+          );
+
+          this.isConnected.set(false);
+          this.provider.set(null);
+          this.lastSyncedLabel.set(null);
+        }
+      }
+    );
+  }
+
+  connectCalendar():void{
     this.http.get('/api/integrations/google/calendar/connect',{
       responseType: 'text'
     }).subscribe(
@@ -191,7 +220,7 @@ export class CalendarComponent implements OnInit{
       end: info.event.end?.toISOString() || '',
       description: rawProps['description'],
       location: rawProps['location'],
-      provider: this.provider(),
+      provider: this.provider()?? 'google',
       category: categoryKey,
       categoryLabel: rawProps['categoryLabel'] || this.getCategoryLabel(categoryKey),
       organizer: rawProps['organizer']
@@ -284,4 +313,5 @@ export class CalendarComponent implements OnInit{
     return `synced ${diffDays}d ago`;
     
   }
+
 }

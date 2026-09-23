@@ -1,25 +1,36 @@
 package timesheets.controller;
 
+import exception.BadRequestException;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import timesheets.domain.User;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.GoogleAuthRequest;
+import timesheets.dto.request.MfaDisableRequest;
+import timesheets.dto.request.MfaLoginVerifyRequest;
+import timesheets.dto.request.MfaVerifyRequest;
+import timesheets.dto.request.MicrosoftAuthRequest;
 import timesheets.dto.request.PasswordRequest;
 import timesheets.dto.request.RegisterRequest;
 import timesheets.dto.response.AuthResponse;
 import timesheets.dto.response.MessageResponse;
+import timesheets.dto.response.MfaSetupResponse;
 import timesheets.dto.response.RegisterResponse;
 import timesheets.security.CustomUserDetails;
 import timesheets.service.AuthService;
+import timesheets.service.JwtService;
+import timesheets.service.MfaService;
 
 // import timesheets.dto.request.GoogleAuthRequest;
 // import timesheets.dto.request.MfaVerifyRequest;
@@ -36,6 +47,56 @@ import timesheets.service.AuthService;
 public class AuthController {
 
   private final AuthService authService;
+  private final JwtService jwtService;
+  private final MfaService mfaService;
+
+  @GetMapping("/mfa/setup")
+  public ResponseEntity<MfaSetupResponse> setupMfa(Authentication authentication) {
+    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+    MfaSetupResponse response = mfaService.setup(userDetails.getUserId());
+
+    return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/mfa/verify")
+  public ResponseEntity<MessageResponse> verifyMfa(
+      Authentication authentication, @Valid @RequestBody MfaVerifyRequest request) {
+    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+    mfaService.verifySetup(userDetails.getUserId(), request.getTotpCode());
+
+    return ResponseEntity.ok(new MessageResponse("MFA enabled successfully"));
+  }
+
+  @PostMapping("/mfa/disable")
+  public ResponseEntity<MessageResponse> disableMfa(
+      Authentication authentication, @Valid @RequestBody MfaDisableRequest request) {
+    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+    mfaService.disable(userDetails.getUserId(), request.getPassword());
+
+    return ResponseEntity.ok(new MessageResponse("MFA disabled successfully"));
+  }
+
+  @PostMapping("/mfa/login/verify")
+  public ResponseEntity<AuthResponse> verifyMfaLogin(
+      @Valid @RequestBody MfaLoginVerifyRequest request) {
+    String challengeToken = request.getChallengeToken();
+
+    if (!jwtService.isMfaChallengeToken(challengeToken)
+        || jwtService.isTokenExpired(challengeToken)) {
+      throw new BadRequestException("MFA challenge is invalid or expired");
+    }
+
+    UUID userId = jwtService.extractUserId(challengeToken);
+
+    User user = mfaService.verifyLogin(userId, request.getTotpCode());
+
+    AuthResponse response = authService.completeMfaLogin(user);
+
+    return ResponseEntity.ok(response);
+  }
 
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -94,6 +155,13 @@ public class AuthController {
   @PostMapping("/google")
   public ResponseEntity<AuthResponse> googleAuth(@Valid @RequestBody GoogleAuthRequest request) {
     AuthResponse response = authService.googleAuth(request);
+    return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/microsoft")
+  public ResponseEntity<AuthResponse> microsoftAuth(
+      @Valid @RequestBody MicrosoftAuthRequest request) {
+    AuthResponse response = authService.microsoftAuth(request);
     return ResponseEntity.ok(response);
   }
 

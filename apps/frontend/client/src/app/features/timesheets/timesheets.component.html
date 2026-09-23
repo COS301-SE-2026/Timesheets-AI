@@ -520,6 +520,13 @@
 
           <div class="modal-actions">
             <button type="button" class="btn btn--secondary" [disabled]="actionPending()" (click)="closeReviewModal()">Close</button>
+
+            <!--AI Review, only fires generateManagerAssistantReview on click -->
+            <button type="button" class="btn btn--ai" [disabled]="actionPending()" (click)="onAiReview(target)">
+              <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+              AI Review
+            </button>
+
             @if (canApproveOrReject()) {
               @if (showRejectReason()) {
                 <button type="button" class="btn btn--danger-solid"
@@ -543,6 +550,18 @@
         </dialog>  
        }
       }
+    <!-- Evidence Review modal, separate from the approve/reject review
+    modal above, opened by the "AI Review" button inside it -->
+    @if (showEvidenceModal()) {
+      <app-evidence-review-modal
+        [review]="evidenceReview()"
+        [loading]="evidenceLoading()"
+        [errorMessage]="evidenceError()"
+        (closeModal)="onEvidenceModalClose()"
+        (approve)="onEvidenceApprove()"
+        (reject)="onEvidenceReject()"
+      />
+    }
 
    <!-- Success toast -->
 

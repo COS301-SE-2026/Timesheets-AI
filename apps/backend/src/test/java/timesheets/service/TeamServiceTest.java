@@ -31,6 +31,7 @@ import timesheets.dto.response.WorkspaceMemberResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
+import timesheets.repository.TaskRepository;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
 import timesheets.repository.WorkspaceRepository;
@@ -47,6 +48,8 @@ public class TeamServiceTest {
   @Mock private ProjectMemberRepository projectMemberRepository;
   @Mock private ProjectRepository projectRepository;
   @Mock private WorkspaceRepository workspaceRepository;
+  @Mock private TimerService timerService;
+  @Mock private TaskRepository taskRepository;
 
   @InjectMocks private TeamService teamService;
 
@@ -78,6 +81,7 @@ public class TeamServiceTest {
     member.setUserId(testUserId);
     member.setWorkspaceId(testWorkspaceId);
     member.setRole(WorkspaceRole.DEVELOPER);
+    member.setIsActive(true);
     member.setJoinedAt(LocalDateTime.now());
     member.setCreatedAt(LocalDateTime.now());
     member.setUpdatedAt(LocalDateTime.now());
@@ -92,6 +96,7 @@ public class TeamServiceTest {
     member.setUserId(UUID.randomUUID());
     member.setWorkspaceId(testWorkspaceId);
     member.setRole(WorkspaceRole.ADMIN);
+    member.setIsActive(true);
     member.setJoinedAt(LocalDateTime.now());
     member.setCreatedAt(LocalDateTime.now());
     member.setUpdatedAt(LocalDateTime.now());
@@ -118,18 +123,18 @@ public class TeamServiceTest {
 
       // ARRANGE: setting up the request and the user
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
-      request.setWorkspaceId(testWorkspaceId);
 
       User user = createTestUser();
       WorkspaceMember savedMember = createTestWorkspaceMember();
 
       // specifying that the user is an admin
       when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
 
       when(userRepository.findById(testUserId)).thenReturn(Optional.of(user));
-      when(workspaceMemberRepository.existsByUserIdAndWorkspaceId(testUserId, testWorkspaceId))
-          .thenReturn(false);
+      when(workspaceMemberRepository.findByUserIdAndWorkspaceId(testUserId, testWorkspaceId))
+          .thenReturn(Optional.empty());
       when(workspaceMemberRepository.save(any(WorkspaceMember.class))).thenReturn(savedMember);
 
       // ACT: assigning the user to the workspace
@@ -166,9 +171,9 @@ public class TeamServiceTest {
     @DisplayName("throw exception when workspace does not exist")
     void throwExceptionWhenWorkspaceNotFound() {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
-      request.setWorkspaceId(testWorkspaceId);
 
       when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(false);
 
       assertThatThrownBy(() -> teamService.assignUserToWorkspace(request))
@@ -182,10 +187,9 @@ public class TeamServiceTest {
     @DisplayName("throw exception when user does not exist")
     void throwExceptionWhenUserNotFound() {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
-      request.setWorkspaceId(testWorkspaceId);
 
       when(securityUtils.isAdmin()).thenReturn(true);
-
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
       when(userRepository.findById(testUserId)).thenReturn(Optional.empty());
 
@@ -200,14 +204,17 @@ public class TeamServiceTest {
     @DisplayName("throw exception when user is already a member of workspace")
     void throwExceptionWhenUserAlreadyInWorkspace() {
       AssignWorkspaceMemberRequest request = createValidAssignRequest();
-      request.setWorkspaceId(testWorkspaceId);
 
       when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
 
       when(userRepository.findById(testUserId)).thenReturn(Optional.of(createTestUser()));
-      when(workspaceMemberRepository.existsByUserIdAndWorkspaceId(testUserId, testWorkspaceId))
-          .thenReturn(true);
+      WorkspaceMember existingMember = createTestWorkspaceMember();
+      existingMember.setIsActive(true);
+
+      when(workspaceMemberRepository.findByUserIdAndWorkspaceId(testUserId, testWorkspaceId))
+          .thenReturn(Optional.of(existingMember));
 
       assertThatThrownBy(() -> teamService.assignUserToWorkspace(request))
           .isInstanceOf(StateConflictException.class)
@@ -232,7 +239,7 @@ public class TeamServiceTest {
       when(securityUtils.isAdmin()).thenReturn(true);
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(member));
-      when(workspaceMemberRepository.findAllByWorkspaceIdAndRole(
+      when(workspaceMemberRepository.findAllByWorkspaceIdAndRoleAndIsActiveTrue(
               testWorkspaceId, WorkspaceRole.ADMIN))
           .thenReturn(admins);
 
@@ -240,7 +247,17 @@ public class TeamServiceTest {
       teamService.removeUserFromWorkspace(testWorkspaceMemberId);
 
       // ASSERT: Verify the user was removed
-      verify(workspaceMemberRepository).delete(member);
+      assertThat(member.getIsActive()).isFalse();
+      assertThat(member.getRemovedAt()).isNotNull();
+
+      verify(timerService).discardTimerForWorkspaceRemoval(testWorkspaceMemberId);
+      verify(workspaceMemberRepository).save(member);
+      verify(projectMemberRepository)
+          .deactivateAllByWorkspaceMemberId(
+              org.mockito.ArgumentMatchers.eq(testWorkspaceMemberId), any(LocalDateTime.class));
+      verify(taskRepository)
+          .unassignActiveTasksFromWorkspaceMember(
+              org.mockito.ArgumentMatchers.eq(testWorkspaceMemberId), any(LocalDateTime.class));
     }
 
     @Test
@@ -283,7 +300,7 @@ public class TeamServiceTest {
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(adminMember));
 
-      when(workspaceMemberRepository.findAllByWorkspaceIdAndRole(
+      when(workspaceMemberRepository.findAllByWorkspaceIdAndRoleAndIsActiveTrue(
               testWorkspaceId, WorkspaceRole.ADMIN))
           .thenReturn(admins);
 
@@ -308,7 +325,7 @@ public class TeamServiceTest {
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(member));
 
-      when(workspaceMemberRepository.findAllByWorkspaceIdAndRole(
+      when(workspaceMemberRepository.findAllByWorkspaceIdAndRoleAndIsActiveTrue(
               testWorkspaceId, WorkspaceRole.ADMIN))
           .thenReturn(admins);
 
@@ -316,7 +333,9 @@ public class TeamServiceTest {
       teamService.removeUserFromWorkspace(testWorkspaceMemberId);
 
       // ASSERT: Verify the user was removed
-      verify(workspaceMemberRepository).delete(member);
+      assertThat(member.getIsActive()).isFalse();
+      assertThat(member.getRemovedAt()).isNotNull();
+      verify(workspaceMemberRepository).save(member);
     }
   }
 
@@ -345,7 +364,7 @@ public class TeamServiceTest {
       List<UUID> userIdsInWorkspace = List.of(user1.getId(), user2.getId());
 
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
-      when(workspaceMemberRepository.findByWorkspaceId(testWorkspaceId))
+      when(workspaceMemberRepository.findByWorkspaceIdAndIsActiveTrue(testWorkspaceId))
           .thenReturn(workspaceMembers);
 
       when(userRepository.findAllById(userIdsInWorkspace)).thenReturn(usersInWorkspace);
@@ -399,7 +418,7 @@ public class TeamServiceTest {
       List<WorkspaceMember> emptyMembersList = List.of();
 
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
-      when(workspaceMemberRepository.findByWorkspaceId(testWorkspaceId))
+      when(workspaceMemberRepository.findByWorkspaceIdAndIsActiveTrue(testWorkspaceId))
           .thenReturn(emptyMembersList);
 
       when(securityUtils.isAdmin()).thenReturn(false);
@@ -429,7 +448,7 @@ public class TeamServiceTest {
 
       when(workspaceRepository.existsById(testWorkspaceId)).thenReturn(true);
 
-      when(workspaceMemberRepository.findByWorkspaceId(testWorkspaceId))
+      when(workspaceMemberRepository.findByWorkspaceIdAndIsActiveTrue(testWorkspaceId))
           .thenReturn(emptyMembersList);
       when(securityUtils.isAdmin()).thenReturn(true);
       when(userRepository.findAll()).thenReturn(allUsers);

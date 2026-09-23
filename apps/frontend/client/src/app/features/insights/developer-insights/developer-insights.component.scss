@@ -1,0 +1,13 @@
+@use '../insights-shared' as *;
+
+.git-effort-layout {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: var(--space-6);
+  align-items: start;
+  margin-top: 4px;
+}
+
+@media (max-width: 700px) {
+  .git-effort-layout { grid-template-columns: 1fr; }
+}

@@ -73,6 +73,10 @@ describe('MyTasksComponent', () => {
   function flushInitialRequests(tasksData: TaskResponse[] = mockTasks): void {
     fixture.detectChanges();
     
+    const jiraStatusReq = httpMock.expectOne('/api/integrations/jira/status');
+    expect(jiraStatusReq.request.method).toBe('GET');
+    jiraStatusReq.flush({ connected: false });
+
     const tasksReq = httpMock.expectOne('/api/tasks/my-tasks');
     expect(tasksReq.request.method).toBe('GET');
     tasksReq.flush(tasksData);
@@ -115,6 +119,10 @@ describe('MyTasksComponent', () => {
       //assert loading state was set before the response came back
       expect(component.isLoading()).toBe(true);
  
+      const jiraStatusReq = httpMock.expectOne('/api/integrations/jira/status');
+      expect(jiraStatusReq.request.method).toBe('GET');
+      jiraStatusReq.flush({ connected: false });
+
       const tasksReq = httpMock.expectOne('/api/tasks/my-tasks');
       expect(tasksReq.request.method).toBe('GET');
       tasksReq.flush(mockTasks);
@@ -129,8 +137,17 @@ describe('MyTasksComponent', () => {
     });
 
      it('should set loadError and stop loading when the request fails', () => {
+
       // Arrange / Act
       fixture.detectChanges();
+
+
+      const jiraStatusReq = httpMock.expectOne('/api/integrations/jira/status');
+      expect(jiraStatusReq.request.method).toBe('GET');
+      jiraStatusReq.flush({ connected: false });
+
+      // Arrange / Act
+      
       const tasksReq = httpMock.expectOne('/api/tasks/my-tasks'); 
       // Assert
       // simulates a backend 500, same failure shape HttpErrorResponse produces
@@ -147,8 +164,14 @@ describe('MyTasksComponent', () => {
     });
  
     it('should default projectName to "Unknown Project" and assignedToName to "Unassigned" when null', () => {
+
       // this covers the ?? fallback logic in mapToTask(), which exists because of the GET /api/tasks/my-tasks 
       fixture.detectChanges();
+
+      const jiraStatusReq = httpMock.expectOne('/api/integrations/jira/status');
+      expect(jiraStatusReq.request.method).toBe('GET');
+      jiraStatusReq.flush({ connected: false });
+
       const tasksReq = httpMock.expectOne('/api/tasks/my-tasks');
       tasksReq.flush([
         makeTaskResponse({
@@ -392,21 +415,6 @@ describe('MyTasksComponent', () => {
       component.navigateToProject(projectId);
  
       expect(navigateSpy).toHaveBeenCalledWith(['/projects', projectId]);
-    });
-  });
- 
-  describe('onStatusChange()', () => {
-    beforeEach(() => {
-      flushInitialRequests(mockTasks);
-    });
- 
-    it('should update the task status locally without hitting the network', () => {
-      //I flagged in the component comments: there is no PATCH /api/tasks/{id}/status endpoint yet, ill let Nyasha know
-      component.onStatusChange(component.tasks()[0], 'DONE');
- 
-      const updated = component.tasks().find((t) => t.id === todoTaskId);
-      expect(updated?.status).toBe('DONE');
-      httpMock.expectNone('/api/tasks/' + todoTaskId + '/status');
     });
   });
 

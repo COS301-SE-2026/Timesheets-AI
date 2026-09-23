@@ -1,23 +1,19 @@
 package timesheets.service;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import exception.AuthException;
 import exception.AuthException.ErrorCode;
 import exception.BadRequestException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +22,10 @@ import timesheets.domain.PasswordResetToken;
 import timesheets.domain.User;
 import timesheets.domain.UserIdentityProvider;
 import timesheets.domain.UserMfa;
+import timesheets.domain.event.UserWaitingForWorkspaceEvent;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.GoogleAuthRequest;
+import timesheets.dto.request.MicrosoftAuthRequest;
 import timesheets.dto.request.PasswordRequest;
 import timesheets.dto.request.RegisterRequest;
 import timesheets.dto.response.AuthResponse;
@@ -40,7 +38,8 @@ import timesheets.repository.UserIdentityProviderRepository;
 import timesheets.repository.UserMfaRepository;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
-import timesheets.security.SecurityUtils;
+import timesheets.service.strategy.SsoAuthenticationStrategy;
+import timesheets.service.strategy.SsoUserInfo;
 import timesheets.util.TotpUtils;
 
 // import timesheets.dto.request.ForgotPasswordRequest;
@@ -63,6 +62,7 @@ public class AuthService {
   private final WorkspaceMemberRepository workspaceMemberRepository;
   private final UserIdentityProviderRepository userIdentityProviderRepository;
   private final PasswordEncoder passwordEncoder;
+  private final ApplicationEventPublisher eventPublisher;
 
   private final EmailService emailService;
 
@@ -71,14 +71,11 @@ public class AuthService {
 
   private final TokenBlacklistService tokenBlacklistService;
   private final JwtService jwtService;
-  private final SecurityUtils securityUtils;
-  private final TimerService timerService;
+
+  private final List<SsoAuthenticationStrategy> ssoStrategies;
 
   // private final OtpService otpService;
   private final PasswordResetTokenRepository passwordResetTokenRepository;
-
-  @Value("${app.google.client-id}")
-  private String googleClientId;
 
   private static final String[] ACCEPTED_DOMAINS = {
     "momentum.co.za", "momentum.com", "gmail.com", "cs.up.ac.za", "outlook.com"
@@ -89,17 +86,21 @@ public class AuthService {
   @Transactional
   public RegisterResponse register(RegisterRequest request) {
 
+    String email = normalizeEmail(request.getEmail());
+
     // validate email domain
-    if (!isAcceptedDomain(request.getEmail())) {
+    if (!isAcceptedDomain(email)) {
       throw new AuthException(ErrorCode.EMAIL_DOMAIN);
     }
 
     // this should check if the user exists
-    Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+    Optional<User> existingUser = userRepository.findByEmailIgnoreCase(email);
 
     // checks to see if the user exists
     if (existingUser.isPresent()) {
       User user = existingUser.get();
+
+      ensureAccountIsActive(user);
 
       // if the email already exists then they cannot register again
       if (Boolean.TRUE.equals(user.getEmailVerified())) {
@@ -136,7 +137,7 @@ public class AuthService {
     // create user
     User user =
         User.builder()
-            .email(request.getEmail())
+            .email(email)
             .firstName(request.getFirstName())
             .lastName(request.getLastName())
             .passwordHash(passwordEncoder.encode(request.getPassword()))
@@ -195,37 +196,42 @@ public class AuthService {
             .findById(verificationToken.getUserId())
             .orElseThrow(() -> new AuthException(ErrorCode.USER_NOT_FOUND));
 
+    ensureAccountIsActive(user);
     user.setEmailVerified(true);
 
     userRepository.save(user);
     // userRepository.saveAndFlush(user);
 
+    // when a user has verified their email and is waiting for an admin to let them in
+    eventPublisher.publishEvent(new UserWaitingForWorkspaceEvent(user.getId()));
+
     return new MessageResponse("Email verified successfully", "/dashboard");
   }
 
   /*
-   * I am using no rollback such that there is no rollback for login failures.
-   * I want the login attempts to still register in the DB
+  - I am using no rollback such that there is no rollback for login failures.
+  - I want the login attempts to still register in the DB
    */
   @Transactional(noRollbackFor = {AuthException.class})
   public AuthResponse login(AuthRequest request) {
+    String email = normalizeEmail(request.getEmail());
+
     User user =
         userRepository
-            .findByEmail(request.getEmail())
+            .findByEmailIgnoreCase(email)
             .orElseThrow(() -> new AuthException(ErrorCode.INVALID_CREDENTIALS));
+
+    ensureAccountIsActive(user);
 
     // check if the user is an SSO user(this means that they have no password)
     if (user.getPasswordHash() == null) {
-      boolean hasGoogleProvider =
-          userIdentityProviderRepository
-              .findByProviderAndUserId("GOOGLE", user.getId())
-              .isPresent();
+      boolean hasSsoProvider = userIdentityProviderRepository.existsByUserId(user.getId());
 
-      if (hasGoogleProvider) {
+      if (hasSsoProvider) {
         throw new AuthException(ErrorCode.SSO_USER);
-      } else {
-        throw new AuthException(ErrorCode.ACCOUNT_NOT_CONFIGURED);
       }
+
+      throw new AuthException(ErrorCode.ACCOUNT_NOT_CONFIGURED);
     }
     // check if the account is locked, and for how long
     if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())) {
@@ -281,6 +287,8 @@ public class AuthService {
             .findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
+    ensureAccountIsActive(user);
+
     // if a user uses SSO then they cannot change their pasword
     if (user.getPasswordHash() == null) {
       throw new StateConflictException("This account uses SSO. Cannot change password.");
@@ -319,9 +327,12 @@ public class AuthService {
   @Transactional
   public MessageResponse forgotPassword(PasswordRequest.Forgot request) {
     userRepository
-        .findByEmail(request.getEmail())
+        .findByEmailIgnoreCase(normalizeEmail(request.getEmail()))
         .ifPresent(
             user -> {
+              if (user.getStatus() != UserStatus.ACTIVE || user.getDeletedAt() != null) {
+                return;
+              }
               String token = UUID.randomUUID().toString();
 
               // for safety I want the reset token to expire after an hour
@@ -345,8 +356,10 @@ public class AuthService {
   public void sendPasswordResetEmail(String email) {
     User user =
         userRepository
-            .findByEmail(email)
+            .findByEmailIgnoreCase(normalizeEmail(email))
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+    ensureAccountIsActive(user);
 
     String token = UUID.randomUUID().toString();
 
@@ -382,6 +395,8 @@ public class AuthService {
             .findById(resetToken.getUserId())
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+    ensureAccountIsActive(user);
+
     if (passwordEncoder.matches(request.getNewPassword(), user.getPasswordHash())) {
       throw new BadRequestException("New password cannot be the same as the current password");
     }
@@ -408,58 +423,25 @@ public class AuthService {
     }
 
     tokenBlacklistService.blacklistToken(token);
-
-    try {
-      UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-      timerService.pauseTimerForLogout(workspaceMemberId);
-    } catch (Exception e) {
-      log.debug("No active timer to pause during logout");
-    }
   }
 
   @Transactional
   public AuthResponse googleAuth(GoogleAuthRequest request) {
-    // first need to see if Google ID token is valif
 
-    GoogleIdToken.Payload payload = verifyGoogleToken(request.getIdToken());
-
-    String googleId = payload.getSubject();
-    String email = payload.getEmail();
-    String firstName = (String) payload.get("given_name");
-    String lastName = (String) payload.get("family_name");
-    String avatarUrl = (String) payload.get("picture");
-    Boolean emailVerified = payload.getEmailVerified();
-
-    // see if the identity provider exists
-    return userIdentityProviderRepository
-        .findByProviderAndProviderUserId("GOOGLE", googleId)
-        .map(
-            identity -> {
-              User user =
-                  userRepository
-                      .findById(identity.getUserId())
-                      .orElseThrow(() -> new AuthException(ErrorCode.USER_NOT_FOUND));
-              return generateAuthResponse(user, false);
-            })
-        .orElseGet(
-            () -> {
-              return userRepository
-                  .findByEmail(email)
-                  .map(
-                      user -> {
-                        linkGoogleIdentity(user, googleId);
-                        return generateAuthResponse(user, false);
-                      })
-                  .orElseGet(
-                      () -> {
-                        User newUser = createUserFromGoogle(payload);
-                        linkGoogleIdentity(newUser, googleId);
-                        return generateAuthResponse(newUser, false);
-                      });
-            });
+    SsoAuthenticationStrategy strategy = getSsoStrategy("GOOGLE");
+    SsoUserInfo ssoUser = strategy.authenticate(request.getIdToken());
+    return handleSsoUser(ssoUser);
   }
 
   // ! helper functions
+
+  // inactive or deleted accounts must not be allowed to authenticate
+  private void ensureAccountIsActive(User user) {
+    if (user.getStatus() != UserStatus.ACTIVE || user.getDeletedAt() != null) {
+      throw new AuthException(ErrorCode.ACCOUNT_INACTIVE);
+    }
+  }
+
   // helper func to see if the email is in the accepted domain
   private boolean isAcceptedDomain(String email) {
     String domain = email.substring(email.indexOf("@") + 1);
@@ -471,6 +453,15 @@ public class AuthService {
     return false;
   }
 
+  // email addresses are stored in one form, caps and space do not make seperate accounts
+  private String normalizeEmail(String email) {
+    if (email == null) {
+      return null;
+    }
+
+    return email.trim().toLowerCase(Locale.ROOT);
+  }
+
   // helper function that helps generate the authorisation response
   private AuthResponse generateAuthResponse(User user, boolean requiresMfa) {
     // need to see if Mfa is enabled
@@ -479,7 +470,7 @@ public class AuthService {
 
     // the workspace roles are taken from memberships
     List<String> roles =
-        workspaceMemberRepository.findByUserId(user.getId()).stream()
+        workspaceMemberRepository.findByUserIdAndIsActiveTrue(user.getId()).stream()
             .map(membership -> "ROLE_" + membership.getRole().name())
             .collect(Collectors.toList());
     if (roles.isEmpty()) {
@@ -490,8 +481,12 @@ public class AuthService {
     String token = null;
     LocalDateTime expiresAt = null;
 
-    if (!requiresMfa) {
+    if (requiresMfa) {
+      token = jwtService.generateMfaChallengeToken(user);
+      expiresAt = LocalDateTime.now().plusMinutes(5);
+    } else {
       int expirationDays = 1;
+
       token = jwtService.generateToken(user, expirationDays);
       expiresAt = LocalDateTime.now().plusDays(expirationDays);
     }
@@ -516,54 +511,105 @@ public class AuthService {
         .build();
   }
 
-  // helper func to see if the google token is valid
-  private GoogleIdToken.Payload verifyGoogleToken(String idToken) {
-
-    // FOR DEVELOPMENT
-    if ("swagger-test".equals(idToken)) {
-      GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
-
-      payload.setSubject("google-test-user-123");
-      payload.setEmail("thabang.siduke@momentum.co.za");
-      payload.put("given_name", "Thabang");
-      payload.put("family_name", "Siduke");
-      payload.put("picture", "https://www.magnific.com/free-photos-vectors/avatar-logo");
-
-      return payload;
-    }
-
-    // this will be what the actual google verification will be ACTUAL PRODUCTION
-    try {
-      GoogleIdTokenVerifier verifier =
-          new GoogleIdTokenVerifier.Builder(
-                  new NetHttpTransport(), GsonFactory.getDefaultInstance())
-              .setAudience(Collections.singletonList(googleClientId))
-              .build();
-
-      GoogleIdToken idTokenObj = verifier.verify(idToken);
-      if (idTokenObj == null) {
-        throw new AuthException(ErrorCode.INVALID_CREDENTIALS);
-      }
-      return idTokenObj.getPayload();
-    } catch (Exception e) {
-      throw new AuthException(ErrorCode.INVALID_CREDENTIALS);
-    }
+  public AuthResponse completeMfaLogin(User user) {
+    return generateAuthResponse(user, false);
   }
 
-  // helper func that creates a user from a google token
-  private User createUserFromGoogle(GoogleIdToken.Payload payload) {
-    String firstName =
-        payload.get("given_name") != null ? (String) payload.get("given_name") : "Google User";
-    String lastName =
-        payload.get("family_name") != null ? (String) payload.get("family_name") : "Unknown";
+  @Transactional
+  public AuthResponse microsoftAuth(MicrosoftAuthRequest request) {
+
+    SsoAuthenticationStrategy strategy = getSsoStrategy("MICROSOFT");
+    SsoUserInfo ssoUser = strategy.authenticate(request.getIdToken());
+    return handleSsoUser(ssoUser);
+  }
+
+  // this will get the stratgy for the requested provider
+  private SsoAuthenticationStrategy getSsoStrategy(String provider) {
+
+    return ssoStrategies.stream()
+        .filter(strategy -> strategy.getProvider().equalsIgnoreCase(provider))
+        .findFirst()
+        .orElseThrow(() -> new AuthException(ErrorCode.INVALID_CREDENTIALS));
+  }
+
+  /*
+  - this happens after a user has been authenticated
+  - it makes sure that there is no other account that this SSO account belongs to
+  - if there is none then a new account is created
+   */
+  private AuthResponse handleSsoUser(SsoUserInfo ssoUser) {
+
+    String email = normalizeEmail(ssoUser.email());
+
+    // if there is no email, how was that user created so SSO cannot verify anything
+    if (email == null || email.isBlank()) {
+      throw new AuthException(ErrorCode.INVALID_CREDENTIALS);
+    }
+
+    if (!isAcceptedDomain(email)) {
+      throw new AuthException(ErrorCode.EMAIL_DOMAIN);
+    }
+
+    // need to check if the user is already linked to a Momently user
+    return userIdentityProviderRepository
+        .findByProviderAndProviderUserId(ssoUser.provider(), ssoUser.providerUserId())
+        .map(
+            identity -> {
+              User user =
+                  userRepository
+                      .findById(identity.getUserId())
+                      .orElseThrow(() -> new AuthException(ErrorCode.USER_NOT_FOUND));
+
+              ensureAccountIsActive(user);
+
+              return generateAuthResponse(user, false);
+            })
+        .orElseGet(
+            () ->
+                userRepository
+                    .findByEmailIgnoreCase(email)
+                    .map(
+                        user -> {
+                          ensureAccountIsActive(user);
+
+                          // if the account already exists then link the SSO identity to it
+                          linkSsoIdentity(user, ssoUser);
+                          return generateAuthResponse(user, false);
+                        })
+                    .orElseGet(
+                        () -> {
+                          User newUser = createUserFromSso(ssoUser);
+
+                          linkSsoIdentity(newUser, ssoUser);
+                          eventPublisher.publishEvent(
+                              new UserWaitingForWorkspaceEvent(newUser.getId()));
+                          return generateAuthResponse(newUser, false);
+                        }));
+  }
+
+  // the reason I am doing this is because existing users should be able to choose to add Google or
+  // Microsoft as another sign-in method
+
+  private User createUserFromSso(SsoUserInfo ssoUser) {
+
+    String firstName = ssoUser.firstName();
+    String lastName = ssoUser.lastName();
+
+    if (firstName == null || firstName.isBlank()) {
+      firstName = "SSO User";
+    }
+
+    if (lastName == null || lastName.isBlank()) {
+      lastName = "Unknown";
+    }
 
     User user =
         User.builder()
-            .email(payload.getEmail())
+            .email(normalizeEmail(ssoUser.email()))
             .firstName(firstName)
             .lastName(lastName)
-            .avatarUrl((String) payload.get("picture"))
-            .emailVerified(Boolean.TRUE.equals(payload.getEmailVerified()))
+            .avatarUrl(ssoUser.avatarUrl())
+            .emailVerified(ssoUser.emailVerified())
             .passwordHash(null)
             .status(UserStatus.ACTIVE)
             .build();
@@ -571,15 +617,15 @@ public class AuthService {
     return userRepository.save(user);
   }
 
-  private void linkGoogleIdentity(User user, String googleId) {
+  private void linkSsoIdentity(User user, SsoUserInfo ssoUser) {
+
     UserIdentityProvider identity =
         UserIdentityProvider.builder()
             .userId(user.getId())
-            .provider("GOOGLE")
-            .providerUserId(googleId)
+            .provider(ssoUser.provider())
+            .providerUserId(ssoUser.providerUserId())
             .email(user.getEmail())
             .build();
-
     userIdentityProviderRepository.save(identity);
   }
 }

@@ -8,26 +8,48 @@
                 <p class="page-subtitle">All tasks assigned to you across projects.</p>
             </div>
             
+            <div class="header-actions">
+                @if (!isJiraConnected()) {
+                    <button type="button" class="button button-primary" 
+                            (click)="connectToJira()" 
+                            [disabled]="isConnectingJira()">
+                        @if (isConnectingJira()) {
+                            <span><i class="fa-solid fa-spinner fa-spin"></i> Connecting...</span>
+                        } @else {
+                            <span><i class="fa-brands fa-jira"></i> Connect to Jira</span>
+                        }
+                    </button>
+                } @else {
+                    <span class="jira-connected-badge">
+                        <i class="fa-brands fa-jira" style="color: #0052CC;"></i>
+                        Jira Connected
+                        <i class="fa-solid fa-check-circle" style="color: #00875A;"></i>
+                    </span>
+                }
+                
+                <button type="button" class="button button-primary" (click)="openCreateModal()">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                    <span>New Task</span>
+                </button>
+            </div>
         </div>
-
-        <button type="button" class="button button-primary" (click)="openCreateModal()">
-            <i class="fa-solid fa-plus" aria-hidden="true"></i>
-            <span>New Task</span>
-        </button>
     </header>
 
     <!-- Summary Cards -->
-      <section class="summary-cards" aria-label="Task summary">
+    <section class="summary-cards" aria-label="Task summary">
         <div class="summary-card">
             <div class="summary-card-icon">
                 <i class="fa-solid fa-list-check"></i>
             </div>
+
             <div class="summary-card-content">
-            <div class="summary-card-value" aria-live="polite">
-                {{ activeCount() }}
-            </div>
-            <div class="summary-card-label text-caption"> Active</div>
-            <div class="summary-card-subtitle text-caption"> Includes To Do &amp; In progress</div>
+                <div class="summary-card-value" aria-live="polite">
+                    {{ totalCount() }}
+                </div>
+
+                <div class="summary-card-label text-caption">
+                    Total Tasks
+                </div>
             </div>
         </div>
 
@@ -43,7 +65,7 @@
             </div>
             <div class="summary-card-label text-caption"> Active </div>
             <div class="summary-card-subtitle text-caption"> Includes To Do &amp; In progress</div>
-             </div>
+            </div>
         </div>
 
         <!-- Completed Tasks -->
@@ -117,6 +139,22 @@
           </div>
       </section>
 
+      <!-- Task tabs -->
+      @if (isManager()) {
+        <div class="task-tabs" role="tablist" aria-label="Task view">
+
+          <button type="button" role="tab" [attr.aria-selected]="activeTab() === 'my-tasks'" [class.active]="activeTab() === 'my-tasks'" (click)="setActiveTab('my-tasks')">
+            My Tasks
+            <span>{{ myTasksCount() }}</span>
+          </button>
+
+          <button type="button" role="tab" [attr.aria-selected]="activeTab() === 'team-tasks'" [class.active]="activeTab() === 'team-tasks'" (click)="setActiveTab('team-tasks')">
+            Team Tasks
+            <span>{{ teamTasksCount() }}</span>
+          </button>
+        </div>
+      }
+
       <!-- Task Table -->
 
       <section class="task-table-container" aria-label="Task list">
@@ -159,9 +197,25 @@
 
                             <td class="text-body">
                                 @if (task.jiraTicketKey) {
-                                    <span class="jira-ticket"> {{ task.jiraTicketKey || '-' }} </span>
+                                    <div class="jira-ticket-info">
+                                        <span class="jira-ticket-badge">
+                                            <i class="fa-brands fa-jira" aria-hidden="true"></i>
+                                            {{ task.jiraTicketKey }}
+                                        </span>
+                                        @if (task.jiraStatus) {
+                                            <span class="jira-status-dot" 
+                                                [class]="'status-' + (task.jiraStatus | lowercase | replace:' ':'-')"
+                                                [title]="task.jiraStatus"></span>
+                                        }
+                                        <a [href]="'https://your-instance.atlassian.net/browse/' + task.jiraTicketKey" 
+                                        target="_blank" 
+                                        class="jira-link" 
+                                        [attr.aria-label]="'Open ' + task.jiraTicketKey + ' in Jira'">
+                                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                        </a>
+                                    </div>
                                 } @else {
-                                    <span class="text-muted">-</span>
+                                    <span class="text-muted">—</span>
                                 }                           
                             </td>
 
@@ -190,10 +244,32 @@
                              <td class="text-body text-right font-mono" > {{ task.estimatedHours }}h </td>
                              <td class="text-body text-right font-mono"> {{ task.actualHours }}h </td>
                              <td class="text-center">
-                                <button type="button" class="view-button"  (click)="onViewTask(task)" [attr.aria-label]="'View details for ' + task.title">
-                                <i class="fa-regular fa-eye"></i> 
-                                View </button>
-                             </td>
+                                <div class="action-buttons">
+                                    <!-- View button -->
+                                    <button type="button" class="view-button" (click)="onViewTask(task)" [attr.aria-label]="'View details for ' + task.title">
+                                        <i class="fa-regular fa-eye"></i> View
+                                    </button>
+                                    
+                                    @if (task.jiraTicketKey) {
+                                        <button type="button" class="sync-button" 
+                                                (click)="onSyncJira(task)" 
+                                                [disabled]="isSyncingJira()"
+                                                [attr.aria-label]="'Sync with Jira for ' + task.title">
+                                            @if (isSyncingJira()) {
+                                                <i class="fa-solid fa-spinner fa-spin"></i>
+                                            } @else {
+                                                <i class="fa-solid fa-rotate"></i>
+                                            }
+                                        </button>
+                                    } @else {
+                                        <button type="button" class="link-jira-button" 
+                                                (click)="openLinkJiraModal(task)"
+                                                [attr.aria-label]="'Link ' + task.title + ' to Jira'">
+                                            <i class="fa-brands fa-jira"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </td>
                         </tr>
                     } @empty {
                         <!-- Empty State -->
@@ -304,8 +380,9 @@
                                     type="text"
                                     name="jiraTicketKey"
                                     [(ngModel)]="newTask.jiraTicketKey"
-                                    placeholder="e.g. ALPHA-101"
+                                    placeholder="e.g. SCRUM-123"
                                 />
+                                <small class="form-help">Optional. Enter an existing Jira ticket to link it to this task.</small>
                             </div>
 
                             <div class="form-row">
@@ -320,6 +397,115 @@
                                 </select>
                             </div>
                         </div>
+
+                        <!-- Jira Creation Toggle -->
+                            <div class="form-row">
+                                <div class="jira-creation-section">
+                                    <label class="form-label">
+                                        <i class="fa-brands fa-jira"></i> Create Jira Issue
+                                    </label>
+                                    <div class="jira-toggle">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" 
+                                                [(ngModel)]="newTask.createJiraIssue"
+                                                name="createJiraIssue"
+                                                (change)="onJiraToggleChange()" />
+                                            <span class="slider"></span>
+                                        </label>
+                                        <span class="toggle-label">
+                                            {{ newTask.createJiraIssue ? 'Create Jira issue' : 'Skip Jira creation' }}
+                                        </span>
+                                        <small class="form-help">
+                                            {{ newTask.createJiraIssue ? 'A Jira issue will be created and linked to this task.' : 'No Jira issue will be created.' }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (newTask.createJiraIssue) {
+                                <div class="jira-details-panel">
+                                    <div class="form-grid">
+                                        <!-- Project Key -->
+                                        <div class="form-row">
+                                            <label class="form-label" for="jira-project-key">
+                                                Jira Project Key <span class="required">*</span>
+                                            </label>
+                                            <input
+                                                id="jira-project-key"
+                                                class="form-control"
+                                                type="text"
+                                                name="jiraProjectKey"
+                                                [(ngModel)]="newTask.jiraDetails!.projectKey"
+                                                placeholder="e.g. SCRUM, WDYSCAFY"
+                                                #jiraProjectInput="ngModel"
+                                                required
+                                                minlength="2"
+                                            />
+                                            @if (jiraProjectInput.touched && jiraProjectInput.invalid) {
+                                                <div class="form-error">
+                                                    @if (jiraProjectInput.errors?.['required']) {
+                                                        <span>Project key is required</span>
+                                                    }
+                                                    @if (jiraProjectInput.errors?.['minlength']) {
+                                                        <span>Project key must be at least 2 characters</span>
+                                                    }
+                                                </div>
+                                            }
+                                            <small class="form-help">The Jira project key (e.g., SCRUM, PROJ)</small>
+                                        </div>
+
+                                        <!-- Issue Type -->
+                                        <div class="form-row">
+                                            <label class="form-label" for="jira-issue-type">
+                                                Issue Type <span class="required">*</span>
+                                            </label>
+                                            <select
+                                                id="jira-issue-type"
+                                                class="form-control"
+                                                name="jiraIssueType"
+                                                [(ngModel)]="newTask.jiraDetails!.issueType"
+                                                required
+                                            >
+                                                <option value="Task">Task</option>
+                                                <option value="Bug">Bug</option>
+                                                <option value="Story">Story</option>
+                                                <option value="Epic">Epic</option>
+                                                <option value="Sub-task">Sub-task</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Jira Priority -->
+                                        <div class="form-row">
+                                            <label class="form-label" for="jira-priority">Jira Priority</label>
+                                            <select
+                                                id="jira-priority"
+                                                class="form-control"
+                                                name="jiraPriority"
+                                                [(ngModel)]="newTask.jiraDetails!.priority"
+                                            >
+                                                <option value="Low">Low</option>
+                                                <option value="Medium">Medium</option>
+                                                <option value="High">High</option>
+                                                <option value="Critical">Critical</option>
+                                            </select>
+                                            <small class="form-help">Optional. Maps to Jira's priority levels.</small>
+                                        </div>
+
+                                        <div class="form-row">
+                                            <label class="form-label" for="jira-assignee">Assignee Email</label>
+                                            <input
+                                                id="jira-assignee"
+                                                class="form-control"
+                                                type="email"
+                                                name="jiraAssigneeEmail"
+                                                [(ngModel)]="newTask.jiraDetails!.assigneeEmail"
+                                                placeholder="email@domain.com"
+                                            />
+                                            <small class="form-help">Optional. Email of the Jira user to assign the issue to.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
 
                         <!-- The status and the priority -->
                         <div class="form-grid">
@@ -369,7 +555,7 @@
                                     type="number"
                                     name="estimatedHours"
                                     [(ngModel)]="newTask.estimatedHours"
-                                    min="0"
+                                    min="0.5"
                                     step="0.5"
                                     placeholder="e.g. 8"
                                 />
@@ -418,7 +604,7 @@
                         </div>
 
                         <footer class="modal-footer">
-                            <button type="button" class="modal-button modal-button-secondary" (click)="closeCreateModal()" [disabled]="isCreating()">
+                            <button type="button" class="button button-primary" (click)="closeCreateModal()" [disabled]="isCreating()">
                                 Cancel
                             </button>
                             <button type="submit" class="modal-button" [disabled]="isCreating() || createTaskForm.invalid">
@@ -451,18 +637,38 @@
                     <p class="modal-message modal-error"> {{ detailError() }} </p>
                 } @else {
                     @if (selectedTask(); as task) {
-                    <form class="task-detail-form" (ngSubmit)="closeTaskDetail()">
+                    <form #editTaskForm="ngForm" class="task-detail-form">
+
+                        @if (updateError()) {
+                            <div class="alert alert-error">
+                                <i
+                                    class="fa-solid fa-circle-exclamation"
+                                    aria-hidden="true"
+                                ></i>
+                                <span>{{ updateError() }}</span>
+                            </div>
+                        }
 
                         <div class="form-row">
                             <label class="form-label" for="detail-title">Title</label>
-                            <input id="detail-title" class="form-control" type="text" [value]="task.title" readonly />
+                            @if (isEditingTask()) {
+                                <input id="detail-title" class="form-control" type="text" name="editTitle" [(ngModel)]="editTask.title" required minlength="3" maxlength="300" />
+                                }
+                                @else {
+                                <input id="detail-title" class="form-control" type="text" [value]="task.title" readonly />
+                                }
                         </div>
 
                         <div class="form-row">
                             <label class="form-label" for="detail-description">Description</label>
-                            <textarea id="detail-description" class="form-control form-textarea" rows="5" readonly>
-                                {{ task.description || 'No description provided.' }}
-                            </textarea>
+
+                            @if (isEditingTask()) {
+                                <textarea id="detail-description" class="form-control form-textarea" name="editDescription" [(ngModel)]="editTask.description" rows="5" placeholder="Enter task description" ></textarea>
+                            } 
+                            @else 
+                            {
+                                <textarea id="detail-description" class="form-control form-textarea" rows="5" readonly >{{ task.description || 'No description provided.' }}</textarea>
+                            }
                         </div>
 
                         <div class="form-grid">
@@ -474,27 +680,93 @@
 
                             <div class="form-row">
                                 <label class="form-label" for="detail-jira">Jira Ticket</label>
-                                <input id="detail-jira" class="form-control" type="text" [value]="task.jiraTicketKey || '-'" readonly />
-                            </div>  
+                                @if (task.jiraTicketKey) {
+                                    <div class="jira-detail-link">
+                                        <i class="fa-brands fa-jira" style="color: #0052CC;"></i>
+                                        <a [href]="'https://your-instance.atlassian.net/browse/' + task.jiraTicketKey"  target="_blank"  class="jira-detail-link-text">
+                                            {{ task.jiraTicketKey }}
+                                            <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 12px;"></i>
+                                        </a>
+                                    </div>
+                                } 
+                                @else {
+                                    <input id="detail-jira" class="form-control" type="text" value="-" readonly />
+                                }
+                            </div>
+                            
+                            <div class="form-row">
+                                <label class="form-label" for="detail-status">Status</label>
+
+                                @if (isEditingTask()) {
+                                    <select id="detail-status" class="form-control" name="editStatus" [(ngModel)]="editTask.status" >
+                                        @for (option of statusDropdownOptions; track option.value) {
+                                            <option [value]="option.value"> {{ option.label }} </option>
+                                        }
+                                    </select>
+                                } 
+                                @else {
+                                    <input id="detail-status" class="form-control" type="text" [value]="statusLabels[task.status]" readonly/>
+                                }
+                            </div>
 
                             <div class="form-row">
                                 <label class="form-label" for="detail-priority">Priority</label>
-                                <input id="detail-priority" class="form-control" type="text" [value]="task.priority" readonly />
+
+                                @if (isEditingTask()) {
+                                    <select id="detail-priority" class="form-control" name="editPriority" [(ngModel)]="editTask.priority">
+                                        <option value="LOW">Low</option>
+                                        <option value="MEDIUM">Medium</option>
+                                        <option value="HIGH">High</option>
+                                        <option value="CRITICAL">Critical</option>
+                                    </select>
+                                } 
+                                @else {
+                                    <input id="detail-priority" class="form-control" type="text" [value]="priorityLabels[task.priority]" readonly />
+                                }
                             </div>
 
                             <div class="form-row">
                                 <label class="form-label" for="detail-assignee">Assigned To</label>
-                                <input id="detail-assignee" class="form-control" type="text" [value]="task.assignedToName" readonly />
+
+                                @if (isEditingTask() && canAssignTasks()) {
+                                    <select id="detail-assignee" class="form-control" name="editAssignedWorkspaceMemberId" [(ngModel)]="editTask.assignedWorkspaceMemberId" >
+
+                                        @for (member of projectMembers(); track member.workspaceMemberId) {
+                                            <option [value]="member.workspaceMemberId">
+                                                {{ member.fullName }} ({{ member.email }})
+                                            </option>
+                                        }
+                                    </select>
+
+                                    @if (isLoadingMembers()) {
+                                        <span class="text-muted text-caption">
+                                            Loading team members...
+                                        </span>
+                                    }
+                                } @else {
+                                    <input id="detail-assignee" class="form-control" type="text" [value]="task.assignedToName" readonly />
+                                }
                             </div>
 
                             <div class="form-row">
-                                <label class="form-label" for="detail-due"> Due Date</label>
-                                <input id="detail-due" class="form-control" type="text"  [value]="formatDate(task.dueDate)" readonly />
+                                <label class="form-label" for="detail-due">Due Date</label>
+
+                                @if (isEditingTask()) {
+                                    <input id="detail-due" class="form-control form-control-date" type="date" name="editDueDate" [(ngModel)]="editTask.dueDate" [min]="todayDate" />
+                                } 
+                                @else {
+                                    <input id="detail-due" class="form-control" type="text" [value]="formatDate(task.dueDate)" readonly />
+                                }
                             </div>
 
                             <div class="form-row">
-                                <label class="form-label" for="detail-estimated"> Estimated hours</label>
-                                <input id="detail-estimated" class="form-control" type="text"  [value]="task.estimatedHours + 'h'" readonly />
+                                <label class="form-label" for="detail-estimated">Estimated Hours</label>
+
+                                @if (isEditingTask()) {
+                                    <input id="detail-estimated" class="form-control" type="number" name="editEstimatedHours" [(ngModel)]="editTask.estimatedHours" min="0.5" step="0.5" />
+                                } @else {
+                                    <input id="detail-estimated" class="form-control" type="text" [value]="task.estimatedHours + 'h'" readonly />
+                                }
                             </div>
 
                             <div class="form-row">
@@ -525,15 +797,98 @@
                         </div>
 
                         <footer class="modal-footer">
-                            <button type="submit" class="modal-button">Close</button>
+                            @if (!isEditingTask()) {
+                                <button type="button" class="modal-button" (click)="startEditingTask()">
+                                    <i class="fa-solid fa-pen"></i>
+                                    Edit
+                                </button>
+
+                                <button type="button" class="button button-primary" (click)="closeTaskDetail()" > Close </button>
+                            } 
+                            @else {
+                                <button type="button" class="modal-button" (click)="saveTaskChanges()" [disabled]="isUpdatingTask() || editTaskForm.invalid">
+                                    @if (isUpdatingTask()) {
+                                        <span> <i class="fa-solid fa-spinner fa-spin"></i> Saving... </span>
+                                    } 
+                                    @else {
+                                        <span> <i class="fa-solid fa-check"></i> Save Changes </span>
+                                    }
+                                </button>
+
+                                <button type="button" class="button button-primary" (click)="cancelEditingTask()" [disabled]="isUpdatingTask()" > Cancel </button>
+                            }
+
                         </footer>
 
                     </form>
-                } @else {
+                } 
+                @else {
                     <p class="modal-message"> Task details are unavailable </p>
                 } 
             }
             </div>
         </div>
+    }
+
+    <!-- Link Jira Modal -->
+    @if (isLinkJiraOpen()) {
+        <dialog class="modal-overlay" #linkJiraDialog open>
+            <dialog class="modal-panel" aria-labelledby="link-jira-title">
+                <header class="modal-header">
+                    <h2 id="link-jira-title" class="modal-title">
+                        <i class="fa-brands fa-jira"></i> Link to Jira
+                    </h2>
+                    <button type="button" class="modal-close" (click)="closeLinkJiraModal()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </header>
+
+                <form (ngSubmit)="onLinkJiraSubmit()" #linkJiraForm="ngForm">
+                    <div class="form-row">
+                        <label class="form-label" for="link-jira-key">
+                            Jira Issue Key <span class="required">*</span>
+                        </label>
+                        <input
+                            id="link-jira-key"
+                            class="form-control"
+                            type="text"
+                            name="linkJiraKey"
+                            [(ngModel)]="linkJiraKey"
+                            #jiraKeyInput="ngModel"
+                            placeholder="e.g. SCRUM-123"
+                            required
+                            pattern="^[A-Z]+-[0-9]+$"
+                        />
+                        @if (jiraKeyInput.touched && jiraKeyInput.invalid) {
+                            <div class="form-error">
+                                @if (jiraKeyInput.errors?.['required']) {
+                                    <span>Jira key is required</span>
+                                }
+                                @if (jiraKeyInput.errors?.['pattern']) {
+                                    <span>Please enter a valid Jira key (e.g., SCRUM-123)</span>
+                                }
+                            </div>
+                        }
+                        <small class="form-help">
+                            Enter the Jira issue key (e.g., SCRUM-123, PROJ-456)
+                        </small>
+                    </div>
+
+                    <footer class="modal-footer">
+                        <button type="button" class="modal-button" (click)="closeLinkJiraModal()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="modal-button" 
+                                [disabled]="linkJiraForm.invalid || isLinkingJira()">
+                            @if (isLinkingJira()) {
+                                <span><i class="fa-solid fa-spinner fa-spin"></i> Linking...</span>
+                            } @else {
+                                <span><i class="fa-brands fa-jira"></i> Link to Jira</span>
+                            }
+                        </button>
+                    </footer>
+                </form>
+            </dialog>
+        </dialog>
     }
 </main>

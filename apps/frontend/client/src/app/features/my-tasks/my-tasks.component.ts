@@ -27,9 +27,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
-import { TaskService, TaskResponse } from '../../core/services/task.service';
+import { TaskService, TaskResponse, UpdateTaskRequest, } from '../../core/services/task.service';
 import { ProjectService, ProjectResponse } from '../../core/services/project.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ReplacePipe } from '../../shared/pipes/replace.pipe';
 
 
 /**
@@ -57,6 +58,8 @@ export interface Task {
   parentTaskId?: string;
   isDeleted: boolean;
   deletedAt?: string;
+  jiraStatus?: string;   
+  jiraIssueType?: string;
 }
 
 export interface ProjectOption {
@@ -82,6 +85,16 @@ export interface UpdateStatusRequest {
   status: TaskStatus;
 }
 
+export interface JiraDetails {
+    summary: string;
+    description?: string;
+    projectKey: string;
+    issueType: string;
+    priority?: string;
+    dueDate?: string;
+    assigneeEmail?: string;
+}
+
 export interface CreateTaskRequest {
   title: string;
   description?: string;
@@ -93,6 +106,8 @@ export interface CreateTaskRequest {
   assignedWorkspaceMemberId?: string;
   dueDate?: string;
   priority: TaskPriority;
+  createJiraIssue?: boolean;
+  jiraDetails?: JiraDetails;
 }
 
 interface StatusFilterOption {
@@ -145,7 +160,7 @@ const PRIORITY_ICONS: Record<TaskPriority, string> = {
 
 @Component({
   selector: 'app-my-tasks',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReplacePipe],
   templateUrl: './my-tasks.component.html',
   styleUrl: './my-tasks.component.scss',
   standalone: true,
@@ -164,11 +179,21 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public readonly isDetailOpen = signal<boolean>(false);
   public readonly isDetailLoading = signal<boolean>(false);
   public readonly detailError = signal<string | null>(null);
+
+
   private readonly router = inject(Router);
   private readonly taskService = inject(TaskService);
   private readonly projectService = inject(ProjectService);
   private readonly authService = inject(AuthService);
 
+  public readonly isSyncingJira = signal<boolean>(false);
+  public readonly isLinkingJira = signal<boolean>(false);
+  public readonly isLinkJiraOpen = signal<boolean>(false);
+  public linkJiraKey = '';
+  public linkJiraTask: Task | null = null;
+
+  public readonly isJiraConnected = signal<boolean>(false);
+  public readonly isConnectingJira = signal<boolean>(false);
 
   //creating the task in the modal state
   public readonly isCreateModalOpen = signal<boolean>(false);
@@ -180,6 +205,19 @@ export class MyTasksComponent implements OnInit, OnDestroy {
 
   public readonly projectMembers = signal<ProjectMemberOption[]>([]);
   public readonly isLoadingMembers = signal<boolean>(false);
+
+  public readonly teamTasks = signal<Task[]>([]);
+
+  //will track if a manager is looking at their own tasks or team tasks
+  public readonly activeTab = signal<'my-tasks' | 'team-tasks'>('my-tasks');
+
+  // tracks whether the task detail modal is currently in edit mode
+  public readonly isEditingTask = signal<boolean>(false);
+  public readonly isUpdatingTask = signal<boolean>(false);
+  public readonly updateError = signal<string | null>(null);
+
+  //has the copy that can be edited
+  public editTask: UpdateTaskRequest = {};
 
 
   //the create task modal
@@ -194,6 +232,16 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     assignedWorkspaceMemberId: '',
     dueDate: '',
     priority: 'MEDIUM',
+    createJiraIssue: false,
+    jiraDetails: {
+        summary: '',
+        description: '',
+        projectKey: '',
+        issueType: 'Task',
+        priority: 'Medium',
+        dueDate: '',
+        assigneeEmail: '',
+    },
   };
 
   public readonly projects = signal<ProjectOption[]>([]);
@@ -206,34 +254,60 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     return user?.roles?.some((role:string) =>  role === 'ROLE_ADMIN' || role === 'ROLE_MANAGER') || false;
   });
 
+  //since I only want managers to view their team tasks
+  public readonly isManager = computed<boolean>(() => {
+    const user = this.authService.currentUser();
+
+    return user?.roles?.includes('ROLE_MANAGER') ?? false;
+  });
+
   //Computed signals
 
-  // Total number of active tasks
+  // tasks currently being viewed based on the selected tab
+  public readonly currentTasks = computed<Task[]>(() => {
+    if (this.activeTab() === 'team-tasks' && this.isManager()) {
+      return this.teamTasks();
+    }
+
+    return this.tasks();
+  });
+
+  //counts the active tasks in the selected view, so is anumber of the functions I have below
   public readonly activeCount = computed<number>(() => {
-    return this.tasks().filter((task: Task) => {
-      return (
-        !task.isDeleted &&
-        (task.status === 'TODO' || task.status === 'IN_PROGRESS')
-      );
+    return this.currentTasks().filter((task: Task) => {
+      return ( !task.isDeleted && (task.status === 'TODO' || task.status === 'IN_PROGRESS'));
     }).length;
   });
 
-  // Total number of completed tasks
+  // total number of completed tasks
   public readonly completedCount = computed<number>(() => {
-    return this.tasks().filter(
-      (task: Task) => !task.isDeleted && task.status === 'DONE',
-    ).length;
+    return this.currentTasks().filter( (task: Task) => !task.isDeleted && task.status === 'DONE', ).length;
   });
 
-  //total number of blocked tasks (was "archived" in the mock, schema only has BLOCKED)
+  //total number of blocked tasks
   public readonly archivedCount = computed<number>(() => {
-    return this.tasks().filter((task: Task) => !task.isDeleted && task.status === 'BLOCKED', ).length;
+    return this.currentTasks().filter((task: Task) => !task.isDeleted && task.status === 'BLOCKED', ).length;
   });
 
   //total number of tasks
   public readonly totalCount = computed<number>(() => {
-    return this.tasks().filter((task: Task) => !task.isDeleted).length;
+    return this.currentTasks().filter((task: Task) => !task.isDeleted).length;
   });
+
+  //the number near the My tasks tab, so the user has easy view 
+  public readonly myTasksCount = computed(() =>
+    this.tasks().filter(task => !task.isDeleted).length
+  );
+
+  public readonly teamTasksCount = computed(() =>
+    this.teamTasks().filter(task => !task.isDeleted).length
+  );
+
+  //this will switch the view of the task, I also want it to apply the existing filters to the selected list
+  public setActiveTab(tab: 'my-tasks' | 'team-tasks'): void {
+    this.activeTab.set(tab);
+    this.applyFilters();
+  }
 
   //public constants tsatus filter options for the filter down
 
@@ -262,12 +336,42 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     this.loadTasks();
     this.loadProjects();
+    this.checkJiraConnection();
+    this.loadTeamTasks();
   }
 
   //cleanup subscription when the component is destroyed
   public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  public checkJiraConnection(): void {
+    this.taskService.checkJiraConnection().subscribe({
+      next: (response) => {
+        this.isJiraConnected.set(response.connected);
+      },
+      error: () => {
+        this.isJiraConnected.set(false);
+      }
+    });
+  }
+
+  public connectToJira(): void {
+    this.isConnectingJira.set(true);
+
+    this.taskService.connectJira().subscribe({
+      next: (url: string) => {
+        this.isConnectingJira.set(false);
+        // Redirect to Jira OAuth page
+        window.location.href = url;
+      },
+      error: (error) => {
+        console.error('Failed to connect to Jira:', error);
+        this.isConnectingJira.set(false);
+        this.createError.set('Failed to connect to Jira. Please try again.');
+      }
+    });
   }
 
   // loads the logged in user's tasks from GET /api/tasks/my-tasks
@@ -287,6 +391,115 @@ export class MyTasksComponent implements OnInit, OnDestroy {
         console.error('[MyTasksComponent] failed to load my-tasks:', error);
         this.isLoading.set(false);
         this.loadError.set(true);
+      },
+    });
+  }
+
+  // switches the task detail modal into edit mode
+  public startEditingTask(): void {
+    const task = this.selectedTask();
+
+    if (!task) {
+      return;
+    }
+
+    this.updateError.set(null);
+
+    // create a separate editable copy so cancelling does not change the displayed task
+    this.editTask = {
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      priority: task.priority,
+      estimatedHours: task.estimatedHours,
+      dueDate: task.dueDate,
+      assignedWorkspaceMemberId: task.assignedWorkspaceMemberId,
+    };
+
+    if (this.canAssignTasks()) {
+      this.loadProjectMembers(task.projectId);
+    }
+
+    this.isEditingTask.set(true);
+  }
+
+  // leaves edit mode without saving any changes
+  public cancelEditingTask(): void {
+    this.isEditingTask.set(false);
+    this.updateError.set(null);
+    this.editTask = {};
+  }
+
+  public saveTaskChanges(): void {
+    const task = this.selectedTask();
+
+    if (!task) {
+      return;
+    }
+
+
+    //I am only making sure that fields that are changed are the ones that will be sent to backend, for efficiency
+    const changes: UpdateTaskRequest = {};
+
+    if (this.editTask.title !== task.title) {
+      changes.title = this.editTask.title;
+    }
+
+    if (this.editTask.description !== task.description) {
+      changes.description = this.editTask.description;
+    }
+
+    if (this.editTask.status !== task.status) {
+      changes.status = this.editTask.status;
+    }
+
+    if (this.editTask.priority !== task.priority) {
+      changes.priority = this.editTask.priority;
+    }
+
+    if (this.editTask.estimatedHours !== task.estimatedHours) {
+      changes.estimatedHours = this.editTask.estimatedHours;
+    }
+
+    if (this.editTask.dueDate !== task.dueDate) {
+      changes.dueDate = this.editTask.dueDate;
+    }
+
+    if (this.editTask.assignedWorkspaceMemberId !== task.assignedWorkspaceMemberId) {
+      changes.assignedWorkspaceMemberId = this.editTask.assignedWorkspaceMemberId;
+    }
+
+    //if there is nothing that was changed, then there is no reason for a patch request
+    if (Object.keys(changes).length === 0) {
+
+      this.isEditingTask.set(false);
+      this.updateError.set(null);
+      this.editTask = {};
+
+      return;
+    }
+
+    this.isUpdatingTask.set(true);
+    this.updateError.set(null);
+
+    this.taskService.updateTask(task.id, changes).subscribe({
+      next: (response: TaskResponse) => {
+        const updatedTask = this.mapToTask(response);
+
+        this.selectedTask.set(updatedTask);
+
+        this.updateTaskInTaskList(updatedTask);
+
+        this.isUpdatingTask.set(false);
+        this.isEditingTask.set(false);
+        this.editTask = {};
+      },
+
+      error: (error) => {
+        console.error('[MyTasksComponent] failed to update task:', error );
+
+        this.isUpdatingTask.set(false);
+        this.updateError.set(error.error?.message || 'Failed to update task. Please try again.' );
       },
     });
   }
@@ -369,6 +582,16 @@ export class MyTasksComponent implements OnInit, OnDestroy {
       assignedWorkspaceMemberId: '',
       dueDate: '',
       priority: 'MEDIUM',
+      createJiraIssue: false,
+      jiraDetails: {
+        summary: '',
+        description: '',
+        projectKey: '',
+        issueType: 'Task',
+        priority: 'Medium',
+        dueDate: '',
+        assigneeEmail: '',
+      },
     };
 
     //should be reloading the projects if the list changes
@@ -406,6 +629,17 @@ export class MyTasksComponent implements OnInit, OnDestroy {
       assignedWorkspaceMemberId: this.newTask.assignedWorkspaceMemberId || undefined,
       dueDate: this.newTask.dueDate || undefined,
       priority: this.newTask.priority,
+
+      createJiraIssue: this.newTask.createJiraIssue || false,
+      jiraDetails: this.newTask.createJiraIssue && this.newTask.jiraDetails ? {
+        summary: this.newTask.jiraDetails.summary || this.newTask.title,
+        description: this.newTask.jiraDetails.description || this.newTask.description,
+        projectKey: this.newTask.jiraDetails.projectKey,
+        issueType: this.newTask.jiraDetails.issueType,
+        priority: this.newTask.jiraDetails.priority,
+        dueDate: this.newTask.jiraDetails.dueDate || this.newTask.dueDate,
+        assigneeEmail: this.newTask.jiraDetails.assigneeEmail || undefined,
+      } : undefined,
     };
 
     this.taskService.createTask(request).subscribe({
@@ -426,6 +660,29 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     });
   }
 
+  private loadTeamTasks(): void {
+    //remember I only want managers to see
+    if (!this.isManager()) {
+      return;
+    }
+
+    this.taskService.getTeamTasks().subscribe({
+      next: (responses: TaskResponse[]) => {
+        const tasks = responses.map(response => this.mapToTask(response));
+
+        this.teamTasks.set(tasks);
+
+        //the table is refreshed when the manager views the team tasks
+        if (this.activeTab() === 'team-tasks') {
+          this.applyFilters();
+        }
+      },
+      error: (error) => {
+        console.error('Failed to load team tasks:', error);
+      }
+    });
+  }
+
 
   /*
   converts a raw TaskResponse (backend DTO shape) into the Task shape this component
@@ -442,6 +699,8 @@ export class MyTasksComponent implements OnInit, OnDestroy {
       estimatedHours: response.estimatedHours ?? 0,
       actualHours: response.actualHours ?? 0,
       jiraTicketKey: response.jiraTicketKey ?? undefined,
+      jiraStatus: (response as any).jiraStatus ?? undefined,
+      jiraIssueType: (response as any).jiraIssueType ?? undefined,
       assignedToName: response.assignedToName ?? 'Unassigned',
       assignedWorkspaceMemberId: response.assignedWorkspaceMemberId ?? undefined,
       dueDate: response.dueDate ?? undefined,
@@ -457,29 +716,25 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   // apply all active filters to the task list
 
   public applyFilters(): void {
-    const currentTasks = this.tasks();
-    let filtered = [...currentTasks];
+    let filtered = [...this.currentTasks()];
 
     // exclude deleted filters from list
     filtered = filtered.filter((task: Task) => !task.isDeleted);
 
     const searchQuery = this.searchQuery().toLowerCase().trim();
+
     if (searchQuery) {
       filtered = filtered.filter((task: Task) => {
-        return (
-          task.title.toLowerCase().includes(searchQuery) ||
-          task.projectName.toLowerCase().includes(searchQuery) ||
-          task.jiraTicketKey?.toLowerCase().includes(searchQuery)
-        );
+        return (task.title.toLowerCase().includes(searchQuery) || task.projectName.toLowerCase().includes(searchQuery) || task.jiraTicketKey?.toLowerCase().includes(searchQuery));
       });
     }
 
     const selectedStatus = this.selectedStatus();
+
     if (selectedStatus !== 'ALL') {
-      filtered = filtered.filter(
-        (task: Task) => task.status === selectedStatus,
-      );
-    } else {
+      filtered = filtered.filter((task: Task) => task.status === selectedStatus, );
+    } 
+    else {
       if (!this.showCompleted()) {
         filtered = filtered.filter((task: Task) => task.status !== 'DONE');
       }
@@ -488,6 +743,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
         filtered = filtered.filter((task: Task) => task.status !== 'BLOCKED');
       }
     }
+
     this.filteredTasks.set(filtered);
   }
 
@@ -515,7 +771,6 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  // Handles show archived checkbox changes
 
   public onToggleArchived(event: Event): void {
     const checkbox = event.target as HTMLInputElement;
@@ -537,10 +792,27 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     return `priority-badge ${PRIORITY_CLASSES[priority]}`;
   }
 
-  //there's no status field on the GET, i've flagged this with backend, so for now its local
   public onStatusChange(task: Task, newStatus: string): void {
     const status = newStatus as TaskStatus;
-    this.updateTaskInTaskList({ ...task, status });
+
+    this.taskService.updateTask(task.id, { status }).subscribe({
+      next: (response: TaskResponse) => {
+
+        const updatedTask = this.mapToTask(response);
+        this.updateTaskInTaskList(updatedTask);
+
+        if (this.selectedTask()?.id === updatedTask.id) {
+          this.selectedTask.set(updatedTask);
+        }
+      },
+
+      error: (error) => {
+        console.error('[MyTasksComponent] failed to update task status:', error);
+
+        // reapply the current data so what was returned by backend comes back
+        this.applyFilters();
+      },
+    });
   }
 
   //navigate to project
@@ -604,19 +876,37 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     return icons[status];
   }
 
-  //update tasks in the task list after a status change
-
+  // updates the task in both task lists after a change
   private updateTaskInTaskList(updatedTask: Task): void {
-    const currentTasks = this.tasks();
-    const index = currentTasks.findIndex(
-      (task: Task) => task.id === updatedTask.id,
-    );
-    if (index !== -1) {
-      const newTasks = [...currentTasks];
-      newTasks[index] = updatedTask;
-      this.tasks.set(newTasks);
-      this.applyFilters();
+
+    // update My Tasks if the task exists there
+    const currentMyTasks = this.tasks();
+
+    const myTaskIndex = currentMyTasks.findIndex((task: Task) => task.id === updatedTask.id);
+
+    if (myTaskIndex !== -1) {
+      const updatedMyTasks = [...currentMyTasks];
+      updatedMyTasks[myTaskIndex] = updatedTask;
+
+      this.tasks.set(updatedMyTasks);
     }
+
+    // update Team Tasks if the task exists there
+    const currentTeamTasks = this.teamTasks();
+
+    const teamTaskIndex = currentTeamTasks.findIndex(
+      (task: Task) => task.id === updatedTask.id
+    );
+
+    if (teamTaskIndex !== -1) {
+      const updatedTeamTasks = [...currentTeamTasks];
+      updatedTeamTasks[teamTaskIndex] = updatedTask;
+
+      this.teamTasks.set(updatedTeamTasks);
+    }
+
+    // reapply the filters to the currently selected task view
+    this.applyFilters();
   }
 
   //opens the task detail modal, wired to GET /api/tasks/{taskId} for the full record
@@ -642,6 +932,12 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     this.isDetailOpen.set(false);
     this.selectedTask.set(null);
     this.detailError.set(null);
+
+    // reset the edit state whenever the modal closes
+    this.isEditingTask.set(false);
+    this.isUpdatingTask.set(false);
+    this.updateError.set(null);
+    this.editTask = {};
   }
 
   //this will close modal on escape
@@ -655,5 +951,78 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     if (this.isCreateModalOpen()) {
       this.closeCreateModal();
     }
+  }
+
+  public onJiraToggleChange(): void {
+      if (this.newTask.createJiraIssue && this.newTask.jiraDetails) {
+          this.newTask.jiraDetails.summary = this.newTask.title;
+          this.newTask.jiraDetails.description = this.newTask.description;
+          this.newTask.jiraDetails.dueDate = this.newTask.dueDate;
+          this.newTask.jiraDetails.priority = this.mapPriorityToJira(this.newTask.priority);
+      }
+  }
+
+  private mapPriorityToJira(priority: string): string {
+      const map: Record<string, string> = {
+          'LOW': 'Low',
+          'MEDIUM': 'Medium', 
+          'HIGH': 'High',
+          'CRITICAL': 'Critical'
+      };
+      return map[priority] || 'Medium';
+  }
+
+  public openLinkJiraModal(task: Task): void {
+      this.linkJiraTask = task;
+      this.linkJiraKey = '';
+      this.isLinkJiraOpen.set(true);
+  }
+
+  public closeLinkJiraModal(): void {
+      this.isLinkJiraOpen.set(false);
+      this.linkJiraTask = null;
+      this.linkJiraKey = '';
+  }
+
+  public onLinkJiraSubmit(): void {
+      if (!this.linkJiraTask || !this.linkJiraKey.trim()) return;
+      
+      this.isLinkingJira.set(true);
+      const issueKey = this.linkJiraKey.trim().toUpperCase();
+      
+      this.taskService.linkTaskToJira(this.linkJiraTask.id, issueKey).subscribe({
+          next: () => {
+              this.isLinkingJira.set(false);
+              this.loadTasks();
+              this.closeLinkJiraModal();
+          },
+          error: (error) => {
+              console.error('Failed to link task to Jira:', error);
+              this.isLinkingJira.set(false);
+          }
+      });
+  }
+
+  public onSyncJira(task: Task): void {
+      if (!task.jiraTicketKey) return;
+      
+      this.isSyncingJira.set(true);
+      
+      this.taskService.syncTaskFromJira(task.id).subscribe({
+          next: (updatedTask: TaskResponse) => {
+              const updated = this.mapToTask(updatedTask);
+              this.updateTaskInTaskList(updated);
+              this.isSyncingJira.set(false);
+          },
+          error: (error) => {
+              console.error('Failed to sync with Jira:', error);
+              this.isSyncingJira.set(false);
+          }
+      });
+  }
+
+  public getJiraStatusClass(status: string): string {
+    if (!status) return 'status-unknown';
+    return 'status-' + status.toLowerCase().replace(/ /g, '-');
   }
 }

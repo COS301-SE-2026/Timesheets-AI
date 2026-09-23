@@ -45,10 +45,22 @@ export interface CreateTaskRequest {
   dueDate?: string;
 }
 
+export interface UpdateTaskRequest {
+  title?: string;
+  description?: string;
+  status?: 'TODO' | 'IN_PROGRESS' | 'DONE' | 'BLOCKED';
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  estimatedHours?: number;
+  dueDate?: string;
+  assignedWorkspaceMemberId?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TaskService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = '/api/tasks';
+
+  private readonly apiUrl = '/api'; 
 
   //gets a projects task
   getTasksForProject(projectId: string): Observable<TaskResponse[]> {
@@ -78,6 +90,10 @@ export class TaskService {
       .pipe(catchError(this.handleError('createTask')));
   }
 
+  getTeamTasks(): Observable<TaskResponse[]> {
+    return this.http.get<TaskResponse[]>(`${this.baseUrl}/team-tasks`);
+  }
+
   private handleError(operation: string) {
     return (error: HttpErrorResponse) => {
       console.error(`[TaskService] ${operation} failed:`, {
@@ -87,5 +103,34 @@ export class TaskService {
       });
       return throwError(() => error);
     };
+  }
+
+  // updates the editable fields of an existing task
+  updateTask(taskId: string, request: UpdateTaskRequest): Observable<TaskResponse> {
+    return this.http.patch<TaskResponse>(`${this.baseUrl}/${taskId}`, request).pipe(catchError(this.handleError('updateTask')));
+  }
+
+  linkTaskToJira(taskId: string, issueKey: string): Observable<void> {
+      return this.http.post<void>(
+          `${this.apiUrl}/integrations/jira/tasks/${taskId}/link/${issueKey}`,
+          {}
+      );
+  }
+
+  syncTaskFromJira(taskId: string): Observable<TaskResponse> {
+      return this.http.post<TaskResponse>(
+          `${this.apiUrl}/integrations/jira/tasks/${taskId}/sync`,
+          {}
+      );
+  }
+
+  checkJiraConnection(): Observable<{ connected: boolean }> {
+      return this.http.get<{ connected: boolean }>(`${this.apiUrl}/integrations/jira/status`)
+          .pipe(catchError(this.handleError('checkJiraConnection')));
+  }
+
+  connectJira(): Observable<string> {
+      return this.http.get(`${this.apiUrl}/integrations/jira/connect`, { responseType: 'text' })
+          .pipe(catchError(this.handleError('connectJira')));
   }
 }

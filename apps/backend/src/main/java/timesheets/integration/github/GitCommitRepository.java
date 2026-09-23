@@ -5,14 +5,13 @@ Author: Zamokuhle Zwane
 Date: 02/09/2026
 */
 
-package timesheets.repository;
+package timesheets.integration.github;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import timesheets.domain.GitCommit;
 
 @Repository
 public interface GitCommitRepository extends JpaRepository<GitCommit, UUID> {
