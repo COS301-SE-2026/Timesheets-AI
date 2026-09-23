@@ -77,6 +77,12 @@ def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | Non
 
     risk = _calculate_risk(budget, schedule, task_progress)
 
+    confidence = _calculate_forecast_confidence(
+        project,
+        tasks,
+        velocity_data,
+    )
+
     return {
         "project_id": project.id,
         "project_name": project.name,
@@ -90,6 +96,7 @@ def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | Non
             "has_sufficient_data": velocity_data["has_sufficient_data"],
         },
         "risk": risk,
+        "confidence": confidence,
     }
 
 
@@ -381,4 +388,70 @@ def _calculate_risk(
         "schedule": schedule_risk,
         "task_progress": task_progress_risk,
         "overall": overall,
+    }
+
+
+def _calculate_forecast_confidence(
+    project: Project,
+    tasks: list[Task],
+    velocity_data: dict,
+) -> dict:
+    """
+    - this will check how much data was available for the forcast
+    - each of the data add to the confidence level
+    - I recoord the missing data so that the manager can see why the confidence is lower
+    """
+
+    evidence_available = 0
+    missing_evidence = []
+
+    # both the dates are needed to compare the progress with the planned timeline, so if missing added to the missing var
+    if project.start_date is not None and project.end_date is not None:
+        evidence_available += 1
+    else:
+        missing_evidence.append("PROJECT_DATES")
+
+    # the budget hours will be needed to see if a project goes over the allocated time
+    if project.budget_hours is not None and float(project.budget_hours) > 0:
+        evidence_available += 1
+    else:
+        missing_evidence.append("BUDGET_HOURS")
+
+    # tasks are needed to calculate how much of the project work is done
+    if tasks:
+        evidence_available += 1
+    else:
+        missing_evidence.append("TASKS")
+
+    # the unfinished tasks have estimates to let the manager know how much work is left
+    incomplete_tasks = [task for task in tasks if task.status != "DONE"]
+
+    if incomplete_tasks and all(task.estimated_hours is not None for task in incomplete_tasks):
+        evidence_available += 1
+    elif not incomplete_tasks and tasks:
+        evidence_available += 1
+    else:
+        missing_evidence.append("TASK_ESTIMATES")
+
+    # this will check whether there was enough recent logged time to calculate the team velocity
+    if velocity_data["has_sufficient_data"]:
+        evidence_available += 1
+    else:
+        missing_evidence.append("RECENT_VELOCITY")
+
+    evidence_total = 5
+
+    # if there is not enough data then I cannot have strong confidence in the forecast
+    if evidence_available >= 5:
+        level = "HIGH"
+    elif evidence_available >= 3:
+        level = "MEDIUM"
+    else:
+        level = "LOW"
+
+    return {
+        "level": level,
+        "evidence_available": evidence_available,
+        "evidence_total": evidence_total,
+        "missing_evidence": missing_evidence,
     }

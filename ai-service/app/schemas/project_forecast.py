@@ -76,6 +76,14 @@ class ProjectRisk(BaseModel):
     overall: str
 
 
+class ProjectForecastConfidence(BaseModel):
+    # this is to show how much data there was to forecast a project
+    level: str
+    evidence_available: int
+    evidence_total: int
+    missing_evidence: list[str]
+
+
 class ProjectForecastResponse(BaseModel):
     """
     - the response should be split into budget, schedule, task progress, velocity and risk sections
@@ -88,5 +96,6 @@ class ProjectForecastResponse(BaseModel):
     tasks: ProjectTaskProgress
     velocity: ProjectVelocity
     risk: ProjectRisk
+    confidence: ProjectForecastConfidence
 
     model_config = {"from_attributes": True}
