@@ -61,6 +61,8 @@ class ProjectVelocity(BaseModel):
 
     recent_hours_per_week: float
     lookback_days: int
+    hours_in_period: float
+    has_sufficient_data: bool
 
 
 class ProjectRisk(BaseModel):

@@ -36,6 +36,7 @@ from app.models.time_entry import TimeEntry
 # choosing this window so we see how a team is doing for an extended period of time
 LOOKBACK_DAYS = 14
 MIN_WEEKLY_VELOCITY_HOURS = 1.0
+MIN_RECENT_ACTIVITY_HOURS = 1.0
 
 BUDGET_WARNING_THRESHOLD_PERCENT = 5.0
 BUDGET_AT_RISK_THRESHOLD_PERCENT = 15.0
@@ -60,7 +61,9 @@ def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | Non
 
     used_hours = _get_used_hours(db, project_id)
     task_progress = _calculate_task_progress(tasks)
-    weekly_velocity = _get_recent_team_velocity(db, project_id)
+
+    velocity_data = _get_recent_team_velocity(db, project_id)
+    weekly_velocity = velocity_data["weekly_velocity"]
 
     forecast_end_date = _calculate_forecast_end_date(
         task_progress["estimated_remaining_hours"], weekly_velocity
@@ -83,6 +86,8 @@ def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | Non
         "velocity": {
             "recent_hours_per_week": round(weekly_velocity, 2),
             "lookback_days": LOOKBACK_DAYS,
+            "hours_in_period": velocity_data["hours_in_period"],
+            "has_sufficient_data": velocity_data["has_sufficient_data"],
         },
         "risk": risk,
     }
@@ -143,7 +148,7 @@ def _calculate_task_progress(tasks: list[Task]) -> dict:
     }
 
 
-def _get_recent_team_velocity(db: Session, project_id: uuid.UUID) -> float:
+def _get_recent_team_velocity(db: Session, project_id: uuid.UUID) -> dict:
     """
     - should calculate the recent velocity of a team in a project
     - looks at the hours logged by active members for 14 days
@@ -178,7 +183,16 @@ def _get_recent_team_velocity(db: Session, project_id: uuid.UUID) -> float:
 
     # this will convert the hours from the 14-day period into an average weekly pace
     weekly_velocity = hours_in_period * (7 / LOOKBACK_DAYS)
-    return max(weekly_velocity, MIN_WEEKLY_VELOCITY_HOURS)
+    has_sufficient_data = hours_in_period >= MIN_RECENT_ACTIVITY_HOURS
+
+    return {
+        "weekly_velocity": max(
+            weekly_velocity,
+            MIN_WEEKLY_VELOCITY_HOURS,
+        ),
+        "hours_in_period": round(hours_in_period, 2),
+        "has_sufficient_data": has_sufficient_data,
+    }
 
 
 def _calculate_forecast_end_date(
