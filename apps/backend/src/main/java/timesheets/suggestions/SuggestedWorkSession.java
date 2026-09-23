@@ -3,6 +3,7 @@ package timesheets.suggestions;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.List;
 import lombok.Data;
 import timesheets.evidence.EvidenceEvent;
 
