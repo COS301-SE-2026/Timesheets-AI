@@ -12,6 +12,36 @@
     margin: 0 auto;
 }
 
+// tabs for switching between manager's own tasks and team tasks
+.task-tabs {
+  display: flex;
+  gap: var(--space-6);
+  margin-bottom: var(--space-4);
+
+  button {
+    background: none;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-weight: var(--font-weight-semibold);
+    padding: var(--space-2) 0;
+
+    &.active {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    span {
+      background: var(--color-gray-light);
+      border-radius: var(--radius-pill);
+      font-size: var(--font-size-caption);
+      margin-left: var(--space-1);
+      padding: var(--space-2);
+    }
+  }
+}
+
 // Page header
 .page-header {
     display: flex;
@@ -482,6 +512,7 @@ tbody {
     position: relative;
     display: inline-block;
     width: 100%;
+    min-width: 120px;
 }
     
     .status-dropdown {
