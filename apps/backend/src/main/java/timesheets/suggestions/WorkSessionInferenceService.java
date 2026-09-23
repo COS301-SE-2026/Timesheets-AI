@@ -25,6 +25,7 @@ public class WorkSessionInferenceService {
       }
 
       SuggestedWorkSession session = createSession(group);
+      suggestionService.save(session);
       sessions.add(session);
     }
 

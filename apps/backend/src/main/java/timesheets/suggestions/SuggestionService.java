@@ -31,40 +31,44 @@ public class SuggestionService {
     throw new RuntimeException("No suggestion found:" + suggestion);
   }
 
-  public SuggestedWorkSession save(SuggestedWorkSession suggestion){
+  public SuggestedWorkSession save(SuggestedWorkSession suggestion) {
     suggestions.add(suggestion);
     return suggestion;
   }
 
-   public SuggestedWorkSession approve(UUID suggestionId){
+  public SuggestedWorkSession approve(UUID suggestionId) {
     SuggestedWorkSession suggestion = getSuggestion(suggestionId);
     suggestion.setStatus(SuggestionStatus.APPROVED);
 
     return suggestion;
-   }
+  }
 
-   public SuggestedWorkSession reject(UUID suggestionId){
+  public SuggestedWorkSession reject(UUID suggestionId) {
     SuggestedWorkSession suggestion = getSuggestion(suggestionId);
     suggestion.setStatus(SuggestionStatus.REJECTED);
 
     return suggestion;
-   }
+  }
 
-   public SuggestedWorkSession edit(UUID suggestionId, String title, java.time.LocalDateTime startTime, java.time.LocalDateTime endTime){
+  public SuggestedWorkSession edit(
+      UUID suggestionId,
+      String title,
+      java.time.LocalDateTime startTime,
+      java.time.LocalDateTime endTime) {
     SuggestedWorkSession suggestion = getSuggestion(suggestionId);
 
     suggestion.setTitle(title);
     suggestion.setStartTime(startTime);
     suggestion.setEndTime(endTime);
 
-    if (startTime != null && endTime != null){
-        long minutes = java.time.Duration.between(startTime, endTime).toMinutes();
+    if (startTime != null && endTime != null) {
+      long minutes = java.time.Duration.between(startTime, endTime).toMinutes();
 
-        suggestion.setDurationMinutes((int) minutes);
+      suggestion.setDurationMinutes((int) minutes);
     }
 
     suggestion.setStatus(SuggestionStatus.EDITED);
 
     return suggestion;
-   }
+  }
 }
