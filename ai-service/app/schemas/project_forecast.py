@@ -37,6 +37,7 @@ class ProjectScheduleForecast(BaseModel):
     planned_end_date: date | None
     forecast_end_date: date | None
     delay_days: int | None
+    timeline_progress_percentage: float | None
 
 
 class ProjectTaskProgress(BaseModel):

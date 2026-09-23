@@ -239,15 +239,29 @@ def _calculate_schedule_forecast(
 ) -> dict:
     """
     - this should compare the forecast completion date with the planned one
+    - I have also now added timeline progress to later compare it to task completion for better risk calculation
     """
     planned_end_date = project.end_date
     delay_days = None
+    timeline_progress_percentage = None
 
     if planned_end_date is not None:
         delay_days = max(
             (forecast_end_date - planned_end_date).days,
             0,
         )
+
+    # both dates will be needed to see how much of the project timeline has passed
+    if project.start_date is not None and planned_end_date is not None:
+        total_project_days = (planned_end_date - project.start_date).days
+        elapsed_project_days = (date.today() - project.start_date).days
+
+        if total_project_days > 0:
+            timeline_progress_percentage = (elapsed_project_days / total_project_days) * 100
+            timeline_progress_percentage = max(
+                0.0,
+                min(timeline_progress_percentage, 100.0),
+            )
 
     return {
         "start_date": project.start_date,
@@ -280,13 +294,26 @@ def _calculate_risk(
     if schedule["planned_end_date"] is not None:
         schedule_risk = "AT_RISK" if (schedule["delay_days"] or 0) > 0 else "HEALTHY"
 
-    # for now I want projects below 50% task completion to recieve a warning
+    # compares task completion against how much of the planned project timeline has passed
+    timeline_progress = schedule["timeline_progress_percentage"]
+    completion_percentage = task_progress["completion_percentage"]
+
     if task_progress["total_tasks"] == 0:
         task_progress_risk = "UNKNOWN"
-    elif task_progress["completion_percentage"] < 50:
-        task_progress_risk = "WARNING"
+
+    # if there are no project dates, keep the original task progress rule as a fallback
+    elif timeline_progress is None:
+        task_progress_risk = "WARNING" if completion_percentage < 50 else "HEALTHY"
+
     else:
-        task_progress_risk = "HEALTHY"
+        progress_gap = timeline_progress - completion_percentage
+
+        if progress_gap <= 0:
+            task_progress_risk = "HEALTHY"
+        elif progress_gap < 20:
+            task_progress_risk = "WARNING"
+        else:
+            task_progress_risk = "AT_RISK"
 
     known_risks = [
         budget_risk,
