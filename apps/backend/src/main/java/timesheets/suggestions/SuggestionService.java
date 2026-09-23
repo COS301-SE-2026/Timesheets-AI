@@ -30,4 +30,9 @@ public class SuggestionService {
 
     throw new RuntimeException("No suggestion found:" + suggestion);
   }
+
+  public SuggestedWorkSession save(SuggestedWorkSession suggestion){
+    suggestions.add(suggestion);
+    return suggestion;
+  }
 }
