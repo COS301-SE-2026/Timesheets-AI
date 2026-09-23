@@ -53,10 +53,10 @@
                     <strong class="timer-value">
                         {{formatDuration(timerSeconds()) }}
                     </strong>
-                    @if (timer.project?.name || timer.task?.title) {
+                    @if (timer.project.name || timer.task.title) {
                         <p class="context">
-                            {{ timer.project?.name || "No project" }}
-                            {{ timer.task?.title || "No task selected" }}
+                            {{ timer.project.name || "No project" }}
+                            {{ timer.task.title || "No task selected" }}
                         </p>
                     }
                     <div class="timer-actions">
@@ -346,12 +346,14 @@
     <!-- Timer stopped modal -->
 
     @if (showTimerStoppedModal()) {
-        <div class="modal-backdrop" (click)="closeTimerStoppedModal()">
-            <section
+        <div class="modal-backdrop" (click)="closeTimerStoppedModal()" (keydown)="closeTimerStoppedModal()">
+            <dialog
                 class="success-modal"
-                role="dialog"
-                aria-modal="true"
-                (click)="$event.stopPropagation()">
+                [open]="showTimerStoppedModal()"
+                aria-labelledby="timer-stopped-title"
+                aria-describedby="timer-stopped-description"
+                (click)="$event.stopPropagation()"
+                (keydown)="$event.stopPropagation()">
                 
             <span class="icon-orb green">
                 <i class="fa-solid fa-check"></i>
@@ -361,7 +363,7 @@
             <button type="button" class="primary-button" (click)="closeTimerStoppedModal()">
                 Close
             </button>
-            </section>
+            </dialog>
         </div>
     }
 
