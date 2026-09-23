@@ -44,6 +44,8 @@ BUDGET_AT_RISK_THRESHOLD_PERCENT = 15.0
 SCHEDULE_WARNING_DELAY_DAYS = 3
 SCHEDULE_AT_RISK_DELAY_DAYS = 7
 
+MIN_TASK_ESTIMATE_COVERAGE = 0.80
+
 
 def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | None:
     """
@@ -423,21 +425,39 @@ def _calculate_forecast_confidence(
     else:
         missing_evidence.append("TASKS")
 
-    # the unfinished tasks have estimates to let the manager know how much work is left
+    # the unfinished tasks are the ones affecting the forecast
     incomplete_tasks = [task for task in tasks if task.status != "DONE"]
 
-    if incomplete_tasks and all(task.estimated_hours is not None for task in incomplete_tasks):
+    estimated_incomplete_tasks = [
+        task for task in incomplete_tasks if task.estimated_hours is not None
+    ]
+
+    # if all tasks are already complete, estimates for remaining work are no longer needed
+    if not incomplete_tasks and tasks:
+        estimate_coverage_percentage = 100.0
         evidence_available += 1
-    elif not incomplete_tasks and tasks:
-        evidence_available += 1
+
+    # if there are unfinished tasks, check how many of them have estimates
+    elif incomplete_tasks:
+        estimate_coverage = len(estimated_incomplete_tasks) / len(incomplete_tasks)
+        estimate_coverage_percentage = round(estimate_coverage * 100, 2)
+
+        # enough of the remaining tasks have estimates to support the forecast
+        if estimate_coverage >= MIN_TASK_ESTIMATE_COVERAGE:
+            evidence_available += 1
+        else:
+            missing_evidence.append("TASK_ESTIMATES")
+
+    # there are no tasks so there cannot be any task estimate evidence
     else:
+        estimate_coverage_percentage = 0.0
         missing_evidence.append("TASK_ESTIMATES")
 
-    # this will check whether there was enough recent logged time to calculate the team velocity
-    if velocity_data["has_sufficient_data"]:
-        evidence_available += 1
-    else:
-        missing_evidence.append("RECENT_VELOCITY")
+        # this will check whether there was enough recent logged time to calculate the team velocity
+        if velocity_data["has_sufficient_data"]:
+            evidence_available += 1
+        else:
+            missing_evidence.append("RECENT_VELOCITY")
 
     evidence_total = 5
 
@@ -454,4 +474,5 @@ def _calculate_forecast_confidence(
         "evidence_available": evidence_available,
         "evidence_total": evidence_total,
         "missing_evidence": missing_evidence,
+        "task_estimate_coverage_percentage": estimate_coverage_percentage,
     }

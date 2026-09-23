@@ -82,6 +82,7 @@ class ProjectForecastConfidence(BaseModel):
     evidence_available: int
     evidence_total: int
     missing_evidence: list[str]
+    task_estimate_coverage_percentage: float
 
 
 class ProjectForecastResponse(BaseModel):
