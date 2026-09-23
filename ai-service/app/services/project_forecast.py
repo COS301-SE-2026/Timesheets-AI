@@ -43,7 +43,9 @@ def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | Non
     - this is the main function, it is what will bring the project, its tasks, and calculate the different forecast sections
     """
 
-    project = db.query(Project).filter(Project.id == project_id, Project.is_deleted.is_(False)).first()
+    project = (
+        db.query(Project).filter(Project.id == project_id, Project.is_deleted.is_(False)).first()
+    )
 
     if project is None:
         return None
@@ -54,9 +56,13 @@ def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | Non
     task_progress = _calculate_task_progress(tasks)
     weekly_velocity = _get_recent_team_velocity(db, project_id)
 
-    forecast_end_date = _calculate_forecast_end_date(task_progress["estimated_remaining_hours"], weekly_velocity)
+    forecast_end_date = _calculate_forecast_end_date(
+        task_progress["estimated_remaining_hours"], weekly_velocity
+    )
 
-    budget = _calculate_budget_forecast(project, used_hours, task_progress["estimated_remaining_hours"])
+    budget = _calculate_budget_forecast(
+        project, used_hours, task_progress["estimated_remaining_hours"]
+    )
 
     schedule = _calculate_schedule_forecast(project, forecast_end_date)
 
@@ -84,12 +90,228 @@ def _get_used_hours(db: Session, project_id: uuid.UUID) -> float:
     """
 
     # adds together the duration of all valid time entries belonging to the project
-    total_seconds = db.query(func.coalesce(func.sum(TimeEntry.duration_seconds), 0)).filter(
-        TimeEntry.project_id == project_id,
-        TimeEntry.is_deleted.is_(False),
-        TimeEntry.duration_seconds.isnot(None),
-    ).scalar()
+    total_seconds = (
+        db.query(func.coalesce(func.sum(TimeEntry.duration_seconds), 0))
+        .filter(
+            TimeEntry.project_id == project_id,
+            TimeEntry.is_deleted.is_(False),
+            TimeEntry.duration_seconds.isnot(None),
+        )
+        .scalar()
+    )
 
-    # duration stored in seconds so we divide by 3600, 
+    # duration stored in seconds so we divide by 3600,
     return round(float(total_seconds) / 3600, 2)
 
+
+def _calculate_task_progress(tasks: list[Task]) -> dict:
+    """
+    - calculates the total number of hours logged for the project
+    - using the time entries are used cause they have the actual time
+    - I am making sure that time entries and entries without a duration should not be included
+    """
+    total_tasks = len(tasks)
+
+    completed_tasks = sum(1 for task in tasks if task.status == "DONE")
+    remaining_tasks = total_tasks - completed_tasks
+
+    completion_percentage = (completed_tasks / total_tasks) * 100 if total_tasks > 0 else 0.0
+    estimated_remaining_hours = 0.0
+
+    for task in tasks:
+        if task.status == "DONE":
+            continue
+
+        # if estimated hours has no number 0 should be used to maintain consistency
+        estimated = float(task.estimated_hours or 0)
+        actual = float(task.actual_hours or 0)
+
+        estimated_remaining_hours += max(estimated - actual, 0)
+
+    return {
+        "total_tasks": total_tasks,
+        "completed_tasks": completed_tasks,
+        "remaining_tasks": remaining_tasks,
+        "completion_percentage": round(completion_percentage, 2),
+        "estimated_remaining_hours": round(estimated_remaining_hours, 2),
+    }
+
+
+def _get_recent_team_velocity(db: Session, project_id: uuid.UUID) -> float:
+    """
+    - should calculate the recent velocity of a team in a project
+    - looks at the hours logged by active members for 14 days
+    - these hours then get converted into a weekly rate
+    - the weekly velocity helps to estimate how long remaining work can take
+    """
+    since = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=LOOKBACK_DAYS)
+
+    # I do not want members who are not active to contribute to the team velocity
+    active_member_ids = (
+        db.query(ProjectMember.workspace_member_id)
+        .filter(
+            ProjectMember.project_id == project_id,
+            ProjectMember.is_active.is_(True),
+        )
+        .subquery()
+    )
+
+    total_seconds = (
+        db.query(func.coalesce(func.sum(TimeEntry.duration_seconds), 0))
+        .filter(
+            TimeEntry.project_id == project_id,
+            TimeEntry.workspace_member_id.in_(active_member_ids),
+            TimeEntry.is_deleted.is_(False),
+            TimeEntry.duration_seconds.isnot(None),
+            TimeEntry.start_time >= since,
+        )
+        .scalar()
+    )
+
+    hours_in_period = float(total_seconds) / 3600
+
+    # this will convert the hours from the 14-day period into an average weekly pace
+    weekly_velocity = hours_in_period * (7 / LOOKBACK_DAYS)
+    return max(weekly_velocity, MIN_WEEKLY_VELOCITY_HOURS)
+
+
+def _calculate_forecast_end_date(
+    remaining_hours: float,
+    weekly_velocity: float,
+) -> date:
+    """
+    - this will estimate when the remaining project work should be completed
+    - it will use the remaining estimated hours and the teams recent weekly activity
+    - I divide the weekly velocity to estimate how many weeks of work is left
+    """
+    if remaining_hours <= 0:
+        return date.today()
+
+    weeks_remaining = remaining_hours / weekly_velocity
+    days_remaining = weeks_remaining * 7
+
+    return date.today() + timedelta(days=round(days_remaining))
+
+
+def _calculate_budget_forecast(
+    project: Project,
+    used_hours: float,
+    remaining_estimated_hours: float,
+) -> dict:
+    """
+    - calculate the hour budget forecast for the project
+    - combines the hours already logged with estimate hours remaining
+    - helps to see if the project will go over the allocated hours
+    """
+    budget_hours = float(project.budget_hours) if project.budget_hours is not None else None
+
+    forecast_total_hours = used_hours + remaining_estimated_hours
+
+    # if the project does not have budget hours then I cannot calculate the remaining
+    # doing this so that I can handle all types of projects so that all kinds of projects are handled
+    if budget_hours is None:
+        remaining_budget_hours = None
+        forecast_overrun_hours = None
+    else:
+        remaining_budget_hours = budget_hours - used_hours
+        forecast_overrun_hours = max(
+            forecast_total_hours - budget_hours,
+            0,
+        )
+        # I want to prevent an under budget from giving negative
+
+    return {
+        "budget_hours": budget_hours,
+        "used_hours": round(used_hours, 2),
+        "remaining_budget_hours": (
+            round(remaining_budget_hours, 2) if remaining_budget_hours is not None else None
+        ),
+        "forecast_total_hours": round(forecast_total_hours, 2),
+        "forecast_overrun_hours": (
+            round(forecast_overrun_hours, 2) if forecast_overrun_hours is not None else None
+        ),
+    }
+
+
+def _calculate_schedule_forecast(
+    project: Project,
+    forecast_end_date: date,
+) -> dict:
+    """
+    - this should compare the forecast completion date with the planned one
+    """
+    planned_end_date = project.end_date
+    delay_days = None
+
+    if planned_end_date is not None:
+        delay_days = max(
+            (forecast_end_date - planned_end_date).days,
+            0,
+        )
+
+    return {
+        "start_date": project.start_date,
+        "planned_end_date": planned_end_date,
+        "forecast_end_date": forecast_end_date,
+        "delay_days": delay_days,
+    }
+
+
+def _calculate_risk(
+    budget: dict,
+    schedule: dict,
+    task_progress: dict,
+) -> dict:
+    """
+    - my helper func to create the risk indicators for the project
+    - this will look at the budget forecast, schedule forecast and task progress individually
+    - then I combine the risks into a final project risk
+    - NOTE: I want to eventually improve them with GitHub, Jira, Calendar
+    """
+    budget_risk = "UNKNOWN"
+
+    # if the project has a budget hours and the forecast says it will exceed those hours
+    if budget["budget_hours"] is not None:
+        budget_risk = "AT_RISK" if (budget["forecast_overrun_hours"] or 0) > 0 else "HEALTHY"
+
+    schedule_risk = "UNKNOWN"
+
+    # if the project has an end date, and the forecast says it will finish after that date
+    if schedule["planned_end_date"] is not None:
+        schedule_risk = "AT_RISK" if (schedule["delay_days"] or 0) > 0 else "HEALTHY"
+
+    # for now I want projects below 50% task completion to recieve a warning
+    if task_progress["total_tasks"] == 0:
+        task_progress_risk = "UNKNOWN"
+    elif task_progress["completion_percentage"] < 50:
+        task_progress_risk = "WARNING"
+    else:
+        task_progress_risk = "HEALTHY"
+
+    known_risks = [
+        budget_risk,
+        schedule_risk,
+        task_progress_risk,
+    ]
+
+    """
+    - if it has at risk at all, overall project is at risk
+    - if there is nothing at risk, but there is a warning then it gets a warning
+    - if all of them cannot be calculated then overall unknown
+    - otherwise healthy
+    """
+    if "AT_RISK" in known_risks:
+        overall = "AT_RISK"
+    elif "WARNING" in known_risks:
+        overall = "WARNING"
+    elif all(risk == "UNKNOWN" for risk in known_risks):
+        overall = "UNKNOWN"
+    else:
+        overall = "HEALTHY"
+
+    return {
+        "budget": budget_risk,
+        "schedule": schedule_risk,
+        "task_progress": task_progress_risk,
+        "overall": overall,
+    }
