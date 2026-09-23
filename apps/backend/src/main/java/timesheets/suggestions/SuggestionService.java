@@ -35,4 +35,18 @@ public class SuggestionService {
     suggestions.add(suggestion);
     return suggestion;
   }
+
+   public SuggestedWorkSession approve(UUID suggestionId){
+    SuggestedWorkSession suggestion = getSuggestion(suggestionId);
+    suggestion.setStatus(SuggestionStatus.APPROVED);
+
+    return suggestion;
+   }
+
+   public SuggestedWorkSession reject(UUID suggestionId){
+    SuggestedWorkSession suggestion = getSuggestion(suggestionId);
+    suggestion.setStatus(SuggestionStatus.REJECTED);
+
+    return suggestion;
+   }
 }
