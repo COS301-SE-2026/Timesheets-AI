@@ -5,7 +5,7 @@ Author: Zamokuhle Zwane
 Date: 03/09/2026
 */
 
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { ChartConfiguration } from 'chart.js';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -27,7 +27,7 @@ type DevScope = 'overall' | 'project';
   templateUrl: './developer-insights.component.html',
   styleUrl: './developer-insights.component.scss'
 })
-export class DeveloperInsightsComponent {
+export class DeveloperInsightsComponent implements OnInit {
   private readonly insightsService = inject(InsightsService);
   private readonly adapter = inject(InsightsAdapterService);
   private readonly githubService = inject(GithubIntegrationService);
