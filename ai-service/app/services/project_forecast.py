@@ -40,6 +40,9 @@ MIN_WEEKLY_VELOCITY_HOURS = 1.0
 BUDGET_WARNING_THRESHOLD_PERCENT = 5.0
 BUDGET_AT_RISK_THRESHOLD_PERCENT = 15.0
 
+SCHEDULE_WARNING_DELAY_DAYS = 3
+SCHEDULE_AT_RISK_DELAY_DAYS = 7
+
 
 def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | None:
     """
@@ -308,7 +311,14 @@ def _calculate_risk(
 
     # if the project has an end date, and the forecast says it will finish after that date
     if schedule["planned_end_date"] is not None:
-        schedule_risk = "AT_RISK" if (schedule["delay_days"] or 0) > 0 else "HEALTHY"
+        delay_days = schedule["delay_days"] or 0
+
+        if delay_days >= SCHEDULE_AT_RISK_DELAY_DAYS:
+            schedule_risk = "AT_RISK"
+        elif delay_days >= SCHEDULE_WARNING_DELAY_DAYS:
+            schedule_risk = "WARNING"
+        else:
+            schedule_risk = "HEALTHY"
 
     # compares task completion against how much of the planned project timeline has passed
     timeline_progress = schedule["timeline_progress_percentage"]
