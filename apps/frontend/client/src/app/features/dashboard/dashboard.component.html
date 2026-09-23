@@ -2,7 +2,7 @@
 
     <header class="page-header">
             <div>
-                <h1>{{ greeting() }}, {{ firstName() }}</h1>
+                <h1>{{ greeting() }}, <span class="greeting-name">{{ firstName() }}</span></h1>
                 <p class="page-subtitle">
                     {{
                         isManagerView()
@@ -103,7 +103,7 @@
                             <i class="fa-solid fa-user-clock"></i>
                         </span>
                         <div>
-                            <h2>Waiting for worskapce</h2>
+                            <h2>Waiting for workskapce</h2>
                             <p>Members awaiting workspace access</p>
                         </div>
                     </div>
@@ -112,6 +112,7 @@
                         Open waiting room
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
+                    <i class="fa-solid fa-users dashboard-illustration dashboard-illustration--waiting" aria-hidden="true"></i>
                 </article>
             }
 
@@ -132,6 +133,7 @@
                     View projects
                     <i class="fa-solid fa-arrow-right"></i>
                 </a>
+                <i class="fa-solid fa-folder dashboard-illustration dashboard-illustration--project" aria-hidden="true"></i>
             </article>
          
             <!-- Tasks summary card -->
@@ -209,6 +211,7 @@
                         Nothing else scheduled for today.
                     </div>
                 }
+                <i class="fa-regular fa-calendar-days dashboard-illustration dashboard-illustration--calendar" aria-hidden="true"></i>
             </article>
             <!-- Hours logged summary card -->
              @if (!isAdminView()) {
@@ -320,7 +323,7 @@
                                         {{ project.teamLeads.join(', ')}}
                                     </p>
                                     <p class="project-members">
-                                        <i class="fa-solid fa-user" aria-hidden="true"></i>
+                                        <i class="fa-solid fa-users" aria-hidden="true"></i>
                                         {{ project.memberCount }} {{ project.memberCount === 1 ? 'member' : 'members'}}
                                     </p>
                                 </div>
