@@ -17,6 +17,13 @@ export const routes: Routes = [
     component: LandingPageComponent,
   },
 
+  {
+    path: 'auth/microsoft-redirect',
+    loadComponent: () =>
+      import('./features/microsoft-redirect/microsoft-redirect.component')
+        .then((m) => m.MicrosoftRedirectComponent),
+  },
+
   /* Log Time page */
   {
     path: 'log-time',
@@ -107,11 +114,19 @@ export const routes: Routes = [
       import('./features/onboarding/waiting-for-workspace/waiting-for-workspace.component')
         .then(m => m.WaitingForWorkspaceComponent)
   },
+  // CALENDER PAGE LINK
   {
     path: 'calendar',
     loadComponent: () =>
       import('./features/calendar/calendar.component')
         .then(m => m.CalendarComponent)
+  },
+  // SETTINGS PAGE ROUTE LINK
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('./features/settings/settings.component')
+        .then(m => m.SettingsComponent)
   },
 
   {
@@ -144,6 +159,7 @@ export const routes: Routes = [
 
   {
     path: 'dashboard',
+    canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
       import('./features/dashboard/dashboard.component')
         .then(m => m.DashboardComponent)

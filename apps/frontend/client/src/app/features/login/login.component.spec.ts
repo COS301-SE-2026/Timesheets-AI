@@ -321,19 +321,6 @@ describe('LoginComponet', () => {
     jest.useRealTimers();
   });
 
-  it('onSocialLogin should show a "not available yet" toast naming the provider', () => {
-    const comp = component as unknown as LoginComponentInternals & {
-      onSocialLogin(provider: string): void;
-    };
-
-    comp.onSocialLogin('Microsoft');
-
-    expect(comp.showToast).toBe(true);
-    expect(comp.toastMessage).toBe(
-      'Microsoft login is not available yet, use email and password.',
-    );
-  });
-
 
   describe('handleGoogleCredential (via the Google Identity callback)', () => {
     //ngAfterViewInit passes handleGoogleCredential in as the `callback` option to google.accounts.id.initialize(), which we've stubbed with jest.fn()

@@ -10,10 +10,13 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class JiraIssueResponse {
+public class IssueResponse {
+
+  // making this provider-neutral
+  // summary changed to title (more provider-neutral)
 
   private String key;
-  private String summary;
+  private String title;
   private String status;
   private String issueType;
 

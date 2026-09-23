@@ -38,6 +38,13 @@ public class WorkspaceMember {
   @Column(name = "joined_at")
   private LocalDateTime joinedAt;
 
+  @Column(name = "is_active", nullable = false)
+  @Builder.Default
+  private Boolean isActive = true;
+
+  @Column(name = "removed_at")
+  private LocalDateTime removedAt;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
@@ -51,6 +58,10 @@ public class WorkspaceMember {
 
     if (joinedAt == null) {
       joinedAt = LocalDateTime.now();
+    }
+
+    if (isActive == null) {
+      isActive = true;
     }
   }
 

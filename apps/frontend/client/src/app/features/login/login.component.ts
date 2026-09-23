@@ -146,10 +146,29 @@ export class LoginComponent implements AfterViewInit {
       },
     });
   }
-  protected onSocialLogin(provider: string): void {
-    this.showDemoToast(
-      `${provider} login is not available yet, use email and password.`,
-    );
+
+  protected async loginWithMicrosoft(): Promise<void> {
+    this.loading = true;
+    this.errorMessage = '';
+
+    try {
+      const res = await this.authService.microsoftAuth();
+
+      this.loading = false;
+
+      if (res.requiresMfa) {
+        this.showDemoToast('MFA is not supported in the UI yet.');
+        return;
+      }
+
+      this.router.navigate(['/dashboard']);
+
+    } 
+    catch (error) {
+      this.loading = false;
+
+      this.errorMessage = error instanceof Error ? error.message : 'Microsoft login failed.';
+    }
   }
 
   // Submit handler

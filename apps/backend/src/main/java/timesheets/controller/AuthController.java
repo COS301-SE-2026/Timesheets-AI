@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import timesheets.dto.request.AuthRequest;
 import timesheets.dto.request.GoogleAuthRequest;
+import timesheets.dto.request.MicrosoftAuthRequest;
 import timesheets.dto.request.PasswordRequest;
 import timesheets.dto.request.RegisterRequest;
 import timesheets.dto.response.AuthResponse;
@@ -94,6 +95,13 @@ public class AuthController {
   @PostMapping("/google")
   public ResponseEntity<AuthResponse> googleAuth(@Valid @RequestBody GoogleAuthRequest request) {
     AuthResponse response = authService.googleAuth(request);
+    return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/microsoft")
+  public ResponseEntity<AuthResponse> microsoftAuth(
+      @Valid @RequestBody MicrosoftAuthRequest request) {
+    AuthResponse response = authService.microsoftAuth(request);
     return ResponseEntity.ok(response);
   }
 

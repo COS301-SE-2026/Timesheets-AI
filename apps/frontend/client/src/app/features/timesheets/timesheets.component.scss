@@ -569,6 +569,16 @@
   filter: brightness(0.95);
 }
 
+.btn--ai {
+  background: tokens.$color-secondary;
+  border-color: tokens.$color-secondary;
+  color: tokens.$color-text-inverse;
+}
+
+.btn--ai:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
 .page-tabs {
   margin-bottom: tokens.$space-2;
 }
