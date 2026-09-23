@@ -37,6 +37,9 @@ from app.models.time_entry import TimeEntry
 LOOKBACK_DAYS = 14
 MIN_WEEKLY_VELOCITY_HOURS = 1.0
 
+BUDGET_WARNING_THRESHOLD_PERCENT = 5.0
+BUDGET_AT_RISK_THRESHOLD_PERCENT = 15.0
+
 
 def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | None:
     """
@@ -284,9 +287,22 @@ def _calculate_risk(
     """
     budget_risk = "UNKNOWN"
 
-    # if the project has a budget hours and the forecast says it will exceed those hours
+    # if the project has budget hours, compare the forecast total with the allocated hours
     if budget["budget_hours"] is not None:
-        budget_risk = "AT_RISK" if (budget["forecast_overrun_hours"] or 0) > 0 else "HEALTHY"
+        budget_hours = budget["budget_hours"]
+        forecast_overrun_hours = budget["forecast_overrun_hours"] or 0
+
+        # I should treat the overrun differently
+        # for example if budget = 100 hours, 105 hour is different from 160 hours
+        if budget_hours > 0:
+            budget_overrun_percentage = (forecast_overrun_hours / budget_hours) * 100
+
+            if budget_overrun_percentage >= BUDGET_AT_RISK_THRESHOLD_PERCENT:
+                budget_risk = "AT_RISK"
+            elif budget_overrun_percentage >= BUDGET_WARNING_THRESHOLD_PERCENT:
+                budget_risk = "WARNING"
+            else:
+                budget_risk = "HEALTHY"
 
     schedule_risk = "UNKNOWN"
 
