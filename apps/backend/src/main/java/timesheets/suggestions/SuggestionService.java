@@ -49,4 +49,22 @@ public class SuggestionService {
 
     return suggestion;
    }
+
+   public SuggestedWorkSession edit(UUID suggestionId, String title, java.time.LocalDateTime startTime, java.time.LocalDateTime endTime){
+    SuggestedWorkSession suggestion = getSuggestion(suggestionId);
+
+    suggestion.setTitle(title);
+    suggestion.setStartTime(startTime);
+    suggestion.setEndTime(endTime);
+
+    if (startTime != null && endTime != null){
+        long minutes = java.time.Duration.between(startTime, endTime).toMinutes();
+
+        suggestion.setDurationMinutes((int) minutes);
+    }
+
+    suggestion.setStatus(SuggestionStatus.EDITED);
+
+    return suggestion;
+   }
 }
