@@ -57,6 +57,7 @@ class ProjectVelocity(BaseModel):
     - the hours logged will be converted into a weekly rate
     - then the service should estimate how long a project tajes
     """
+
     recent_hours_per_week: float
     lookback_days: int
 
@@ -65,6 +66,7 @@ class ProjectRisk(BaseModel):
     """
     - I want to keep the individual risk areas separate and that will allow a manager to see why a project has that risk status
     """
+
     budget: str
     schedule: str
     task_progress: str
@@ -75,6 +77,7 @@ class ProjectForecastResponse(BaseModel):
     """
     - the response should be split into budget, schedule, task progress, velocity and risk sections
     """
+
     project_id: uuid.UUID
     project_name: str
     budget: ProjectBudgetForecast
