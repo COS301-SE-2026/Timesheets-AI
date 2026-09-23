@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import exception.StateConflictException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -130,8 +129,6 @@ class TimerServiceTest {
       when(workspaceMemberRepository.findById(workspaceMemberId))
           .thenReturn(Optional.of(workspaceMember));
 
-      when(workspaceMemberRepository.findByUserId(userId)).thenReturn(List.of(workspaceMember));
-
       // making sure that no active timer exists
       when(timerSessionRepository.findFirstByWorkspaceMemberIdInAndIsRunningTrue(anyList()))
           .thenReturn(Optional.empty());
@@ -139,7 +136,7 @@ class TimerServiceTest {
       when(projectRepository.findById(projectId)).thenReturn(Optional.of(project));
 
       // user gets assigned to the project
-      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
               projectId, workspaceMemberId))
           .thenReturn(true);
 

@@ -116,6 +116,7 @@ public class GlobalExceptionHandler {
         return HttpStatus.LOCKED; // this will be 423
       case SSO_USER:
       case ACCOUNT_NOT_CONFIGURED:
+      case ACCOUNT_INACTIVE:
         return HttpStatus.FORBIDDEN;
       case EMAIL_EXISTS:
         return HttpStatus.CONFLICT;

@@ -37,6 +37,9 @@ public class ProjectMember {
   @Builder.Default
   private Boolean isActive = true;
 
+  @Column(name = "removed_at")
+  private LocalDateTime removedAt;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 

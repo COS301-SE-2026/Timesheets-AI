@@ -39,6 +39,7 @@ import timesheets.dto.response.ProjectResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
+import timesheets.repository.TaskRepository;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
@@ -55,6 +56,7 @@ public class ProjectServiceTest {
   @Mock private WorkspaceMemberRepository workspaceMemberRepository;
   @Mock private UserRepository userRepository;
   @Mock private TimeEntryRepository timeEntryRepository;
+  @Mock private TaskRepository taskRepository;
 
   @InjectMocks private ProjectService projectService;
 
@@ -154,6 +156,7 @@ public class ProjectServiceTest {
     member.setUserId(testUserId);
     member.setWorkspaceId(testWorkspaceId);
     member.setRole(WorkspaceRole.DEVELOPER);
+    member.setIsActive(true);
     member.setCreatedAt(LocalDateTime.now());
     return member;
   }
@@ -474,9 +477,9 @@ public class ProjectServiceTest {
       when(projectRepository.findById(testProjectId)).thenReturn(Optional.of(project));
       when(securityUtils.isAdmin()).thenReturn(false);
       when(securityUtils.isManager()).thenReturn(false);
-      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
               testProjectId, testWorkspaceMemberId))
-          .thenReturn(false);
+          .thenReturn(Optional.empty());
 
       assertThatThrownBy(
               () -> projectService.getProjectDetail(testProjectId, testWorkspaceMemberId))
@@ -691,9 +694,15 @@ public class ProjectServiceTest {
       projectService.removeMemberFromProject(testProjectId, testWorkspaceMemberId);
 
       assertThat(projectMember.getIsActive()).isFalse();
-      assertThat(projectMember.getUpdatedAt()).isNotNull();
+      assertThat(projectMember.getRemovedAt()).isNotNull();
 
       verify(projectMemberRepository).save(projectMember);
+
+      verify(taskRepository)
+          .unassignActiveTasksFromProjectMember(
+              org.mockito.ArgumentMatchers.eq(testProjectId),
+              org.mockito.ArgumentMatchers.eq(testWorkspaceMemberId),
+              any(LocalDateTime.class));
     }
 
     @Test
@@ -796,9 +805,12 @@ public class ProjectServiceTest {
           .thenReturn(Optional.of(workspaceMember));
 
       when(securityUtils.isAdmin()).thenReturn(true);
-      when(projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+      ProjectMember existingMember = createTestProjectMember();
+      existingMember.setIsActive(true);
+
+      when(projectMemberRepository.findByProjectIdAndWorkspaceMemberId(
               testProjectId, testWorkspaceMemberId))
-          .thenReturn(true);
+          .thenReturn(Optional.of(existingMember));
 
       assertThatThrownBy(
               () ->

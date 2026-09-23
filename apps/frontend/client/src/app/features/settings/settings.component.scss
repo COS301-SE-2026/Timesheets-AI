@@ -1,0 +1,505 @@
+// Author: Cleopatra Kwenda
+// Date:2026-09-02
+// Purpose: Settings page styling matched to the approved
+//  the wireframe
+
+$page-bg: #f7f8fb;
+$card-bg: #ffffff;
+$card-border: #e7e9f0;
+$text-title: #0f172a;
+$text-body: #334155;
+$text-muted: #6b7280;
+$primary: #2563eb;
+$primary-light: #eaf1fe;
+$green: #16a34a;
+$red: #dc2626;
+$red-bg: #fdecec;
+
+// SETTINGS ARE
+.settings-page{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+
+    color: $text-body;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 32px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-sizing: border-box;
+}
+
+// HEADEING AREA
+.settings-header{
+    margin-bottom: 10px;
+
+    h1{
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+        color: $text-title;
+    }
+
+    p{
+        margin: 5px 0 0;
+        font-size: 14px;
+        color: $text-muted;
+    }
+}
+
+// SETTINGS CARDS
+.settings-card{
+    background: $card-bg;
+    border: 1px solid $card-border;
+    border-radius: 14px;
+
+    display: grid;
+    grid-template-columns: 68px 260px minmax(0, 1fr);
+    column-gap: 16px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+
+    // CARDS ICONS
+    .card-icon{
+        grid-column: 1;
+        grid-row: 1;
+        width: 48px;
+        height: 48px;
+        margin-top: 14px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+
+        &.security{
+            background: #e6f0fe;
+            color: #1e40af;
+        }
+
+        &.integrations{
+            background: #efeafe;
+            color: #7c3aed;
+        }
+
+        &.notifications{
+            background: #fef3e0;
+            color: #b45309;
+        }
+
+        &.danger{
+            background: $red-bg;
+            color: $red;
+        }
+
+    }
+
+    // HEADINGS OF THE CARDS
+    .card-heading{
+        grid-column: 2;
+        grid-row: 1;
+
+        padding: 16px 20px 16px 0;
+
+        h2{
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: $text-title;
+        }
+
+        p{
+            margin: 6px 0 0;
+            font-size: 14px;
+            color: $text-muted;
+            line-height: 1.5;
+        }
+    }
+
+    // CARD BODDY STYLING
+    .card-body{
+        grid-column: 3;
+        grid-row: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-left: 1px solid $card-border;
+        padding: 0 20px 0 24px;
+    }
+}
+
+// SETTINGS ROW STYLING
+.setting-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    min-height: 64px;
+    padding: 10px 0;
+
+    &:not(:last-child){
+        border-bottom: 1px solid #f0f1f4;
+    }
+}
+
+// SETTINGS LABEL
+.setting-label{
+    min-width: 0;
+
+    .label-title{
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+
+        color: $text-title;
+    }
+
+    p{
+        margin: 3px 0 0;
+        font-size: 13px;
+        line-height: 1.4;
+        color: $text-muted;
+    }
+}
+
+// SETTINGS CONTROLS
+.setting-control{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+// PASSWORD
+.password-dots{
+    letter-spacing: 3px;
+    color: $text-muted;
+    font-size: 15px;
+}
+
+// TOGGLE LABEL
+.toggle-label{
+    font-size: 13px;
+    color: $text-muted;
+    min-width: 55px;
+    font-weight: 500;
+}
+
+// SECONDARY BUTTONS
+.secondary-button{
+    padding: 8px 28px;
+
+    border: 1px solid $card-border;
+    background: #ffffff;
+
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    color: $text-title;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &:hover{
+        background: #f8fafc;
+        border-color: #d7dae3;
+    }
+}
+
+// DELETION AREA BUTTON
+.danger-button{
+    padding: 9px 18px;
+    border: 1px solid #f3b4b4;
+    background: #ffffff;
+
+    color: $red;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover{
+        background: $red-bg;
+    }
+}
+
+// TEXT LINKS
+.text-link{
+    align-self: flex-start;
+    margin-top: 12px;
+    background: none;
+    border: none;
+    color: $primary;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: opacity 0.2s ease;
+
+    &:hover{
+        text-decoration: underline;
+        opacity: 0.85;
+    }
+}
+
+// INTEGRATION AREA
+.integration-row{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 58px;
+    padding: 10px 0;
+
+    &:not(:last-child){
+        border-bottom: 1px solid #f0f1f4;
+    }
+
+    > i{
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        text-align: center;
+        color: $text-title;
+        flex-shrink: 0;
+        border-radius: 10px;
+        background: #f8fafc;
+    }
+
+    .integration-info{
+        flex: 1;
+        min-width: 0;
+
+        .label-title{
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: $text-title;
+        }
+
+        p{
+            margin: 3px 0 0;
+            font-size: 13px;
+            color: $text-muted;
+        }
+    }
+
+    .integration-control{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    .chevron{
+        color: #9ca3af;
+        font-size: 13px;
+        margin-left: 4px;
+    }
+
+    &.read-only{
+        .integration-info{
+            .label-title{
+                color: #9ca3af;
+            }
+
+            p{
+                color: #c2c7cf;
+            }
+        }
+
+        > i{
+            color: #9ca3af;
+        }
+
+        .status-dot.connected{
+            background: #9ca3aa;
+        }
+
+        .status-text{
+            color: #9ca3af;
+        }
+    }
+}
+
+// CONNECTION STATUS
+.status-dot{
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+
+    &.connected{
+        background: $green;
+    }
+}
+
+.status-text{
+    font-size: 13px;
+    color: $text-muted;
+    font-weight: 500;
+}
+
+// READ ONLY NOTICE
+.read-only-note{
+    margin: 12px 0 0;
+    font-size: 13px;
+    color: $text-muted;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+// NOTIFICATIONS SELECTION
+.settings-select{
+    min-width: 210px;
+    width: 260px;
+    margin: 0;
+    flex-shrink: 0;
+
+    ::ng-deep .mat-mdc-text-field-wrapper{
+        background: #ffffff;
+        border-radius: 10px;
+    }
+
+    ::ng-deep .mat-mdc-form-field-flex{
+        min-height: 44px;
+        align-items: center;
+    }
+
+    ::ng-deep .mat-mdc-form-field-infix{
+        min-height: auto;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    ::ng-deep .mat-mdc-select-arrow{
+        color: $text-muted;
+    }
+
+    ::ng-deep .mdc-notched-outline__leading,
+    ::ng-deep .mdc-notched-outline__notch,
+    ::ng-deep .mdc-notched-outline__trailing{
+        border-color: $card-border;
+    }
+
+    &:hover{
+        ::ng-deep .mdc-notched-outline__leading,
+        ::ng-deep .mdc-notched-outline__notch,
+        ::ng-deep .mdc-notched-outline__trailing{
+            border-color: #cbd0da;
+        }
+    }
+
+}
+
+// STYLING TOGGLES
+::ng-deep .mat-mdc-slide-toggle{
+    --mdc-switch-selected-track-color: #{$primary};
+    --mdc-switch-selected-handle-color: #ffffff;
+    --mdc-switch-selected-hover-track-color: #{$primary};
+    --mdc-switch-selected-focus-track-color: #{$primary};
+    --mdc-switch-selected-pressed-track-color: #{$primary};
+    --mdc-switch-unselected-track-color: #d1d5db;
+    --mdc-switch-unselected-handle-color: #ffffff;
+    --mdc-switch-unselected-hover-track-color: #d1d5db;
+    --mdc-switch-unselected-focus-track-color: #d1d5db;
+}
+
+::ng-deep .mat-mdc-slide-toggle .mdc-switch__icons{
+    display: none;
+}
+
+::ng-deep .mat-mdc-slide-toggle .mdc-switch__track{
+    border-radius: 999px;
+}
+
+::ng-deep .mat-mdc-slide-toggle .mdc-switch__handle{
+    border-radius: 50%;
+}
+
+// RESPONSIVENESS
+@media (max-width: 900px){
+    .settings-page{
+        padding: 24px 20px;
+    }
+
+    .settings-card{
+        grid-template-columns: 56px minmax(0,1fr);
+        row-gap: 16px;
+
+        .card-heading{
+            grid-column: 2;
+        }
+    
+
+        .card-body{
+            grid-column: 1/ -1;
+            grid-row: 2;
+            border-left: none;
+            border-top: 1px solid $card-border;
+            padding-left: 0;
+            padding-top: 16px;
+        }
+    }
+}
+
+@media (max-width: 600px){
+    .settings-page{
+        padding: 20px 14px;
+    }
+
+    .settings-header{
+        h1{
+            font-size: 23px;
+        }
+    }
+
+    .settings-card{
+        padding: 16px;
+
+        grid-template-columns: 48px minmax(0,1fr);
+        column-gap: 12px;
+
+        .card-icon{
+            width: 40px;
+            height: 40px;
+        }
+    }
+
+    .setting-row{
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .setting-control{
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .integration-row{
+        align-items: flex-start;
+
+        .integration-control{
+            gap: 8px;
+        }
+    }
+
+    .settings-select{
+        width: 100%;
+    }
+
+    .secondary-button{
+        padding: 8px 20px;
+    }
+}
