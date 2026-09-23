@@ -16,7 +16,7 @@
   margin-top: 14px;
   padding: 10px 16px;
   border-radius: 8px;
-  background: #0877ed;
+  background: #0756a8;
   color: white;
   font-size: 13px;
   font-weight: 700;
@@ -35,12 +35,12 @@
 
 .card .timer-status {
   background: #e3f0ff;
-  color: #0877ed;
+  color: #075ca8;
 }
 
 .card .timer-status.running {
   background: #dcf6e4;
-  color: #158347;
+  color: #08783f;
 }
 
 .modal-backdrop {
@@ -58,6 +58,7 @@
   padding: 32px;
   text-align: center;
   background: white;
+  border: none;
   border-radius: 16px;
   box-shadow: var(--elevation-3);
 }
@@ -79,7 +80,7 @@
   border: 0;
   border-radius: 8px;
   padding: 11px 30px;
-  background: #0877ed;
+  background: #0756a8;
   color: white;
   font-weight: 700;
   cursor: pointer;
@@ -481,19 +482,19 @@
 
 .blue {
   background: #d8eafb;
-  color: #1676e4;
+  color: #0f4c91;
 }
 .light-blue {
   background: #dcecff;
-  color: #0877ed;
+  color: #075ca8;
 }
 .amber {
   background: #fff0ce;
-  color: #bc7600;
+  color: #8a5500;
 }
 .green {
   background: #d9f5d8;
-  color: #159b57;
+  color: #08783f;
 }
 .purple {
   background: #ece0ff;
@@ -505,7 +506,7 @@
   padding: 7px 11px;
   border-radius: 99px;
   background: #dcf6e4;
-  color: #158347;
+  color: #08783f;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -539,7 +540,7 @@
 }
 
 .danger-button {
-  background: #e93445;
+  background: #b91c2b;
   color: white;
 }
 
@@ -557,8 +558,6 @@
 }
 
 .summary-card > strong {
-  // display: block;
-  // margin: 16px 0 0;
   display: grid;
   flex: 1;
   place-items: center;
@@ -639,7 +638,7 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #147cf5;
+  background: #0f4c91;
   color: white;
   font-size: 12px;
 }
@@ -666,7 +665,7 @@
   padding: 6px 9px;
   border-radius: 99px;
   background: #fff2d6;
-  color: #a76400;
+  color: #7a4a00;
   font-size: 11px;
   font-weight: 700;
 }
@@ -676,7 +675,7 @@
   padding: 7px 14px;
   border-radius: 99px;
   background: #edf6ff;
-  color: #0877ed;
+  color: #075ca8;
   font-size: 12px;
   font-weight: 700;
 }
@@ -773,6 +772,11 @@
   width: 100%;
 }
 
+.dashboard-page > .modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+}
 
 @media (max-width: 1100px) {
   .manager-grid {

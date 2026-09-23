@@ -32,15 +32,15 @@ interface ActiveProjectCard {
 })
 export class DashboardComponent implements OnInit, OnDestroy {
 
-  private auth = inject(AuthService);
+  private readonly auth = inject(AuthService);
   private readonly notificationService = inject(NotificationService);
-  private timers = inject(TimerService);
-  private projectsApi = inject(ProjectService);
-  private tasksApi = inject(TaskService);
-  private entriesApi = inject(TimeEntryService);
-  private timesheetsApi = inject(TimesheetService);
-  private calendarApi = inject(CalendarService);
-  private teamApi = inject(TeamService);
+  private readonly timers = inject(TimerService);
+  private readonly projectsApi = inject(ProjectService);
+  private readonly tasksApi = inject(TaskService);
+  private readonly entriesApi = inject(TimeEntryService);
+  private readonly timesheetsApi = inject(TimesheetService);
+  private readonly calendarApi = inject(CalendarService);
+  private readonly teamApi = inject(TeamService);
   public readonly showNotifications = signal<boolean>(false);
   public readonly unreadCount = this.notificationService.unreadCount;
   readonly isLoading = signal(true);
@@ -54,8 +54,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly activeProjectCards = signal<ActiveProjectCard[]>([]);
   readonly todayMinutes = signal(0);
   readonly weekMinutes = signal(0);
-  private tick = signal(0);
-  private ticker = window.setInterval(
+  private readonly tick = signal(0);
+  private readonly ticker = window.setInterval(
     () => this.tick.update((v) => v + 1), 1000);
 
   readonly isManagerView = computed(() =>
@@ -77,7 +77,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   readonly greeting = computed(() => {
     const h = new Date().getHours();
-    return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+    
+    if(h < 12) {
+      return 'Good morning';
+    }
+
+    if (h < 18) {
+      return 'Good afternoon';
+    }
+
+    return 'Good evening';
+
   });
 
   readonly activeProjects = computed(() =>
