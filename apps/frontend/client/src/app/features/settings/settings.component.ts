@@ -10,7 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
 import { MfaSetupDialogComponent } from './mfa-setup-dialog/mfa-setup-dialog.component';
-import { MfaDisab}
+import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dialog.component';
 @Component({
   selector: 'app-settings',
   standalone: true,
@@ -95,28 +95,13 @@ export class SettingsComponent implements OnInit{
   }
 
   toggleMfa(enabled:boolean):void{
-    this.settingsService.toggleMfa(enabled).subscribe(
-      ()=>{
-        this.settings.update(
-          (s)=>(
-            s? {...s, security:{
-              ...s.security, mfaEnabled:enabled
-            }}: s
-          )
-        );
-      }
-    );
+    if(enabled){
+      this.enabledMfa();
+    }else{
+      this.disableMfa();
+    }
   }
 
-  toggleDoNotDisturb(enabled:boolean):void{
-        this.settings.update(
-          (s)=>(
-            s? {...s, notifications:{
-              ...s.notifications, doNotDisturbEnabled:enabled
-            }}: s
-          )
-        );
-  }
   
 
   toggleIntegration(integration: IntegrationStatus, enabled:boolean):void{
