@@ -1,15 +1,18 @@
 package timesheets.suggestions;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import timesheets.evidence.correlation.EvidenceEngineService;
 
 @RestController
 @RequestMapping("/api/suggestions")
 @RequiredArgsConstructor
 public class SuggestionController {
   private final SuggestionService suggestionService;
+  private final EvidenceEngineService evidenceEngineService;
 
   @GetMapping("/workspace-member/{workspaceMemberId}")
   public List<SuggestedWorkSession> getSuggestions(@PathVariable UUID workspaceMemberId) {
@@ -17,8 +20,16 @@ public class SuggestionController {
   }
 
   @GetMapping("/{suggestionId}")
-  public SuggestedWorkSession getSuggestion(@PathVariable UUID getSuggestionId) {
+  public SuggestedWorkSession getSuggestion(@PathVariable UUID suggestionId) {
     return suggestionService.getSuggestion(suggestionId);
+  }
+
+  @PostMapping("/generate")
+  public List<SuggestedWorkSession> generateSuggestions(
+      @RequestParam UUID workspaceMemberId,
+      @RequestParam LocalDateTime startTime,
+      @RequestParam LocalDateTime endTime) {
+    return evidenceEngineService.generateSuggestions(workspaceMemberId, startTime, endTime);
   }
 
   @PostMapping("/{suggestionId}/approve")
@@ -27,8 +38,8 @@ public class SuggestionController {
   }
 
   @PostMapping("/{suggestionId}/reject")
-  public SuggestedWorkSession approve(@PathVariable UUID suggestionId) {
-    return suggestionService.approve(suggestionId);
+  public SuggestedWorkSession reject(@PathVariable UUID suggestionId) {
+    return suggestionService.reject(suggestionId);
   }
 
   @PutMapping("/{suggestionId}")
