@@ -13,7 +13,7 @@
     margin-bottom: 18px;
     border-radius: 8px;
     background: #fdecec;
-    color: #991b1b;
+    color: #dc2626;
 }
 
 .warning-box strong{
@@ -78,6 +78,10 @@
     line-height: 1.5;
 }
 
+button[mat-flat-button]{
+    --mdc-filled-button-container-color: #0f4c91;
+    --mdc-filled-button-label-text-color: #ffffff;
+}
 
 button[mat-button]{
     color: #0f4c91;
