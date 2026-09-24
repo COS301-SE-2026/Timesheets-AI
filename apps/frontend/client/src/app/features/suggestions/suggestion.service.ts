@@ -18,6 +18,14 @@ export class SuggestionService {
     }
 
     getSuggestion(suggestionId: string): Observable<SuggestedWorkSession>{
-        return this.http.post<SuggestedWorkSession>(`${this.apiUrl}/${suggestionId}/approve`, {});
+        return this.http.get<SuggestedWorkSession>(`${this.apiUrl}/${suggestionId}`);
+    }
+
+    approve(suggestionId: string): Observable<SuggestedWorkSession>{
+        return this.http.post<SuggestedWorkSession>('${this.apiUrl}/${suggestionId}/approve', {});
+    }
+
+    reject(suggestionId: string): Observable<SuggestedWorkSession>{
+        return this.http.post<SuggestedWorkSession>('${this.apiUrl}/${suggestionId}/reject', {});
     }
 }
