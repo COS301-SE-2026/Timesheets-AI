@@ -1,14 +1,16 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from './settings.services';
-import { CurrentUserService } from './current-user.services';
-import { UserSettings, UserRole, IntegrationStatus, NotificationType } from './settings.model';
+import { UserSettings, UserRole, IntegrationStatus } from './settings.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
+import { MfaSetupDialogComponent } from './mfa-setup-dialog/mfa-setup-dialog.component';
+import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dialog.component';
+import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-settings',
   standalone: true,
@@ -26,7 +28,7 @@ import { ChangePasswordDialogComponent } from './change-password-dialog/change-p
 
 export class SettingsComponent implements OnInit{
   private readonly settingsService= inject(SettingsService);
-  private readonly currentUserService= inject( CurrentUserService);
+  private readonly authService= inject( AuthService);
   private readonly dialog=inject(MatDialog);
 
   settings= signal<UserSettings | null>(null);
@@ -59,18 +61,29 @@ export class SettingsComponent implements OnInit{
   );
 
   ngOnInit(): void{
-    this.currentUserService.getCurrentUser().subscribe(
-      (user)=>{
-        this.role.set(user.role);
-      }
-    );
+    const user= this.authService.currentUser();
 
-    this.settingsService.getSettings().subscribe(
-      (settings)=>{
-        this.settings.set(settings);
-        this.isLoading.set(false);
-      }
-    );
+    if(!user){
+      this.isLoading.set(false);
+      return;
+    }
+
+    let role: UserRole;
+
+    if(user.roles.includes('ROLE_ADMIN')){
+      role='ADMIN';
+    }else if (user.roles.includes('ROLE_MANAGER')){
+      role= 'MANAGER';
+    }else{
+      role= 'DEVELOPER';
+    }
+
+    this.role.set(role);
+
+    this.settingsService.getSettings(user.mfaEnabled).subscribe((settings)=> {
+      this.settings.set(settings);
+      this.isLoading.set(false)
+    });
   }
 
   changePassword():void{
@@ -92,30 +105,66 @@ export class SettingsComponent implements OnInit{
     );
   }
 
-  toggleMfa(enabled:boolean):void{
-    this.settingsService.toggleMfa(enabled).subscribe(
-      ()=>{
-        this.settings.update(
-          (s)=>(
-            s? {...s, security:{
-              ...s.security, mfaEnabled:enabled
-            }}: s
-          )
-        );
-      }
-    );
+  toggleMfa(event: MatSlideToggleChange):void{
+    const currentlyEnabled= !event.checked;
+    event.source.checked= currentlyEnabled;
+
+    if(currentlyEnabled){
+      this.disableMfa();
+    }else{
+      this.enableMfa();
+    }
   }
 
-  toggleDoNotDisturb(enabled:boolean):void{
-        this.settings.update(
-          (s)=>(
-            s? {...s, notifications:{
-              ...s.notifications, doNotDisturbEnabled:enabled
-            }}: s
-          )
-        );
+  private enableMfa(): void{
+    const dialogRef= this.dialog.open(
+      MfaSetupDialogComponent,
+      {
+        width: '480px',
+        maxWidth: '95vw',
+        disableClose: true
+      }
+    );
+
+    dialogRef.afterClosed().subscribe((enabled)=> {
+      if(!enabled){
+        return;
+      }
+
+      this.authService.updateMfaStatus(true);
+
+      this.settings.update((s)=> (
+        s? {...s, security: {
+          ...s.security, mfaEnabled:true
+        }}:s
+      ));
+    });
   }
-  
+
+  private disableMfa(): void{    
+    const dialogRef= this.dialog.open(
+      MfaDisableDialogComponent,
+      {
+        width: '480px',
+        maxWidth: '95vw',
+        disableClose: true
+      }
+    );
+
+    dialogRef.afterClosed().subscribe((disabled)=> {
+      if(!disabled){
+        return;
+      }
+
+      this.authService.updateMfaStatus(false);
+
+      this.settings.update((s)=> (
+        s? {...s, security: {
+          ...s.security, mfaEnabled:false
+        }}:s
+      ));
+    });
+  }
 
   toggleIntegration(integration: IntegrationStatus, enabled:boolean):void{
     if(!this.canToggleIntegrations()){
@@ -143,25 +192,6 @@ export class SettingsComponent implements OnInit{
       });
   }
 
-  setNotificationType(notificationType: NotificationType):void{
-    const current= this.settings();
-
-    if(!current) return;
-
-    const notifications={
-      ...current.notifications, notificationType
-    };
-
-    this.settingsService.updateNotifications(notifications).subscribe(
-      ()=>{
-        this.settings.update(
-          (s)=>(
-            s? {...s, notifications}: s
-          )
-        );
-      }
-    );
-  }
   requestAccountDeletion():void{
     this.settingsService.requestAccountDeletion().subscribe(
       ()=>{

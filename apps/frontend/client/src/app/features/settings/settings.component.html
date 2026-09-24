@@ -65,7 +65,8 @@ Realated Requirement: N/A
                     <div class="setting-control">
                         <mat-slide-toggle
                         [checked]="s.security.mfaEnabled"
-                        (change)="toggleMfa($event.checked)">
+                        (change)=" toggleMfa($event)"
+                        >
                     </mat-slide-toggle>
                     <span class="toggle-label">
                         {{ s.security.mfaEnabled ? 'Enabled' : 'Disabled' }}
@@ -151,77 +152,7 @@ Realated Requirement: N/A
                 }
             </div>
         </section>
-
-        <!-- WHAT IT LOOKS LIKE(LIKE CUSTOMIZATIONS) -->
-        
-        <!-- NOTIFICATIONS AREA -->
-        <section class="settings-card">
-            <div class="card-icon notifications">
-                <i class="fa-solid fa-bell"></i>
-            </div>
-
-            <div class="card-heading">
-                <h2>
-                    Notifications
-                </h2>
-                <p>
-                    Control how and when you recieve notifications.
-                </p>
-            </div>
-
-            <div class="card-body">
-                <div class="setting-row">
-                    <div class="setting-label">
-                        <span class="label-title">
-                            Notification type
-                        </span>
-                        <p>
-                            Choose how you want to be notified.
-                        </p>
-                    </div>
-
-                    <mat-form-field
-                        appearance="outline"
-                        class="settings-select">
-                        <mat-select
-                            class="settings-select"
-                            [value]="s.notifications.notificationType"
-                            (selectionChange)="setNotificationType($event.value)">
-                            <mat-option 
-                                value="ALL">
-                                All notifications
-                            </mat-option>
-                            <mat-option 
-                                value="MENTIONS_ONLY">
-                                Mentions only
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
-
-                <div class="setting-row">
-                    <div class="setting-label">
-                        <span class="label-title">
-                            Do Not Disturb
-                        </span>
-                        <p>
-                            Pause all non-urgent notifications during a selected time.
-                        </p>
-                    </div>
-                    
-                    <div class="settings-control">
-                        <span class="dnd-range">
-                            {{ s.notifications.doNotDisturbStart }} - {{ s.notifications.doNotDisturbEnd}}
-                        </span>
-                
-                        <mat-slide-toggle
-                            [checked]="s.notifications.doNotDisturbEnabled"
-                            (change)="toggleDoNotDisturb($event.checked)">
-                        </mat-slide-toggle>
-                    </div> 
-                </div>
-            </div>
-        </section>
+    
 
         <!-- MANAGE ACCOUNT -->
         <section class="settings-card">

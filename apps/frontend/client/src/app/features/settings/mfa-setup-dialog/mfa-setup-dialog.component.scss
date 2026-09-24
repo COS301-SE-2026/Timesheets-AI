@@ -1,0 +1,120 @@
+// Author: Cleopatra Kwenda
+// Date: 2026-09-22
+// Purpose: a pop-up for mfa 
+
+.dialog-description{
+    margin: 0 0 20px;
+    color: #6b7a99;
+    line-height: 1.5;
+}
+
+.loading-state{
+    padding: 30px 0;
+    text-align: center;
+    color: #6b7a99;
+}
+
+.qr-container{
+    display: flex;
+    justify-content: center;
+    margin: 10px 0 20px;
+}
+
+.qr-code{
+    width: 200px;
+    height: 200px;
+    border-radius: 8px;
+}
+
+.manual-key{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 12px;
+    background: #f7f8fb;
+    border-radius: 8px;
+}
+
+.manual-key-label{
+    font-size: 12px;
+    font-family: monospace;
+    margin: 0;
+}
+
+
+.manual-key-instruction{
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #4b5563;
+    font-family: monospace;
+
+}
+
+.manual-key-instruction strong{
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.dialog-field{
+    width: 100%;
+    margin-top: 10px;
+
+    --mdc-outlined-text-field-outline-color: #bfd4f4;
+    --mdc-outlined-text-field-hover-outline-color: #0f4c91;
+    --mdc-outlined-text-field-focus-outline-color: #0f4c91;
+    --mdc-outlined-text-field-label-text-color: #6b7a99;
+    --mdc-outlined-text-field-focus-label-text-color: #0f4c91;
+    --mdc-outlined-text-field-caret-color: #0f4c91;
+}
+
+.dialog-error{
+    color: #dc2626;
+    font-size: 13px;
+    margin: 4px 0 0;
+}
+
+.success-state{
+    text-align: center;
+    padding: 24px 10px 20px;
+}
+
+.success-icon{
+    width: 64px;
+    height: 63px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.success-icon i{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.success-state h3{
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.success-state p{
+    margin: 0;
+    color: #6b7a99;
+    line-height: 1.5;
+}
+
+button[mat-flat-button]{
+    --mdc-filled-button-container-color: #0f4c91;
+    --mdc-filled-button-label-text-color: #ffffff;
+}
+
+button[mat-button]{
+    color: #0f4c91;
+}

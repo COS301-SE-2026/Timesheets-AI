@@ -11,6 +11,7 @@ export interface CurrentUser{
     firstName: string;
     lastName: string;
     role: UserRole;
+    mfaEnabled: boolean;
 }
 
 export interface IntegrationStatus{
@@ -24,6 +25,25 @@ export interface IntegrationStatus{
 
 export interface AccountSecuritySettings{
     mfaEnabled:boolean;
+}
+
+export interface MfaSetupResponse{
+    secretKey: string;
+    qrCodeUrl: string;
+    message: string;
+}
+
+export interface MfaVerifyRequest{
+    totpCode: string;
+}
+
+export interface MfaDisableRequest{
+    password: string;
+}
+
+export interface MessageResponse{
+    message: string;
+    redirectUrl?: string | null;
 }
 
 export type ThemePreference= 'light' | 'dark';
