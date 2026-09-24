@@ -8,7 +8,7 @@ Date: 22/09/2026
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -30,8 +30,19 @@ router = APIRouter(
 def calculate_project(
     project_id: uuid.UUID,
     db: Annotated[Session, Depends(get_db)],
+    authorization: Annotated[str | None, Header()] = None,
 ):
-    result = calculate_project_forecast(db, project_id)
+    access_token = None
+
+    # forward the authenticated user's token when external evidence is available
+    if authorization:
+        access_token = authorization.removeprefix("Bearer ").strip()
+
+    result = calculate_project_forecast(
+        db,
+        project_id,
+        access_token=access_token,
+    )
 
     if result is None:
         raise HTTPException(
