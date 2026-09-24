@@ -8,7 +8,8 @@ Date: 24/09/2026
 
 import uuid
 from datetime import datetime
-from pydantic import BaseModel
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ActivityCount(BaseModel):
@@ -17,7 +18,7 @@ class ActivityCount(BaseModel):
     - for example GitHub commits or Jira issues
     """
 
-    activity_type: str
+    activity_type: str = Field(alias="activityType")
     count: int
 
 
@@ -27,9 +28,11 @@ class ExternalEvidenceSummary(BaseModel):
     - this avoids sending every individual evidence event to the forecast service
     """
 
+    model_config = ConfigDict(populate_by_name=True)
+
     available: bool
-    activity_count: int
-    latest_activity: datetime | None
+    activity_count: int = Field(alias="activityCount")
+    latest_activity: datetime | None = Field(alias="latestActivity")
     activities: list[ActivityCount]
 
 
@@ -39,5 +42,8 @@ class ProjectForecastEvidenceResponse(BaseModel):
     - GitHub and Jira are seperate so I know which source is contributing to the support evidence
     """
 
+    model_config = ConfigDict(populate_by_name=True)
+
+    project_id: uuid.UUID = Field(alias="projectId")
     github: ExternalEvidenceSummary
     jira: ExternalEvidenceSummary
