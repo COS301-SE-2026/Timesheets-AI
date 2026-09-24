@@ -31,16 +31,8 @@ import {
 import { TaskService, TaskResponse } from '../../core/services/task.service';
 import { AuthService } from '../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import {
-  forkJoin,
-  Observable,
-  of,
-  catchError,
-  tap,
-  map,
-  switchMap,
-} from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {forkJoin, Observable, of, catchError, tap, map, switchMap } from 'rxjs';
 import { TimeEntryResponse } from '../../core/services/time-entry.service';
 import { EvidenceReviewModalComponent } from '../evidence-review-modal/evidence-review-modal.component';
 type StatusFilter = 'ALL' | TimesheetStatus;
@@ -146,6 +138,7 @@ export class TimesheetsComponent {
   private readonly projectService = inject(ProjectService);
   private readonly taskService = inject(TaskService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   // INTEGRATION : Set from auth/session
   // Managers see Approve / Reject when status is submitted
@@ -274,6 +267,9 @@ export class TimesheetsComponent {
 
   constructor() {
     this.loadTimesheets();
+    if (this.route.snapshot.queryParamMap.get('tab') === 'review' && this.isManager()) {
+      this.setPageTab('review');
+    }
   }
 
   readonly showEvidenceModal = signal(false);
