@@ -68,10 +68,15 @@ export class SettingsComponent implements OnInit{
       return;
     }
 
-    const role=user.roles.includes('ROLE_ADMIN')
-      ?'ADMIN': user.roles.includes('ROLE_MANAGER')
-      ? 'MANAGER'
-      : 'DEVELOPER';
+    let role: UserRole;
+
+    if(user.roles.includes('ROLE_ADMIN')){
+      role='ADMIN';
+    }else if (user.roles.includes('ROLE_MANAGER')){
+      role= 'MANAGER';
+    }else{
+      role= 'DEVELOPER';
+    }
 
     this.role.set(role);
 
@@ -123,17 +128,6 @@ export class SettingsComponent implements OnInit{
 
     dialogRef.afterClosed().subscribe((enabled)=> {
       if(!enabled){
-      //   this.settings.update((s)=> (
-      //   s? {...s, security: {
-      //     ...s.security, mfaEnabled:false
-      //   }}:s
-      // );
-
-      // const toggle= this.mfaToggle();
-      // if(toggle){
-      //   toggle.checked=false;
-      // }
-    
         return;
       }
 
@@ -159,17 +153,6 @@ export class SettingsComponent implements OnInit{
 
     dialogRef.afterClosed().subscribe((disabled)=> {
       if(!disabled){
-        // this.settings.update((s)=> (
-        //   s? {...s, security: {
-        //     ...s.security, mfaEnabled:true
-        //   }}:s
-        // );
-
-        // const toggle= this.mfaToggle();
-        // if(toggle){
-        //   toggle.checked=true;
-        // }
-
         return;
       }
 
