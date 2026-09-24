@@ -1,0 +1,88 @@
+<!--  Author: Cleopatra Kwenda
+    Date:2026-09-24
+    Purpose: this is for the MFA disable
+    Related Requirement: N/A -->
+
+
+<h2 mat-dialog-title>
+    Disable multi-factor authentication
+</h2>
+
+<mat-dialog-content>
+
+    @if(isSuccess){
+        <div class="success-state">
+            <div class="success-icon">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3> MFA disabled successfully</h3>
+            <p>Multi-factor authentication has been disabled for your account.</p>
+        </div>
+    }@else{
+        <div class="warning-box">
+            <strong> Are you sure?</strong>
+            
+            <p>
+                Disabling MFA removes the additional security
+                protection from your account.
+            </p>
+        </div>
+
+        <p class="dialog-description">
+            Enter your account password to confirm that you want to disable MFA.
+        </p>
+
+        <mat-form-field 
+            appearance="outline"
+            class="dialog-field">
+            <mat-label>
+                Password
+            </mat-label>
+
+            <input
+                matInput
+                type="password"
+                autocomplete="current-password"
+                [(ngModel)]="password"
+                [disabled]="isSubmitting">
+        </mat-form-field>
+
+        @if(errorMessage){
+            <p class="dialog-error">
+                {{ errorMessage}}
+            </p>
+        }
+    }
+    
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    @if(isSuccess){
+        <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="done()">
+            Done
+        </button>
+    
+    }@else{
+        <button
+            mat-button
+            type="button"
+            (click)="cancel()"
+            [disabled]="isSubmitting">
+            Cancel
+        </button>
+
+        <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="disable()"
+            [disabled]="isSubmitting">
+            {{ isSubmitting? 'Disabling...': 'Disable MFA'}}
+    </button>
+
+    }
+</mat-dialog-actions>
