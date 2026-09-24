@@ -16,7 +16,7 @@ Related Requirements: N/A
 <!--
 HEADER
 -->
-<app-header [title] ="'Projects'">
+<!-- <app-header [title] ="'Projects'">
   <div class="header-search">
     <label for="project-search" class="visually-hid">
       Search projects
@@ -32,9 +32,10 @@ HEADER
       >
 
   </div>
-</app-header>
+</app-header> -->
 
 <div class="projects-page-container">
+  <h1 class="page-title">Projects</h1>
   <!--
   PAGE HEADING
   -->
@@ -97,6 +98,7 @@ HEADER
     FILTER BUTTONS SECTION
     -->
     <section class="project-filter-row">
+      <div class="project-filters">
       @for (filter of filters; track filter){
         <button
           class="project-filter-button"
@@ -105,6 +107,17 @@ HEADER
           {{filter}}
         </button>
       }
+      </div>
+      <div class="project-search">
+        <label for="project-search" class="visually-hid">Search projects</label>
+        <input
+        id="project-search"
+        class="project-search-input"
+        type="search"
+        placeholder="Search projects..."
+        [value]="searchTerm"
+        (input)="searchProjects($any($event.target).value)">
+      </div>
     </section>
     <!--
     PROJECTS :)
