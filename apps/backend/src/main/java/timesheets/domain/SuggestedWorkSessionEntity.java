@@ -43,6 +43,9 @@ public class SuggestedWorkSessionEntity {
   @Column(name = "duration_minutes")
   private Integer durationMinutes;
 
+  @Column(name = "description")
+  private String description;
+
   @Column(name = "explanation")
   private String explanation;
 
