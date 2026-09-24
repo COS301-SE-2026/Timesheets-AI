@@ -28,4 +28,17 @@ export class SuggestionService {
     reject(suggestionId: string): Observable<SuggestedWorkSession>{
         return this.http.post<SuggestedWorkSession>('${this.apiUrl}/${suggestionId}/reject', {});
     }
+
+    edit(suggestionId: string, request: EditSuggestionRequest): Observable<SuggestedWorkSession>{
+        return this.http.put<SuggestedWorkSession>('${this.apiUrl}/${suggestionId}', request);
+    }
+}
+
+export interface EditSuggestionRequest {
+    title: string;
+    projectId?: string;
+    taskId?: string;
+    startTime: string;
+    endTime: string;
+    description?: string;
 }
