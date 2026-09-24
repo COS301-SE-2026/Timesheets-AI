@@ -7,7 +7,7 @@
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, of, delay } from "rxjs";
-import { UserSettings, IntegrationStatus, NotificationSettings, ChangePasswordRequest, ChangePasswordResponse, MessageResponse, MfaSetupResponse } from "./settings.model";
+import { UserSettings, IntegrationStatus, ChangePasswordRequest, ChangePasswordResponse, MessageResponse, MfaSetupResponse } from "./settings.model";
 
 
 @Injectable({ providedIn: 'root'})
@@ -61,8 +61,8 @@ export class SettingsService{
         );
     }
 
-    getSettings(): Observable<UserSettings>{
-        return of(this.mockSettings).pipe(delay(200));
+    getSettings(mfaEnabled: boolean): Observable<UserSettings>{
+        return of({...this.mockSettings, security:{mfaEnabled}}).pipe(delay(200));
     }
 
     getMfaSetup(): Observable<MfaSetupResponse>{
@@ -96,12 +96,6 @@ export class SettingsService{
     }
 
     requestIntegration(): Observable<void>{
-        return of(void 0).pipe(delay(150));
-    }
-
-    updateNotifications(notifications: NotificationSettings): Observable<void>{
-        this.mockSettings.notifications= notifications;
-
         return of(void 0).pipe(delay(150));
     }
 

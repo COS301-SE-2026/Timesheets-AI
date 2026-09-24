@@ -198,6 +198,21 @@ export class AuthService {
     this.currentUser.set(res.user);
   }
 
+  updateMfaStatus(enabled: boolean): void{
+    const user= this.currentUser();
+
+    if(!user){
+      return
+    }
+
+    const updateUser={
+      ...user, mfaEnabled: enabled
+    };
+
+    localStorage.setItem(USER_KEY, JSON.stringify(updateUser));
+    this.currentUser.set(updateUser);
+  }
+
   //this will read whstever was last stord, used to seed the signal on app start up and page refress doesnt lose name until next login
   private loadStoredUser(): AuthUser | null {
     const raw = localStorage.getItem(USER_KEY);

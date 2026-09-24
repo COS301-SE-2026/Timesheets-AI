@@ -11,6 +11,7 @@ export interface CurrentUser{
     firstName: string;
     lastName: string;
     role: UserRole;
+    mfaEnabled: boolean;
 }
 
 export interface IntegrationStatus{
