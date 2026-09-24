@@ -1,16 +1,16 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from './settings.services';
-import { CurrentUserService } from './current-user.services';
 import { UserSettings, UserRole, IntegrationStatus } from './settings.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
 import { MfaSetupDialogComponent } from './mfa-setup-dialog/mfa-setup-dialog.component';
 import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dialog.component';
+import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-settings',
   standalone: true,
@@ -28,7 +28,7 @@ import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dial
 
 export class SettingsComponent implements OnInit{
   private readonly settingsService= inject(SettingsService);
-  private readonly currentUserService= inject( CurrentUserService);
+  private readonly authService= inject( AuthService);
   private readonly dialog=inject(MatDialog);
 
   settings= signal<UserSettings | null>(null);
@@ -61,18 +61,24 @@ export class SettingsComponent implements OnInit{
   );
 
   ngOnInit(): void{
-    this.currentUserService.getCurrentUser().subscribe(
-      (user)=>{
-        this.role.set(user.role);
-      }
-    );
+    const user= this.authService.currentUser();
 
-    this.settingsService.getSettings().subscribe(
-      (settings)=>{
-        this.settings.set(settings);
-        this.isLoading.set(false);
-      }
-    );
+    if(!user){
+      this.isLoading.set(false);
+      return;
+    }
+
+    const role=user.roles.includes('ROLE_ADMIN')
+      ?'ADMIN': user.roles.includes('ROLE_MANAGER')
+      ? 'MANAGER'
+      : 'DEVELOPER';
+
+    this.role.set(role);
+
+    this.settingsService.getSettings(user.mfaEnabled).subscribe((settings)=> {
+      this.settings.set(settings);
+      this.isLoading.set(false)
+    });
   }
 
   changePassword():void{
@@ -94,11 +100,14 @@ export class SettingsComponent implements OnInit{
     );
   }
 
-  toggleMfa(enabled:boolean):void{
-    if(enabled){
-      this.enableMfa();
-    }else{
+  toggleMfa(event: MatSlideToggleChange):void{
+    const currentlyEnabled= !event.checked;
+    event.source.checked= currentlyEnabled;
+
+    if(currentlyEnabled){
       this.disableMfa();
+    }else{
+      this.enableMfa();
     }
   }
 
@@ -114,8 +123,21 @@ export class SettingsComponent implements OnInit{
 
     dialogRef.afterClosed().subscribe((enabled)=> {
       if(!enabled){
+      //   this.settings.update((s)=> (
+      //   s? {...s, security: {
+      //     ...s.security, mfaEnabled:false
+      //   }}:s
+      // );
+
+      // const toggle= this.mfaToggle();
+      // if(toggle){
+      //   toggle.checked=false;
+      // }
+    
         return;
       }
+
+      this.authService.updateMfaStatus(true);
 
       this.settings.update((s)=> (
         s? {...s, security: {
@@ -125,7 +147,7 @@ export class SettingsComponent implements OnInit{
     });
   }
 
-  private disableMfa(): void{
+  private disableMfa(): void{    
     const dialogRef= this.dialog.open(
       MfaDisableDialogComponent,
       {
@@ -137,8 +159,21 @@ export class SettingsComponent implements OnInit{
 
     dialogRef.afterClosed().subscribe((disabled)=> {
       if(!disabled){
+        // this.settings.update((s)=> (
+        //   s? {...s, security: {
+        //     ...s.security, mfaEnabled:true
+        //   }}:s
+        // );
+
+        // const toggle= this.mfaToggle();
+        // if(toggle){
+        //   toggle.checked=true;
+        // }
+
         return;
       }
+
+      this.authService.updateMfaStatus(false);
 
       this.settings.update((s)=> (
         s? {...s, security: {
