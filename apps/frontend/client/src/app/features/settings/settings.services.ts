@@ -16,7 +16,7 @@ export class SettingsService{
     private readonly apiUrl= 'api/settings';
     private readonly authUrl= 'api/auth';
 
-    private mockSettings: UserSettings={
+    private readonly mockSettings: UserSettings={
         security:{
             mfaEnabled:true,
         },

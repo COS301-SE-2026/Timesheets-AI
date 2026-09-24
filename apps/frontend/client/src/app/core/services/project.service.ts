@@ -39,6 +39,7 @@ export interface ProjectMemberInfo {
   lastName: string;
   email: string;
   role: 'ADMIN' | 'MANAGER' | 'DEVELOPER';
+  isProjectManager?: boolean;
   hoursLogged: number;
   joinedAt: string;
 }
