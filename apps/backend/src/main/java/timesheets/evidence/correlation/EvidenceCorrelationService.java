@@ -31,6 +31,7 @@ so the system would sees it as individual events.
 
 package timesheets.evidence.correlation;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -44,6 +45,8 @@ public class EvidenceCorrelationService {
   // this is for temporal correlation - max time
   private static final long CORRELATION_WINDOW = 60;
 
+  private static final double MINIMUM_CORRELATION_SCORE = 0.60;
+
   // create a lists of evidene events for a specific member into clustered evidence groups
   public List<EvidenceGroup> correlate(UUID workspaceMemberId, List<EvidenceEvent> evidenceEvents) {
     List<EvidenceGroup> groups = new ArrayList<EvidenceGroup>();
@@ -53,6 +56,7 @@ public class EvidenceCorrelationService {
     }
 
     List<EvidenceEvent> sortedEvents = new ArrayList<EvidenceEvent>(evidenceEvents);
+
     sortedEvents.sort(
         Comparator.comparing(
             EvidenceEvent::getTimestamp, Comparator.nullsLast(Comparator.naturalOrder())));
@@ -79,31 +83,6 @@ public class EvidenceCorrelationService {
     return groups;
   }
 
-  private void addEventToGroup(EvidenceGroup group, EvidenceEvent event) {
-
-    group.getEvidenceEvents().add(event);
-
-    if (event.getTimestamp() != null
-        && (group.getStartTime() == null || event.getTimestamp().isBefore(group.getStartTime()))) {
-      group.setStartTime(event.getTimestamp());
-    }
-
-    LocalDateTime eventEndTime = getEventEndTime(event);
-
-    if (eventEndTime != null
-        && (group.getEndTime() == null || eventEndTime.isAfter(group.getEndTime()))) {
-      group.setStartTime(eventEndTime);
-    }
-  }
-
-  private LocalDateTime getEventEndTime(EvidenceEvent event) {
-    if (event.getEndTime() != null) {
-      return event.getEndTime();
-    }
-
-    return event.getTimestamp();
-  }
-
   // find the highest scoring existing group
   private EvidenceGroup findMatchingGroup(EvidenceEvent event, List<EvidenceGroup> groups) {
     EvidenceGroup bestGroup = null;
@@ -118,7 +97,7 @@ public class EvidenceCorrelationService {
       }
     }
 
-    if (bestGroup != null && bestScore >= 0.60) {
+    if (bestGroup != null && bestScore >= MINIMUM_CORRELATION_SCORE) {
       bestGroup.setCorrelationScore(bestScore);
       return bestGroup;
     }
@@ -153,7 +132,7 @@ public class EvidenceCorrelationService {
     double projectScore = projectMatchedScore(event, group);
     double contextScore = contextMatchScore(event, group);
 
-    return (temporalScore * 0.50) + (projectMatchedScore * 0.30) + (contextScore * 0.20);
+    return (temporalScore * 0.50) + (projectScore * 0.30) + (contextScore * 0.20);
   }
 
   //  check if there is shared project id with any event in the group
