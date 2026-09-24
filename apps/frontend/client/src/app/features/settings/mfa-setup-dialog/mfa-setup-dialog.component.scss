@@ -29,16 +29,31 @@
 .manual-key{
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 2px;
     margin-bottom: 12px;
     background: #f7f8fb;
     border-radius: 8px;
 }
 
 .manual-key-label{
-    font-family: 12px;
-    word-break: break-all;
+    font-size: 12px;
     font-family: monospace;
+    margin: 0;
+}
+
+
+.manual-key-instruction{
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #4b5563;
+    font-family: monospace;
+
+}
+
+.manual-key-instruction strong{
+    font-weight: 600;
+    color: #1f2937;
 }
 
 .dialog-field{
