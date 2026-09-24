@@ -13,7 +13,6 @@ import { AvailableTeamUser, TeamService } from '../../core/services/team.service
 import { AppEvent } from '../calendar/calendar.model';
 import { CalendarService } from '../calendar/calendar.services';
 import { NotificationPanelComponent } from '../notifications/notification-panel.component';
-import { Project } from '../projects/models/project.model';
 
 interface ActiveProjectCard {
   id: string;
