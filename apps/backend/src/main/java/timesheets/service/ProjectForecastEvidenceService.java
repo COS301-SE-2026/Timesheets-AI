@@ -34,7 +34,6 @@ public class ProjectForecastEvidenceService {
   private final ProjectMemberRepository projectMemberRepository;
   private final TaskRepository taskRepository;
 
-
   /*
   - this is what will get the evidence of each member in a project
   - I used helpers to break down the function logic
@@ -42,7 +41,8 @@ public class ProjectForecastEvidenceService {
   public List<EvidenceEvent> collectProjectEvidence(
       UUID projectId, LocalDateTime startTime, LocalDateTime endTime) {
 
-    List<ProjectMember> projectMembers = projectMemberRepository.findByProjectIdAndIsActiveTrue(projectId);
+    List<ProjectMember> projectMembers =
+        projectMemberRepository.findByProjectIdAndIsActiveTrue(projectId);
     List<EvidenceEvent> projectEvidence = new ArrayList<>();
 
     // collect evidence for every active member that belongs to the project
@@ -64,21 +64,23 @@ public class ProjectForecastEvidenceService {
     return filteredEvidence;
   }
 
-  //collects the GitHub evidence for a workspace member for the period of project forecast
-  public List<EvidenceEvent> collectGitHubEvidence(UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+  // collects the GitHub evidence for a workspace member for the period of project forecast
+  public List<EvidenceEvent> collectGitHubEvidence(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
     return gitHubEvidenceCollector.collect(workspaceMemberId, startTime, endTime);
   }
 
-    //collects the Jira evidence for a workspace member for the period of project forecast
-  public List<EvidenceEvent> collectJiraEvidence(UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+  // collects the Jira evidence for a workspace member for the period of project forecast
+  public List<EvidenceEvent> collectJiraEvidence(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
     return jiraEvidenceCollector.collect(workspaceMemberId, startTime, endTime);
   }
 
-  
-  //want to combine the evidence into one list
-  public List<EvidenceEvent> collectExternalEvidence(UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+  // want to combine the evidence into one list
+  public List<EvidenceEvent> collectExternalEvidence(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
     List<EvidenceEvent> evidence = new ArrayList<>();
 
@@ -88,14 +90,16 @@ public class ProjectForecastEvidenceService {
     return evidence;
   }
 
-
-  //filters the GitHub evidence
+  // filters the GitHub evidence
   private List<EvidenceEvent> filterGitHubEvidence(List<EvidenceEvent> evidence, UUID projectId) {
 
-    return evidence.stream().filter(event -> "GITHUB".equals(event.getSource())).filter(event -> projectId.equals(event.getProjectId())).toList();
+    return evidence.stream()
+        .filter(event -> "GITHUB".equals(event.getSource()))
+        .filter(event -> projectId.equals(event.getProjectId()))
+        .toList();
   }
 
-  //filters the Jira evidence
+  // filters the Jira evidence
   private List<EvidenceEvent> filterJiraEvidence(List<EvidenceEvent> evidence, UUID projectId) {
 
     List<EvidenceEvent> jiraEvidence = new ArrayList<>();
@@ -106,7 +110,7 @@ public class ProjectForecastEvidenceService {
         continue;
       }
 
-      //I am trying to handle that if the meta data is null, then I should handle that properly
+      // I am trying to handle that if the meta data is null, then I should handle that properly
       if (event.getMetadata() == null) {
         continue;
       }
@@ -124,8 +128,7 @@ public class ProjectForecastEvidenceService {
 
       try {
         taskId = UUID.fromString(localTaskId.toString());
-      } 
-      catch (IllegalArgumentException exception) {
+      } catch (IllegalArgumentException exception) {
         continue;
       }
 
@@ -142,11 +145,14 @@ public class ProjectForecastEvidenceService {
   /*
   - this prepares the response to sent to the ai-service
   - still keeping GitHuba and Jira separate so the forecast knows what exactly came from what */
-  public ProjectForecastEvidenceResponse getProjectEvidence(UUID projectId, LocalDateTime startTime, LocalDateTime endTime) {
+  public ProjectForecastEvidenceResponse getProjectEvidence(
+      UUID projectId, LocalDateTime startTime, LocalDateTime endTime) {
 
     List<EvidenceEvent> evidence = collectProjectEvidence(projectId, startTime, endTime);
-    List<EvidenceEvent> githubEvidence = evidence.stream().filter(event -> "GITHUB".equals(event.getSource())).toList();
-    List<EvidenceEvent> jiraEvidence = evidence.stream().filter(event -> "JIRA".equals(event.getSource())).toList();
+    List<EvidenceEvent> githubEvidence =
+        evidence.stream().filter(event -> "GITHUB".equals(event.getSource())).toList();
+    List<EvidenceEvent> jiraEvidence =
+        evidence.stream().filter(event -> "JIRA".equals(event.getSource())).toList();
 
     return ProjectForecastEvidenceResponse.builder()
         .projectId(projectId)
@@ -164,11 +170,19 @@ public class ProjectForecastEvidenceService {
 
     // if no evidence was found then this source is not available
     if (evidence.isEmpty()) {
-      return ExternalEvidenceSummary.builder().available(false).activityCount(0).latestActivity(null).activities(new ArrayList<>()).build();
+      return ExternalEvidenceSummary.builder()
+          .available(false)
+          .activityCount(0)
+          .latestActivity(null)
+          .activities(new ArrayList<>())
+          .build();
     }
 
-    //to count how many evidence event there are for each activity type
-    Map<String, Long> activityCounts = evidence.stream().filter(event -> event.getActivityType() != null).collect(Collectors.groupingBy(EvidenceEvent::getActivityType, Collectors.counting()));
+    // to count how many evidence event there are for each activity type
+    Map<String, Long> activityCounts =
+        evidence.stream()
+            .filter(event -> event.getActivityType() != null)
+            .collect(Collectors.groupingBy(EvidenceEvent::getActivityType, Collectors.counting()));
 
     List<ActivityCount> activities =
         activityCounts.entrySet().stream()
@@ -185,7 +199,12 @@ public class ProjectForecastEvidenceService {
     - its more so used as supporting, so that a whole picture on the evidence can be built
     - if the activity does not have a timestamp, then it is ignored
      */
-    LocalDateTime latestActivity = evidence.stream().map(EvidenceEvent::getTimestamp).filter(timestamp -> timestamp != null).max(LocalDateTime::compareTo).orElse(null);
+    LocalDateTime latestActivity =
+        evidence.stream()
+            .map(EvidenceEvent::getTimestamp)
+            .filter(timestamp -> timestamp != null)
+            .max(LocalDateTime::compareTo)
+            .orElse(null);
 
     return ExternalEvidenceSummary.builder()
         .available(true)

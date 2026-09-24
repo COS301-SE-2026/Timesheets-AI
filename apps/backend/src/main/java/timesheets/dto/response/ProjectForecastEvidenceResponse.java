@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProjectForecastEvidenceResponse {
 
-  //this is the project that the evidence is for
+  // this is the project that the evidence is for
   private UUID projectId;
   private ExternalEvidenceSummary github;
   private ExternalEvidenceSummary jira;
@@ -25,22 +25,23 @@ public class ProjectForecastEvidenceResponse {
   @AllArgsConstructor
   public static class ExternalEvidenceSummary {
 
-    //this will be for if evidence has been found for this source
+    // this will be for if evidence has been found for this source
     private boolean available;
     private int activityCount;
     private LocalDateTime latestActivity;
     private List<ActivityCount> activities;
   }
 
-  //this class will be the number of times a certain type of  activity has been found in the external evidence
+  // this class will be the number of times a certain type of  activity has been found in the
+  // external evidence
   @Data
   @Builder
   @NoArgsConstructor
   @AllArgsConstructor
   public static class ActivityCount {
 
-    //will be whether it is a COMMIT or an ISSUe that kinda thing
-    private String activityType; 
+    // will be whether it is a COMMIT or an ISSUe that kinda thing
+    private String activityType;
     private int count;
   }
 }
