@@ -139,5 +139,59 @@ public class ProjectForecastEvidenceService {
     return jiraEvidence;
   }
 
-  
+  /*
+  - this prepares the response to sent to the ai-service
+  - still keeping GitHuba and Jira separate so the forecast knows what exactly came from what */
+  public ProjectForecastEvidenceResponse getProjectEvidence(UUID projectId, LocalDateTime startTime, LocalDateTime endTime) {
+
+    List<EvidenceEvent> evidence = collectProjectEvidence(projectId, startTime, endTime);
+    List<EvidenceEvent> githubEvidence = evidence.stream().filter(event -> "GITHUB".equals(event.getSource())).toList();
+    List<EvidenceEvent> jiraEvidence = evidence.stream().filter(event -> "JIRA".equals(event.getSource())).toList();
+
+    return ProjectForecastEvidenceResponse.builder()
+        .projectId(projectId)
+        .github(buildEvidenceSummary(githubEvidence))
+        .jira(buildEvidenceSummary(jiraEvidence))
+        .build();
+  }
+
+  /*
+  - this will create a summary for an external evidence source
+  - instead of the ai-service just seeing all the events
+  - it just summarises whether evidence was found or not
+  */
+  private ExternalEvidenceSummary buildEvidenceSummary(List<EvidenceEvent> evidence) {
+
+    // if no evidence was found then this source is not available
+    if (evidence.isEmpty()) {
+      return ExternalEvidenceSummary.builder().available(false).activityCount(0).latestActivity(null).activities(new ArrayList<>()).build();
+    }
+
+    //to count how many evidence event there are for each activity type
+    Map<String, Long> activityCounts = evidence.stream().filter(event -> event.getActivityType() != null).collect(Collectors.groupingBy(EvidenceEvent::getActivityType, Collectors.counting()));
+
+    List<ActivityCount> activities =
+        activityCounts.entrySet().stream()
+            .map(
+                entry ->
+                    ActivityCount.builder()
+                        .activityType(entry.getKey())
+                        .count(entry.getValue().intValue())
+                        .build())
+            .toList();
+
+    /*
+    - to find the most recent activity from the evidence
+    - its more so used as supporting, so that a whole picture on the evidence can be built
+    - if the activity does not have a timestamp, then it is ignored
+     */
+    LocalDateTime latestActivity = evidence.stream().map(EvidenceEvent::getTimestamp).filter(timestamp -> timestamp != null).max(LocalDateTime::compareTo).orElse(null);
+
+    return ExternalEvidenceSummary.builder()
+        .available(true)
+        .activityCount(evidence.size())
+        .latestActivity(latestActivity)
+        .activities(activities)
+        .build();
+  }
 }
