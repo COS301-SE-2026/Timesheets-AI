@@ -24,8 +24,7 @@ public class SuggestionGenerationService {
 
     suggestion.setEvidenceEvents(new ArrayList<EvidenceEvent>(group.getEvidenceEvents()));
     suggestion.setConfidenceScore(group.getCorrelationScore());
-    suggestion.setDurationMinutes(
-        calculateDurationMinutes(group.getStartTime(), group.getEndTime()));
+    suggestion.setDurationMinutes(calculateDurationMinutes(group.getStartTime(), group.getEndTime()));
     suggestion.setProjectId(findProjectId(group.getEvidenceEvents()));
     suggestion.setTaskId(findTaskId(group.getEvidenceEvents()));
     suggestion.setTitle(generateTitle(group.getEvidenceEvents()));
@@ -35,7 +34,7 @@ public class SuggestionGenerationService {
     return suggestion;
   }
 
-  // accept multiple EvidenceGroups and generate one SuggestedWorkSession for each group
+  
   public List<SuggestedWorkSession> generateSuggestions(List<EvidenceGroup> groups) {
 
     List<SuggestedWorkSession> suggestions = new ArrayList<SuggestedWorkSession>();
