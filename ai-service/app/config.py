@@ -18,8 +18,12 @@ class Settings(BaseSettings):
     # here i'll place the api key for whatever api we use for the ai service
     anthropic_api_key: str = ""
     gemini_api_key: str = ""  # we went with gemini instead
+    
+    backend_url: str = "http://localhost:8080"
+    
     app_env: str = "development"
     log_level: str = "info"
+
 
 
 settings = Settings()
