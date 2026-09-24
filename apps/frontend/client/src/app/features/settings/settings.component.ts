@@ -5,7 +5,7 @@ import { MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from './settings.services';
 import { CurrentUserService } from './current-user.services';
-import { UserSettings, UserRole, IntegrationStatus, NotificationType } from './settings.model';
+import { UserSettings, UserRole, IntegrationStatus } from './settings.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
@@ -96,13 +96,57 @@ export class SettingsComponent implements OnInit{
 
   toggleMfa(enabled:boolean):void{
     if(enabled){
-      this.enabledMfa();
+      this.enableMfa();
     }else{
       this.disableMfa();
     }
   }
 
-  
+  private enableMfa(): void{
+    const dialogRef= this.dialog.open(
+      MfaSetupDialogComponent,
+      {
+        width: '480px',
+        maxWidth: '95vw',
+        disableClose: true
+      }
+    );
+
+    dialogRef.afterClosed().subscribe((enabled)=> {
+      if(!enabled){
+        return;
+      }
+
+      this.settings.update((s)=> (
+        s? {...s, security: {
+          ...s.security, mfaEnabled:true
+        }}:s
+      ));
+    });
+  }
+
+  private disableMfa(): void{
+    const dialogRef= this.dialog.open(
+      MfaDisableDialogComponent,
+      {
+        width: '480px',
+        maxWidth: '95vw',
+        disableClose: true
+      }
+    );
+
+    dialogRef.afterClosed().subscribe((disabled)=> {
+      if(!disabled){
+        return;
+      }
+
+      this.settings.update((s)=> (
+        s? {...s, security: {
+          ...s.security, mfaEnabled:false
+        }}:s
+      ));
+    });
+  }
 
   toggleIntegration(integration: IntegrationStatus, enabled:boolean):void{
     if(!this.canToggleIntegrations()){
@@ -130,25 +174,6 @@ export class SettingsComponent implements OnInit{
       });
   }
 
-  setNotificationType(notificationType: NotificationType):void{
-    const current= this.settings();
-
-    if(!current) return;
-
-    const notifications={
-      ...current.notifications, notificationType
-    };
-
-    this.settingsService.updateNotifications(notifications).subscribe(
-      ()=>{
-        this.settings.update(
-          (s)=>(
-            s? {...s, notifications}: s
-          )
-        );
-      }
-    );
-  }
   requestAccountDeletion():void{
     this.settingsService.requestAccountDeletion().subscribe(
       ()=>{
