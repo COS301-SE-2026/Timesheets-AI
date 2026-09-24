@@ -3,12 +3,18 @@ package timesheets.suggestions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import timesheets.evidence.EvidenceEvent;
 import timesheets.evidence.correlation.EvidenceGroup;
 
 @Service
+@RequiredArgsConstructor
 public class WorkSessionInferenceService {
+
+  private final SuggestionGenerationService suggestionGenerationService;
+  private final SuggestionService suggestionService;
+
   public List<SuggestedWorkSession> inferWorkSession(List<EvidenceGroup> evidenceGroups) {
 
     List<SuggestedWorkSession> sessions = new ArrayList<SuggestedWorkSession>();
@@ -17,18 +23,14 @@ public class WorkSessionInferenceService {
       return sessions;
     }
 
-    for (EvidenceGroup group : evidenceGroups) {
-      if (group == null
-          || group.getEvidenceEvents() == null
-          || group.getEvidenceEvents().isEmpty()) {
-        continue;
-      }
+    List<SuggestedWorkSession> generatedSuggestions =
+        suggestionGenerationService.generateSuggestions(evidenceGroups);
 
-      SuggestedWorkSession session = createSession(group);
-      suggestionService.save(session);
-      sessions.add(session);
+    for (SuggestedWorkSession suggestion : generatedSuggestions) {
+      SuggestedWorkSession saved = suggestionService.save(suggestion);
+
+      sessions.add(saved);
     }
-
     return sessions;
   }
 
@@ -36,7 +38,7 @@ public class WorkSessionInferenceService {
     SuggestedWorkSession session = new SuggestedWorkSession();
 
     session.setId(UUID.randomUUID());
-    session.setWorkspaceMemberId(group.getWorkspaceMeberMemberId());
+    session.setWorkspaceMemberId(group.getWorkspaceMemberId());
     session.setStartTime(group.getStartTime());
     session.setEndTime(group.getEndTime());
     session.setEvidenceEvents(new ArrayList<EvidenceEvent>(group.getEvidenceEvents()));
@@ -83,24 +85,6 @@ public class WorkSessionInferenceService {
     }
 
     return "Suggested work session";
-  }
-
-  private double calculateConfidence(EvidenceGroup group) {
-    int evidenceCount = group.getEvidenceEvents().size();
-
-    if (evidenceCount >= 4) {
-      return 0.90;
-    }
-
-    if (evidenceCount == 3) {
-      return 0.80;
-    }
-
-    if (evidenceCount == 2) {
-      return 0.70;
-    }
-
-    return 0.50;
   }
 
   private Integer calculateDurationMinutes(EvidenceGroup group) {
