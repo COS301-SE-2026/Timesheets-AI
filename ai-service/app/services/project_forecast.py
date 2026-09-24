@@ -31,6 +31,7 @@ from app.models.project import Project
 from app.models.project_member import ProjectMember
 from app.models.task import Task
 from app.models.time_entry import TimeEntry
+from app.services.project_forecast_evidence import get_project_forecast_evidence
 
 # I am using the last 14 days of the teams activity
 # choosing this window so we see how a team is doing for an extended period of time
@@ -47,7 +48,11 @@ SCHEDULE_AT_RISK_DELAY_DAYS = 7
 MIN_TASK_ESTIMATE_COVERAGE = 0.80
 
 
-def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | None:
+def calculate_project_forecast(
+    db: Session,
+    project_id: uuid.UUID,
+    access_token: str | None = None,
+) -> dict | None:
     """
     - this is the main function, it is what will bring the project, its tasks, and calculate the different forecast sections
     """
@@ -58,6 +63,10 @@ def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | Non
 
     if project is None:
         return None
+
+    # external evidence uses the same recent period as the team velocity
+    evidence_end_time = datetime.now(timezone.utc).replace(tzinfo=None)
+    evidence_start_time = evidence_end_time - timedelta(days=LOOKBACK_DAYS)
 
     tasks = db.query(Task).filter(Task.project_id == project_id, Task.is_deleted.is_(False)).all()
 
@@ -79,10 +88,23 @@ def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | Non
 
     risk = _calculate_risk(budget, schedule, task_progress)
 
+    external_evidence = None
+
+    # external evidence is supporting information only
+    # the project forecast should still work if it cannot be retrieved
+    if access_token:
+        external_evidence = get_project_forecast_evidence(
+            project_id=project_id,
+            start_time=evidence_start_time,
+            end_time=evidence_end_time,
+            access_token=access_token,
+        )
+
     confidence = _calculate_forecast_confidence(
         project,
         tasks,
         velocity_data,
+        external_evidence,
     )
 
     return {
@@ -99,6 +121,9 @@ def calculate_project_forecast(db: Session, project_id: uuid.UUID) -> dict | Non
         },
         "risk": risk,
         "confidence": confidence,
+        "external_evidence": (
+            external_evidence.model_dump(by_alias=True) if external_evidence is not None else None
+        ),
     }
 
 
@@ -297,6 +322,11 @@ def _calculate_schedule_forecast(
         "planned_end_date": planned_end_date,
         "forecast_end_date": forecast_end_date,
         "delay_days": delay_days,
+        "timeline_progress_percentage": (
+            round(timeline_progress_percentage, 2)
+            if timeline_progress_percentage is not None
+            else None
+        ),
     }
 
 
@@ -397,6 +427,7 @@ def _calculate_forecast_confidence(
     project: Project,
     tasks: list[Task],
     velocity_data: dict,
+    external_evidence,
 ) -> dict:
     """
     - this will check how much data was available for the forcast
@@ -453,13 +484,22 @@ def _calculate_forecast_confidence(
         estimate_coverage_percentage = 0.0
         missing_evidence.append("TASK_ESTIMATES")
 
-        # this will check whether there was enough recent logged time to calculate the team velocity
-        if velocity_data["has_sufficient_data"]:
-            evidence_available += 1
-        else:
-            missing_evidence.append("RECENT_VELOCITY")
+    # this will check whether there was enough recent logged time to calculate the team velocity
+    if velocity_data["has_sufficient_data"]:
+        evidence_available += 1
+    else:
+        missing_evidence.append("RECENT_VELOCITY")
 
-    evidence_total = 5
+    has_external_evidence = external_evidence is not None and (
+        external_evidence.github.available or external_evidence.jira.available
+    )
+
+    if has_external_evidence:
+        evidence_available += 1
+    else:
+        missing_evidence.append("EXTERNAL_EVIDENCE")
+
+    evidence_total = 6
 
     # if there is not enough data then I cannot have strong confidence in the forecast
     if evidence_available >= 5:

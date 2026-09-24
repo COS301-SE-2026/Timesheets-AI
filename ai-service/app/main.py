@@ -21,6 +21,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api import project_forecast_evidence
 from app.api.anomaly import router as anomaly_router
 from app.api.burnout import router as burnout_router
 from app.api.dashboard import router as dashboard_router
@@ -29,6 +30,7 @@ from app.api.dev_trigger import router as dev_trigger_router
 from app.api.health import router as health_router
 from app.api.manager_assistant import router as manager_assistant_router
 from app.api.productivity import router as productivity_router
+from app.api.project_forecast import router as project_forecast_router
 from app.api.task_switching import router as task_switching_router
 from app.api.weekly_summary import router as weekly_summary_router
 from app.scheduler import start_scheduler, stop_scheduler
@@ -66,6 +68,8 @@ app.include_router(weekly_summary_router)
 app.include_router(dashboard_router)
 app.include_router(dev_trigger_router)
 app.include_router(manager_assistant_router)
+app.include_router(project_forecast_evidence.router)
+app.include_router(project_forecast_router)
 
 
 @app.get("/health", tags=["Health"])

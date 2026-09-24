@@ -22,7 +22,6 @@ from app.api.anomaly import router as anomaly_router
 from app.api.burnout import router as burnout_router
 from app.api.dashboard import router as dashboard_router
 from app.api.delivery_forecast import router as delivery_forecast_router
-from app.api.project_forecast import router as project_forecast_router
 from app.api.weekly_summary import router as weekly_summary_router
 from app.scheduler import start_scheduler, stop_scheduler
 
@@ -54,7 +53,6 @@ app.include_router(delivery_forecast_router)
 app.include_router(anomaly_router)
 app.include_router(weekly_summary_router)
 app.include_router(dashboard_router)
-app.include_router(project_forecast_router)
 
 
 @app.get("/health", tags=["Health"])
