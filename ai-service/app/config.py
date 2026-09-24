@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     gemini_api_key: str = ""  # we went with gemini instead
     
-    backend_url: str = "http://localhost:8080"
+    backend_url: str
     
     app_env: str = "development"
     log_level: str = "info"
