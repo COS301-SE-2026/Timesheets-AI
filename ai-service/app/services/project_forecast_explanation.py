@@ -79,6 +79,8 @@ def _build_project_forecast_prompt(forecast: dict) -> str:
     The forecast has already been calculated by the Momently forecasting service.
     You are NOT responsible for calculating, correcting, replacing, or predicting any forecast values.
 
+    The deterministic forecast below is the only source of truth.
+
     STRICT RULES:
     1. Use only information contained in the supplied forecast.
 
@@ -89,7 +91,13 @@ def _build_project_forecast_prompt(forecast: dict) -> str:
     - task counts
     - GitHub activity
     - Jira activity
-    
+    - team capacity
+    - team size
+    - deadlines
+    - causes of delays
+    - causes of low velocity
+    - causes of budget overruns
+
     3. Never change or recalculate any deterministic forecast value.
 
     4. Do not claim that one metric caused another metric.
@@ -100,11 +108,22 @@ def _build_project_forecast_prompt(forecast: dict) -> str:
     - logged time
     - task estimates
     - project budget
+    - calculated velocity
+    - calculated completion date
+    - deterministic risk indicators
 
+    6. If GitHub or Jira has available=false, do not assume that there was no activity. State only that evidence from that source was unavailable.
+
+    7. If a forecast field is null, unknown, unavailable, or listed under missing_evidence, acknowledge the limitation instead of guessing.
+
+    8. Respect the supplied confidence level. 
+    If confidence is LOW or MEDIUM, make the uncertainty clear in the explanation and avoid presenting the forecast as certain.
 
     FORECAST:
 
     {forecast_json}
+
+    Return VALID JSON ONLY.
 
 
     Return exactly this structure:
@@ -126,9 +145,12 @@ def _build_project_forecast_prompt(forecast: dict) -> str:
     For contributing_factors:
     - include only factors supported by the forecast
     - prioritize the factors most relevant to risk and confidence
+    - do not invent missing information
 
     For recommendations:
     - provide between 1 and 3 recommendations
+    - make each recommendation specific to the supplied evidence
+    - focus on actions the manager can take
     - do not recommend changing a deterministic forecast value
     """.strip()
 
