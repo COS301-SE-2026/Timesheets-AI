@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import timesheets.evidence.correlation.EvidenceEngineService;
 
@@ -32,6 +33,8 @@ public class SuggestionController {
     return evidenceEngineService.generateSuggestions(workspaceMemberId, startTime, endTime);
   }
 
+  // so it can create time entry and update suggestion status
+  @Transactional
   @PostMapping("/{suggestionId}/approve")
   public SuggestedWorkSession approve(@PathVariable UUID suggestionId) {
     return suggestionService.approve(suggestionId);
@@ -47,6 +50,12 @@ public class SuggestionController {
       @PathVariable UUID suggestionId, @RequestBody EditSuggestionRequest request) {
 
     return suggestionService.edit(
-        suggestionId, request.getTitle(), request.getStartTime(), request.getEndTime());
+        suggestionId,
+        request.getTitle(),
+        request.getProjectId(),
+        request.getTaskId(),
+        request.getDescription(),
+        request.getStartTime(),
+        request.getEndTime());
   }
 }
