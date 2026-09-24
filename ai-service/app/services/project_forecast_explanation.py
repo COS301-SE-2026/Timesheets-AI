@@ -119,12 +119,27 @@ def _build_project_forecast_prompt(forecast: dict) -> str:
     8. Respect the supplied confidence level. 
     If confidence is LOW or MEDIUM, make the uncertainty clear in the explanation and avoid presenting the forecast as certain.
 
+    9. Recommendations must be actionable for a project manager and must respond directly to evidence in the supplied forecast.
+
+    10. Recommendations must not introduce unsupported facts.
+        For example, do not recommend adding a team member unless the supplied evidence supports a capacity concern. You may instead recommend reviewing
+        capacity or workload where appropriate.
+
+    11. Do not describe GitHub commit counts as hours worked or productivity. They are activity evidence only.
+
+    12. Do not describe Jira activity as proof that work is complete unless the supplied deterministic task data says that work is complete.
+
+    13. Keep the explanation concise, factual, neutral, and suitable for display inside a project insights interface.
+
     FORECAST:
 
     {forecast_json}
 
     Return VALID JSON ONLY.
 
+    Do not include markdown.
+    Do not include ```json code fences.
+    Do not include text before or after the JSON.
 
     Return exactly this structure:
 
