@@ -24,7 +24,7 @@ Date: 22/09/2026
 import uuid
 from datetime import date, datetime, timedelta, timezone
 
-from sqlalchemy import func
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models.project import Project
@@ -32,6 +32,9 @@ from app.models.project_member import ProjectMember
 from app.models.task import Task
 from app.models.time_entry import TimeEntry
 from app.services.project_forecast_evidence import get_project_forecast_evidence
+from app.services.project_forecast_explanation import (
+    generate_project_forecast_explanation,
+)
 
 # I am using the last 14 days of the teams activity
 # choosing this window so we see how a team is doing for an extended period of time
@@ -107,7 +110,7 @@ def calculate_project_forecast(
         external_evidence,
     )
 
-    return {
+    forecast = {
         "project_id": project.id,
         "project_name": project.name,
         "budget": budget,
@@ -125,6 +128,12 @@ def calculate_project_forecast(
             external_evidence.model_dump(by_alias=True) if external_evidence is not None else None
         ),
     }
+
+    ai_explanation = generate_project_forecast_explanation(forecast)
+
+    forecast["ai_explanation"] = ai_explanation.model_dump() if ai_explanation is not None else None
+
+    return forecast
 
 
 def _get_used_hours(db: Session, project_id: uuid.UUID) -> float:
@@ -192,13 +201,9 @@ def _get_recent_team_velocity(db: Session, project_id: uuid.UUID) -> dict:
     since = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=LOOKBACK_DAYS)
 
     # I do not want members who are not active to contribute to the team velocity
-    active_member_ids = (
-        db.query(ProjectMember.workspace_member_id)
-        .filter(
-            ProjectMember.project_id == project_id,
-            ProjectMember.is_active.is_(True),
-        )
-        .subquery()
+    active_member_ids = select(ProjectMember.workspace_member_id).where(
+        ProjectMember.project_id == project_id,
+        ProjectMember.is_active.is_(True),
     )
 
     total_seconds = (

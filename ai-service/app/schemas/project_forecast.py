@@ -12,6 +12,7 @@ from datetime import date
 from pydantic import BaseModel
 
 from app.schemas.project_forecast_evidence import ProjectForecastEvidenceResponse
+from app.schemas.project_forecast_explanation import ProjectForecastExplanation
 
 
 class ProjectBudgetForecast(BaseModel):
@@ -101,5 +102,6 @@ class ProjectForecastResponse(BaseModel):
     risk: ProjectRisk
     confidence: ProjectForecastConfidence
     external_evidence: ProjectForecastEvidenceResponse | None = None
+    ai_explanation: ProjectForecastExplanation | None = None
 
     model_config = {"from_attributes": True}
