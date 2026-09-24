@@ -7,14 +7,17 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.SuggestedWorkSessionEntity;
 import timesheets.repository.SuggestionRepository;
+import timesheets.service.TimeEntryService;
 
 @Service
 @RequiredArgsConstructor
 public class SuggestionService {
 
   private final SuggestionRepository suggestionRepository;
+  private final TimeEntryService timeEntryService;
 
   public List<SuggestedWorkSession> getSuggestions(UUID workspaceMemberId) {
 
@@ -53,10 +56,22 @@ public class SuggestionService {
 
     SuggestedWorkSession suggestion = getSuggestion(suggestionId);
 
-    if (suggestion.getStatus() != SuggestionStatus.PENDING) {
-      throw new RuntimeException("Only pending suggestions can be approved");
+    if (suggestion.getStatus() != SuggestionStatus.PENDING
+        && suggestion.getStatus() != SuggestionStatus.EDITED) {
+      throw new RuntimeException("Only pending or edited suggestions can be approved");
     }
 
+    // the approval creates real time entry
+
+    suggestion.setProjectId(suggestion.getProjectId());
+    suggestion.setTaskId(suggestion.getTaskId());
+    suggestion.setStartTime(suggestion.getStartTime());
+    suggestion.setEndTime(suggestion.getEndTime());
+    suggestion.setDurationSeconds(suggestion.getDurationMinutes() * 60);
+    suggestion.setEntryType("AI_SUGGESTION");
+    suggestion.setDescription(suggestion.getTitle());
+
+    timeEntryService.createTimeEntry(request);
     suggestion.setStatus(SuggestionStatus.APPROVED);
 
     return save(suggestion);
@@ -75,8 +90,15 @@ public class SuggestionService {
     return save(suggestion);
   }
 
+  @Transactional
   public SuggestedWorkSession edit(
-      UUID suggestionId, String title, LocalDateTime startTime, LocalDateTime endTime) {
+      UUID suggestionId,
+      String title,
+      UUID projectId,
+      UUID taskId,
+      String description,
+      LocalDateTime startTime,
+      LocalDateTime endTime) {
 
     SuggestedWorkSession suggestion = getSuggestion(suggestionId);
 
@@ -85,6 +107,9 @@ public class SuggestionService {
     }
 
     suggestion.setTitle(title);
+    suggestion.setProjectId(projectId);
+    suggestion.setTaskId(taskId);
+    suggestion.setDescription(description);
     suggestion.setStartTime(startTime);
     suggestion.setEndTime(endTime);
 
