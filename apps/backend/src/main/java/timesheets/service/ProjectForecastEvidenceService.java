@@ -68,14 +68,23 @@ public class ProjectForecastEvidenceService {
   public List<EvidenceEvent> collectGitHubEvidence(
       UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
-    return gitHubEvidenceCollector.collect(workspaceMemberId, startTime, endTime);
+    try {
+      return gitHubEvidenceCollector.collect(workspaceMemberId, startTime, endTime);
+    } catch (RuntimeException exception) {
+      return new ArrayList<>();
+    }
   }
 
   // collects the Jira evidence for a workspace member for the period of project forecast
   public List<EvidenceEvent> collectJiraEvidence(
       UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
-    return jiraEvidenceCollector.collect(workspaceMemberId, startTime, endTime);
+    try {
+      return jiraEvidenceCollector.collect(workspaceMemberId, startTime, endTime);
+
+    } catch (RuntimeException exception) {
+      return new ArrayList<>();
+    }
   }
 
   // want to combine the evidence into one list
