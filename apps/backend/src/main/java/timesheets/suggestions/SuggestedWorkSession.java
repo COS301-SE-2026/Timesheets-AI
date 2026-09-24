@@ -23,6 +23,7 @@ public class SuggestedWorkSession {
   private Integer durationMinutes;
   private String explanation;
   private SuggestionStatus status;
+  private String description;
 
   public SuggestedWorkSessionEntity toEntity() {
 
@@ -36,6 +37,7 @@ public class SuggestedWorkSession {
         .taskId(taskId)
         .confidenceScore(confidenceScore)
         .durationMinutes(durationMinutes)
+        .description(description)
         .explanation(explanation)
         .status(status != null ? status.name() : null)
         .build();
@@ -54,6 +56,7 @@ public class SuggestedWorkSession {
     suggestion.setTaskId(entity.getTaskId());
     suggestion.setConfidenceScore(entity.getConfidenceScore());
     suggestion.setDurationMinutes(entity.getDurationMinutes());
+    suggestion.setDescription(entity.getDescription());
     suggestion.setExplanation(entity.getExplanation());
 
     if (entity.getStatus() != null) {
