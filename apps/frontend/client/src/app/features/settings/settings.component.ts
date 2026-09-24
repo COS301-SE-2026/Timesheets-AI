@@ -9,6 +9,8 @@ import { UserSettings, UserRole, IntegrationStatus, NotificationType } from './s
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
+import { MfaSetupDialogComponent } from './mfa-setup-dialog/mfa-setup-dialog.component';
+import { MfaDisab}
 @Component({
   selector: 'app-settings',
   standalone: true,
