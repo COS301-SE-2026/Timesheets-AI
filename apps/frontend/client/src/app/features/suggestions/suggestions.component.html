@@ -1,0 +1,95 @@
+<div class="suggestions-page">
+    <h1> Suggested Work</h1>
+
+    <p> 
+        Review your work detected from your connected activity before adding it to your timesheets of the week. 
+    </p>
+
+    <div *ngIf="loading">
+        Loading suggestions ...
+    </div>
+
+    <div *ngIf="errorMessage">
+        {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!loading && suggestions.length === 0">
+        No suggested work availiable
+    </div>
+
+    <div *ngIf="!loading && suggestions.length > 0">
+        <h2> Pending Suggestions </h2>
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Project</th>
+                    <th>Evidence</th>
+                    <th>Duration</th>
+                    <th>Confidence Score</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let suggestion of suggestions">
+                    <td>
+                        {{formatDate(suggestion.startTime)}}
+                        <br>
+
+                        {{formatTime(suggestion.startTime)}}
+                        -
+                        {{formatTime(suggestion.endTime)}}
+                    </td>
+
+                    <td>
+                        <div>
+                            {{ suggestion.projectId || 'No project found'}}
+                        </div>
+
+                        <div>
+                            {{ suggestion.taskId || 'No task Id found'}}
+                        </div>
+                    </td>
+
+                    <td>
+                        {{ suggestion.evidenceEvents.length}} events
+
+                        <br>
+
+                        {{ getSourceSummary(suggestion)}}
+                    </td>
+
+                    <td>
+                        {{suggestion.durationMinutes}} min
+                    </td>
+
+                    <td>
+                        {{suggestion.confidenceScore * 100}}% 
+                    </td>
+
+                    <td>
+                        {{suggestion.title}} 
+                    </td>
+
+                    <td>
+                        {{suggestion.status}} 
+                    </td>
+
+                    <td>
+                    <button type="button" (click)="approveSuggestion(suggestion)" [disabled]="suggestion.status !== 'PENDING' && suggestion.status !== 'EDITED'">
+                        Approve
+                    </button>
+
+                    <button type="button" (click)="rejectSuggestion(suggestion)" [disabled]="suggestion.status !== 'PENDING' && suggestion.status !== 'EDITED'">
+                        Reject
+                    </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
