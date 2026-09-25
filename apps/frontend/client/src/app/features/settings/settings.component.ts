@@ -11,6 +11,7 @@ import { ChangePasswordDialogComponent } from './change-password-dialog/change-p
 import { MfaSetupDialogComponent } from './mfa-setup-dialog/mfa-setup-dialog.component';
 import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dialog.component';
 import { AuthService } from '../../core/services/auth.service';
+import { IntegrationBrowserDialogComponent } from './integration-browser-dialog/integration-browser-dialog.component';
 @Component({
   selector: 'app-settings',
   standalone: true,
@@ -83,6 +84,28 @@ export class SettingsComponent implements OnInit{
     this.settingsService.getSettings(user.mfaEnabled).subscribe((settings)=> {
       this.settings.set(settings);
       this.isLoading.set(false)
+    });
+  }
+
+  browseIntegrations(): void{
+    if(!this.canAddIntegrations()){
+      return;
+    }
+
+    const dialogRef= this.dialog.open(
+      IntegrationBrowserDialogComponent,{
+        width: '700px',
+        maxWidth: '95vw',
+        disableClose: true
+      }
+    );
+
+    dialogRef.afterClosed().subscribe((integration)=> {
+      if(!integration){
+        return;
+      }
+
+      console.log('Integration selected:', integration);
     });
   }
 
