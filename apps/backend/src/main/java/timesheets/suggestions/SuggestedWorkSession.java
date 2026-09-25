@@ -21,6 +21,8 @@ public class SuggestedWorkSession {
   private List<EvidenceEvent> evidenceEvents = new ArrayList<EvidenceEvent>();
   private double confidenceScore;
   private Integer durationMinutes;
+  private Integer durationSeconds;
+  private String entryType;
   private String explanation;
   private SuggestionStatus status;
   private String description;
