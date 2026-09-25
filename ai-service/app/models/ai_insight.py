@@ -11,9 +11,10 @@ Patch: added workspace id
 
 import uuid
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -43,4 +44,17 @@ class AIInsight(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     recommendation: Mapped[str | None] = mapped_column(Text, nullable=True)
     narrative: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    data: Mapped[dict | None] = mapped_column(
+        JSONB,
+        nullable=True,
+    )
+    last_synced_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=lambda: datetime.now(ZoneInfo("Africa/Johannesburg")).replace(tzinfo=None),
+    )
