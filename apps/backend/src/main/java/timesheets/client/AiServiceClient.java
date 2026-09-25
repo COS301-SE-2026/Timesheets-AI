@@ -85,8 +85,6 @@ public class AiServiceClient {
         .body(new ParameterizedTypeReference<ProjectForecastResponse>() {});
   }
 
-  
-
   /*
   - used the style that Zamo originally did
   - this creates the client to communicate with the ai service
