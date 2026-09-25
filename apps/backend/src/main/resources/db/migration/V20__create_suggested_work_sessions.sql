@@ -4,6 +4,7 @@ CREATE TABLE suggested_work_sessions (
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP NOT NULL,
     title VARCHAR(255),
+    description TEXT,
     project_id UUID,
     task_id UUID,
     confidence_score DOUBLE PRECISION,
