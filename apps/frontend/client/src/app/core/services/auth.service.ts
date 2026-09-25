@@ -34,6 +34,7 @@ export interface AuthUser {
   emailVerified: boolean;
   roles: string[];
   mfaEnabled: boolean;
+  workspaceMemberId: string | null;
 }
 export interface AuthResponse {
   token: string;
