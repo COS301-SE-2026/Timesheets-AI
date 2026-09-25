@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import timesheets.domain.SuggestedWorkSessionEntity;
+import timesheets.dto.request.TimeEntryRequest;
 import timesheets.repository.SuggestionRepository;
 import timesheets.service.TimeEntryService;
 
@@ -63,13 +64,24 @@ public class SuggestionService {
 
     // the approval creates real time entry
 
-    suggestion.setProjectId(suggestion.getProjectId());
-    suggestion.setTaskId(suggestion.getTaskId());
-    suggestion.setStartTime(suggestion.getStartTime());
-    suggestion.setEndTime(suggestion.getEndTime());
-    suggestion.setDurationSeconds(suggestion.getDurationMinutes() * 60);
-    suggestion.setEntryType("AI_SUGGESTION");
-    suggestion.setDescription(suggestion.getTitle());
+    // Calculate duration in seconds for TimeEntryRequest
+    Integer durationSeconds = null;
+    if (suggestion.getStartTime() != null && suggestion.getEndTime() != null) {
+      durationSeconds =
+          (int) Duration.between(suggestion.getStartTime(), suggestion.getEndTime()).toSeconds();
+    } else if (suggestion.getDurationMinutes() != null) {
+      durationSeconds = suggestion.getDurationMinutes() * 60;
+    }
+
+    // Map suggestion parameters into time entry request
+    TimeEntryRequest request = new TimeEntryRequest();
+    request.setProjectId(suggestion.getProjectId());
+    request.setTaskId(suggestion.getTaskId());
+    request.setStartTime(suggestion.getStartTime());
+    request.setEndTime(suggestion.getEndTime());
+    request.setDurationSeconds(suggestion.getDurationMinutes() * 60);
+    request.setDescription(suggestion.getTitle());
+    request.setEntryType("AI_SUGGESTION");
 
     timeEntryService.createTimeEntry(request);
     suggestion.setStatus(SuggestionStatus.APPROVED);
