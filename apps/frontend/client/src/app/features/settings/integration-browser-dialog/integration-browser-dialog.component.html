@@ -1,0 +1,55 @@
+<!-- 
+Author: Cleopatra Kwenda
+Date: 2026-09-25
+Purpose: Settings page 
+created a broswe dialog for more integrations they can add to their workspace
+Realated Requirement: N/A
+-->
+
+<div class="dialog-header">
+    <div>
+        <h2> Browse Integrations</h2>
+        <p>
+            Add integrations that can be  made available to your workspace.
+        </p>
+    </div>
+
+    <button
+        type="button"
+        class="close-button"
+        (click)="cancel()"
+        aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+</div>
+
+<div class="integration-grid">
+    @for(integration of integrations; track integration.id){
+        <div class="integration-option">
+            <div class="integration-icon">
+                <i [class]="integration.icon"></i>
+            </div>
+
+            <div class="integration-info">
+                <h3>{{ integration.name }}</h3>
+                <p>{{ integration.description }}</p>
+            </div>
+
+            <button
+                type="button"
+                class="add-button"
+                (click)="canAddIntegration(integration)">
+                Add
+            </button>
+        </div>
+    }
+</div>
+
+<div class="dialog-actions">
+    <button
+        type="button"
+        class="secondary-button"
+        (click)="cancel()">
+        Cancel
+    </button>
+</div>
