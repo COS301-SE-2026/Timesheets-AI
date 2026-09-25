@@ -475,6 +475,12 @@ public class AuthService {
       expiresAt = LocalDateTime.now().plusDays(expirationDays);
     }
 
+    UUID workspaceMemberId =
+        workspaceMemberRepository.findByUserId(user.getId()).stream()
+            .findFirst()
+            .map(membership -> membership.getId())
+            .orElse(null);
+
     AuthResponse.UserInfo userInfo =
         AuthResponse.UserInfo.builder()
             .id(user.getId().toString())
@@ -485,6 +491,7 @@ public class AuthService {
             .avatarUrl(user.getAvatarUrl())
             .roles(roles)
             .mfaEnabled(mfaEnabled)
+            .workspaceMemberId(workspaceMemberId != null ? workspaceMemberId.toString() : null)
             .build();
 
     return AuthResponse.builder()
