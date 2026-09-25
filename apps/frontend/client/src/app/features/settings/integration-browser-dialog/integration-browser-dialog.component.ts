@@ -15,8 +15,8 @@ interface AvaiableIntegrations{
     imports: [
         CommonModule
     ],
-    templateUrl: './integartion-browser-dialog.component.html',
-    styleUrl: './integartion-browser-dialog.component.scss'
+    templateUrl: './integration-browser-dialog.component.html',
+    styleUrl: './integration-browser-dialog.component.scss'
 })
 
 export class IntegrationBrowserDialogComponent{
