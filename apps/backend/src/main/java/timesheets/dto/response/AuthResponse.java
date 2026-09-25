@@ -33,5 +33,6 @@ public class AuthResponse {
     private Boolean emailVerified;
     private List<String> roles;
     private Boolean mfaEnabled;
+    private String workspaceMemberId;
   }
 }
