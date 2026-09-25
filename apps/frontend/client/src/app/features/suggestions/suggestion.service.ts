@@ -3,7 +3,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { SuggestedWorkSession } from './models/suggested-work-session';
+import { SuggestedWorkSession } from './models/suggested.model';
 
 @Injectable({
     providedIn: 'root'

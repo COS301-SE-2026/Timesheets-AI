@@ -164,9 +164,16 @@ export const routes: Routes = [
         .then(m => m.NotificationsPageComponent),
   },
 
+  { 
+    path: 'suggestions',
+    canActivate: [authGuard, workspaceGuard],
+    loadComponent: () => import('./features/suggestions/suggestions.component').then((m) => m.SuggestionsComponent)
+  }, 
+
   /* Catch-all wildcard (redirects to 404) */
   {
     path: '**',
     redirectTo: 'not-found',
   },
+
 ];
