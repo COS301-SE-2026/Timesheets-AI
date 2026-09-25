@@ -4,6 +4,9 @@ its a rest client not webclient.
 
 Author: Zamokuhle Zwane
 Date: 02/09/2026
+
+Updated: Nyasha
+date 25/09/2026
 */
 
 package timesheets.client;
@@ -19,6 +22,8 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import timesheets.dto.response.AiDashboardResponse;
+import timesheets.dto.response.ProjectForecastResponse;
+import timesheets.dto.response.SavedProjectForecastResponse;
 
 @Component
 @RequiredArgsConstructor
@@ -51,5 +56,50 @@ public class AiServiceClient {
         .uri("/insights/dashboard/{workspaceMemberId}", workspaceMemberId)
         .retrieve()
         .body(new ParameterizedTypeReference<AiDashboardResponse>() {});
+  }
+
+  /*
+  - gets the recent project from the ai service
+  - allows springboot to expose the last synced forcast to the frontend
+  - returned response has the saved forecast and the last sync
+   */
+  public SavedProjectForecastResponse getProjectForecast(UUID projectId) {
+    RestClient client = buildClient();
+
+    return client
+        .get()
+        .uri("/insights/project-forecast/{projectId}", projectId)
+        .retrieve()
+        .body(new ParameterizedTypeReference<SavedProjectForecastResponse>() {});
+  }
+
+  public ProjectForecastResponse syncProjectForecast(UUID projectId, String authorization) {
+
+    RestClient client = buildClient();
+
+    return client
+        .post()
+        .uri("/insights/project-forecast/{projectId}/sync", projectId)
+        .header("Authorization", authorization)
+        .retrieve()
+        .body(new ParameterizedTypeReference<ProjectForecastResponse>() {});
+  }
+
+  
+
+  /*
+  - used the style that Zamo originally did
+  - this creates the client to communicate with the ai service
+  - also makes sure that the snake fields returned by python as mapped into the java response dto
+   */
+  private RestClient buildClient() {
+    return restClientBuilder
+        .baseUrl(aiServiceBaseUrl)
+        .messageConverters(
+            converters -> {
+              converters.removeIf(c -> c instanceof MappingJackson2HttpMessageConverter);
+              converters.add(new MappingJackson2HttpMessageConverter(snakeCaseMapper));
+            })
+        .build();
   }
 }
