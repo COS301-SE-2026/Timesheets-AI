@@ -15,8 +15,9 @@ from pydantic import BaseModel
 
 class ProjectForecastScenario(BaseModel):
     """
-    - will be the calculated result of one project forecast scenario 
+    - will be the calculated result of one project forecast scenario
     """
+
     scenario_type: str
     scenario_name: str
 
