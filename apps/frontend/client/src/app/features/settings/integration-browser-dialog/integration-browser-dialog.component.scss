@@ -1,0 +1,117 @@
+// Author: Cleopatra Kwenda
+// Date:2026-09-25
+// Purpose: browser page styling 
+
+.dialog-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+
+    h2{
+        margin: 0 0 6px;
+        font-size: 20px;
+        color: #1f2937;
+    }
+
+    p{
+        margin: 0;
+        color: #6b7a99;
+        font-size: 14px;
+    }
+}
+
+.close-button{
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+
+    &:hover{
+        color: #1f2937;
+    }
+}
+
+.integration-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.integration-option{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.integration-icon{
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #f7f8fb;
+    color: #374151;
+    font-size: 20px;
+}
+
+.integration-info{
+    flex: 1;
+    min-width: 0;
+
+    h3{
+        margin: 0 0 4px;
+        font-size: 14px;
+        color: #1f2937;
+    }
+
+    p{
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.4;
+        color: #6b7280;
+    }
+}
+
+.add-button{
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    background: #2563eb;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover{
+        background: #1d4ed8;
+    }
+}
+
+.dialog-actions{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.secondary-button{
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 8px 16px;
+    background: white;
+    color: #374151;
+    cursor: pointer;
+}
+
+@media( max-width: 650px){
+    .integration-grid{
+        grid-template-columns: 1fr;
+    }
+}
