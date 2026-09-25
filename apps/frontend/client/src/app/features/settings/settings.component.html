@@ -115,7 +115,6 @@ Realated Requirement: N/A
 
                             <mat-slide-toggle
                                 [checked]="integration.enabled"
-                                [disabled]="!canToggleIntegrations()"
                                 (change)="toggleIntegration(integration, $event.checked)">
                             </mat-slide-toggle>
 
