@@ -93,9 +93,7 @@ Realated Requirement: N/A
 
             <div class="card-body">
                 @for(integration of s.integrations; track integration.id){
-                    <div 
-                        class="integration-row"
-                        [class.read-only]="isDeveloper()">
+                    <div class="integration-row">
                         <i [class]="integration.icon"></i>
                         <div class="integration-info">
                             <span class="label-title">
