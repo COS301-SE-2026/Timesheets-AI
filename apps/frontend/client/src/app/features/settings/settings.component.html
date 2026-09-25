@@ -119,9 +119,9 @@ Realated Requirement: N/A
                                 (change)="toggleIntegration(integration, $event.checked)">
                             </mat-slide-toggle>
 
-                            @if(canToggleIntegrations()){
+                            <!-- @if(canToggleIntegrations()){
                                 <i class="fa-solid fa-chevron-right chevron"></i>
-                            }
+                            } -->
                         </div>
                     </div>
                 }
@@ -140,13 +140,6 @@ Realated Requirement: N/A
                         (click)="requestIntegration()">
                         Request an integration <i class="fa-solid fa-arrow-right"></i>
                     </button>
-                }
-
-                @if(isDeveloper()){
-                    <p class="read-only-note">
-                        <i class="fa-solid fa-lock"></i>
-                        Only admins and managers can manage integrations.
-                    </p>
                 }
             </div>
         </section>
