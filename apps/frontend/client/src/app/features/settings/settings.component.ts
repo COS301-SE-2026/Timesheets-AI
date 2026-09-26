@@ -12,6 +12,8 @@ import { MfaSetupDialogComponent } from './mfa-setup-dialog/mfa-setup-dialog.com
 import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dialog.component';
 import { AuthService } from '../../core/services/auth.service';
 import { IntegrationBrowserDialogComponent } from './integration-browser-dialog/integration-browser-dialog.component';
+import { IntegrationRequestDialogComponent } from './integration-request-dialog/integration-request-dialog.component';
+import { request } from 'node:http';
 @Component({
   selector: 'app-settings',
   standalone: true,
@@ -210,10 +212,26 @@ export class SettingsComponent implements OnInit{
   }
 
   requestIntegration():void{
-    this.settingsService.requestIntegration().subscribe(
-      ()=>{
-        // NOTIFICATION CONFIRMATION HOWEVER THATS DONE
-      });
+    if(!this.canRequestIntegrations()){
+      return;
+    }
+
+    const dialogRef= this.dialog.open(
+      IntegrationRequestDialogComponent,
+      {
+        width:'500px',
+        maxWidth: '95vw',
+        disableClose: true
+      }
+    );
+
+    dialogRef.afterClosed().subscribe((request)=> {
+      if(!request){
+        return;
+      }
+
+      console.log('Integration request:', request);
+    });
   }
 
   requestAccountDeletion():void{
