@@ -20,18 +20,14 @@ from app.services.dashboard_aggregates import cycle_time_stats, estimate_vs_actu
 PRODUCTIVITY_AT_RISK_BELOW = 60.0
 PRODUCTIVITY_HEALTHY_AT_OR_ABOVE = 85.0
 
-# ASSUMPTION: no existing thresholds anywhere for these two - new, and
-# should be reviewed with the team before Demo 3, not treated as settled.
 TASK_SWITCHING_HEALTHY_AT_OR_BELOW = 3.0  # switches/day
 TASK_SWITCHING_AT_RISK_ABOVE = 6.0
 CYCLE_TIME_HEALTHY_AT_OR_BELOW = 3.0  # days
 CYCLE_TIME_AT_RISK_ABOVE = 7.0
 
-# BURNOUT has no numeric score column (see save_burnout_insight in
-# burnout.py - only description/recommendation are set). This maps the
+# BURNOUT has no numeric score column (see save_burnout_insight in burnout.py only description/recommendation are set). This maps the
 # existing risk_level strings to a display number so the card/gauge has
-# something to show. Display convenience only - never feed this back into
-# calculate_burnout_risk's own threshold logic.
+# something to show. Display convenience only, never feed this back into calculate_burnout_risk's own threshold logic.
 _BURNOUT_RISK_TO_SCORE = {"LOW": 20.0, "MEDIUM": 55.0, "HIGH": 90.0}
 
 
@@ -117,11 +113,9 @@ def _productivity_card(db: Session, workspace_member_id: UUID) -> dict:
 
 def _burnout_card(db: Session, workspace_member_id: UUID) -> dict:
     """
-    KNOWN FRAGILITY: risk_level was never persisted as a column on
-    ai_insights (only baked into free-text description/recommendation in
-    save_burnout_insight). This re-derives it from that text, which breaks
-    silently if anyone edits the wording in burnout.py. Recommend a real
-    risk_level column in a follow-up migration.
+    risk_level was never persisted as a column on ai_insights (only baked into free-text description/recommendation in
+    save_burnout_insight). This re-derives it from that text, which breaks silently if anyone edits the wording in burnout.py. Recommend a real
+    risk_level column in a follow-up migration
     """
     latest_two = _latest_two(db, workspace_member_id, "BURNOUT")
     if not latest_two:
@@ -218,8 +212,7 @@ def _estimate_accuracy_card(
     db: Session, workspace_member_id: UUID, period_start: date, period_end: date
 ) -> dict:
     """
-    Not persisted (no ESTIMATE_ACCURACY insight_type exists) - computed live
-    for this period AND the immediately preceding period of equal length,
+    Not persisted (no ESTIMATE_ACCURACY insight_type exists), computed live for this period AND the immediately preceding period of equal length,
     to get a real (not synthetic) delta.
     """
     current = estimate_vs_actual(db, workspace_member_id, period_start, period_end)
