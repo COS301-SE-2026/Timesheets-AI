@@ -441,23 +441,27 @@ def _calculate_forecast_confidence(
     """
 
     evidence_available = 0
+    available_evidence = []
     missing_evidence = []
 
     # both the dates are needed to compare the progress with the planned timeline, so if missing added to the missing var
     if project.start_date is not None and project.end_date is not None:
         evidence_available += 1
+        available_evidence.append("PROJECT_DATES")
     else:
         missing_evidence.append("PROJECT_DATES")
 
     # the budget hours will be needed to see if a project goes over the allocated time
     if project.budget_hours is not None and float(project.budget_hours) > 0:
         evidence_available += 1
+        available_evidence.append("BUDGET_HOURS")
     else:
         missing_evidence.append("BUDGET_HOURS")
 
     # tasks are needed to calculate how much of the project work is done
     if tasks:
         evidence_available += 1
+        available_evidence.append("TASKS")
     else:
         missing_evidence.append("TASKS")
 
@@ -472,6 +476,7 @@ def _calculate_forecast_confidence(
     if not incomplete_tasks and tasks:
         estimate_coverage_percentage = 100.0
         evidence_available += 1
+        available_evidence.append("TASK_ESTIMATES")
 
     # if there are unfinished tasks, check how many of them have estimates
     elif incomplete_tasks:
@@ -481,6 +486,7 @@ def _calculate_forecast_confidence(
         # enough of the remaining tasks have estimates to support the forecast
         if estimate_coverage >= MIN_TASK_ESTIMATE_COVERAGE:
             evidence_available += 1
+            available_evidence.append("TASK_ESTIMATES")
         else:
             missing_evidence.append("TASK_ESTIMATES")
 
@@ -492,6 +498,7 @@ def _calculate_forecast_confidence(
     # this will check whether there was enough recent logged time to calculate the team velocity
     if velocity_data["has_sufficient_data"]:
         evidence_available += 1
+        available_evidence.append("RECENT_VELOCITY")
     else:
         missing_evidence.append("RECENT_VELOCITY")
 
@@ -501,6 +508,7 @@ def _calculate_forecast_confidence(
 
     if has_external_evidence:
         evidence_available += 1
+        available_evidence.append("EXTERNAL_EVIDENCE")
     else:
         missing_evidence.append("EXTERNAL_EVIDENCE")
 
@@ -517,6 +525,7 @@ def _calculate_forecast_confidence(
     return {
         "level": level,
         "evidence_available": evidence_available,
+        "available_evidence": available_evidence,
         "evidence_total": evidence_total,
         "missing_evidence": missing_evidence,
         "task_estimate_coverage_percentage": estimate_coverage_percentage,
