@@ -9,6 +9,8 @@ Endpoints:
 
   Patched: 25 August 2026
   added router imports
+
+  Patched: 22/09/2026 - Nyasha added project router
 """
 
 from contextlib import asynccontextmanager

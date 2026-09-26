@@ -1,0 +1,537 @@
+<section class="forecast-page">
+
+  <div class="forecast-header">
+    <div class="forecast-heading">
+      <div class="forecast-title-row">
+        <h2>Project Forecast</h2>
+        <span class="ai-badge">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          AI Powered
+        </span>
+      </div>
+
+      <p>
+        Delivery predictions based on project progress, workload, task estimates and recent activity.
+      </p>
+    </div>
+
+    <div class="forecast-sync">
+      @if (lastSyncedAt()) {
+        <span class="last-synced"> Last synced: {{ lastSyncedAt() | date:'dd MMM yyyy, HH:mm' }} </span>
+      }
+
+      <button type="button" class="sync-button" [disabled]="syncing()" (click)="syncForecast()">
+        <i class="fa-solid fa-rotate" [class.spinning]="syncing()"> </i>
+        {{ syncing() ? 'Syncing...' : 'Sync Forecast' }}
+      </button>
+    </div>
+  </div>
+
+
+  @if (loading()) {
+    <div class="forecast-state">
+      <i class="fa-solid fa-spinner fa-spin state-icon"></i>
+      <h3>Loading project forecast</h3>
+      <p>Retrieving the latest saved forecast...</p>
+    </div>
+
+  } 
+  @else if (error()) {
+    <div class="forecast-state error-state">
+      <i class="fa-solid fa-triangle-exclamation state-icon"></i>
+
+      <h3>Unable to update forecast</h3>
+      <p>
+        The latest forecast could not be generated. Your previously saved forecast has not been changed.
+      </p>
+
+      <button type="button" class="retry-button" (click)="syncForecast()">
+        Try again
+      </button>
+    </div>
+
+  } 
+  @else if (!forecast()) {
+    <div class="forecast-state empty-state">
+      <div class="empty-icon">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+
+      <h3>No project forecast yet</h3>
+
+      <p>
+        Generate the first forecast to analyse the project's delivery outlook, risk and expected completion.
+      </p>
+
+      <button type="button" class="sync-button" [disabled]="syncing()" (click)="syncForecast()">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Generate Forecast
+      </button>
+    </div>
+  } 
+  @else {
+
+    @if (forecast(); as currentForecast) {
+      <div class="forecast-summary-grid">
+
+        <article class="summary-card">
+          <div class="summary-card-header">
+            <span class="summary-label">Overall Risk</span>
+
+            <div class="summary-icon risk-icon">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+          </div>
+
+          <span
+            class="status-badge"
+            [class.status-healthy]="currentForecast.risk.overall === 'HEALTHY'"
+            [class.status-warning]="currentForecast.risk.overall === 'WARNING'"
+            [class.status-critical]="currentForecast.risk.overall === 'CRITICAL'"
+            [class.status-unknown]="currentForecast.risk.overall === 'UNKNOWN'">
+            {{ currentForecast.risk.overall }}
+          </span>
+
+          <span class="summary-description">
+            Current project risk
+          </span>
+        </article>
+
+
+        <article class="summary-card">
+          <div class="summary-card-header">
+            <span class="summary-label">Forecast Confidence</span>
+
+            <div class="summary-icon confidence-icon">
+              <i class="fa-solid fa-bullseye"></i>
+            </div>
+          </div>
+
+          <strong class="summary-value" >
+            {{ currentForecast.confidence.level }}
+          </strong>
+
+          <span class="summary-description"> {{ currentForecast.confidence.evidenceAvailable }} of {{ currentForecast.confidence.evidenceTotal }}
+            evidence signals available
+          </span>
+        </article>
+
+        <article class="summary-card">
+          <div class="summary-card-header">
+            <span class="summary-label">Forecast Completion</span>
+
+            <div class="summary-icon date-icon">
+              <i class="fa-regular fa-calendar"></i>
+            </div>
+          </div>
+
+          <strong class="summary-value">
+            @if (currentForecast.schedule.forecastEndDate) {
+              {{ currentForecast.schedule.forecastEndDate | date:'dd MMM yyyy' }}
+            } 
+            @else {
+              Not available
+            }
+          </strong>
+
+          <span class="summary-description"> Estimated delivery date </span>
+        </article>
+      </div>
+
+      <div class="forecast-chart-grid">
+
+        <!-- Budget Forecast -->
+        <article class="forecast-card">
+          <div class="card-heading">
+            <div>
+              <h3>Budget Forecast</h3>
+              <p>Logged, forecast and allocated project hours</p>
+            </div>
+
+            <div class="card-icon">
+              <i class="fa-solid fa-chart-column"></i>
+            </div>
+          </div>
+
+          <div class="chart-container budget-chart">
+            <canvas baseChart [data]="getBudgetChartData()" [options]="budgetChartOptions" [type]="'bar'"> </canvas>
+          </div>
+
+          <div class="metric-row">
+            <div class="metric">
+              <span>Used</span>
+              <strong> {{ currentForecast.budget.usedHours | number:'1.1-1' }}h </strong>
+            </div>
+
+            <div class="metric">
+              <span>Forecast</span>
+              <strong> {{ currentForecast.budget.forecastTotalHours | number:'1.1-1' }}h </strong>
+            </div>
+
+            <div class="metric">
+              <span>Budget</span>
+              <strong>
+                {{ currentForecast.budget.budgetHours | number:'1.1-1' }}h
+              </strong>
+            </div>
+          </div>
+        </article>
+
+
+        <article class="forecast-card">
+          <div class="card-heading">
+            <div>
+              <h3>Task Progress</h3>
+              <p>Completion status across project tasks</p>
+            </div>
+
+            <div class="card-icon">
+              <i class="fa-solid fa-list-check"></i>
+            </div>
+          </div>
+
+          <div class="task-chart-wrapper">
+
+            <div class="chart-container task-chart">
+              <canvas
+                baseChart
+                [data]="getTaskChartData()"
+                [options]="taskChartOptions"
+                [type]="'doughnut'">
+              </canvas>
+
+              <div class="chart-center-label">
+                <strong>
+                  {{ currentForecast.tasks.completionPercentage | number:'1.0-0' }}%
+                </strong>
+                <span>Complete</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="metric-row">
+
+            <div class="metric">
+              <span>Total</span>
+              <strong>{{ currentForecast.tasks.totalTasks }}</strong>
+            </div>
+
+            <div class="metric">
+              <span>Completed</span>
+              <strong>{{ currentForecast.tasks.completedTasks }}</strong>
+            </div>
+
+            <div class="metric">
+              <span>Remaining</span>
+              <strong>{{ currentForecast.tasks.remainingTasks }}</strong>
+            </div>
+
+          </div>
+        </article>
+
+      </div>
+
+
+      <article class="forecast-card delivery-card">
+        <div class="card-heading">
+          <div>
+            <h3>Delivery Forecast</h3>
+            <p>
+              Expected delivery based on remaining work and recent velocity
+            </p>
+          </div>
+
+          <div class="card-icon">
+            <i class="fa-solid fa-flag-checkered"></i>
+          </div>
+        </div>
+
+        <div class="delivery-grid">
+
+          <div class="delivery-metric">
+            <span>Recent Velocity</span>
+            <strong>
+              {{ currentForecast.velocity.recentHoursPerWeek | number:'1.1-1' }}
+              h/week
+            </strong>
+            <small>
+              Last {{ currentForecast.velocity.lookbackDays }} days
+            </small>
+          </div>
+
+          <div class="delivery-metric">
+            <span>Remaining Work</span>
+            <strong>
+              {{ currentForecast.tasks.estimatedRemainingHours | number:'1.1-1' }}h
+            </strong>
+            <small>Estimated from remaining tasks</small>
+          </div>
+
+          <div class="delivery-metric">
+            <span>Forecast Date</span>
+
+            <strong>
+              @if (currentForecast.schedule.forecastEndDate) {
+                {{ currentForecast.schedule.forecastEndDate | date:'dd MMM yyyy' }}
+              } 
+              @else {
+                Unknown
+              }
+            </strong>
+
+            <small>Expected project completion</small>
+          </div>
+
+          <div class="delivery-metric">
+            <span>Schedule Risk</span>
+
+            <strong
+              class="risk-text"
+              [class.warning]="currentForecast.risk.schedule === 'WARNING'"
+              [class.healthy]="currentForecast.risk.schedule === 'HEALTHY'"
+              [class.critical]="currentForecast.risk.schedule === 'CRITICAL'">
+              {{ currentForecast.risk.schedule }}
+            </strong>
+
+            <small>Based on current schedule evidence</small>
+          </div>
+
+        </div>
+
+        @if (!currentForecast.velocity.hasSufficientData) {
+          <div class="forecast-warning">
+            <i class="fa-solid fa-circle-info"></i>
+
+            <div>
+              <strong>Limited velocity data</strong>
+              <span>
+                The forecast currently has limited recent time-tracking history. Accuracy should improve as more work is logged.
+              </span>
+            </div>
+          </div>
+        }
+      </article>
+
+
+      @if (currentForecast.aiExplanation) {
+
+        <article class="forecast-card ai-explanation-card">
+
+          <div class="card-heading">
+            <div>
+              <h3>
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                AI Forecast Explanation
+              </h3>
+
+              <p>
+                Explanation of the factors influencing this forecast
+              </p>
+            </div>
+          </div>
+
+
+          <div class="explanation-summary">
+            {{ currentForecast.aiExplanation.summary }}
+          </div>
+
+
+          <div class="explanation-section">
+            <h4>Risk Analysis</h4>
+
+            <p>
+              {{ currentForecast.aiExplanation.riskExplanation }}
+            </p>
+          </div>
+
+
+          @if (currentForecast.aiExplanation.contributingFactors.length > 0) {
+
+            <div class="explanation-section">
+              <h4>Contributing Factors</h4>
+
+              <ul class="factor-list">
+                @for ( factor of currentForecast.aiExplanation.contributingFactors; track factor) {
+                  <li>
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>{{ factor }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </article>
+      }
+
+      <div class="forecast-bottom-grid">
+        <article class="forecast-card">
+
+          <div class="card-heading">
+            <div>
+              <h3>Recommendations</h3>
+              <p>Suggested actions based on the current forecast</p>
+            </div>
+
+            <div class="card-icon">
+              <i class="fa-regular fa-lightbulb"></i>
+            </div>
+          </div>
+
+          @if (currentForecast.aiExplanation && currentForecast.aiExplanation.recommendations.length > 0) {
+            <div class="recommendation-list">
+              @for (recommendation of currentForecast.aiExplanation.recommendations; track recommendation.title) 
+              {
+
+                <div class="recommendation-item">
+                  <div class="recommendation-number"> {{ $index + 1 }} </div>
+
+                  <div>
+                    <strong>{{ recommendation.title }}</strong>
+                    <p>{{ recommendation.description }}</p>
+                  </div>
+                </div>
+
+              }
+
+            </div>
+
+          } 
+          @else {
+
+            <p class="muted-message">
+              No recommendations are currently available.
+            </p>
+          }
+        </article>
+
+
+        <article class="forecast-card">
+          <div class="card-heading">
+            <div>
+              <h3>Forecast Evidence</h3>
+              <p>Data currently supporting the forecast</p>
+            </div>
+
+            <div class="card-icon">
+              <i class="fa-solid fa-database"></i>
+            </div>
+          </div>
+
+
+          <div class="evidence-summary">
+
+            <div class="evidence-score">
+              <strong>{{ currentForecast.confidence.evidenceAvailable }} / {{ currentForecast.confidence.evidenceTotal }} </strong>
+
+              <span>Evidence available</span>
+            </div>
+
+
+            <div class="coverage">
+              <div class="coverage-heading">
+                <span>Task estimate coverage</span>
+
+                <strong>
+                  {{ currentForecast.confidence.taskEstimateCoveragePercentage | number:'1.0-0'}}%
+                </strong>
+              </div>
+
+              <div class="coverage-track">
+                <div class="coverage-fill" [style.width.%]=" currentForecast.confidence.taskEstimateCoveragePercentage"></div>
+              </div>
+            </div>
+
+          </div>
+
+
+          @if (currentForecast.externalEvidence; as evidence) {
+            <div class="integration-evidence">
+              <div class="integration-row">
+
+                <div class="integration-name">
+                  <i class="fa-brands fa-github"></i>
+                  <div>
+                    <strong>GitHub</strong>
+                    <span>Repository activity</span>
+                  </div>
+                </div>
+
+                @if (evidence.github.available) {
+                  <span class="available-badge">
+                    {{ evidence.github.activityCount }} activities
+                  </span>
+                } 
+                @else {
+                  <span class="unavailable-badge">
+                    Not available
+                  </span>
+                }
+
+              </div>
+
+
+              <div class="integration-row">
+
+                <div class="integration-name">
+                  <i class="fa-brands fa-jira"></i>
+
+                  <div>
+                    <strong>Jira</strong>
+                    <span>Issue activity</span>
+                  </div>
+                </div>
+
+                @if (evidence.jira.available) {
+                  <span class="available-badge">
+                    {{ evidence.jira.activityCount }} activities
+                  </span>
+                } 
+                @else {
+                  <span class="unavailable-badge">
+                    Not available
+                  </span>
+                }
+
+              </div>
+            </div>
+
+          }
+
+          @if (currentForecast.confidence.availableEvidence.length > 0) {
+            <div class="available-evidence">
+
+              <span class="available-evidence-title">
+                Available evidence
+              </span>
+
+              <div class="evidence-tags">
+                @for (available of currentForecast.confidence.availableEvidence; track available) {
+                  <span class="evidence-tag evidence-tag-available">
+                    {{ available.replaceAll('_', ' ') }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+          @if (currentForecast.confidence.missingEvidence.length > 0) {
+            <div class="missing-evidence">
+
+              <span class="missing-evidence-title"> Missing evidence </span>
+
+              <div class="evidence-tags">
+                @for (missing of currentForecast.confidence.missingEvidence; track missing) 
+                {
+                  <span class="evidence-tag">
+                    {{ missing.replaceAll('_', ' ') }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+        </article>
+      </div>
+    }
+  }
+</section>
