@@ -95,7 +95,7 @@ export class SettingsComponent implements OnInit{
     const dialogRef= this.dialog.open(
       IntegrationBrowserDialogComponent,{
         width: '700px',
-        maxWidth: '95vw',
+        maxWidth: '120vw',
         disableClose: true
       }
     );
@@ -115,7 +115,8 @@ export class SettingsComponent implements OnInit{
       ChangePasswordDialogComponent,{
         width:'450px',
         maxWidth: '95vw',
-        disableClose: true
+        disableClose: true,
+        panelClass: 'integration-browser-dialog'
       }
     );
 
