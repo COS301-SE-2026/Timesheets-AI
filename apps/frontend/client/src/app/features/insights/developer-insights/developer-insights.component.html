@@ -1,299 +1,214 @@
 <div class="page-header">
   <div class="page-header-row">
-    <h1 class="page-title">Insights</h1>
-    <button class="export-btn">
-      <i class="fa-solid fa-file-export"></i> Export insights
-    </button>
+    <h1 class="page-title">Developer Insights</h1>
+    <label for="period-select" class="visually-hidden">Time period</label>
+    <select id="period-select" class="period-select" [value]="period()" (change)="onPeriodChange($event)">
+      @for (option of periodOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
   </div>
 </div>
 
-@if (loading()) {
+@if (dashboard(); as data) {
+
+  <app-insight-card variant="summary" icon="fa-file-lines" title="Weekly Summary" badge="ai" [span]="12">
+  @if (weeklySummaryNarrative()) {
+    <p class="summary">{{ weeklySummaryNarrative() }}</p>
+  } @else {
+    <p class="summary">{{ weeklySummaryLoading() ? 'Generating your weekly summary…' : (weeklySummaryError() ?? 'No summary generated yet for this week.') }}</p>
+  }
+  <button class="export-btn" [disabled]="weeklySummaryLoading()" (click)="loadWeeklySummary()">
+    <i class="fa-solid fa-wand-magic-sparkles"></i>
+    {{ weeklySummaryLoading() ? 'Generating…' : 'Generate summary' }}
+  </button>
+</app-insight-card>
+  <br>
+
+  <div class="grid">
+
+    <app-insight-card icon="fa-arrow-trend-up" title="This Week's Productivity Score" variant="raw" [span]="12">
+      <div class="productivity-layout">
+        <div class="productivity-score-box">
+          <div class="metric">{{ currentProductivityScore() ?? '—' }}<span class="metric-unit"> / 100</span></div>
+          @if (productivityDelta() !== null) {
+            <span class="chip" [class.chip-done]="productivityDelta()! >= 0" [class.chip-risk-high]="productivityDelta()! < 0">
+              <i class="fa-solid" [class.fa-arrow-up]="productivityDelta()! >= 0" [class.fa-arrow-down]="productivityDelta()! < 0"></i>
+              {{ productivityDelta() }}% vs last week
+            </span>
+          }
+        </div>
+        <app-insight-chart [config]="productivitySparkline()" [height]="140"></app-insight-chart>
+      </div>
+    </app-insight-card>
+
+    <app-insight-card icon="fa-brands fa-github" title="GitHub Activity" variant="raw" badge="raw" [span]="6">
+      @if (data.github; as github) {
+        <div class="compare-bars">
+          <div class="compare-row">
+            <span class="name">Hours Logged</span>
+            <div class="compare-track"><div class="compare-fill" [style.width.%]="githubBarPercent(github.hoursLogged, 40)"></div></div>
+            <span class="val">{{ github.hoursLogged }}h</span>
+          </div>
+          <div class="compare-row">
+            <span class="name">Commits</span>
+            <div class="compare-track"><div class="compare-fill you" [style.width.%]="githubBarPercent(github.commitCount, 30)"></div></div>
+            <span class="val">{{ github.commitCount }}</span>
+          </div>
+          <div class="compare-row">
+            <span class="name">Active Days</span>
+            <div class="compare-track"><div class="compare-fill" [style.width.%]="githubBarPercent(github.activeDays, 7)"></div></div>
+            <span class="val">{{ github.activeDays }}</span>
+          </div>
+        </div>
+      } @else {
+        <p class="note">GitHub not connected yet.</p>
+      }
+    </app-insight-card>
+
+    <app-insight-card
+      icon="fa-brands fa-jira"
+      title="Jira Tickets"
+      variant="raw"
+      badgeText="via Jira"
+      badgeVariant="neutral"
+      [span]="6"
+    >
+      @if (jiraBreakdown(); as breakdown) {
+        @if (breakdown.totalTickets > 0) {
+          <div class="donut-layout">
+            <div class="donut-wrap">
+              <app-insight-chart [config]="jiraChart()" [height]="140"></app-insight-chart>
+              <div class="donut-center">
+                <div class="donut-total">{{ breakdown.totalTickets }}</div>
+                <div class="donut-caption">assigned tickets</div>
+              </div>
+            </div>
+            <div class="list">
+              @for (row of breakdown.byStatus; track row.status) {
+                <div class="list-row">
+                  <div class="l-main">
+                    <span class="l-title">{{ row.status }}</span>
+                  </div>
+                  <span class="l-val">{{ row.count }} ({{ row.percentage }}%)</span>
+                </div>
+              }
+            </div>
+          </div>
+        } @else {
+          <p class="note">No Jira tickets assigned right now.</p>
+        }
+      } @else {
+        <p class="note">Jira isn't connected yet.</p>
+      }
+    </app-insight-card>
+
+    <app-insight-card icon="fa-clock" title="Time Allocation" variant="raw" badge="raw" [span]="6">
+      <div class="donut-layout">
+        <div class="donut-wrap">
+          <app-insight-chart [config]="timeAllocationChart()" [height]="140"></app-insight-chart>
+          <div class="donut-center">
+            <div class="donut-total">{{ data.timeAllocation?.totalHours ?? 0 }}h</div>
+            <div class="donut-caption">total logged</div>
+          </div>
+        </div>
+        <div class="list">
+          @for (segment of timeAllocationLegend(); track segment.category) {
+            <div class="list-row">
+              <div class="l-main">
+                <span class="legend-dot" [style.background]="segment.color"></span>
+                <span class="l-title">{{ segment.category }}</span>
+              </div>
+              <span class="l-val">{{ segment.hours }}h ({{ segment.percentage }}%)</span>
+            </div>
+          }
+        </div>
+      </div>
+    </app-insight-card>
+
+    <app-insight-card
+      icon="fa-chart-column"
+      title="Estimate vs Actual"
+      variant="raw"
+      badgeText="{{ estimateAccuracyPillText() }}"
+      badgeVariant="success"
+      [span]="6"
+    >
+      <app-insight-chart [config]="estimateVsActualChart()" [height]="180"></app-insight-chart>
+    </app-insight-card>
+
+    @if (burnoutCard(); as burnout) {
+      <app-insight-card
+        icon="fa-fire"
+        title="Burnout Scale"
+        variant="insight"
+        badgeText="{{ burnoutRiskLabel() }}"
+        [badgeVariant]="statusBadgeVariant(burnout.status)"
+        [span]="6"
+      >
+        <div class="gauge-track">
+          <div class="gauge-thumb" [style.left.%]="burnoutGaugePercent()"></div>
+        </div>
+        <div class="gauge-labels">
+          <span>Low</span>
+          <span>Moderate</span>
+          <span>High</span>
+        </div>
+      </app-insight-card>
+    }
+
+    <app-insight-card icon="fa-shuffle" title="Task Switching" variant="raw" badge="raw" [span]="6">
+      <app-insight-chart [config]="taskSwitchingChart()" [height]="180"></app-insight-chart>
+    </app-insight-card>
+
+    <app-insight-card icon="fa-list" title="Time Split by Task" variant="raw" badge="raw" [span]="6">
+      <div class="donut-layout">
+        <div class="donut-wrap">
+          <app-insight-chart [config]="timeSplitByTaskChart()" [height]="140"></app-insight-chart>
+          <div class="donut-center">
+            <div class="donut-total">{{ data.timeSplitByTask?.totalHours ?? 0 }}h</div>
+            <div class="donut-caption">total logged</div>
+          </div>
+        </div>
+        <div class="list">
+          @for (segment of timeSplitByTaskLegend(); track segment.taskTitle) {
+            <div class="list-row">
+              <div class="l-main">
+                <span class="legend-dot" [style.background]="segment.color"></span>
+                <span class="l-title">{{ segment.taskTitle }}</span>
+              </div>
+              <span class="l-val">{{ segment.hours }}h ({{ segment.percentage }}%)</span>
+            </div>
+          }
+        </div>
+      </div>
+    </app-insight-card>
+
+    <app-insight-card icon="fa-folder" title="My Projects" variant="raw" [span]="12">
+      <div class="list">
+        @for (project of myProjects(); track project.projectId) {
+          <div class="list-row" [class.risk-medium]="!project.active">
+            <div class="l-main">
+              <span class="l-title">
+                {{ project.projectName }}
+                @if (!project.active) {
+                  <span class="l-sub"> (inactive)</span>
+                }
+              </span>
+              <div class="compare-track"><div class="compare-fill" [style.width.%]="githubBarPercent(project.hoursLogged, 40)"></div></div>
+            </div>
+            <span class="l-val">{{ project.hoursLogged | number: '1.0-1' }}h</span>
+          </div>
+        } @empty {
+          <p class="note">You're not currently assigned to any projects.</p>
+        }
+      </div>
+    </app-insight-card>
+
+  </div>
+
+} @else if (loading()) {
   <p class="note">Loading your insights…</p>
 } @else if (error()) {
   <p class="note">{{ error() }}</p>
-} @else {
-  @if (data(); as data) {
-    <app-insight-card
-      variant="summary"
-      title="Weekly summary"
-      [subtitle]="
-        data.weeklySummary.weekLabel + ' · ' + data.weeklySummary.generatedNote
-      "
-      badge="ai"
-      [span]="12"
-    >
-      <p class="summary" [innerHTML]="data.weeklySummary.narrative"></p>
-    </app-insight-card>
-    <br />
-
-    <app-scope-switcher
-      [options]="scopeOptions"
-      [value]="scope()"
-      (valueChange)="setScope($event)"
-    ></app-scope-switcher>
-
-    @if (scope() === "overall") {
-      <div class="grid">
-        <app-insight-card
-          title="Productivity score"
-          subtitle="This week"
-          variant="insight"
-          badge="ai"
-          [span]="4"
-        >
-          <div class="metric">
-            {{ data.overall.productivity.score
-            }}<span class="metric-unit"> / 100</span>
-          </div>
-          <div class="bar-track">
-            <div
-              class="bar-fill amber"
-              [style.width.%]="data.overall.productivity.score"
-            ></div>
-          </div>
-          <div class="note">{{ data.overall.productivity.note }}</div>
-        </app-insight-card>
-
-        <app-insight-card
-          title="Productivity trend"
-          subtitle="Last 6 weeks, overall score"
-          variant="insight"
-          badge="ai"
-          [span]="8"
-        >
-          <app-insight-chart
-            [config]="trendChart()"
-            [height]="180"
-          ></app-insight-chart>
-        </app-insight-card>
-
-        <app-insight-card
-          title="Task-switching frequency"
-          subtitle="Daily average"
-          variant="insight"
-          badge="ai"
-          [span]="6"
-        >
-          <div class="metric">
-            {{ data.overall.taskSwitching.perDay
-            }}<span class="metric-unit"> switches/day</span>
-          </div>
-          <div class="note">{{ data.overall.taskSwitching.note }}</div>
-        </app-insight-card>
-
-        <app-insight-card
-          title="Delivery forecast"
-          [subtitle]="data.overall.deliveryForecast.taskName"
-          variant="insight"
-          badge="ai"
-          [span]="6"
-        >
-          <div class="metric-sm">
-            {{ data.overall.deliveryForecast.forecastDate }}
-          </div>
-          <div class="metric-label">
-            {{ data.overall.deliveryForecast.note }}
-          </div>
-        </app-insight-card>
-
-        <app-insight-card
-          title="Flagged time entries"
-          subtitle="ML data-accuracy classification"
-          variant="insight"
-          badge="ai"
-          [span]="12"
-        >
-          <div class="list">
-            @for (e of data.overall.flaggedEntries; track e.title) {
-              <div class="list-row" [class.risk-high]="e.level === 'high'">
-                <div class="l-main">
-                  <span class="l-title">{{ e.title }}</span>
-                  <span class="l-sub">{{ e.sub }}</span>
-                </div>
-                <span
-                  class="chip"
-                  [class.chip-risk-high]="e.level === 'high'"
-                  [class.chip-risk-med]="e.level !== 'high'"
-                >
-                  {{ e.level === "high" ? "Review" : "Low confidence" }}
-                </span>
-              </div>
-            } @empty {
-              <div class="note">Nothing flagged this week.</div>
-            }
-          </div>
-        </app-insight-card>
-
-        <app-insight-card
-          title="Calendar vs tracked time"
-          subtitle="This week, hours"
-          variant="raw"
-          badge="comparison"
-          [span]="5"
-        >
-          <div class="compare-bars">
-            <div class="compare-row">
-              <span class="name">Calendar</span>
-              <div class="compare-track">
-                <div class="compare-fill" [style.width.%]="calendarBars().calendar"></div>
-              </div>
-              <span class="val"
-                >{{ data.overall.calendarVsTracked.calendarHours }}h</span
-              >
-            </div>
-            <div class="compare-row">
-              <span class="name">Tracked</span>
-              <div class="compare-track">
-               <div class="compare-fill you" [style.width.%]="calendarBars().tracked"></div>
-              </div>
-              <span class="val"
-                >{{ data.overall.calendarVsTracked.trackedHours }}h</span
-              >
-            </div>
-          </div>
-          <div class="note">
-            {{ data.overall.calendarVsTracked.unmatchedHours }}h of meeting time
-            this week has no matching timesheet entry.
-          </div>
-        </app-insight-card>
-
-        <app-insight-card
-          title="Jira vs logged time"
-          subtitle="Tickets you're assigned this sprint"
-          variant="raw"
-          badge="comparison"
-          [span]="7"
-        >
-          <div class="list">
-            @for (t of data.overall.jiraVsLogged; track t.ticket) {
-              <div class="list-row">
-                <div class="l-main">
-                  <span class="l-title">{{ t.ticket }}</span>
-                  <span class="l-sub"
-                    >Jira estimate: {{ t.estimateHours }}h</span
-                  >
-                </div>
-                <span class="l-val">Logged: {{ t.loggedHours }}h</span>
-              </div>
-            } @empty {
-              <div class="note">No Jira comparisons yet.</div>
-            }
-          </div>
-        </app-insight-card>
-
-        <app-insight-card
-          title="Git commits vs effort"
-          subtitle="This week, your commits vs logged hours, by day"
-          variant="raw"
-          badge="comparison"
-          [span]="12"
-        >
-          <div
-            style="
-              display: flex;
-              justify-content: flex-end;
-              margin-bottom: var(--space-4);
-            "
-          >
-            @if (!githubConnected()) {
-              <button
-                (click)="connectGitHub()"
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: var(--space-2);
-                  background: var(--color-primary);
-                  color: var(--color-text-inverse);
-                  border: none;
-                  padding: 9px 16px;
-                  border-radius: var(--radius-button);
-                  font-size: var(--font-size-caption);
-                  font-weight: var(--font-weight-semibold);
-                  cursor: pointer;
-                  font-family: var(--font-body);
-                "
-              >
-                <i class="fa-brands fa-github"></i> Connect GitHub
-              </button>
-            } @else {
-              <button
-                (click)="syncGitHub()"
-                [disabled]="syncingGitHub()"
-                [style.opacity]="syncingGitHub() ? 0.6 : 1"
-                [style.cursor]="syncingGitHub() ? 'default' : 'pointer'"
-                style="
-                  display: flex;
-                  align-items: center;
-                  gap: var(--space-2);
-                  background: var(--color-primary-surface);
-                  color: var(--color-primary);
-                  border: none;
-                  padding: 9px 16px;
-                  border-radius: var(--radius-button);
-                  font-size: var(--font-size-caption);
-                  font-weight: var(--font-weight-semibold);
-                  font-family: var(--font-body);
-                "
-              >
-                <i class="fa-solid fa-arrows-rotate"></i>
-                {{ syncingGitHub() ? "Syncing…" : "Sync commits" }}
-              </button>
-            }
-          </div>
-          <div class="git-effort-layout">
-            <div>
-              <div class="metric">{{ data.overall.gitEffort.correlation }}</div>
-              <div class="metric-label">
-                Your correlation, up from
-                {{ data.overall.gitEffort.correlationPrevWeek }} last week
-              </div>
-            </div>
-            <app-insight-chart
-              [config]="gitEffortChart()"
-              [height]="170"
-            ></app-insight-chart>
-          </div>
-          <div class="note">{{ data.overall.gitEffort.note }}</div>
-        </app-insight-card>
-      </div>
-    }
-
-    @if (scope() === "project") {
-      <div class="grid">
-        @for (p of data.byProject.projects; track p.name) {
-          <app-insight-card
-            [title]="p.name"
-            subtitle="Your productivity on this project"
-            variant="insight"
-            badge="ai"
-            [span]="6"
-          >
-            <div class="metric">{{ p.score }}</div>
-            <div class="bar-track">
-              <div class="bar-fill amber" [style.width.%]="p.score"></div>
-            </div>
-            <div class="note">{{ p.note }}</div>
-          </app-insight-card>
-        } @empty {
-          <p class="note">
-            No per-project breakdown yet, check back once there's more logged
-            activity.
-          </p>
-        }
-
-        <app-insight-card
-          title="Hours by project"
-          subtitle="This week, your logged time"
-          variant="raw"
-          badge="raw"
-          [span]="12"
-        >
-          <app-insight-chart
-            [config]="hoursByProjectChart()"
-            [height]="160"
-          ></app-insight-chart>
-        </app-insight-card>
-      </div>
-    }
-  }
 }

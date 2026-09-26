@@ -76,6 +76,17 @@
   background: var(--color-gray-light);
   color: var(--color-text-muted);
 }
+.card-head-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  i.fa-solid { color: var(--color-primary); font-size: 0.95em; }
+}
+
+.badge-neutral { background: var(--color-gray-light); color: var(--color-text-muted); }
+.badge-success { background: var(--color-status-approved-bg); color: var(--color-status-approved-text); }
+.badge-warning { background: var(--color-status-pending-bg); color: var(--color-status-pending-text); }
 
 @media (max-width: 900px) {
   .c-4, .c-5, .c-6, .c-7, .c-8 { grid-column: span 12; }

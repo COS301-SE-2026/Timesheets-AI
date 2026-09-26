@@ -26,4 +26,7 @@ export class InsightCardComponent {
   @Input() variant: CardVariant = 'plain';
   @Input() badge: BadgeKind = 'none';
   @Input() span: CardSpan = 4;
+  @Input() icon = ''; //fa-solid icon name (no prefix), e.g. "fa-clock". Empty = no icon, unchanged for every existing caller.
+  @Input() badgeText = ''; //freeform pill text ("via Jira", "92% accurate"), independent of badge
+  @Input() badgeVariant: 'neutral' | 'success' | 'warning' = 'neutral'; // NEW - color for badgeText's pill
 }

@@ -1,13 +1,74 @@
 @use '../insights-shared' as *;
 
-.git-effort-layout {
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: var(--space-6);
-  align-items: start;
-  margin-top: 4px;
+.period-select {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  padding: 8px 12px;
+  background: var(--color-white);
+  color: var(--color-text-body);
+  font-size: var(--font-size-caption);
+  font-family: var(--font-body);
 }
 
-@media (max-width: 700px) {
-  .git-effort-layout { grid-template-columns: 1fr; }
+.productivity-layout {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: var(--space-6);
+  align-items: center;
+}
+.productivity-score-box { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.donut-layout { display: grid; grid-template-columns: 140px 1fr; gap: var(--space-4); align-items: center; }
+.donut-wrap { position: relative; width: 140px; height: 140px; }
+.donut-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.donut-total { font-family: var(--font-mono); font-weight: var(--font-weight-semibold); font-size: var(--font-size-h3); color: var(--color-text-primary); }
+.donut-caption { font-size: 9px; color: var(--color-text-muted); }
+
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+
+.gauge-track {
+  position: relative;
+  height: 12px;
+  border-radius: var(--radius-pill);
+  margin: var(--space-4) 0 var(--space-2);
+  background: linear-gradient(
+    to right,
+    #F4A261 0%,   /* amber */
+    #E76F51 50%,  /* orange-red */
+    #C1121F 100%  /* deep red */
+  );
+}
+.gauge-thumb {
+  position: absolute;
+  top: -4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-white);
+  border: 3px solid var(--color-primary);
+  transform: translateX(-50%);
+  box-shadow: 0 2px 6px rgba(15, 76, 145, 0.2);
+}
+.gauge-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+.metric { font-size: 70px; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+@media (max-width: 900px) {
+  .productivity-layout, .donut-layout { grid-template-columns: 1fr; }
 }

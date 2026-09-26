@@ -5,9 +5,12 @@
   [class.summary]="variant === 'summary'"
   [class]="'c-' + span"
 >
-  @if (title || badge !== 'none') {
+  @if (title || badge !== 'none' || badgeText) {
     <div class="card-head">
-      <div>
+      <div class="card-head-title">
+        @if (icon) {
+          <i class="fa-solid" [class]="icon"></i>
+        }
         @if (title) {
           <h3>{{ title }}</h3>
         }
@@ -24,6 +27,14 @@
       }
       @if (badge === 'comparison') {
         <span class="badge badge-raw">Comparison</span>
+      }
+      @if (badgeText) {
+        <span
+          class="badge"
+          [class.badge-neutral]="badgeVariant === 'neutral'"
+          [class.badge-success]="badgeVariant === 'success'"
+          [class.badge-warning]="badgeVariant === 'warning'"
+        >{{ badgeText }}</span>
       }
     </div>
   }
