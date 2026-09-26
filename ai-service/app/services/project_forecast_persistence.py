@@ -10,9 +10,9 @@ Date: 25/09/2026
 import json
 import uuid
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from sqlalchemy.orm import Session
+from zoneinfo import ZoneInfo
 
 from app.models.ai_insight import AIInsight
 from app.models.project import Project

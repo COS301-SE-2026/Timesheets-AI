@@ -11,11 +11,11 @@ Patch: added workspace id
 
 import uuid
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
+from zoneinfo import ZoneInfo
 
 from app.database import Base
 
