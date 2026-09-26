@@ -1,7 +1,8 @@
 <div class="page-header">
   <div class="page-header-row">
     <h1 class="page-title">Developer Insights</h1>
-    <select class="period-select" [value]="period()" (change)="onPeriodChange($event)">
+    <label for="period-select" class="visually-hidden">Time period</label>
+    <select id="period-select" class="period-select" [value]="period()" (change)="onPeriodChange($event)">
       @for (option of periodOptions; track option.value) {
         <option [value]="option.value">{{ option.label }}</option>
       }

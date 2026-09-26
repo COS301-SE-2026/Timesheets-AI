@@ -263,10 +263,10 @@ def get_dashboard(
         ),
     )
 
-
 @router.patch(
     "/{insight_id}/resolve",
     response_model=ResolveInsightResponse,
+    responses={404: {"description": "Insight not found"}},
 )
 def resolve_insight(
     insight_id: UUID,

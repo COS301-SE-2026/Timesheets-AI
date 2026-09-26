@@ -281,7 +281,7 @@ def task_switching_by_day(
     )
 
     weekday_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-    switches_by_weekday = {label: 0 for label in weekday_labels}
+    switches_by_weekday = dict.fromkeys(weekday_labels, 0)
 
     previous_task_id = None
     previous_day = None

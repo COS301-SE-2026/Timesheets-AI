@@ -16,8 +16,8 @@ import {
   DeveloperProject,
   JiraTicketsBreakdown,
   PeriodOption,
+  PersonalInsightsResponse,
 } from '../../features/insights/models/ai-insights.model';
-import { PersonalInsightsResponse } from '../../features/insights/models/ai-insights.model';
 
 @Injectable({
   providedIn: 'root',
