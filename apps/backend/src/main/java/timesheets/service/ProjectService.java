@@ -25,6 +25,7 @@ import timesheets.dto.response.ProjectResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
+import timesheets.repository.TaskRepository;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.repository.UserRepository;
 import timesheets.repository.WorkspaceMemberRepository;
@@ -40,6 +41,7 @@ public class ProjectService {
   private final WorkspaceMemberRepository workspaceMemberRepository;
   private final TimeEntryRepository timeEntryRepository;
   private final UserRepository userRepository;
+  private final TaskRepository taskRepository;
 
   /*
   - gets all the projects for the current user
@@ -114,16 +116,33 @@ public class ProjectService {
     // to assign project managers if they are assigned - mostly for admin
     if (request.getManagerIds() != null && !request.getManagerIds().isEmpty()) {
       for (UUID managerId : request.getManagerIds()) {
-        workspaceMemberRepository
-            .findById(managerId)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("Workspace member not found: " + managerId));
+
+        WorkspaceMember manager =
+            workspaceMemberRepository
+                .findById(managerId)
+                .orElseThrow(
+                    () ->
+                        new ResourceNotFoundException("Workspace member not found: " + managerId));
+
+        // a project manager must currently belong to the workspace
+        // a soft deleted workspace membership should not give the user access to new projects
+        if (!Boolean.TRUE.equals(manager.getIsActive())) {
+          throw new StateConflictException(
+              "Cannot assign an inactive workspace member as a project manager");
+        }
+
+        // a project manager must belong to the same workspace as the project
+        if (!manager.getWorkspaceId().equals(workspaceId)) {
+          throw new AccessDeniedException(
+              "Project manager does not belong to the project's workspace");
+        }
 
         ProjectMember member = new ProjectMember();
         member.setProjectId(savedProject.getId());
         member.setWorkspaceMemberId(managerId);
         member.setIsProjectManager(true);
         member.setIsActive(true);
+
         projectMemberRepository.save(member);
       }
     }
@@ -288,7 +307,7 @@ public class ProjectService {
     }
 
     // only devs that are assigned to this project, otherwise false and has no access
-    return projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
+    return projectMemberRepository.existsByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(
         projectId, workspaceMemberId);
   }
 
@@ -314,6 +333,13 @@ public class ProjectService {
             .findById(workspaceMemberId)
             .orElseThrow(() -> new ResourceNotFoundException("Workspace member not found"));
 
+    // project access can only be given to a current workspace member, and they should not be
+    // soft-deleted
+    if (!Boolean.TRUE.equals(member.getIsActive())) {
+      throw new StateConflictException(
+          "Member must be active in the workspace before being assigned to a project");
+    }
+
     // to ensure that the user belongs to the same workspace as the project
     if (!member.getWorkspaceId().equals(project.getWorkspaceId())) {
       throw new AccessDeniedException("Member does not belong to the project's workspace");
@@ -337,22 +363,33 @@ public class ProjectService {
           "Only Admins and Managers and Project Managers can assign members to projects");
     }
 
-    // if a member is already assigned to a project then we cannot do that again
-    if (projectMemberRepository.existsByProjectIdAndWorkspaceMemberId(
-        projectId, workspaceMemberId)) {
-      throw new StateConflictException("Member is already assigned to this project");
-    }
+    // reuse an existing historical project membership instead of creating a duplicate
+    // they'll get assigned a new one if they don't have project membership already
+    ProjectMember saved =
+        projectMemberRepository
+            .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
+            .map(
+                existingMember -> {
+                  if (Boolean.TRUE.equals(existingMember.getIsActive())) {
+                    throw new StateConflictException("Member is already assigned to this project");
+                  }
 
-    // creating that member
-    ProjectMember projectMember = new ProjectMember();
-    projectMember.setProjectId(projectId);
-    projectMember.setWorkspaceMemberId(workspaceMemberId);
-    projectMember.setIsProjectManager(isProjectManager != null && isProjectManager);
-    projectMember.setIsActive(true);
-    projectMember.setCreatedAt(LocalDateTime.now());
-    projectMember.setUpdatedAt(LocalDateTime.now());
+                  existingMember.setIsActive(true);
+                  existingMember.setRemovedAt(null);
+                  existingMember.setIsProjectManager(isProjectManager != null && isProjectManager);
 
-    ProjectMember saved = projectMemberRepository.save(projectMember);
+                  return projectMemberRepository.save(existingMember);
+                })
+            .orElseGet(
+                () -> {
+                  ProjectMember newMember = new ProjectMember();
+                  newMember.setProjectId(projectId);
+                  newMember.setWorkspaceMemberId(workspaceMemberId);
+                  newMember.setIsProjectManager(isProjectManager != null && isProjectManager);
+                  newMember.setIsActive(true);
+
+                  return projectMemberRepository.save(newMember);
+                });
 
     User user =
         userRepository
@@ -395,17 +432,26 @@ public class ProjectService {
             .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
             .orElseThrow(() -> new ResourceNotFoundException("Member not found on this project"));
 
+    if (!Boolean.TRUE.equals(projectMember.getIsActive())) {
+      throw new StateConflictException("Member has already been removed from this project");
+    }
+
+    LocalDateTime removedAt = LocalDateTime.now();
+
     // this is soft deleting so that we keep track
     projectMember.setIsActive(false);
-    projectMember.setUpdatedAt(LocalDateTime.now());
+    projectMember.setRemovedAt(LocalDateTime.now());
     projectMemberRepository.save(projectMember);
+
+    taskRepository.unassignActiveTasksFromProjectMember(projectId, workspaceMemberId, removedAt);
   }
 
   // ! helper functions
   // determines a users role on a project
+  // determines a user's current role on a project
   private WorkspaceRole getProjectLevelRole(UUID projectId, UUID workspaceMemberId) {
     return projectMemberRepository
-        .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
+        .findByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(projectId, workspaceMemberId)
         .map(
             projectMembership ->
                 projectMembership.getIsProjectManager()
@@ -415,9 +461,10 @@ public class ProjectService {
   }
 
   // to determine if a user has management permissions for a specific project
+  // determines whether the member currently has project manager permissions
   private boolean isProjectManager(UUID projectId, UUID workspaceMemberId) {
     return projectMemberRepository
-        .findByProjectIdAndWorkspaceMemberId(projectId, workspaceMemberId)
+        .findByProjectIdAndWorkspaceMemberIdAndIsActiveTrue(projectId, workspaceMemberId)
         .map(pm -> Boolean.TRUE.equals(pm.getIsProjectManager()))
         .orElse(false);
   }
@@ -478,6 +525,7 @@ public class ProjectService {
                       projectMembership.getIsProjectManager()
                           ? WorkspaceRole.MANAGER
                           : WorkspaceRole.DEVELOPER)
+                  .isProjectManager(projectMembership.getIsProjectManager())
                   .hoursLogged(hoursLogged)
                   .joinedAt(projectMembership.getCreatedAt())
                   .build();

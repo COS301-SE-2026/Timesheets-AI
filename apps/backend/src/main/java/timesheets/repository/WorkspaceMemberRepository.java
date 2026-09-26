@@ -17,6 +17,19 @@ public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember
   // finds all the workspace memberships for a workspace
   List<WorkspaceMember> findByWorkspaceId(UUID workspaceId);
 
+  // finds all active memberships for a workspace
+  List<WorkspaceMember> findByWorkspaceIdAndIsActiveTrue(UUID workspaceId);
+
+  // finds all active workspace memberships for a user
+  List<WorkspaceMember> findByUserIdAndIsActiveTrue(UUID userId);
+
+  // finds a user's active membership in a specific workspace
+  Optional<WorkspaceMember> findByUserIdAndWorkspaceIdAndIsActiveTrue(
+      UUID userId, UUID workspaceId);
+
+  // checks whether a user currently belongs to a workspace
+  boolean existsByUserIdAndWorkspaceIdAndIsActiveTrue(UUID userId, UUID workspaceId);
+
   // finds a specific membership with workspace membership and userID
   Optional<WorkspaceMember> findByUserIdAndWorkspaceId(UUID userId, UUID workspaceId);
 
@@ -32,24 +45,28 @@ public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember
   // finds all the members if a workspace
   List<WorkspaceMember> findAllByWorkspaceId(UUID workspaceId);
 
+  // finds active members with a specific role in a workspace
+  List<WorkspaceMember> findAllByWorkspaceIdAndRoleAndIsActiveTrue(
+      UUID workspaceId, WorkspaceRole role);
+
   //   // this will find all the workspace memberships for a given user, thinking it can be used for
   // like
   //   // a drop down and stuff
   //   List<WorkspaceMember> findAllByUserId(UUID userId);
 
-  // this should find all the devs within a specific workspace
+  // finds the active developers within a specific workspace
   default List<WorkspaceMember> findAllDevelopersByWorkspaceId(UUID workspaceId) {
-    return findAllByWorkspaceIdAndRole(workspaceId, WorkspaceRole.DEVELOPER);
+    return findAllByWorkspaceIdAndRoleAndIsActiveTrue(workspaceId, WorkspaceRole.DEVELOPER);
   }
 
-  // this should find all the managers within a specific workspace
+  // finds the active managers within a specific workspace
   default List<WorkspaceMember> findAllManagersByWorkspaceId(UUID workspaceId) {
-    return findAllByWorkspaceIdAndRole(workspaceId, WorkspaceRole.MANAGER);
+    return findAllByWorkspaceIdAndRoleAndIsActiveTrue(workspaceId, WorkspaceRole.MANAGER);
   }
 
-  // this should find all the admins within a specific workspace
+  // finds the active admins within a specific workspace
   default List<WorkspaceMember> findAllAdminsByWorkspaceId(UUID workspaceId) {
-    return findAllByWorkspaceIdAndRole(workspaceId, WorkspaceRole.ADMIN);
+    return findAllByWorkspaceIdAndRoleAndIsActiveTrue(workspaceId, WorkspaceRole.ADMIN);
   }
 
   //   // this will find if a specific user is locked from a workspace, is locked means they are
