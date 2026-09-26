@@ -3,8 +3,10 @@ package timesheets.integration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -16,12 +18,14 @@ import timesheets.auth.GoogleTokenResponse;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
 import timesheets.domain.IntegrationToken;
+import timesheets.domain.JiraTicket;
 import timesheets.domain.Task;
 import timesheets.domain.TimeEntry;
 import timesheets.dto.response.IssueResponse;
 import timesheets.integration.issue.JiraAdapter;
 import timesheets.integration.issue.JiraOAuthService;
 import timesheets.repository.IntegrationTokenRepository;
+import timesheets.repository.JiraTicketRepository;
 import timesheets.repository.TaskRepository;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.security.SecurityUtils;
@@ -37,6 +41,7 @@ public class IntegrationController {
   private final IntegrationTokenRepository integrationTokenRepository;
   private final JiraOAuthService jiraOAuthService;
   private final JiraAdapter jiraAdapter;
+  private final JiraTicketRepository jiraTicketRepository;
   private final TaskRepository taskRepository;
   private final TimeEntryRepository timeEntryRepository;
 
@@ -315,5 +320,48 @@ public class IntegrationController {
     }
 
     return ResponseEntity.ok(rows);
+  }
+
+  public record JiraStatusCount(String status, long count, double percentage) {}
+
+  public record JiraTicketsBreakdownResponse(int totalTickets, List<JiraStatusCount> byStatus) {}
+
+  // "Jira Tickets" donut on the Developer Insights page - same task -> jira_ticket_key join as getJiraVsLogged(), grouping on status instead
+  @GetMapping("/jira/tickets-breakdown")
+  public ResponseEntity<JiraTicketsBreakdownResponse> getJiraTicketsBreakdown() {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    List<String> ticketKeys =
+        taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId).stream()
+            .map(Task::getJiraTicketKey)
+            .filter(key -> key != null)
+            .toList();
+
+    if (ticketKeys.isEmpty()) {
+      return ResponseEntity.ok(new JiraTicketsBreakdownResponse(0, List.of()));
+    }
+
+    List<JiraTicket> tickets = jiraTicketRepository.findByJiraTicketKeyIn(ticketKeys);
+    int total = tickets.size();
+
+    Map<String, Long> countsByStatus =
+    tickets.stream()
+        .collect(
+            Collectors.groupingBy(
+                t -> Optional.ofNullable(t.getJiraStatus()).orElse("UNKNOWN"),
+                Collectors.counting()));
+                
+    List<JiraStatusCount> byStatus =
+        countsByStatus.entrySet().stream()
+            .map(
+                entry ->
+                    new JiraStatusCount(
+                        entry.getKey(),
+                        entry.getValue(),
+                        Math.round((entry.getValue() * 100.0 / total) * 10.0) / 10.0))
+            .sorted((a, b) -> Long.compare(b.count(), a.count()))
+            .toList();
+
+    return ResponseEntity.ok(new JiraTicketsBreakdownResponse(total, byStatus));
   }
 }
