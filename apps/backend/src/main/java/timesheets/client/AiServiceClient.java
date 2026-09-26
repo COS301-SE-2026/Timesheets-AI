@@ -59,7 +59,8 @@ public class AiServiceClient {
     return getDashboardInsights(workspaceMemberId, includeResolved, "8w");
   }
 
-  public AiDashboardResponse getDashboardInsights(UUID workspaceMemberId, boolean includeResolved, String period) {
+  public AiDashboardResponse getDashboardInsights(
+      UUID workspaceMemberId, boolean includeResolved, String period) {
     return buildClient()
         .get()
         .uri(

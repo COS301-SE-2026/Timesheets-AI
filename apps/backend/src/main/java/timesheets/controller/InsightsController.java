@@ -28,14 +28,16 @@ import timesheets.service.InsightsService;
 public class InsightsController {
 
   private final InsightsService insightsService;
-   private final SecurityUtils securityUtils;
+  private final SecurityUtils securityUtils;
 
   public record CurrentMemberResponse(UUID workspaceMemberId) {}
 
   @GetMapping("/me")
   public ResponseEntity<CurrentMemberResponse> getCurrentMember() {
-    return ResponseEntity.ok(new CurrentMemberResponse(securityUtils.getDefaultWorkspaceMemberId()));
+    return ResponseEntity.ok(
+        new CurrentMemberResponse(securityUtils.getDefaultWorkspaceMemberId()));
   }
+
   @GetMapping("/summary")
   public ResponseEntity<PersonalInsightsResponse> getInsightsSummary(
       @RequestParam LocalDate from, @RequestParam LocalDate to) {

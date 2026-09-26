@@ -19,6 +19,7 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, UU
 
   // finds all the projects that a workspace member is assigned to
   List<ProjectMember> findByWorkspaceMemberId(UUID workspaceMemberId);
+
   List<ProjectMember> findByWorkspaceMemberIdAndIsActiveTrue(UUID workspaceMemberId);
 
   // finds all the workspace members assigned to a specific project

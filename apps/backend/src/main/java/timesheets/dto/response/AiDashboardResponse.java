@@ -34,7 +34,7 @@ public class AiDashboardResponse {
   private EstimateVsActual estimateVsActual;
   private List<ScoreCard> scoreCards;
   private TimeSplitByTask timeSplitByTask;
-    private TaskSwitchingByDay taskSwitchingByDay;
+  private TaskSwitchingByDay taskSwitchingByDay;
 
   @Data
   @NoArgsConstructor

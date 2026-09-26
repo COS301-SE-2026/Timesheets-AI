@@ -328,7 +328,8 @@ public class IntegrationController {
 
   public record JiraTicketsBreakdownResponse(int totalTickets, List<JiraStatusCount> byStatus) {}
 
-  // "Jira Tickets" donut on the Developer Insights page - same task -> jira_ticket_key join as getJiraVsLogged(), grouping on status instead
+  // "Jira Tickets" donut on the Developer Insights page - same task -> jira_ticket_key join as
+  // getJiraVsLogged(), grouping on status instead
   @GetMapping("/jira/tickets-breakdown")
   public ResponseEntity<JiraTicketsBreakdownResponse> getJiraTicketsBreakdown() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
@@ -347,12 +348,12 @@ public class IntegrationController {
     int total = tickets.size();
 
     Map<String, Long> countsByStatus =
-    tickets.stream()
-        .collect(
-            Collectors.groupingBy(
-                t -> Optional.ofNullable(t.getJiraStatus()).orElse("UNKNOWN"),
-                Collectors.counting()));
-                
+        tickets.stream()
+            .collect(
+                Collectors.groupingBy(
+                    t -> Optional.ofNullable(t.getJiraStatus()).orElse("UNKNOWN"),
+                    Collectors.counting()));
+
     List<JiraStatusCount> byStatus =
         countsByStatus.entrySet().stream()
             .map(

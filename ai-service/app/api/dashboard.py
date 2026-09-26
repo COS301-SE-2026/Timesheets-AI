@@ -117,7 +117,7 @@ def _get_productivity_trend(
         ]
         return ProductivityTrend(points=points, is_synthetic=False)
 
-    #fallback: no persisted history, compute live per week
+    # fallback: no persisted history, compute live per week
     today = date.today()
     points = []
     teammate_ids = (
