@@ -1,0 +1,65 @@
+<!--  Author: Cleopatra Kwenda
+    Date:2026-09-24
+    Purpose: this is for the browsing integrations disable
+    Related Requirement: N/A -->
+
+
+<h2 mat-dialog-title>
+    Request an Integration
+</h2>
+
+<mat-dialog-content>
+
+    <p class="dialog-description">
+        Tell your administrator which integration 
+        you would like to use and why it would be useful.
+    </p>
+
+    <mat-form-field 
+            appearance="outline"
+            class="dialog-field">
+            <mat-label>
+                Integration name
+            </mat-label>
+
+            <input
+                matInput
+                [(ngModel)]="integrationName"
+                placeholder="e.g. Slack"
+                maxlength="100">
+        </mat-form-field>
+
+        <mat-form-field 
+            appearance="outline"
+            class="dialog-field">
+            <mat-label>
+                Reason for request
+            </mat-label>
+
+            <textarea
+                matInput
+                [(ngModel)]="reason"
+                placeholder="Explain why this integration would be useful..."
+                rows="4"
+                maxlength="500">
+            </textarea>
+        </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    
+        <button
+            mat-button
+            type="button"
+            (click)="cancel()">
+            Cancel
+        </button>
+
+        <button
+            mat-flat-button
+            type="button"
+            (click)="submit()"
+            [disabled]="!integrationName.trim() || !reason.trim()">
+            Request
+        </button>
+</mat-dialog-actions>
