@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+
 
 interface AvaiableIntegrations{
     id: string;
@@ -13,7 +15,9 @@ interface AvaiableIntegrations{
     selector: 'app-integartion-browser-dialog',
     standalone: true,
     imports: [
-        CommonModule
+        CommonModule,
+        MatButtonModule,
+        MatDialogModule
     ],
     templateUrl: './integration-browser-dialog.component.html',
     styleUrl: './integration-browser-dialog.component.scss'
@@ -51,7 +55,7 @@ export class IntegrationBrowserDialogComponent{
         }
     ];
 
-    addIntegrations(integartion: AvaiableIntegrations): void{
+    canAddIntegration(integartion: AvaiableIntegrations): void{
         this.dialogRef.close(integartion);
     }
 
