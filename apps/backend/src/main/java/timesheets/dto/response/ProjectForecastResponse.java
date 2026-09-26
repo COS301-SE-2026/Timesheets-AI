@@ -50,6 +50,7 @@ public record ProjectForecastResponse(
       String level,
       int evidenceAvailable,
       int evidenceTotal,
+      List<String> availableEvidence,
       List<String> missingEvidence,
       double taskEstimateCoveragePercentage) {}
 

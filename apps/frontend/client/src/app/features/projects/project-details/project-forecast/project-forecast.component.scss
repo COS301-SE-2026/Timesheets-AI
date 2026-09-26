@@ -887,8 +887,6 @@
   color: #5c6679;
 }
 
-
-
 //MISSING EVIDENCE
 
 .missing-evidence {
@@ -932,7 +930,25 @@
   font-weight: 600;
 }
 
+//AVAILABLE EVIDENCE
 
+.available-evidence {
+  margin-top: 18px;
+}
+
+.available-evidence-title {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.evidence-tag-available {
+  border-color: #b7dfc5;
+  background: #e8f7ee;
+  color: #145c32;
+}
 
 //RESPONSIVE - TABLET
 

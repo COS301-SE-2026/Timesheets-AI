@@ -44,6 +44,7 @@ export interface ProjectForecastConfidence {
   level: ProjectForecastConfidenceLevel;
   evidenceAvailable: number;
   evidenceTotal: number;
+  availableEvidence: string[];
   missingEvidence: string[];
   taskEstimateCoveragePercentage: number;
 }

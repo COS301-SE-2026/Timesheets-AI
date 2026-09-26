@@ -498,6 +498,22 @@
 
           }
 
+          @if (currentForecast.confidence.availableEvidence.length > 0) {
+            <div class="available-evidence">
+
+              <span class="available-evidence-title">
+                Available evidence
+              </span>
+
+              <div class="evidence-tags">
+                @for (available of currentForecast.confidence.availableEvidence; track available) {
+                  <span class="evidence-tag evidence-tag-available">
+                    {{ available.replaceAll('_', ' ') }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
 
           @if (currentForecast.confidence.missingEvidence.length > 0) {
             <div class="missing-evidence">
