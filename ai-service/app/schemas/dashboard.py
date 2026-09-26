@@ -9,12 +9,13 @@ Patched: added the GitHubActivity schema to handle the GitHub activity data for 
 """
 
 from datetime import datetime
-from typing import Optional, Literal
+from typing import Literal, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
 
 StatusBand = Literal["HEALTHY", "MODERATE", "AT_RISK"]
+
 
 class DashboardInsight(BaseModel):
     id: UUID
@@ -48,6 +49,7 @@ class GitHubActivity(BaseModel):
     alignment: Optional[str] = None
     alignment_score: Optional[float] = None
     explanation: Optional[str] = None
+
 
 class ProductivityTrendPoint(BaseModel):
     week_label: str
@@ -99,7 +101,8 @@ class TimeSplitByTaskItem(BaseModel):
 class TimeSplitByTask(BaseModel):
     total_hours: float
     tasks: list[TimeSplitByTaskItem]
-    
+
+
 class TaskSwitchingByDayItem(BaseModel):
     day_label: str
     switches: int
@@ -107,6 +110,7 @@ class TaskSwitchingByDayItem(BaseModel):
 
 class TaskSwitchingByDay(BaseModel):
     days: list[TaskSwitchingByDayItem]
+
 
 class DashboardResponse(BaseModel):
     workspace_member_id: UUID
@@ -120,6 +124,7 @@ class DashboardResponse(BaseModel):
     time_split_by_task: Optional[TimeSplitByTask] = None
     task_switching_by_day: Optional[TaskSwitchingByDay] = None
 
+
 class ResolveInsightRequest(BaseModel):
     resolved_by_workspace_member_id: UUID
 
@@ -131,4 +136,3 @@ class ResolveInsightResponse(BaseModel):
     resolved_by_workspace_member_id: Optional[UUID] = None
 
     model_config = {"from_attributes": True}
-
