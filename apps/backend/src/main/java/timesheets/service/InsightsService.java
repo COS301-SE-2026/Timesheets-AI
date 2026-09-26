@@ -11,10 +11,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import timesheets.client.AiServiceClient;
 import timesheets.domain.Project;
+import timesheets.domain.ProjectMember;
 import timesheets.domain.TimeEntry;
+import timesheets.dto.response.DeveloperProjectResponse;
 import timesheets.dto.request.ProductivityReportRequest;
 import timesheets.dto.response.AiDashboardResponse;
 import timesheets.dto.response.PersonalInsightsResponse;
+import timesheets.dto.response.ResolveInsightResponse;
+import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.security.SecurityUtils;
@@ -31,6 +35,7 @@ public class InsightsService {
   private final SecurityUtils securityUtils;
   private final AiServiceClient aiServiceClient;
   private final ProjectRepository projectRepository;
+  private final ProjectMemberRepository projectMemberRepository;
 
   public PersonalInsightsResponse getInsightsSummary(ProductivityReportRequest request) {
 
@@ -150,7 +155,54 @@ public class InsightsService {
   }
 
   public AiDashboardResponse getAiDashboard() {
+    return getAiDashboard(false, "8w");
+  }
+
+  public AiDashboardResponse getAiDashboard(boolean includeResolved, String period) {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    return aiServiceClient.getDashboardInsights(workspaceMemberId);
+    return aiServiceClient.getDashboardInsights(workspaceMemberId, includeResolved, period);
+  }
+
+  public ResolveInsightResponse resolveInsight(UUID insightId) {
+    UUID resolvedBy = securityUtils.getDefaultWorkspaceMemberId();
+    return aiServiceClient.resolveInsight(insightId, resolvedBy);
+  }
+
+  // every project this dev belongs to, active or not, with
+  // all-time hours logged per project, a standing list, not scoped to a period
+  public List<DeveloperProjectResponse> getMyProjects() {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    List<ProjectMember> memberships =
+        projectMemberRepository.findByWorkspaceMemberId(workspaceMemberId);
+    if (memberships.isEmpty()) {
+      return List.of();
+    }
+
+    List<UUID> projectIds =
+        memberships.stream().map(ProjectMember::getProjectId).distinct().toList();
+    Map<UUID, String> projectNames =
+        projectRepository.findAllById(projectIds).stream()
+            .collect(Collectors.toMap(Project::getId, Project::getName));
+
+    List<TimeEntry> allEntries = timeEntryRepository.findByWorkspaceMemberId(workspaceMemberId);
+    Map<UUID, Double> hoursByProject =
+        allEntries.stream()
+            .collect(
+                Collectors.groupingBy(
+                    TimeEntry::getProjectId,
+                    Collectors.summingDouble(e -> e.getDurationSeconds() / 3600.0)));
+
+    return memberships.stream()
+        .map(
+            membership ->
+                DeveloperProjectResponse.builder()
+                    .projectId(membership.getProjectId())
+                    .projectName(
+                        projectNames.getOrDefault(membership.getProjectId(), "Unknown project"))
+                    .hoursLogged(hoursByProject.getOrDefault(membership.getProjectId(), 0.0))
+                    .active(Boolean.TRUE.equals(membership.getIsActive()))
+                    .build())
+        .toList();
   }
 }
