@@ -23,6 +23,7 @@ import { ProjectTask } from "../models/project-task.model";
 import { ProjectService } from "../../../core/services/project.service";
 import { TaskService } from "../../../core/services/task.service";
 import {mapToProjectDetails, mapToProjectTask} from "../utils/project-mapper";
+import { ProjectForecastComponent } from './project-forecast/project-forecast.component';
 
 //this is used to keep every template binding valid while real data is being loaded
 const EMPTY_PROJECT_DETAILS: ProjectDetails = {
@@ -58,6 +59,7 @@ const EMPTY_PROJECT_DETAILS: ProjectDetails = {
         CommonModule,
         RouterModule,
         BaseChartDirective,
+        ProjectForecastComponent,
     ],
     templateUrl: './project-details.component.html',
     styleUrls: ['./project-details.component.scss']
@@ -131,9 +133,9 @@ export class ProjectDetailsComponent {
 
     // protected readonly project= signal<Project>(PROJECTS[0]);
 
-    protected readonly activeTab=signal<'overview' | 'tasks'>('overview');
+    protected readonly activeTab = signal<'overview' | 'tasks' | 'forecast'>('overview');
 
-    protected setActiveTab( tab: 'overview' | 'tasks'):void{
+    protected setActiveTab( tab: 'overview' | 'tasks' | 'forecast'):void{
         this.activeTab.set(tab);
     }
 

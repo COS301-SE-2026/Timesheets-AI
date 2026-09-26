@@ -190,6 +190,12 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             Tasks
 
         </button>
+
+        @if (project().myRole === ProjectRole.MANAGER) {
+            <button class="tab-button" [class.active]="activeTab() === 'forecast'" (click)="setActiveTab('forecast')">
+                Forecast
+            </button>
+        }
     </nav>
 
     <!--
@@ -501,6 +507,10 @@ Wrapped in loading error guard since now content now comes from GET /api/project
         </article>
 
     </section>
+    }
+
+    @if (activeTab() === 'forecast') {
+        <app-project-forecast [projectId]="projectId()"> </app-project-forecast>
     }
 </div>
 }
