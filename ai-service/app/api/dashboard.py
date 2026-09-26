@@ -263,6 +263,7 @@ def get_dashboard(
         ),
     )
 
+
 @router.patch(
     "/{insight_id}/resolve",
     response_model=ResolveInsightResponse,

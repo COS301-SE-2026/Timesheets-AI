@@ -335,7 +335,9 @@ public class IntegrationController {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
     List<String> ticketKeys =
-        taskRepository.findByAssignedWorkspaceMemberIdAndIsDeletedFalse(workspaceMemberId).stream()
+        taskRepository
+            .findByAssignedWorkspaceMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(workspaceMemberId)
+            .stream()
             .map(Task::getJiraTicketKey)
             .filter(key -> key != null)
             .toList();
