@@ -18,9 +18,8 @@ from app.models.ai_insight import AIInsight
 from app.models.project import Project
 
 
+# just making the values into format when needed so that they can be stored in DB
 def _make_json_safe(forecast: dict) -> dict:
-
-    # just making the values into format when needed so that they can be stored in DB
     return json.loads(
         json.dumps(
             forecast,
