@@ -432,6 +432,26 @@ Wrapped in loading error guard since now content now comes from GET /api/project
     </section>
     }
 
+    <!-- View members template -->
+     <ng-template #membersDialog>
+        <h2 mat-dialog-title>All Team Members ({{ project().members.length }})</h2>
+        <mat-dialog-content>
+            <div class="member-left">
+            @for (member of project().members; track member.workspaceMemberId ){
+                <span class="team-avatar" [ngClass]="getAvatarColour(member)">{{ getInitials(member) }}</span>
+                <div class="member-details">
+                    <span class="member-name">{{ getMemberName(member) }}</span>
+                    <span class="member-role">{{ member.role }} · {{ member.email }}</span>
+                    <span class="member-hours">{{ member.hoursLoggedLabel }} Logged</span>
+                </div>
+            }
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions align="end">
+            <button mat-button mat-dialog-close>Close</button>
+        </mat-dialog-actions>
+     </ng-template>
+
     <!--
     TASKS TAB
     -->
