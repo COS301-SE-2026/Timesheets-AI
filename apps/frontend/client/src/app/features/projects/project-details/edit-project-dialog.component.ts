@@ -68,6 +68,23 @@ import { ProjectDetailResponse, ProjectService } from "../../../core/services/pr
         }
     }   
 
-    `]
+    `],
 
 })
+
+export class EditProjectDialogComponent {
+    readonly data = inject<ProjectDetailResponse>(MAT_DIALOG_DATA);
+    readonly dialogRef = inject(MatDialogRef<EditProjectDialogComponent>);
+
+    private readonly projects = inject(ProjectService);
+    readonly draft = {
+        name: this.data.name, description: this.data.description ?? '',
+        budgetHours: this.data.budgetHours, hourlyRate: this.data.hourlyRate,
+        budgetCost: this.data.budgetCost, startDate: this.data.startDate ?? '', endDate: this.data.endDate ?? '',
+    };
+
+    saving= false;
+    error= '';
+    
+
+}
