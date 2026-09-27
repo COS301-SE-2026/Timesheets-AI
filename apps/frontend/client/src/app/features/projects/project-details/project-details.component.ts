@@ -84,6 +84,18 @@ export class ProjectDetailsComponent {
             (user?.roles.some(role => ['ADMIN', 'ROLE_ADMIN', 'MANAGER', 'ROLE_MANAGER'].includes(role)) ?? false);
     })
 
+    // View all members
+    protected viewMembers(template: TemplateRef<unknown>): void {
+        this.dialog.open(template, {width: '640px', maxWidth: '95vw', ariaLabel: 'All project members'});
+    }
+
+    // edit project
+    protected editProject(): void {
+        if (!this.canEdit() || !this.detail ) return;
+        this.dialog.open(EditProjectDialogComponent, { data: this.detail, width: '640px', maxWidth: '95vw' })
+            .afterClosed().subscribe(saved => { if (saved) this.loadProject(); });
+    
+    }
 
     protected readonly ProjectStatus= ProjectStatus;
     protected readonly ProjectRole= ProjectRole;
@@ -169,6 +181,7 @@ export class ProjectDetailsComponent {
 
         this.projectService.getProjectDetail(id).subscribe({
             next: (detail) => {
+                this.detail = detail;
                 this.project.set(mapToProjectDetails(detail));
                 this.loading.set(false);
                 this.loadTasks(id);
