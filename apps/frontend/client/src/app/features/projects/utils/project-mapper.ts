@@ -188,7 +188,7 @@ export function mapToProjectDetails(
     //still gonna do(Nyasha): backend detail endpoint doesn't return these yet
     myRole: ProjectRole.DEVELOPER,
     startDate: detail.startDate ?? '',
-    endDate: detail.endDate ? '',
+    endDate: detail.endDate ?? '',
 
     members: detail.members.map(mapToProjectMember),
   };

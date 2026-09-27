@@ -57,42 +57,19 @@ HEADER
     STATS CARDS
     -->
     <section class="projects-statistics-grid">
-      <app-stats-card
-        label="Projects"
-        [value]="totalProjects.toString()"
-        description="Total assigned projects"
-        [progress]="100"
-        icon="fa-regular fa-folder-open"
-        iconClass="blue">
-      </app-stats-card>
-      <app-stats-card
-        label="Active"
-        [value]="activeProjects.toString()"
-        description="Currently active"
-        [progress]="75"
-        icon="fa-solid fa-check"
-        iconClass="green">
-      </app-stats-card>
-      <app-stats-card
-        label="Completed"
-        [value]="completedProjects.toString()"
-        description="Completed projects"
-        [progress]="100"
-        icon="fa-solid fa-flag-checkered"
-        iconClass="orange">
-      </app-stats-card>
-      <!--
-      Total hours logged across all YOUR projects summed from /api/projects/{id}
-      member entries matched by email, not the team total
-      -->
-      <app-stats-card
-        label="Your Hours"
-        [value]="myTotalHoursLoading ? '...': myTotalHoursLabel"
-        description="Your hours across all projects"
-        [progress]="100"
-        icon="fa-regular fa-clock"
-        iconClass="purple">
-      </app-stats-card>
+     @for (card of summaryCards; track card.label ){
+      <article class="project-summary-card" [ngClass]="card.color">
+        <div class="summary-deading">
+          <span class="summary-icon"><i class="fa-solid" [ngClass]="card.icon" aria-hidden="true"></i></span>
+          <div>
+            <h2>{{ card.label }}</h2>
+            <p>{{ card.description }}</p>
+          </div>
+        </div>
+        <strong class="summary-value">{{ card.value }}</strong>
+        <i class="fa-solid summary-watermark" [ngClass]="card.icon" aria-hidden="true"></i>
+      </article>
+     }
     </section>
     <!--
     FILTER BUTTONS SECTION
