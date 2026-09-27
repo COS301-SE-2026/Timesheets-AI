@@ -9,7 +9,12 @@ Patched: 30/07/2026 integration Zamokuhle Zwane
 Intergrated project detail page replacing the hard coded details
 */
 
-import { Component, signal, computed, inject, effect } from "@angular/core";
+import { Component, signal, computed, inject, effect, TemplateRef } from "@angular/core";
+import { MatDialog, MatDialogModule } from "@angular/material/dialog";
+import { MatButtonModule } from "@angular/material/button";
+import { AuthService } from "../../../core/services/auth.service";
+import { ProjectDetailResponse } from "../../../core/services/project.service";
+import { EditProjectDialogComponent } from "./edit-project-dialog.component";
 import { CommonModule } from "@angular/common";
 //import { PROJECT_DETAIL } from "../mock/project-details.mock";
 import { ActivatedRoute, RouterModule } from "@angular/router";
@@ -23,6 +28,7 @@ import { ProjectTask } from "../models/project-task.model";
 import { ProjectService } from "../../../core/services/project.service";
 import { TaskService } from "../../../core/services/task.service";
 import {mapToProjectDetails, mapToProjectTask} from "../utils/project-mapper";
+import { MatDialogActions, MatDialogClose } from "@angular/material/dialog";
 
 //this is used to keep every template binding valid while real data is being loaded
 const EMPTY_PROJECT_DETAILS: ProjectDetails = {
@@ -55,16 +61,28 @@ const EMPTY_PROJECT_DETAILS: ProjectDetails = {
     selector: 'app-project-details',
     standalone: true,
     imports: [
-        CommonModule,
-        RouterModule,
-        BaseChartDirective,
-    ],
+    CommonModule,
+    RouterModule,
+    BaseChartDirective,
+    MatDialogModule,
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogClose
+],
     templateUrl: './project-details.component.html',
     styleUrls: ['./project-details.component.scss']
 })
 
 export class ProjectDetailsComponent {
     private readonly route = inject(ActivatedRoute);
+    private readonly dialog = inject(MatDialog);
+    private readonly auth = inject(AuthService);
+    private detail: ProjectDetailResponse | null = null;
+    protected readonly canEdit = computed(() => {
+        const user = this.auth.currentUser();
+        return this.project().status !== ProjectStatus.ARCHIVED &&
+            (user?.roles.some(role => ['ADMIN', 'ROLE_ADMIN', 'MANAGER', 'ROLE_MANAGER'].includes(role)) ?? false);
+    })
 
 
     protected readonly ProjectStatus= ProjectStatus;
