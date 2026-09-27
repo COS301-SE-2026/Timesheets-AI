@@ -123,7 +123,7 @@ Related Requirements: N/A
                 [progress]="project.progressPercentageClamped!">
               </app-progress-bar>
               <span class="progress-value">
-                Progress: {{project.progressPercentageClamped}}%
+                Progress: {{project.progressPercentageClamped | number:'1.0-0'}}%
               </span>
             </div>
           } @else {

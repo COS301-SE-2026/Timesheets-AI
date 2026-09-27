@@ -150,21 +150,17 @@ export class ProjectsComponent implements OnInit {
   protected filterProjects(selectedFilter: string): void {
     this.selectedFilter = selectedFilter;
 
-    if (selectedFilter === 'All') {
-      this.filteredProjects = [...this.projects];
-      return;
-    }
 
     this.filteredProjects = this.projects.filter(
-      (project) => project.status === selectedFilter,
+      (project) => (selectedFilter === 'All' ||
+        (selectedFilter === 'My Projects' ? project.role !== null : project.status === selectedFilter )) &&
+        project.name.toLowerCase().includes(this.searchTerm.toLowerCase()),
     );
   }
 
   protected searchProjects(searchValue: string): void {
     this.searchTerm = searchValue;
-    this.filteredProjects = this.projects.filter((project) =>
-      project.name.toLowerCase().includes(searchValue.toLowerCase()),
-    );
+    this.filterProjects(this.selectedFilter);
   }
 
   protected getProjectInitials(name:string):string{
