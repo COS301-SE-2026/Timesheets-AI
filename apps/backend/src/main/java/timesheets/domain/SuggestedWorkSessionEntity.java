@@ -2,11 +2,15 @@ package timesheets.domain;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import timesheets.evidence.EvidenceEvent;
 
 @Entity
 @Table(name = "suggested_work_sessions")
@@ -36,6 +40,11 @@ public class SuggestedWorkSessionEntity {
 
   @Column(name = "task_id")
   private UUID taskId;
+
+  // this tells Hibernate to store this java object as JSON
+  @JdbcTypeCode(SqlTypes.JSON)
+  @Column(name = "evidence_events", columnDefinition = "jsonb")
+  private List<EvidenceEvent> evidenceEvents;
 
   @Column(name = "confidence_score")
   private double confidenceScore;
