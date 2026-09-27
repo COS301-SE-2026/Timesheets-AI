@@ -614,6 +614,8 @@ public class ProjectService {
             .description(project.getDescription())
             .status(project.getStatus())
             .members(memberInfos)
+            .startDate(project.getStartDate())
+            .endDate(project.getEndDate())
             .hoursLogged(totalHoursLogged)
             .progressPercentage(progressPercentage)
             .createdAt(project.getCreatedAt())
