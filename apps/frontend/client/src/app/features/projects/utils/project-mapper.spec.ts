@@ -6,6 +6,7 @@ covering the ProjectResponse into Project card shape, detail merge, hours format
 */
 import {
   mapToProjectCard,
+  mapToProjectDetails,
   applyProjectDetail,
   extractMyHoursFromDetail,
   formatHoursMinutes,
@@ -95,6 +96,8 @@ describe('project-mapper', () => {
 
   describe('applyProjectDetail', () => {
     const detail: ProjectDetailResponse = {
+      startDate: '2026-09-01',
+      endDate: '2026-09-30',
       id: 'proj-1',
       name: 'Mobile App Development',
       description: 'Building the React Native mobile application',
@@ -128,6 +131,14 @@ describe('project-mapper', () => {
       createdAt: FIXTURE_TIMESTAMP,
       updatedAt: FIXTURE_TIMESTAMP,
     };
+
+    it('preserves project dates and handles unscheduled projects', () => {
+      expect(mapToProjectDetails(detail)).toEqual(expect.objectContaining({
+        startDate: '2026-09-01', endDate: '2026-09-30',
+      }));
+      expect(mapToProjectDetails({ ...detail, startDate: null, endDate: null }))
+        .toEqual(expect.objectContaining({ startDate: '', endDate: ' '}));
+    });
 
     it('should set hoursLoggedLabel and progressPercentageClamped, and mark detailLoaded', () => {
       const card = mapToProjectCard({
