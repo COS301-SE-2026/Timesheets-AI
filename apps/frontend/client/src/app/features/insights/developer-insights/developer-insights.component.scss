@@ -1,74 +1,294 @@
 @use '../insights-shared' as *;
 
+
+/*
+ * Period Selector
+ */
+
 .period-select {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-button);
-  padding: 8px 12px;
-  background: var(--color-white);
-  color: var(--color-text-body);
-  font-size: var(--font-size-caption);
+  height: 40px;
+  min-width: 150px;
+  padding: 0 36px 0 14px;
+
   font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #173b78;
+  background-color: #ffffff;
+
+  border: 1px solid var(--color-input-border);
+  border-radius: 8px;
+
+  box-shadow: var(--elevation-1);
+
+  cursor: pointer;
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
+
+.period-select:hover {
+  border-color: var(--color-primary);
+}
+
+.period-select:focus {
+  border-color: var(--color-primary);
+  outline: 2px solid rgba(8, 119, 237, 0.12);
+  outline-offset: 1px;
+}
+
+
+/*
+ * Sections
+ */
+
+.insights-section {
+  width: 100%;
+}
+
+
+/*
+ * Weekly Summary
+ */
+
+.weekly-summary-content {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.weekly-summary-content .summary {
+  flex: 1;
+  max-width: 950px;
+}
+
+.weekly-summary-content .export-btn {
+  flex-shrink: 0;
+}
+
+
+/*
+ * Productivity
+ */
 
 .productivity-layout {
   display: grid;
-  grid-template-columns: 160px 1fr;
-  gap: var(--space-6);
+  grid-template-columns: 180px minmax(0, 1fr);
   align-items: center;
+  gap: 28px;
 }
-.productivity-score-box { display: flex; flex-direction: column; gap: var(--space-3); }
 
-.donut-layout { display: grid; grid-template-columns: 140px 1fr; gap: var(--space-4); align-items: center; }
-.donut-wrap { position: relative; width: 140px; height: 140px; }
+.productivity-score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+
+/*
+ * Charts
+ */
+
+.chart-panel {
+  min-width: 0;
+}
+
+
+/*
+ * Donut Charts
+ */
+
+.donut-layout {
+  display: grid;
+  grid-template-columns: 145px minmax(0, 1fr);
+  align-items: center;
+  gap: 22px;
+}
+
+.donut-wrap {
+  position: relative;
+
+  width: 140px;
+  height: 140px;
+}
+
 .donut-center {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
   pointer-events: none;
 }
-.donut-total { font-family: var(--font-mono); font-weight: var(--font-weight-semibold); font-size: var(--font-size-h3); color: var(--color-text-primary); }
-.donut-caption { font-size: 9px; color: var(--color-text-muted); }
 
-.legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+.donut-total {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+
+  color: #102b61;
+}
+
+.donut-caption {
+  margin-top: 2px;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  color: var(--color-text-muted);
+}
+
+
+/*
+ * Legend
+ */
+
+.legend-title {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+}
+
+.legend-dot {
+  display: inline-block;
+  flex-shrink: 0;
+
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+}
+
+
+/*
+ * Burnout Gauge
+ */
+
+.gauge-panel {
+  padding: 12px 4px 4px;
+}
 
 .gauge-track {
   position: relative;
-  height: 12px;
-  border-radius: var(--radius-pill);
-  margin: var(--space-4) 0 var(--space-2);
+
+  height: 8px;
+  margin: 12px 0 10px;
+
+  border-radius: 999px;
+
   background: linear-gradient(
     to right,
-    #F4A261 0%,   /* amber */
-    #E76F51 50%,  /* orange-red */
-    #C1121F 100%  /* deep red */
+    #5abf83 0%,
+    #f0b64d 50%,
+    #dc5a5a 100%
   );
 }
+
 .gauge-thumb {
   position: absolute;
-  top: -4px;
-  width: 20px;
-  height: 20px;
+  top: 50%;
+
+  width: 18px;
+  height: 18px;
+
+  background: #ffffff;
+
+  border: 3px solid #173b78;
   border-radius: 50%;
-  background: var(--color-white);
-  border: 3px solid var(--color-primary);
-  transform: translateX(-50%);
-  box-shadow: 0 2px 6px rgba(15, 76, 145, 0.2);
+
+  transform: translate(-50%, -50%);
+
+  box-shadow: 0 2px 6px rgba(15, 43, 97, 0.18);
 }
+
 .gauge-labels {
   display: flex;
   justify-content: space-between;
-  font-size: var(--font-size-caption);
+
+  font-size: 11px;
+  font-weight: 600;
+
   color: var(--color-text-muted);
 }
-.metric { font-size: 70px; }
+
+
+/*
+ * Project Row
+ */
+
+.project-row .compare-track {
+  width: 100%;
+  max-width: 360px;
+  margin-top: 7px;
+}
+
+
+/*
+ * Accessibility
+ */
 
 .visually-hidden {
   position: absolute;
+
   width: 1px;
   height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
   overflow: hidden;
+
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
+
+  border: 0;
 }
+
+
+/*
+ * Responsive
+ */
+
 @media (max-width: 900px) {
-  .productivity-layout, .donut-layout { grid-template-columns: 1fr; }
+
+  .productivity-layout {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .donut-layout {
+    grid-template-columns: 140px minmax(0, 1fr);
+  }
+
+  .weekly-summary-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+
+@media (max-width: 650px) {
+
+  .period-select {
+    width: 100%;
+  }
+
+  .donut-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .donut-wrap {
+    margin: 0 auto;
+  }
+
+  .weekly-summary-content .export-btn {
+    width: 100%;
+  }
 }
