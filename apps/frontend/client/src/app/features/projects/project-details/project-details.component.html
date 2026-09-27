@@ -59,6 +59,9 @@ Wrapped in loading error guard since now content now comes from GET /api/project
         </div>
 
         <div class="project-header-right">
+            @if (canEdit()) {
+                <button mat-flat-button type="button" (click)="editProject()">Edit project</button>
+            }
             <span
                 class="project-status-badge"
                 [ngClass]="{
@@ -145,7 +148,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                 </span>
 
                 <strong>
-                    {{ project().endDate | date }}
+                    {{ project().endDate ? (project().endDate ? date:'mediumDate') : 'Not set' }}
                 </strong>
             </div>
         </div>
@@ -167,6 +170,13 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             </div>
         </div>
         
+        <div class="meta-card">
+            <div class="icon-wrapper green"><i class="fa-regular fa-calendar"></i></div>
+            <div class="meta-info">
+                <span class="meta-title">Start Date</span>
+                <strong>{{ project().startDate ? (project().startDate | date:'mediumDate') : 'Not set' }}</strong>
+            </div>
+        </div>
     </section>
 
     <!--
@@ -355,7 +365,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             
 
             <div class="team-list">
-                @for (member of project().members; track member.workspaceMemberId) {
+                @for (member of project().members.slice(0, 4); track member.workspaceMemberId) {
                 <div class="team-member-row">
 
                     <div class="member-top-row">
@@ -409,11 +419,13 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                 </div>
                 }
             </div>
- 
-            <button class="view-members-btn">
+            
+            @if (project().members.length > 4) {
+            <button class="view-members-btn" type="button" (click)="viewMembers(membersDialog)">
                 <i class="fa-solid fa-user-group"></i>
                 View all members
             </button>
+            }
             
         </article>
 
