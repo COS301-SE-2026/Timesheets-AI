@@ -79,7 +79,7 @@ export class ProjectDetailsComponent {
     private detail: ProjectDetailResponse | null = null;
     protected readonly canEdit = computed(() => {
         const user = this.auth.currentUser();
-        return this.project().status !== ProjectStatus.ARCHIVED &&
+        return this.project().myRole === ProjectRole.MANAGER ||
             (user?.roles.some(role => ['ADMIN', 'ROLE_ADMIN', 'MANAGER', 'ROLE_MANAGER'].includes(role)) ?? false);
     })
 
@@ -181,7 +181,11 @@ export class ProjectDetailsComponent {
         this.projectService.getProjectDetail(id).subscribe({
             next: (detail) => {
                 this.detail = detail;
-                this.project.set(mapToProjectDetails(detail));
+                const project = mapToProjectDetails(detail);
+                const email = this.auth.currentUser()?.email.toLowerCase();
+                const membership = detail.members.find(member => member.email.toLowerCase() === email);
+                project.myRole = membership?.isProjectManager ? ProjectRole.MANAGER : ProjectRole.DEVELOPER;
+                this.project.set(project);
                 this.loading.set(false);
                 this.loadTasks(id);
             },
@@ -224,26 +228,6 @@ export class ProjectDetailsComponent {
 
     });
 
-
-    // protected readonly projectTitle= computed(
-    //     ()=> this.project().name,
-    // );
-
-    // protected readonly projectStatus= computed(
-    //     ()=> this.project().status,
-    // );
-
-    // protected readonly projectRole= computed(
-    //     ()=> this.project().role,
-    // );
-
-    // protected readonly projectTags= computed(
-    //     ()=> this.project().tags,
-    // );
-
-    // protected readonly projectMembers= computed(
-    //     ()=> this.project().teamMembers,
-    // );
 
     protected readonly hoursSummary= computed(()=>{
         const project= this.project();
