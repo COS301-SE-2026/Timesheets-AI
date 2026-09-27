@@ -31,4 +31,5 @@ public class IssueResponse {
   private String dueDate;
 
   private UUID localTaskId;
+  private UUID localProjectId;
 }
