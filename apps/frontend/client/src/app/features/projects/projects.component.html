@@ -13,27 +13,6 @@ all the project that specific user is on.
 Related Requirements: N/A
 -->
 
-<!--
-HEADER
--->
-<!-- <app-header [title] ="'Projects'">
-  <div class="header-search">
-    <label for="project-search" class="visually-hid">
-      Search projects
-    </label>
-
-    <input
-      id="project-search"
-      class="project-search-input"
-      type="search"
-      placeholder="Search projects..."
-      [value]="searchTerm"
-      (input)="searchProjects($any($event.target).value)"
-      >
-
-  </div>
-</app-header> -->
-
 <div class="projects-page-container">
   <h1 class="page-title">Projects</h1>
   <!--
@@ -59,7 +38,7 @@ HEADER
     <section class="projects-statistics-grid">
      @for (card of summaryCards; track card.label ){
       <article class="project-summary-card" [ngClass]="card.color">
-        <div class="summary-deading">
+        <div class="summary-heading">
           <span class="summary-icon"><i class="fa-solid" [ngClass]="card.icon" aria-hidden="true"></i></span>
           <div>
             <h2>{{ card.label }}</h2>
@@ -67,7 +46,6 @@ HEADER
           </div>
         </div>
         <strong class="summary-value">{{ card.value }}</strong>
-        <i class="fa-solid summary-watermark" [ngClass]="card.icon" aria-hidden="true"></i>
       </article>
      }
     </section>

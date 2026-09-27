@@ -148,7 +148,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                 </span>
 
                 <strong>
-                    {{ project().endDate ? (project().endDate ? date:'mediumDate') : 'Not set' }}
+                    {{ project().endDate ? (project().endDate | date:'mediumDate') : 'Not set' }}
                 </strong>
             </div>
         </div>
