@@ -80,7 +80,7 @@ public class ProjectController {
   // this will be used to update a project
   @PatchMapping("/{projectId}")
   public ResponseEntity<ProjectResponse> patchProject(
-      @PathVariable UUID projectId, @RequestBody UpdateProjectRequest request) {
+      @PathVariable UUID projectId, @Valid @RequestBody UpdateProjectRequest request) {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 

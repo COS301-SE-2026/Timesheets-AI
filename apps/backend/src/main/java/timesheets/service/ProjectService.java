@@ -177,8 +177,12 @@ public class ProjectService {
     }
 
     // if a project is archived then it cannot be updated
-    if ("ARCHIVED".equals(project.getStatus())) {
-      throw new StateConflictException("Cannot update an archived project");
+    // if ("ARCHIVED".equals(project.getStatus())) {
+    //   throw new StateConflictException("Cannot update an archived project");
+    // }
+
+    if (request.getStatus() != null ) {
+      project.setStatus(request.getStatus());
     }
 
     // the provided details will be the one updated
@@ -290,7 +294,7 @@ public class ProjectService {
     BigDecimal totalHoursLogged = calculateProjectTotalHours(projectId);
     BigDecimal progressPercentage = calculateProgressPercentage(project, totalHoursLogged);
 
-    boolean showCostInfo = securityUtils.isAdmin() || securityUtils.isManager();
+    boolean showCostInfo = securityUtils.isAdmin() || securityUtils.isManager() || isProjectManager(projectId, workspaceMemberId);
 
     // calling the helper to build the response
     return buildProjectDetailResponse(
@@ -590,11 +594,11 @@ public class ProjectService {
             .myRole(role)
             .createdAt(project.getCreatedAt())
             .updatedAt(project.getUpdatedAt())
-            .budgetHours(project.getBudgetHours())
-            .hourlyRate(project.getHourlyRate());
+            .budgetHours(project.getBudgetHours());
 
-    if (showCostInfo) {
-      builder.budgetCost(project.getBudgetCost());
+    if (showCostInfo || role == WorkspaceRole.MANAGER) {
+      builder.hourlyRate(project.getHourlyRate());
+      builder.budgetHours(project.getBudgetHours());
     }
 
     return builder.build();
@@ -620,10 +624,10 @@ public class ProjectService {
             .progressPercentage(progressPercentage)
             .createdAt(project.getCreatedAt())
             .updatedAt(project.getUpdatedAt())
-            .budgetHours(project.getBudgetHours())
-            .hourlyRate(project.getHourlyRate());
+            .budgetHours(project.getBudgetHours());
 
     if (showCostInfo) {
+      builder.hourlyRate(project.getHourlyRate());
       builder.budgetCost(project.getBudgetCost());
 
       if (project.getBudgetHours() != null && project.getHourlyRate() != null) {
