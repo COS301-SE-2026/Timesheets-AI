@@ -7,8 +7,8 @@ import { ProjectDetailResponse, ProjectService } from "../../../core/services/pr
 @Component({
     standalone: true,
     imports: [FormsModule, MatDialogModule, MatButtonModule],
-    template:`
-        <h2 mat-dialog-title>Edit Project</h2>
+    template: `
+    <h2 mat-dialog-title>Edit Project</h2>
     <form #form="ngForm" (ngSubmit)="save()">
         <mat-dialog-content>
             <div class="fields">
@@ -16,24 +16,24 @@ import { ProjectDetailResponse, ProjectService } from "../../../core/services/pr
                 <label class="wide">Description<textarea name="description" [(ngModel)]="draft.description" rows="3"></textarea></label>
                 <label>Budget hours<input name="budgetHours" type="number" [(ngModel)]="draft.budgetHours" min="0.01" step="0.01" /></label>
                 <label>Hourly rate<input name="hourlyRate" type="number" [(ngModel)]="draft.hourlyRate"  min="0.01" step="0.01" /></label>
-                <label>Budget cost<input name="budgetCost" type="number" [(ngModel)]="draft.budgetCost"  min="0.01" step="0.01" /><label>
+                <label>Budget cost<input name="budgetCost" type="number" [(ngModel)]="draft.budgetCost"  min="0.01" step="0.01" /></label>
                 <label>Start Date<input name="startDate" type="date" [(ngModel)]="draft.startDate" [required]="!!data.startDate" /></label>
                 <label>End Date<input name="endDate" type="date" [(ngModel)]="draft.endDate" [min]="draft.startDate || ''" [required]="!!data.endDate" /></label>
             </div>
-            @if (invalidDate) { <p role="alert">End date must be on or after start date.</p> }
-            @if (error) { <p role="alert">{{ error }}</p>
+            @if (invalidDates) { <p role="alert">End date must be on or after start date.</p> }
+            @if (error) { <p role="alert">{{ error }}</p> }
         </mat-dialog-content>
 
         <mat-dialog-actions align="end">
-            <button mat-button type="button" [disabled]="saving" (click)="dialogRef..close()"> Cancel </button>
-            <button mat-flat=button type="submit" [disabled]="form.invalid || !draft.name.trim() || invalidDates || saving">{{ saving ? 'Saving...' : 'Save changes '}}</button>
+            <button mat-button type="button" [disabled]="saving" (click)="dialogRef.close()"> Cancel </button>
+            <button mat-flat-button type="submit" [disabled]="form.invalid || !draft.name.trim() || invalidDates || saving">{{ saving ? 'Saving...' : 'Save changes '}}</button>
         </mat-dialog-actions>
     </form>
     `,
   styles: [`
     .fields {
         display: grid;
-        grid-template-columns: repeat(2, minmax:(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 18px;
         padding-top: 8px;
     }
@@ -85,6 +85,29 @@ export class EditProjectDialogComponent {
 
     saving= false;
     error= '';
-    
+
+    get invalidDates(): boolean {
+        return !!(this.draft.startDate && this.draft.endDate && this.draft.endDate < this.draft.startDate);
+    }
+
+    save(): void {
+        if (this.saving || !this.draft.name.trim() || this.invalidDates) return;
+        this.saving = true;
+        this.error = '';
+        this.dialogRef.disableClose = true;
+        this.projects.updateProject(this.data.id, {
+            name: this.draft.name.trim(), description: this.draft.description.trim(),
+            budgetHours: this.draft.budgetHours ?? undefined, hourlyRate: this.draft.hourlyRate ?? undefined,
+            budgetCost: this.draft.budgetCost ?? undefined,
+            startDate: this.draft.startDate || undefined, endDate: this.draft.endDate || undefined,
+        }).subscribe({
+            next: () => this.dialogRef.close(true),
+            error: () => {
+                this.saving = false;
+                this.dialogRef.disableClose = false;
+                this.error = 'Could not save this project. Please try again.';
+            },
+        });
+    }
 
 }
