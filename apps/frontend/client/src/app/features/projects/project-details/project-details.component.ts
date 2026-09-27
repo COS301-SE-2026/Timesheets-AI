@@ -10,10 +10,10 @@ Intergrated project detail page replacing the hard coded details
 */
 
 import { Component, signal, computed, inject, effect, TemplateRef } from "@angular/core";
-import { MatDialog, MatDialogModule } from "@angular/material/dialog";
+import { MatDialog, MatDialogModule,  MatDialogActions, MatDialogClose } from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
 import { AuthService } from "../../../core/services/auth.service";
-import { ProjectDetailResponse } from "../../../core/services/project.service";
+import { ProjectDetailResponse, ProjectService } from "../../../core/services/project.service";
 import { EditProjectDialogComponent } from "./edit-project-dialog.component";
 import { CommonModule } from "@angular/common";
 //import { PROJECT_DETAIL } from "../mock/project-details.mock";
@@ -25,10 +25,9 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 //import { PROJECT_TASK } from "../mock/project-task.mock";
 import { ProjectTask } from "../models/project-task.model";
-import { ProjectService } from "../../../core/services/project.service";
 import { TaskService } from "../../../core/services/task.service";
 import {mapToProjectDetails, mapToProjectTask} from "../utils/project-mapper";
-import { MatDialogActions, MatDialogClose } from "@angular/material/dialog";
+
 
 //this is used to keep every template binding valid while real data is being loaded
 const EMPTY_PROJECT_DETAILS: ProjectDetails = {
