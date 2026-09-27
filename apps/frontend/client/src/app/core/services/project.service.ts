@@ -45,6 +45,8 @@ export interface ProjectMemberInfo {
 }
 
 export interface ProjectDetailResponse {
+  startDate?: string | null;
+  endDate?: string | null;
   id: string;
   name: string;
   description: string | null;
@@ -88,6 +90,12 @@ export class ProjectService {
     return this.http
       .get<ProjectDetailResponse>(`${this.baseUrl}/${projectId}`)
       .pipe(catchError(this.handleError('getProjectDetail')));
+  }
+
+  // Update a project, admin and manager only
+  updateProject(projectId: string, request: Partial<Omit<CreateProjectRequest, 'managerIds' | 'status'>>): Observable<ProjectResponse> {
+    return this.http.patch<ProjectResponse>(`${this.baseUrl}/${projectId}`, request)
+    .pipe(catchError(this.handleError('updateProject')));
   }
 
   //create a project, admin and manager only
