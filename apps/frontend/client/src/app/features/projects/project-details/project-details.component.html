@@ -90,6 +90,30 @@ Wrapped in loading error guard since now content now comes from GET /api/project
 
     <section class="project-meta-grid">
         <div class="meta-card">
+            <div class="icon-wrapper green"><i class="fa-regular fa-calendar"></i></div>
+            <div class="meta-info">
+                <span class="meta-title">Start Date</span>
+                <strong>{{ project().startDate ? (project().startDate | date:'mediumDate') : 'Not set' }}</strong>
+            </div>
+        </div>
+
+        <div class="meta-card">
+            <div class="icon-wrapper orange">
+                <i class="fa-regular fa-calendar"></i>
+            </div>
+            
+            <div class="meta-info">
+                <span class="meta-title">
+                    End Date
+                </span>
+
+                <strong>
+                    {{ project().endDate ? (project().endDate | date:'mediumDate') : 'Not set' }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="meta-card">    
             <div class="icon-wrapper blue">
                 <i class="fa-regular fa-clock"></i>
             </div>
@@ -105,6 +129,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             </div>
         </div>
 
+        @if (canEdit()) {
         <div class="meta-card">
             <div class="icon-wrapper blue-light">
                 <i class="fa-solid fa-coins"></i>
@@ -136,22 +161,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                 </strong>
             </div>
         </div>
-
-        <div class="meta-card">
-            <div class="icon-wrapper orange">
-                <i class="fa-regular fa-calendar"></i>
-            </div>
-            
-            <div class="meta-info">
-                <span class="meta-title">
-                    End Date
-                </span>
-
-                <strong>
-                    {{ project().endDate ? (project().endDate | date:'mediumDate') : 'Not set' }}
-                </strong>
-            </div>
-        </div>
+    }
         
 
         <div class="meta-card">
@@ -170,13 +180,6 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             </div>
         </div>
         
-        <div class="meta-card">
-            <div class="icon-wrapper green"><i class="fa-regular fa-calendar"></i></div>
-            <div class="meta-info">
-                <span class="meta-title">Start Date</span>
-                <strong>{{ project().startDate ? (project().startDate | date:'mediumDate') : 'Not set' }}</strong>
-            </div>
-        </div>
     </section>
 
     <!--
@@ -246,7 +249,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                                 Logged
                             </span>
                             <span class="kpi-value primary">
-                                {{ project().hoursLoggedLabel }}h
+                                {{ project().hoursLoggedLabel }}
                             </span>
                         </div>
 
@@ -300,11 +303,11 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             <div class="progress-circle-wrapper">
                 <div 
                     class="progress-circle"
-                    [style.--progress]="project().progressPercentage">
+                    [style.--progress]="project().progressPercentageClamped">
 
                     <div class="progress-inner">
                         <span class="progress-percentage">
-                            {{ project().progressPercentage }}%
+                            {{ project().progressPercentage | number:'1.0-0'}}%
                         </span>
 
                         <span class="progress-label">
@@ -327,7 +330,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                     </div>
 
                     <span class="summary-value">
-                        {{ project().hoursLoggedLabel }}h
+                        {{ project().hoursLoggedLabel }}
                     </span>
                 </div>
 
@@ -436,13 +439,15 @@ Wrapped in loading error guard since now content now comes from GET /api/project
      <ng-template #membersDialog>
         <h2 mat-dialog-title>All Team Members ({{ project().members.length }})</h2>
         <mat-dialog-content>
-            <div class="member-left">
+            <div class="team-list">
             @for (member of project().members; track member.workspaceMemberId ){
+                <div class="member-list">
                 <span class="team-avatar" [ngClass]="getAvatarColour(member)">{{ getInitials(member) }}</span>
                 <div class="member-details">
                     <span class="member-name">{{ getMemberName(member) }}</span>
                     <span class="member-role">{{ member.role }} · {{ member.email }}</span>
                     <span class="member-hours">{{ member.hoursLoggedLabel }} Logged</span>
+                </div>
                 </div>
             }
             </div>

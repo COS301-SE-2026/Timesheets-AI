@@ -28,7 +28,7 @@ export interface ProjectResponse {
   budgetCost: number | null;
   startDate: string | null;
   endDate: string | null;
-  myRole: 'ADMIN' | 'MANAGER' | 'DEVELOPER'; //matches ProjectResponse.myRole, a WorkspaceRole enum
+  myRole: 'ADMIN' | 'MANAGER' | 'DEVELOPER' | null; //matches ProjectResponse.myRole, a WorkspaceRole enum
   createdAt: string;
   updatedAt: string;
 }
@@ -93,7 +93,7 @@ export class ProjectService {
   }
 
   // Update a project, admin and manager only
-  updateProject(projectId: string, request: Partial<Omit<CreateProjectRequest, 'managerIds' | 'status'>>): Observable<ProjectResponse> {
+  updateProject(projectId: string, request: Partial<Omit<CreateProjectRequest, 'managerIds' | 'status'>> & { status?: ProjectResponse['status'] }): Observable<ProjectResponse> {
     return this.http.patch<ProjectResponse>(`${this.baseUrl}/${projectId}`, request)
     .pipe(catchError(this.handleError('updateProject')));
   }
