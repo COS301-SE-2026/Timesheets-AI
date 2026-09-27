@@ -109,7 +109,7 @@ STATS
 */
 .projects-statistics-grid{
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 24px;
     margin-top: 10px;
     margin-bottom: 28px;
@@ -120,10 +120,37 @@ FILTERS
 */
 .project-filter-row{
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 2rem;
     border-bottom: 1px solid #ececec;
     margin-bottom: 20px;
     padding-bottom: 10px;
+}
+
+.project-filters { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+.project-search { margin-left: auto; }
+.project-summary-card {
+    --accent: #4b83cb;
+    --tint: #e1edff;
+    position: relative;
+    overflow: hidden;
+    min-height: 190px;
+    padding: 24px 20px;
+    border: 1px solid #e4eafb;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 8px 24px #233d6810;
+    color: #1b3063;
+    &.green { --accent: #489a60; --tint: #dff5d9; }
+    &.orange { --accent: #d99136; --tint: #fff0d9; }
+    &.purple { --accent: #9265cb; --tint: #efe5fa; }
+    .summary-heading { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+    .summary-icon { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 48px; border-radius: 8px; background: var(--tint); color: var(--accent); font-size: 21px; }
+    h2 { margin: 0 0 8px; font-size: 18px; font-weight: 700; }
+    p { margin: 0; color: #7c89a6; font-size: 14px; line-height: 1.5; }
+    .summary-value { display: block; position: relative; z-index: 1; text-align: center; margin-top: 30px; font-size: 35px; }
+    //.summary-watermark { position: absolute; right: 20px; bottom: -16px; color: var(--accent); opacity: .15; font-size: 100px; }
 }
 
 .project-filter-button{
@@ -417,6 +444,18 @@ RESPONSE
 }
 
 @media (max-width: 768px){
+    .projects-page-container { 
+        padding: 1.5rem;
+    }
+
+    .project-filter-row {
+        flex-wrap: wrap;
+    }
+
+    .project-search {
+        width: 100%;
+    }
+
     .projects-statistics-grid{
         grid-template-columns: 1fr;
     }
