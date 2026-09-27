@@ -14,6 +14,14 @@ import { ProjectDetailResponse, ProjectService } from "../../../core/services/pr
             <div class="fields">
                 <label class="wide">Project name <input name="name" [(ngModel)]="draft.name" required maxlength="255"/></label>
                 <label class="wide">Description<textarea name="description" [(ngModel)]="draft.description" rows="3"></textarea></label>
+                <label class="wide">Status
+                    <select name="status" [(ngModel)]="draft.status" required>
+                        <option value="ACTIVE">Active</option>
+                        <option value="ON_HOLD">On Hold</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="ARCHIVED">Archived</option>
+                    </select>
+                </label>    
                 <label>Budget hours<input name="budgetHours" type="number" [(ngModel)]="draft.budgetHours" min="0.01" step="0.01" /></label>
                 <label>Hourly rate<input name="hourlyRate" type="number" [(ngModel)]="draft.hourlyRate"  min="0.01" step="0.01" /></label>
                 <label>Budget cost<input name="budgetCost" type="number" [(ngModel)]="draft.budgetCost"  min="0.01" step="0.01" /></label>
@@ -45,7 +53,7 @@ import { ProjectDetailResponse, ProjectService } from "../../../core/services/pr
         font-size: 14px;
     }
 
-    input, textarea {
+    input, textarea, select {
         box-sizing: border-box;
         width: 100%;
         padding: 10px;
@@ -78,6 +86,7 @@ export class EditProjectDialogComponent {
 
     private readonly projects = inject(ProjectService);
     readonly draft = {
+        status: this.draft.status,
         name: this.data.name, description: this.data.description ?? '',
         budgetHours: this.data.budgetHours, hourlyRate: this.data.hourlyRate,
         budgetCost: this.data.budgetCost, startDate: this.data.startDate ?? '', endDate: this.data.endDate ?? '',
@@ -96,6 +105,7 @@ export class EditProjectDialogComponent {
         this.error = '';
         this.dialogRef.disableClose = true;
         this.projects.updateProject(this.data.id, {
+            status: this.draft.status,
             name: this.draft.name.trim(), description: this.draft.description.trim(),
             budgetHours: this.draft.budgetHours ?? undefined, hourlyRate: this.draft.hourlyRate ?? undefined,
             budgetCost: this.draft.budgetCost ?? undefined,
