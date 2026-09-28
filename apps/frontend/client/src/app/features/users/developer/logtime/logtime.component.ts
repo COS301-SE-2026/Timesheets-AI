@@ -487,6 +487,16 @@ export class LogtimeComponent implements OnDestroy {
     this.toastMessage.set('');
   }
 
+  // need to make the UI bit better - need to show error messages more nicely and clearly
+  // helper method to avoid repetition
+  showToast(message: string): void {
+    this.toastMessage.set(message);
+
+    setTimeout(() => {
+      this.toastMessage.set(''); 
+    }, 3000);
+  }
+
   openManualPanel(): void {
     if (!this.canEditEntries()) {
       this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
@@ -1273,10 +1283,11 @@ export class LogtimeComponent implements OnDestroy {
         )
       );
 
-      // display a friendly message 
+      // display a friendly message
+      this.showToast('Suggestion rejected.') 
     },
     error: (error) => {
-      console.error('Failed to reject suggestion:', error);
+      this.showToast('We could not reject this suggestion. Please try again.')
     }
   });
 }
@@ -1297,19 +1308,12 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
 
       // adding nice closing after clicing approve 
 
-      this.toastMessage.set('Suggested work added to your timesheet.');
-      setTimeout(() => {
-        this.toastMessage.set('');
-      }, 3000);
+      this.showToast('Suggested work added to your timesheet.');
     },
     error: (error) => {
       console.error('APPROVE: error =', error);
 
-      this.toastMessage.set('Failed to add suggested work to your timesheet.');
-
-      setTimeout(() => {
-        this.toastMessage.set('');
-      }, 3000);
+      this.showToast('Failed to add suggested work to your timesheet.');
     }
   });
 }
