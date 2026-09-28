@@ -39,6 +39,7 @@ import {
 import { SuggestedWorkSession } from '../../../suggestions/models/suggested.model';
 import { SuggestionService } from '../../../suggestions/suggestion.service';
 import { sign } from 'node:crypto';
+import { error } from 'node:console';
 //type definitions and interface
 
 type ViewOption = 'Day' | 'Week' | 'Month';
@@ -1387,6 +1388,8 @@ assignSuggestionTask(suggestion: SuggestedWorkSession, event: Event): void {
   if (taskId === 'CREATE NEW TASK'){
     this.suggestionCreatingTask.set(suggestion.id);
     this.newSuggestionTaskTitle.set('');
+
+    select.value = suggestion.taskId || '';
     return;
   }
 
@@ -1411,6 +1414,76 @@ assignSuggestionTask(suggestion: SuggestedWorkSession, event: Event): void {
       this.toastMessage.set(error.eror?.message ?? 'Unable to assign the task.');
     }
   });
+}
+
+createSuggestionTask(suggestion: SuggestedWorkSession): void {
+  const title = this.newSuggestionTaskTitle().trim();
+  const projectId = suggestion.projectId;
+
+  if (!projectId){
+    this.showToast('Please select a project before creating a task.');
+    return;
+  }
+
+  if (!title){
+    this.showToast('Please enter a task title.');
+    return;
+  }
+
+  const request = {
+    title: title,
+    projectId: projectId
+  };
+
+  this.http.post<TaskApiResponse>(`${this.apiBaseUrl}/tasks`, request, this.requestOptions()).subscribe({
+    next: (createdTask) => {
+      // add new task to this suggestion's task list
+      const currentTasks = this.suggestionTasks.get(suggestion.id) || [];
+
+        currentTasks.push({
+          id: createdTask.id,
+          projectId: createdTask.projectId,
+          title: createdTask.title
+        });
+      
+        this.suggestionTasks.set(
+          suggestion.id, currentTasks
+        )
+
+        this.suggestionService.edit(suggestion.id, {
+          title: suggestion.title,
+          projectId: projectId,
+          taskId: createdTask.id,
+          startTime: suggestion.startTime,
+          endTime: suggestion.endTime,
+          description: suggestion.description || undefined
+        }).subscribe({
+          next: (updatedSuggestion) => {
+            const updatedSuggestions = this.suggestions().map((item) =>
+              item.id === updatedSuggestion.id
+              ? updatedSuggestion
+              : item
+            );
+
+            this.suggestions.set(updatedSuggestions);
+            this.suggestionCreatingTask.set(null);
+            this.newSuggestionTaskTitle.set('');
+            this.showToast('Task created and assigned to the suggestion.');
+          },
+          error: (error) => {
+            this.showToast('The task was created but we could not assign it to the suggestion.');
+          }
+        });
+    },
+    error: (error) => {
+      this.showToast(error.error?.message ?? 'We could not create the task. Please try again.');
+    }
+  });
+}
+
+cancelCreateSuggestionTask(): void {
+  this.suggestionCreatingTask.set(null);
+  this.newSuggestionTaskTitle.set('');
 }
    
 // this is for fetching all the tasks to display in the suggestion panel 
