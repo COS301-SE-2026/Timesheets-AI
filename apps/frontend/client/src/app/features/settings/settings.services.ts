@@ -15,6 +15,8 @@ export class SettingsService{
     private readonly http= inject(HttpClient);
     private readonly apiUrl= 'api/settings';
     private readonly authUrl= 'api/auth';
+    private readonly accountUrl= 'api/account';
+
 
     private readonly mockSettings: UserSettings={
         security:{
@@ -99,7 +101,10 @@ export class SettingsService{
         return of(void 0).pipe(delay(150));
     }
 
-    requestAccountDeletion(): Observable<void>{
-        return of(void 0).pipe(delay(150));
+    requestAccountDeletion(reason: string): Observable<MessageResponse>{
+        return this.http.post<MessageResponse>(
+            `${this.accountUrl}/deletion/request`,
+            { reason }
+        );
     }
 }
