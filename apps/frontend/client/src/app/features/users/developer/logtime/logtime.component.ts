@@ -1375,6 +1375,33 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
   });
 }
 
+assignSuggestionTask(suggestion: SuggestedWorkSession, event: Event): void {
+  const select = event.target as HTMLSelectElement;
+  const taskId = select.value;
+
+  this.suggestionService.edit(suggestion.id, {
+    title: suggestion.title,
+    projectId: suggestion.projectId || undefined,
+    taskId: taskId || undefined,
+    startTime: suggestion.startTime,
+    endTime: suggestion.endTime,
+    description: suggestion.description || undefined
+  }).subscribe({
+    next: (updatedSuggestion) => {
+      const updatedSuggestions = this.suggestions().map((item) =>
+        item.id === updatedSuggestion.id
+        ? updatedSuggestion
+        : item
+      );
+
+      this.suggestions.set(updatedSuggestions);
+    },
+    error: (error) => {
+      this.toastMessage.set(error.eror?.message ?? 'Unable to assign the task.');
+    }
+  });
+}
+
    
 // this is for fetching all the tasks to display in the suggestion panel 
 // goal here is connect the suggestion's selected project to this existing task 
