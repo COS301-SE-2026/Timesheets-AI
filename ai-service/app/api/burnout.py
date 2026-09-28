@@ -2,6 +2,7 @@
 This file handles the Router for the burnout risk endpoints
 Author: Zamokuhle Zwane
 Date: 23/08/2026
+Patch: added risk_score to the response, mirrors the schema/service patch
 """
 
 import uuid
@@ -32,6 +33,7 @@ def calculate_and_save(
         period_start=period_start,
         period_end=period_end,
         risk_level=result["risk_level"],
+        risk_score=result["risk_score"],
         reason=result["reason"],
         insight_id=insight.id,
     )
