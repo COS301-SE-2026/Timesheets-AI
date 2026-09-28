@@ -45,7 +45,7 @@ def generate_project_forecast_explanation(
 
         return ProjectForecastExplanation.model_validate(response_data)
 
-    except (RuntimeError, ValueError, TypeError, json.JSONDecodeError):
+    except (RuntimeError, ValueError, TypeError):
         logger.exception(
             "Failed to generate AI explanation for project forecast %s",
             forecast.get("project_id"),
