@@ -54,7 +54,7 @@ Related Requirements: N/A
     -->
     <section class="project-filter-row">
       <div class="project-filters">
-      @for (filter of filters; track filter){
+      @for (filter of visibleFilters; track filter){
         <button
           class="project-filter-button"
           [class.selected-filter]="selectedFilter===filter"
@@ -124,7 +124,7 @@ Related Requirements: N/A
                 [progress]="project.progressPercentageClamped!">
               </app-progress-bar>
               <span class="progress-value">
-                Progress: {{project.progressPercentageClamped | number:'1.0-0'}}%
+                Progress: {{project.progressPercentageClamped | number:'1.0-2'}}%
               </span>
             </div>
           } @else {

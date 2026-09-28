@@ -167,7 +167,10 @@ export class ProjectsComponent implements OnInit {
     );
   }
 
-  
+  private get canSeeMyProjects(): boolean {
+    const user = this.authService.currentUser();
+    return user?.roles.some(role => ['MANAGER', 'ROLE_MANAGER', 'ADMIN', 'ROLE_ADMIN'].includes(role)) ?? false;
+  }
 
   protected searchProjects(searchValue: string): void {
     this.searchTerm = searchValue;
