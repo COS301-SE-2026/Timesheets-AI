@@ -26,8 +26,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import timesheets.dto.response.AiDashboardResponse;
 import timesheets.dto.response.ProjectForecastResponse;
-import timesheets.dto.response.SavedProjectForecastResponse;
 import timesheets.dto.response.ResolveInsightResponse;
+import timesheets.dto.response.SavedProjectForecastResponse;
 
 @Component
 @RequiredArgsConstructor
@@ -103,20 +103,6 @@ public class AiServiceClient {
         .body(new ParameterizedTypeReference<ProjectForecastResponse>() {});
   }
 
-  /*
-  - used the style that Zamo originally did
-  - this creates the client to communicate with the ai service
-  - also makes sure that the snake fields returned by python as mapped into the java response dto
-   */
-  private RestClient buildClient() {
-    return restClientBuilder
-        .baseUrl(aiServiceBaseUrl)
-        .messageConverters(
-            converters -> {
-              converters.removeIf(c -> c instanceof MappingJackson2HttpMessageConverter);
-              converters.add(new MappingJackson2HttpMessageConverter(snakeCaseMapper));
-            })
-        .build();
   public ResolveInsightResponse resolveInsight(UUID insightId, UUID resolvedByWorkspaceMemberId) {
     return buildClient()
         .patch()
