@@ -1,0 +1,2 @@
+ALTER TABLE suggested_work_sessions
+ADD COLUMN evidence_events JSONB;
