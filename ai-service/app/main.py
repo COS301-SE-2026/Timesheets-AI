@@ -28,11 +28,12 @@ from app.api.delivery_forecast import router as delivery_forecast_router
 from app.api.dev_trigger import router as dev_trigger_router
 from app.api.health import router as health_router
 from app.api.manager_assistant import router as manager_assistant_router
+from app.api.manager_dashboard import router as manager_dashboard_router
 from app.api.productivity import router as productivity_router
 from app.api.task_switching import router as task_switching_router
 from app.api.weekly_summary import router as weekly_summary_router
 from app.scheduler import start_scheduler, stop_scheduler
-from app.api.manager_dashboard import router as manager_dashboard_router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

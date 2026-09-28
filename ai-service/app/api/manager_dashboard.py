@@ -5,7 +5,7 @@ Author: Zamokuhle Zwane
 Date: 26/09/2026
 """
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID
 
@@ -32,7 +32,6 @@ from app.services.manager_dashboard import (
     team_logged_hours,
     velocity,
 )
-from datetime import datetime, time, timezone
 
 router = APIRouter(prefix="/insights", tags=["Manager Dashboard"])
 
