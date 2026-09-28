@@ -1,2 +1,2 @@
 ALTER TABLE suggested_work_sessions
-ADD COLUMN evidence_events JSONB;
+ADD COLUMN IF NOT EXISTS evidence_events JSONB;
