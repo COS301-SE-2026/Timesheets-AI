@@ -11,6 +11,7 @@ export interface SuggestedWorkSession {
     explanation: string;
     status: 'PENDING' | 'EDITED' | 'APPROVED' | 'REJECTED';
     evidenceEvents: EvidenceEvent[];
+    description?: string;
 }
 
 export interface EvidenceEvent {
