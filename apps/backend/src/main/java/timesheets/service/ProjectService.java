@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import timesheets.client.AiServiceClient;
 import timesheets.domain.Project;
 import timesheets.domain.ProjectMember;
 import timesheets.domain.TimeEntry;
@@ -20,8 +21,10 @@ import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateProjectRequest;
 import timesheets.dto.request.UpdateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
+import timesheets.dto.response.ProjectForecastResponse;
 import timesheets.dto.response.ProjectMemberResponse;
 import timesheets.dto.response.ProjectResponse;
+import timesheets.dto.response.SavedProjectForecastResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
@@ -42,6 +45,7 @@ public class ProjectService {
   private final TimeEntryRepository timeEntryRepository;
   private final UserRepository userRepository;
   private final TaskRepository taskRepository;
+  private final AiServiceClient aiServiceClient;
 
   /*
   - gets all the projects for the current user
@@ -444,6 +448,29 @@ public class ProjectService {
     projectMemberRepository.save(projectMember);
 
     taskRepository.unassignActiveTasksFromProjectMember(projectId, workspaceMemberId, removedAt);
+  }
+
+  // gets the last saved forcast to display until the manager syncs
+  @Transactional(readOnly = true)
+  public SavedProjectForecastResponse getProjectForecast(UUID projectId, UUID workspaceMemberId) {
+
+    if (!userHasAccessToProject(projectId, workspaceMemberId)) {
+      throw new AccessDeniedException("No access to this project");
+    }
+
+    return aiServiceClient.getProjectForecast(projectId);
+  }
+
+  // this actually calculates the new project forecast
+  public ProjectForecastResponse syncProjectForecast(
+      UUID projectId, UUID workspaceMemberId, String authorization) {
+
+    if (!userHasAccessToProject(projectId, workspaceMemberId)) {
+      throw new AccessDeniedException("No access to this project");
+    }
+
+    // sending the auth token so that the service can get the external evidence
+    return aiServiceClient.syncProjectForecast(projectId, authorization);
   }
 
   // ! helper functions
