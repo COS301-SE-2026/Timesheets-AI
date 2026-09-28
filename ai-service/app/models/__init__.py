@@ -19,6 +19,7 @@ or app/main.py), guarantees the full metadata is registered before any table is 
 
 from app.models.ai_insight import AIInsight
 from app.models.project import Project
+from app.models.project_member import ProjectMember
 from app.models.task import Task
 from app.models.time_entry import TimeEntry
 from app.models.user import User
@@ -28,6 +29,7 @@ from app.models.workspace_member import WorkspaceMember
 __all__ = [
     "AIInsight",
     "Project",
+    "ProjectMember",
     "Task",
     "TimeEntry",
     "User",
