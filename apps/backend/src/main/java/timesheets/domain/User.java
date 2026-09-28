@@ -89,6 +89,9 @@ public class User {
   @Column(name = "deletion_processed_at")
   private LocalDateTime deletionProcessedAt;
 
+  @Column(name = "deleted_at")
+  private LocalDateTime deletedAt;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 

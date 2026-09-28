@@ -213,4 +213,11 @@ public class GitHubService implements GitHubAdapter {
 
     return saved;
   }
+
+  // returns true when the member has finished the oauth flow and a token row exists
+  public boolean isConnected(UUID workspaceMemberId) {
+    return integrationTokenRepository
+        .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "GITHUB")
+        .isPresent();
+  }
 }

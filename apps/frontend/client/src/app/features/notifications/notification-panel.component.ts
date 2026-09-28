@@ -4,7 +4,7 @@
  * 
  */
 
-import { Component, EventEmitter, HostListener, OnInit, Output, inject, signal, } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnInit, Output, inject, signal, ElementRef,} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationResponse, NotificationService, } from '../../core/services/notification.service';
 import { RouterLink, Router } from '@angular/router';
@@ -21,6 +21,7 @@ export class NotificationPanelComponent implements OnInit {
 
   public readonly notificationService = inject(NotificationService);
   private readonly router = inject(Router);
+  private readonly elementRef = inject(ElementRef);
 
   @Output() closePanel = new EventEmitter<void>();
 
@@ -115,5 +116,15 @@ export class NotificationPanelComponent implements OnInit {
   @HostListener('document:keydown.escape')
   public closeOnEscape(): void {
     this.closePanel.emit();
+  }
+
+  // closes the panel when the user clicks outside it
+  @HostListener('document:click', ['$event'])
+  public closeOnOutsideClick(event: MouseEvent): void {
+    const clickedElement = event.target as Node;
+
+    if (!this.elementRef.nativeElement.contains(clickedElement)) {
+      this.closePanel.emit();
+    }
   }
 }

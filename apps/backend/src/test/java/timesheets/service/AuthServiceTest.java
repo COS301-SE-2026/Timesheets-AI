@@ -57,13 +57,13 @@ class AuthServiceTest {
   @Mock private PasswordEncoder passwordEncoder;
   @Mock private EmailVerificationTokenRepository emailVerificationTokenRepository;
   @Mock private EmailService emailService;
-  @Mock private WorkspaceMemberRepository workspaceMemberRepository;
   @Mock private UserMfaRepository userMfaRepository;
   @Mock private JwtService jwtService;
   @Mock private UserIdentityProviderRepository userIdentityProviderRepository;
   @Mock private SsoAuthenticationStrategy googleSsoStrategy;
   @Mock private List<SsoAuthenticationStrategy> ssoStrategies;
   @Mock private ApplicationEventPublisher eventPublisher;
+  @Mock private WorkspaceMemberRepository workspaceMemberRepository;
 
   @InjectMocks private AuthService authService;
 
@@ -237,9 +237,9 @@ class AuthServiceTest {
 
       // the passwords should match
       when(passwordEncoder.matches(testPassword, user.getPasswordHash())).thenReturn(true);
-      when(workspaceMemberRepository.findByUserId(testUserId))
-          .thenReturn(List.of()); // no workspaces yet
       when(userMfaRepository.findByUserId(testUserId)).thenReturn(Optional.empty()); // no mfa yet
+
+      when(workspaceMemberRepository.findByUserIdAndIsActiveTrue(testUserId)).thenReturn(List.of());
 
       // mock token generated
       when(jwtService.generateToken(any(User.class), eq(1))).thenReturn("jwt-token");
@@ -312,9 +312,9 @@ class AuthServiceTest {
               "GOOGLE", "google-test-user-123"))
           .thenReturn(Optional.of(identityProvider));
       when(userRepository.findById(testUserId)).thenReturn(Optional.of(user));
-      when(workspaceMemberRepository.findByUserId(testUserId)).thenReturn(List.of());
-      when(userMfaRepository.findByUserId(testUserId)).thenReturn(Optional.empty());
       when(jwtService.generateToken(any(User.class), eq(1))).thenReturn("jwt-token");
+
+      when(workspaceMemberRepository.findByUserIdAndIsActiveTrue(testUserId)).thenReturn(List.of());
 
       // ACT: testing that method
       AuthResponse response = authService.googleAuth(request);
@@ -352,8 +352,6 @@ class AuthServiceTest {
       when(userIdentityProviderRepository.save(any(UserIdentityProvider.class)))
           .thenReturn(UserIdentityProvider.builder().build());
 
-      when(workspaceMemberRepository.findByUserId(any(UUID.class))).thenReturn(List.of());
-      when(userMfaRepository.findByUserId(any(UUID.class))).thenReturn(Optional.empty());
       when(jwtService.generateToken(any(User.class), eq(1))).thenReturn("jwt-token");
 
       // ACT: testing the function

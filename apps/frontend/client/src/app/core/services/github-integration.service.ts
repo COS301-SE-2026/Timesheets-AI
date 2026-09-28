@@ -26,4 +26,7 @@ export class GithubIntegrationService {
       map(res => res.number)
     );
   }
+  status(): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseUrl}/status`);
+  }
 }

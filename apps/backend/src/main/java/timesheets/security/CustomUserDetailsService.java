@@ -34,7 +34,10 @@ public class CustomUserDetailsService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
     List<GrantedAuthority> authorities = new ArrayList<>();
-    List<WorkspaceMember> memberships = workspaceMemberRepository.findByUserId(user.getId());
+
+    // only active memberships should grant workspace access or workspace roles
+    List<WorkspaceMember> memberships =
+        workspaceMemberRepository.findByUserIdAndIsActiveTrue(user.getId());
 
     UUID defaultWorkspaceMemberId = null;
     UUID workspaceId = null;

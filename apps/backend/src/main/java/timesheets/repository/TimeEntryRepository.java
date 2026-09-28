@@ -20,6 +20,8 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, UUID> {
 
   List<TimeEntry> findByWorkspaceMemberIdOrderByStartTimeDesc(UUID workspaceMemberId);
 
+  List<TimeEntry> findByWorkspaceMemberIdAndTaskId(UUID workspaceMemberId, UUID taskId);
+
   List<TimeEntry> findByWorkspaceMemberIdAndStartTimeBetween(
       UUID workspaceMemberId, LocalDateTime start, LocalDateTime end);
 
@@ -59,6 +61,8 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, UUID> {
 
   // finds all the time entries on a particular project
   List<TimeEntry> findByProjectId(UUID projectId);
+
+  List<TimeEntry> findByWorkspaceMemberId(UUID workspaceMemberId);
 
   // finds all the time entries on a project based on a timeframe
   List<TimeEntry> findByProjectIdAndStartTimeBetween(

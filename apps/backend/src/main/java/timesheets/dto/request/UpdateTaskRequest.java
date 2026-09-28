@@ -66,4 +66,31 @@ public class UpdateTaskRequest {
     private String jiraTicketKey;
     private UUID parentTaskId;
   }
+
+  // request to edit the fields of an existing task
+  @Data
+  public static class UpdateTask {
+
+    private String title;
+
+    private String description;
+
+    @Pattern(
+        regexp = "TODO|IN_PROGRESS|DONE|BLOCKED",
+        message = "Status must be TODO, IN_PROGRESS, DONE or BLOCKED")
+    private String status;
+
+    @Pattern(
+        regexp = "LOW|MEDIUM|HIGH|CRITICAL",
+        message = "Priority must be LOW, MEDIUM, HIGH or CRITICAL")
+    private String priority;
+
+    @Positive(message = "Estimated hours must be positive")
+    private BigDecimal estimatedHours;
+
+    @FutureOrPresent(message = "Due date cannot be in the past")
+    private LocalDate dueDate;
+
+    private UUID assignedWorkspaceMemberId;
+  }
 }
