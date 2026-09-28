@@ -116,8 +116,13 @@
     <button class="btn btn--outline" type="button" [disabled]="!canEditEntries()" (click)="openManualPanel()">
       + Add Manual Time Entry
     </button>
+
     <button class="btn btn--primary" type="button" [disabled]="!canEditEntries()" (click)="openTimerPanel()">
       Start Automatic Time Entry
+    </button>
+
+    <button class="btn btn--outline" type="button" [disabled]="!canEditEntries()" (click)="openSuggestionsPanel()">
+      See Suggested Work
     </button>
   </section>
 
@@ -424,6 +429,123 @@
       </article>
     </section>
   }
+
+  <!-- Suggestion works panel for suggested works -->
+   @if (activePanel() === "suggestions"){
+    <section class="entry-panel" aria-labelledby="suggestions-panel-title">
+      <article class="card entry-panel_card">
+        <header class="card_header">
+          <div>
+            <h2 id="suggestions-panel-title">Suggested Work</h2>
+            <p> We found work that may be missing from your timesheet.</p>
+          </div>
+
+          <button type="button" class="icon-btn" aria-label="Close" (click)="closePanel()">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18"></path>
+            </svg>
+          </button>
+        </header>
+
+        <div class="suggestions-panel">
+          @if (suggestionsLoading()){
+            <div class="suggestions-state">
+              <p>Looking for suggested work...</p>
+            </div>
+          }
+
+          @else if (suggestions().length === 0){
+            <div class="suggestions-state">
+              <h3>No suggested work found</h3>
+              <p>
+                We could not find any additional work for this period.
+              </p>
+            </div>
+          }
+
+          @else {
+            <div class="suggestions-list">
+              @for (suggestion of suggestions(); track suggestion.id){
+                <article class="suggestion-card">
+                  <header>
+                    <div>
+                      <h3>
+                        {{ suggestion.title }}
+                      </h3>
+
+                      <p class="suggestion-card-time">
+                        {{ formatDate(suggestion.startTime) }}
+                        {{ formatTime(suggestion.startTime) }}
+
+                        @if (suggestion.endTime){
+                          - {{ formatTime(suggestion.endTime) }}
+                        }
+                      </p>
+                    </div>
+
+                    @if (suggestion.confidenceScore !== null){
+                      <span class="suggestion-card-confidence">
+                        {{ suggestion.confidenceScore * 100 | number:'1.0-0' }}%
+                      </span>
+                    }
+                  </header>
+
+                  <div class="suggestion-card-details">
+                    <div class="suggestion-card-field">
+
+                      @if (suggestion.durationMinutes !== null){
+                        <span>
+                          {{ suggestion.durationMinutes }} min
+                        </span>
+                      } @else {
+                        <span>Not determined</span>
+                      }
+                    </div>
+
+                    <label class="field">
+                      <span class="field-label">Project</span>
+
+                      <select
+                      [value]="suggestion.projectId || ''"
+                      (change)="assignSuggestionProject(suggestion, $event)">
+
+                        <option value="">Select project</option>
+
+                        @for (project of projects(); track project.id){
+                          <option [value]="project.id">
+                            {{ project.name }}
+                          </option>
+                        }
+                      </select>
+                    </label>
+                  </div>
+
+                  <div class="suggestion-card-evidence">
+                    <span class="field-label">Evidence</span>
+
+                    <p> {{ getSourceSummary(suggestion) }} </p>
+                  </div>
+
+                  <footer class="suggestion-card-actions">
+                    <button type="button" class="btn btn--ghost" (click)="rejectSuggestion(suggestion)">
+                      Reject 
+                    </button>
+
+                     <button type="button" class="btn btn--primary" [disabled]="!suggestion.projectId" (click)="approveSuggestion(suggestion)">
+                      Approve &amp; Add  
+                    </button>
+                  </footer>
+                </article>
+              }
+            </div>
+          }
+        </div>
+
+
+      </article>
+    </section>
+   }
+
 
   <!-- Entries list section -->
   <section class="entries-section">
