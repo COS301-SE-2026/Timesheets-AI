@@ -106,8 +106,6 @@ public class JiraAdapter implements IssueTrackerAdapter {
       UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
     List<IssueResponse> issues = getIssues(workspaceMemberId);
-
-    for (IssueResponse issue : issues) {
     List<IssueResponse> filteredIssues = new ArrayList<>();
 
     for (IssueResponse issue : issues) {
@@ -168,7 +166,8 @@ public class JiraAdapter implements IssueTrackerAdapter {
     HttpEntity<String> httpRequest = new HttpEntity<>(payload, headers);
 
     try {
-      ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, httpRequest, String.class);
+      ResponseEntity<String> response =
+          restTemplate.exchange(url, HttpMethod.POST, httpRequest, String.class);
 
       JsonNode result = objectMapper.readTree(response.getBody());
       String issueKey = result.get("key").asText();
