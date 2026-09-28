@@ -127,17 +127,21 @@ $orange-light: #fff4e8;
         grid-column: 2;
         grid-row: 1;
 
-        padding: 16px 20px 16px 0;
+        padding: 22px 20px 22px 4px;
 
         h2{
             margin: 0;
-            font-size: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-size: 17px;
             font-weight: 700;
             color: $text-title;
+            line-height: 1.35;
         }
 
         p{
-            margin: 6px 0 0;
+            margin: 7px 0 0;
             font-size: 14px;
             color: $text-muted;
             line-height: 1.5;
@@ -153,7 +157,7 @@ $orange-light: #fff4e8;
         flex-direction: column;
         justify-content: center;
         border-left: 1px solid $card-border;
-        padding: 0 20px 0 24px;
+        padding: 10px 24px 10px 28px;
     }
 }
 
@@ -162,12 +166,13 @@ $orange-light: #fff4e8;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
-    min-height: 64px;
-    padding: 10px 0;
+    gap: 24px;
+    min-height: 66px;
+    padding: 12px 0;
+    box-sizing: border-box;
 
     &:not(:last-child){
-        border-bottom: 1px solid #f0f1f4;
+        border-bottom: 1px solid #eef1f5;
     }
 }
 
@@ -179,14 +184,13 @@ $orange-light: #fff4e8;
         display: block;
         font-size: 14px;
         font-weight: 600;
-
         color: $text-title;
     }
 
     p{
-        margin: 3px 0 0;
+        margin: 4px 0 0;
         font-size: 13px;
-        line-height: 1.4;
+        line-height: 1.45;
         color: $text-muted;
     }
 }
@@ -195,60 +199,75 @@ $orange-light: #fff4e8;
 .setting-control{
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     flex-shrink: 0;
 }
 
 // PASSWORD
 .password-dots{
     letter-spacing: 3px;
-    color: $text-muted;
-    font-size: 15px;
+    color: #8994a7;
+    font-size: 14px;
 }
 
 // TOGGLE LABEL
 .toggle-label{
     font-size: 13px;
     color: $text-muted;
-    min-width: 55px;
+    min-width: 58px;
     font-weight: 500;
 }
 
 // SECONDARY BUTTONS
 .secondary-button{
-    padding: 8px 28px;
+    min-width: 104px;
+    padding: 9px 20px;
 
-    border: 1px solid $card-border;
+    border: 1px solid #dfe5ee;
     background: #ffffff;
 
-    border-radius: 8px;
+    border-radius: 9px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    color: $text-title;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    // color: $text-title;
+    // transition: background 0.2s ease, border-color 0.2s ease;
 
     &:hover{
+        transition: 
+                    background 0.2s ease,
+                    border-color 0.2s ease,
+                    box-shadow 0.2s ease;
         background: #f8fafc;
-        border-color: #d7dae3;
+        border-color: #cfd7e3;
+        box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
+    }
+
+    &:active{
+        background: #f1f5f9;
     }
 }
 
 // DELETION AREA BUTTON
 .danger-button{
-    padding: 9px 18px;
-    border: 1px solid #f3b4b4;
+    min-width: 142px;
+    padding: 10px 18px;
+    border: 1px solid #f3b8b8;
     background: #ffffff;
 
     color: $red;
-    border-radius: 8px;
+    border-radius: 9px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease;
+    // transition: background 0.2s ease;
 
     &:hover{
-        background: $red-bg;
+        transition: 
+                    background 0.2s ease,
+                    border-color 0.2s ease;
+        background: $red-light;
+        border-color: #ef9b9b;
     }
 }
 
