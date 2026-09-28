@@ -121,15 +121,15 @@ export class ManagerInsightsComponent implements OnInit {
   initialsFor(name: string): string {
     const parts = name.trim().split(/\s+/);
     const first = parts[0]?.[0] ?? '';
-    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+    const last = parts.length > 1 ? (parts.at(-1)?.[0] ?? '') : '';
     return (first + last).toUpperCase();
   }
 
   private readonly avatarPalette = ['#0F4C91', '#E07830', '#3FA34D', '#9B7EDE', '#C94F4F', '#3B8FC9'];
   avatarColorFor(name: string): string {
     let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    for (const char of name) {
+      hash = (char.codePointAt(0) ?? 0) + ((hash << 5) - hash);
     }
     return this.avatarPalette[Math.abs(hash) % this.avatarPalette.length];
   }

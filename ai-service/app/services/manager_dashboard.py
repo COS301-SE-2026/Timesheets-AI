@@ -128,6 +128,32 @@ def team_logged_hours(db: Session, project_id: UUID, period_start: date, period_
     return {"members": members}
 
 
+def _count_tasks(rows) -> tuple[dict[str, int], dict[str, int], dict[str, int]]:
+    status_counts = {"TODO": 0, "IN_PROGRESS": 0, "DONE": 0, "BLOCKED": 0}
+    priority_counts: dict[str, int] = {}
+    open_priority_counts: dict[str, int] = {}
+    for row in rows:
+        status, priority, count = row["status"], row["priority"], row["count"]
+        status_counts[status] = status_counts.get(status, 0) + count
+        if not priority:
+            continue
+        priority_counts[priority] = priority_counts.get(priority, 0) + count
+        if status in ("TODO", "IN_PROGRESS"):
+            open_priority_counts[priority] = open_priority_counts.get(priority, 0) + count
+    return status_counts, priority_counts, open_priority_counts
+
+
+def _task_narrative(open_priority_counts: dict[str, int], blocked_count: int) -> str:
+    blocked_text = f"{blocked_count} task{'s' if blocked_count != 1 else ''} are currently blocked"
+    if open_priority_counts:
+        top = max(open_priority_counts, key=open_priority_counts.get)
+        base = f"Most open tasks are {top.title()} priority"
+        return f"{base}; {blocked_text}." if blocked_count > 0 else f"{base}."
+    if blocked_count > 0:
+        return f"{blocked_text}."
+    return "No open tasks right now."
+
+
 def task_overview(db: Session, project_id: UUID) -> dict:
     rows = (
         db.execute(
@@ -145,42 +171,10 @@ def task_overview(db: Session, project_id: UUID) -> dict:
         .all()
     )
 
-    status_counts: dict[str, int] = {"TODO": 0, "IN_PROGRESS": 0, "DONE": 0, "BLOCKED": 0}
-    priority_counts: dict[str, int] = {}
-    for row in rows:
-        status_counts[row["status"]] = status_counts.get(row["status"], 0) + row["count"]
-        if row["priority"]:
-            priority_counts[row["priority"]] = (
-                priority_counts.get(row["priority"], 0) + row["count"]
-            )
-
+    status_counts, priority_counts, open_priority_counts = _count_tasks(rows)
     total = sum(status_counts.values())
     blocked_count = status_counts.get("BLOCKED", 0)
-
-    # only build a "most open tasks are X priority" clause if there's an open task at all,
-    # avoids a nonsense sentence on an empty/all-done project
-    open_statuses_priority_counts: dict[str, int] = {}
-    for row in rows:
-        if row["status"] in ("TODO", "IN_PROGRESS") and row["priority"]:
-            open_statuses_priority_counts[row["priority"]] = (
-                open_statuses_priority_counts.get(row["priority"], 0) + row["count"]
-            )
-
-    if open_statuses_priority_counts:
-        top_priority = max(open_statuses_priority_counts, key=open_statuses_priority_counts.get)
-        narrative = f"Most open tasks are {top_priority.title()} priority"
-        if blocked_count > 0:
-            narrative += (
-                f"; {blocked_count} task{'s' if blocked_count != 1 else ''} are currently blocked."
-            )
-        else:
-            narrative += "."
-    elif blocked_count > 0:
-        narrative = (
-            f"{blocked_count} task{'s' if blocked_count != 1 else ''} are currently blocked."
-        )
-    else:
-        narrative = "No open tasks right now."
+    narrative = _task_narrative(open_priority_counts, blocked_count)
 
     return {
         "total": total,
@@ -236,6 +230,31 @@ def velocity(db: Session, project_id: UUID, weeks: int = 8) -> dict:
     return {"weeks": weekly_counts, "rolling_average": average}
 
 
+def _classify_task(row, today: date) -> tuple[str, bool, bool]:
+    """returns (bucket, counts_toward_on_time_pct, finished_on_time)"""
+    if row["status"] == "DONE":
+        if row["due_date"] is None or row["completed_at"] is None:
+            return "on_track", False, False  # no due date to miss, doesn't count against on-time %
+        on_time = row["completed_at"].date() <= row["due_date"]
+        return ("on_track" if on_time else "behind"), True, on_time
+    if row["due_date"] is not None and row["due_date"] < today:
+        return "behind", False, False
+    return "at_risk", False, False
+
+
+def _estimate_accuracy(row) -> float | None:
+    estimated, actual = row["estimated_hours"], row["actual_hours"]
+    if estimated is None or actual is None or estimated <= 0:
+        return None
+    return max(1 - abs(float(actual) - float(estimated)) / float(estimated), 0.0)
+
+
+def _health_label(score: int) -> str:
+    if score >= 75:
+        return "On Track"
+    return "At Risk" if score >= 50 else "Behind"
+
+
 def project_health(db: Session, project_id: UUID) -> dict:
     """
     composite 0-100 score, weighted blend of on-time task %, estimate accuracy %, and blocked-task ratio
@@ -266,49 +285,24 @@ def project_health(db: Session, project_id: UUID) -> dict:
         }
 
     total = len(rows)
+    buckets = {"on_track": 0, "at_risk": 0, "behind": 0}
     on_time_done = 0
     done_with_due_date = 0
-    estimate_matches = []
     blocked_count = 0
-
-    on_track_count = 0
-    behind_count = 0
-    at_risk_count = 0
-
+    estimate_matches: list[float] = []
     today = date.today()
 
     for row in rows:
-        if row["status"] == "BLOCKED":
-            blocked_count += 1
+        bucket, has_due_date, on_time = _classify_task(row, today)
+        buckets[bucket] += 1
+        done_with_due_date += int(has_due_date)
+        on_time_done += int(on_time)
+        blocked_count += int(row["status"] == "BLOCKED")
+        accuracy = _estimate_accuracy(row)
+        if accuracy is not None:
+            estimate_matches.append(accuracy)
 
-        if row["status"] == "DONE":
-            if row["due_date"] is not None and row["completed_at"] is not None:
-                done_with_due_date += 1
-                if row["completed_at"].date() <= row["due_date"]:
-                    on_time_done += 1
-                    on_track_count += 1
-                else:
-                    behind_count += 1  # finished, but late
-            else:
-                on_track_count += 1  # no due date to miss, doesn't count against on-time %
-        else:
-            if row["due_date"] is not None and row["due_date"] < today:
-                behind_count += 1
-            else:
-                at_risk_count += 1
-
-        if (
-            row["estimated_hours"] is not None
-            and row["actual_hours"] is not None
-            and row["estimated_hours"] > 0
-        ):
-            accuracy = 1 - (
-                abs(float(row["actual_hours"]) - float(row["estimated_hours"]))
-                / float(row["estimated_hours"])
-            )
-            estimate_matches.append(max(accuracy, 0.0))
-
-    on_time_percent = (on_time_done / done_with_due_date * 100) if done_with_due_date > 0 else 100.0
+    on_time_percent = (on_time_done / done_with_due_date * 100) if done_with_due_date else 100.0
     estimate_accuracy_percent = (
         (sum(estimate_matches) / len(estimate_matches) * 100) if estimate_matches else 100.0
     )
@@ -321,19 +315,12 @@ def project_health(db: Session, project_id: UUID) -> dict:
     )
     score = max(0, min(100, score))
 
-    if score >= 75:
-        status_label = "On Track"
-    elif score >= 50:
-        status_label = "At Risk"
-    else:
-        status_label = "Behind"
-
     return {
         "score": score,
-        "status_label": status_label,
-        "on_track_percent": round((on_track_count / total) * 100, 1),
-        "at_risk_percent": round((at_risk_count / total) * 100, 1),
-        "behind_percent": round((behind_count / total) * 100, 1),
+        "status_label": _health_label(score),
+        "on_track_percent": round(buckets["on_track"] / total * 100, 1),
+        "at_risk_percent": round(buckets["at_risk"] / total * 100, 1),
+        "behind_percent": round(buckets["behind"] / total * 100, 1),
     }
 
 
