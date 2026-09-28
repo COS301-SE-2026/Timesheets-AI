@@ -10,9 +10,12 @@ Patched: Zamokuhle Zwane, 03 August 2026
 I fixed the problem with the timer not showing up on the log time page,
 it was because the timer component was not being rendered on the log time page
 so i added it to the log time page and it now shows up correctly
- */
+ 
 
-import { Injectable, inject } from '@angular/core';
+Patched: Cleopatra Kwenda, 29 Sept 2026
+adding the hovering timer logic/feature*/
+
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -28,7 +31,7 @@ export interface ActiveTimerResponse {
   task: {
     id: string;
     title: string;
-  };
+  }| null;
   startedAt: string;
   elapsedMinutes: number;
   elapsedSeconds: number;
@@ -72,6 +75,12 @@ export class TimerService {
     full host here, its the same as the authservice
     */
   private readonly baseUrl = '/api/timers';
+
+  // SHARED TIMER SHANDIES//
+  readonly activeTimer= signal<ActiveTimerResponse| null>(null);
+  readonly elapsedSeconds= signal(0);
+  readonly isTimerPaused= signal(false);
+  private timerIntervalId: ReturnType<typeof setInterval>| null= null;
   //starts a new timer for a given project + task, backend hardcodes entryType to a TIMER
   startTimer(request: StartTimerRequest): Observable<ActiveTimerResponse> {
     return this.http
