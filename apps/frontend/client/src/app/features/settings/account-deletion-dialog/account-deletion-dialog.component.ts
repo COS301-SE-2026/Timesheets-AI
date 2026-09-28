@@ -5,7 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { error } from 'node:console';
+import { SettingsService } from '../settings.services';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-account-deletion-dialog',
@@ -18,14 +19,16 @@ import { error } from 'node:console';
         MatButtonModule,
         MatDialogModule
     ],
-    templateUrl: './account-deletion-dialog.html',
-    styleUrl: './account-deletion-dialog.scss'
+    templateUrl: './account-deletion-dialog.component.html',
+    styleUrl: './account-deletion-dialog.component.scss'
 })
 
 export class AccountDeletionDialogComponent{
     private readonly dialogRef= inject(
         MatDialogRef<AccountDeletionDialogComponent>
     );
+
+    private readonly settingsService= inject(SettingsService);
 
     isSubmitting=false;
     reason='';
@@ -46,7 +49,7 @@ export class AccountDeletionDialogComponent{
             next:()=>{
                 this.dialogRef.close(true);
             },
-            error:(error)=> {
+            error:(error: HttpErrorResponse)=> {
                 this.isSubmitting= false;
                 this.errorMessage= error?.error?.message??'Unable to submit your account deletion request. Please try again.'
             }
