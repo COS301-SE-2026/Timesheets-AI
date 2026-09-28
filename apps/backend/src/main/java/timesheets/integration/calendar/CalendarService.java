@@ -29,21 +29,38 @@ public class CalendarService {
   private CalendarAdapter getCalendarAdapter(UUID workspaceMemberId) {
 
     // to find which calendar provider this user has connected
-    IntegrationToken integrationToken =
-        integrationTokenRepository
-            .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "GOOGLE_CALENDAR")
-            .orElse(null);
-
-    if (integrationToken == null) {
-      throw new CalendarNotConnectedException();
-    }
-
-    String provider = integrationToken.getProvider();
+    List<IntegrationToken> integrationTokens =
+        integrationTokenRepository.findByWorkspaceMemberId(workspaceMemberId);
 
     return calendarAdapters.stream()
-        .filter(adapter -> adapter.getProvider().equals(provider))
+        .filter(
+            adapter ->
+                integrationTokens.stream()
+                    .anyMatch(token -> token.getProvider().equals(adapter.getProvider())))
         .findFirst()
-        .orElseThrow(
-            () -> new IllegalStateException("No calendar adapter found for provider: " + provider));
+        .orElseThrow(CalendarNotConnectedException::new);
+  }
+
+  public CalendarStatus getStatus(UUID workspaceMemberId) {
+
+    List<IntegrationToken> integrationTokens =
+        integrationTokenRepository.findByWorkspaceMemberId(workspaceMemberId);
+
+    return calendarAdapters.stream()
+        .filter(
+            adapter ->
+                integrationTokens.stream()
+                    .anyMatch(token -> token.getProvider().equals(adapter.getProvider())))
+        .findFirst()
+        .map(adapter -> new CalendarStatus(true, toDisplayProvider(adapter.getProvider()), null))
+        .orElse(new CalendarStatus(false, null, null));
+  }
+
+  private String toDisplayProvider(String provider) {
+    return switch (provider) {
+      case "GOOGLE_CALENDAR" -> "google";
+      case "MICROSOFT_CALENDAR" -> "microsoft";
+      default -> provider.toLowerCase();
+    };
   }
 }
