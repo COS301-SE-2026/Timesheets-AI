@@ -200,6 +200,7 @@ export class LogtimeComponent implements OnDestroy {
   readonly filterFrom = signal(this.todayStartOfWeek());
   readonly filterTo = signal(this.todayEndOfWeek());
   readonly durationPreviewSeconds = signal(3600);
+  readonly suggestionPendingReject = signal<SuggestedWorkSession | null>(null);
 
   /*  
   tracks the current period's timesheet, submit now happens at this level not per entry, since status/submittedAt/approvedAt/isLocked all live on
@@ -1292,6 +1293,26 @@ export class LogtimeComponent implements OnDestroy {
   });
 }
 
+// this is when the user reject suggestion, we should alert them of this action 
+confirmRejectSuggestion(suggestion: SuggestedWorkSession): void {
+  this.suggestionPendingReject.set(suggestion);
+}
+
+cancelRejectSuggestion(): void {
+  this.suggestionPendingReject.set(null);
+}
+
+confirmReject(): void {
+  const suggestion = this.suggestionPendingReject();
+
+  if (!suggestion){
+    return;
+  }
+
+  this.suggestionPendingReject.set(null);
+  this.rejectSuggestion(suggestion);
+}
+
 
 approveSuggestion(suggestion: SuggestedWorkSession): void {
   this.suggestionService.approve(suggestion.id).subscribe({
@@ -1351,6 +1372,8 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
   });
 }
 
+   
+
   /*
   I decided to deviate from the previous use of the api/tasks/my-tasks GET
   because i think the system to should load every task on the project
@@ -1358,6 +1381,7 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
   so now tasks i fetched per project with the api/tasks/project GET
   */
   private lastLoadedTaskProjectId: string | null = null;
+  
   private loadTasksForProject(projectId: string): void {
     if (!projectId) {
       this.tasks.set([{ id: '', projectId: '', title: 'No task selected' }]);
