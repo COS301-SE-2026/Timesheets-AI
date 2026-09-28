@@ -75,6 +75,7 @@ jobs:
         env:
           PYTHONPATH: .
           DATABASE_URL: "sqlite:///:memory:"
+          BACKEND_URL: "http://localhost:8080"
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           pytest

@@ -31,6 +31,8 @@ import { BaseChartDirective } from 'ng2-charts';
 import { ProjectTask } from "../models/project-task.model";
 import { TaskService } from "../../../core/services/task.service";
 import {mapToProjectDetails, mapToProjectTask} from "../utils/project-mapper";
+import { ProjectForecastComponent } from './project-forecast/project-forecast.component';
+import { AuthService } from '../../../core/services/auth.service';
 
 
 //this is used to keep every template binding valid while real data is being loaded
@@ -70,7 +72,8 @@ const EMPTY_PROJECT_DETAILS: ProjectDetails = {
     MatDialogModule,
     MatButtonModule,
     MatDialogActions,
-    MatDialogClose
+    MatDialogClose,
+    ProjectForecastComponent,
 ],
     templateUrl: './project-details.component.html',
     styleUrls: ['./project-details.component.scss']
@@ -106,11 +109,13 @@ export class ProjectDetailsComponent {
 
     private readonly projectService = inject(ProjectService);
     private readonly taskService = inject(TaskService);
+    private readonly authService = inject(AuthService);
 
     protected readonly loading = signal<boolean>(true);
     protected readonly error = signal<boolean>(false);
 
     protected readonly tasks=signal<ProjectTask[]>([]);
+
 
     constructor(){
         const legacyProjectId = this.route.snapshot.paramMap.get('id');
@@ -174,12 +179,22 @@ export class ProjectDetailsComponent {
     protected readonly project= signal<ProjectDetails>(
         EMPTY_PROJECT_DETAILS,
     )
+    
+    protected readonly canViewForecast = computed(() => {
+        const workspaceRoles = this.authService.currentUser()?.roles ?? [];
+        const projectRole = this.project().myRole;
+
+        const isWorkspaceManager = workspaceRoles.includes('ROLE_MANAGER') || workspaceRoles.includes('ROLE_ADMIN');
+        const isProjectManager = projectRole === ProjectRole.MANAGER;
+
+        return isWorkspaceManager || isProjectManager;
+    });
 
     // protected readonly project= signal<Project>(PROJECTS[0]);
 
-    protected readonly activeTab=signal<'overview' | 'tasks'>('overview');
+    protected readonly activeTab = signal<'overview' | 'tasks' | 'forecast'>('overview');
 
-    protected setActiveTab( tab: 'overview' | 'tasks'):void{
+    protected setActiveTab( tab: 'overview' | 'tasks' | 'forecast'):void{
         this.activeTab.set(tab);
     }
 

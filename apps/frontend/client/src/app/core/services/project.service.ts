@@ -15,6 +15,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import {ProjectForecast, SavedProjectForecast,} from '../../features/projects/project-details/project-forecast/models/project-forecast.model';
 
 //matches ProjectResponse field for field
 
@@ -96,6 +97,19 @@ export class ProjectService {
   updateProject(projectId: string, request: Partial<Omit<CreateProjectRequest, 'managerIds' | 'status'>> & { status?: ProjectResponse['status'] }): Observable<ProjectResponse> {
     return this.http.patch<ProjectResponse>(`${this.baseUrl}/${projectId}`, request)
     .pipe(catchError(this.handleError('updateProject')));
+    
+  // gets the latest saved project forecast
+  getProjectForecast(projectId: string): Observable<SavedProjectForecast> {
+    return this.http
+      .get<SavedProjectForecast>(`${this.baseUrl}/${projectId}/forecast`)
+      .pipe(catchError(this.handleError('getProjectForecast')));
+  }
+
+  // recalculates and saves the latest project forecast
+  syncProjectForecast(projectId: string): Observable<ProjectForecast> {
+    return this.http
+      .post<ProjectForecast>(`${this.baseUrl}/${projectId}/forecast/sync`,{})
+      .pipe(catchError(this.handleError('syncProjectForecast')));
   }
 
   //create a project, admin and manager only
