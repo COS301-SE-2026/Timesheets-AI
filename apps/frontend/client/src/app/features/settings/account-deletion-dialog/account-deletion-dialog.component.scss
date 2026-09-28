@@ -1,0 +1,28 @@
+// Author: Cleopatra Kwenda
+// Date: 2026-09-22
+// Purpose: a pop-up for account deletion
+
+.warning-text{
+    margin-bottom: 18px;
+    background: #fdecec;
+    color: #b91c1c;
+}
+
+.full-width{
+    width: 100%;
+}
+
+.error-message{
+    margin-top: 8px;
+    color: #dc2626;
+    font-size: 14px;
+}
+
+button[mat-flat-button]{
+    --mdc-filled-button-container-color: #0f4c91;
+    --mdc-filled-button-label-text-color: #ffffff;
+}
+
+button[mat-button]{
+    color: #0f4c91;
+}
