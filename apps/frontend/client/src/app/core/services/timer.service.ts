@@ -19,6 +19,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { time } from 'node:console';
 
 //so these mirror the schema on swagger exactly, so there's no silent mismatch later
 
@@ -122,6 +123,36 @@ export class TimerService {
     pattern angular's own docs recommend for httpclient error handling, check my draft file
     */
   }
+
+  // STATE MANAGING
+  setActiveTimer(timer: ActiveTimerResponse| null): void{
+    this.activeTimer.set(timer);
+
+    if(!timer){
+      this.stopElapsedInterval();
+      this.elapsedSeconds.set(0);
+      this.isTimerPaused.set(false);
+      return;
+    }
+
+    this.isTimerPaused.set(timer.isPaused?? false);
+    if(timer.isPaused){
+      this.stopElapsedInterval();
+      this.elapsedSeconds.set(timer.elapsedSeconds?? 0);
+    }else{
+      this.startElapsedInterval(timer.elapsedSeconds?? 0);
+    }
+  }
+
+  clearActiveTimer():void {
+    this.activeTimer.set(null);
+    this.elapsedSeconds.set(0);
+    this.isTimerPaused.set(false);
+    this.stopElapsedInterval();
+  }
+
+  // TIMER DISPLAY
+
   private handleError(operation: string) {
     return (error: HttpErrorResponse) => { //was: (error: any)
       console.error(`[TimerService] ${operation} failed:`, {
