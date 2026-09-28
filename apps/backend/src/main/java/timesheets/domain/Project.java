@@ -69,7 +69,7 @@ public class Project {
   @Column(name = "updated_at")
   private LocalDateTime updatedAt;
 
-  // need to add this - because it is busy retunring null null 
+  // need to add this - because it is busy retunring null null
   @Column(name = "jira_project_key")
   private String jiraProjectKey;
 
