@@ -5,7 +5,7 @@
         "changeOrigin": true
     },
 
-    "/actuator":{
+    "/actuator": {
         "target": "http://backend:8080",
         "secure": false,
         "changeOrigin": true
@@ -24,8 +24,11 @@
     },
 
     "/ai": {
-        "target": "http://backend:8080",
+        "target": "http://ai-service:8000",
         "secure": false,
-        "changeOrigin": true
-    }   
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/ai": ""
+        }
+    }
 }
