@@ -1485,6 +1485,37 @@ cancelCreateSuggestionTask(): void {
   this.suggestionCreatingTask.set(null);
   this.newSuggestionTaskTitle.set('');
 }
+
+
+updateSuggestionDescription(
+  suggestion: SuggestedWorkSession,
+  event: Event
+): void {
+  const textarea = event.target as HTMLTextAreaElement;
+  const description = textarea.value;
+
+  this.suggestionService.edit(suggestion.id, {
+    title: suggestion.title,
+    projectId: suggestion.projectId || undefined,
+    taskId: suggestion.taskId || undefined,
+    startTime: suggestion.startTime,
+    endTime: suggestion.endTime,
+    description: description || undefined
+  }).subscribe({
+    next: (updatedSuggestion) => {
+      const updatedSuggestions = this.suggestions().map((item) =>
+        item.id === updatedSuggestion.id
+          ? updatedSuggestion
+          : item
+      );
+
+      this.suggestions.set(updatedSuggestions);
+    },
+    error: (error) => {
+      this.showToast(error.error?.message ?? 'Unable to update the description.');
+    }
+  });
+}
    
 // this is for fetching all the tasks to display in the suggestion panel 
 // goal here is connect the suggestion's selected project to this existing task 

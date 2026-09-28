@@ -32,6 +32,6 @@ export interface EditSuggestionRequest {
     startTime: string;
     endTime: string;
     projectId: string;
-    taskId: string;
-    description: string;
+    taskId?: string;
+    description?: string;
 }

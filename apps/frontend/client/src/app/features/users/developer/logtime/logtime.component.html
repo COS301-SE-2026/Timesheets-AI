@@ -491,6 +491,7 @@
                   </header>
 
                   <div class="suggestion-card-details">
+
                     <div class="suggestion-card-field">
 
                       @if (suggestion.durationMinutes !== null){
@@ -559,7 +560,19 @@
                         </div>
                       </div>
                     }
+
+                  <label class="field">
+                    <span class="field-label">Description</span>
+
+                    <textarea
+                      [value]="suggestion.description || ''"
+                      (input)="updateSuggestionDescription(suggestion, $event)"
+                      rows="4"
+                      placeholder="Add a description of this work...">
+                    </textarea>
+                  </label>
                   </div>
+
 
                   <div class="suggestion-card-evidence">
                     <span class="field-label">Evidence</span>
