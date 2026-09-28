@@ -14,6 +14,7 @@ package timesheets.client;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,9 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import timesheets.dto.response.AiDashboardResponse;
+import timesheets.dto.response.ManagerDashboardResponse;
 import timesheets.dto.response.ResolveInsightResponse;
+import timesheets.dto.response.WeeklySummaryResponse;
 
 @Component
 @RequiredArgsConstructor
@@ -70,6 +73,38 @@ public class AiServiceClient {
             period)
         .retrieve()
         .body(new ParameterizedTypeReference<AiDashboardResponse>() {});
+  }
+
+  public ManagerDashboardResponse getManagerDashboard(
+      UUID workspaceMemberId, UUID projectId, String period) {
+    String uri =
+        projectId != null
+            ? "/insights/manager-dashboard?workspace_member_id={workspaceMemberId}&project_id={projectId}&period={period}"
+            : "/insights/manager-dashboard?workspace_member_id={workspaceMemberId}&period={period}";
+
+    RestClient.RequestHeadersUriSpec<?> request = buildClient().get();
+    return projectId != null
+        ? request
+            .uri(uri, workspaceMemberId, projectId, period)
+            .retrieve()
+            .body(new ParameterizedTypeReference<ManagerDashboardResponse>() {})
+        : request
+            .uri(uri, workspaceMemberId, period)
+            .retrieve()
+            .body(new ParameterizedTypeReference<ManagerDashboardResponse>() {});
+  }
+
+  public WeeklySummaryResponse generateWeeklySummary(
+      UUID subjectId, String subjectType, LocalDate weekStart) {
+    return buildClient()
+        .post()
+        .uri(
+            "/insights/weekly-summary/{subjectId}/generate?subject_type={subjectType}&week_start={weekStart}",
+            subjectId,
+            subjectType,
+            weekStart)
+        .retrieve()
+        .body(new ParameterizedTypeReference<WeeklySummaryResponse>() {});
   }
 
   public ResolveInsightResponse resolveInsight(UUID insightId, UUID resolvedByWorkspaceMemberId) {
