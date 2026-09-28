@@ -8,18 +8,23 @@ Date: 24/09/2026
 
 import uuid
 from datetime import datetime
+from typing import Annotated
 
 from fastapi import APIRouter, Header, HTTPException
 
 from app.schemas.project_forecast_evidence import ProjectForecastEvidenceResponse
 from app.services.project_forecast_evidence import get_project_forecast_evidence
-from typing import Annotated
 
 router = APIRouter()
 
 
 @router.get(
     "/insights/project-forecast/{project_id}/evidence",
+    responses={
+        502: {
+            "description": "Could not retrieve project forecast evidence",
+        },
+    },
 )
 def get_external_project_evidence(
     project_id: uuid.UUID,
