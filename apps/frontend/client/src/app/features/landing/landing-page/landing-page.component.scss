@@ -101,7 +101,9 @@ $border-colour: #f1f5f9;
         font-size: 0.95rem;
         box-shadow: 0 4px 12px rgba(37, 99, 255, 0.2);
         transition: transform 0.2s ease, background-color 0.2 ease;
-
+        border: none;
+        outline: none;
+        
         &:hover{
             background-color: lighten($primary-blue, 5%);
             transform: translateY(-1px);
