@@ -736,6 +736,137 @@
   }
 }
 
+//
+.suggestions-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.suggestions-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  padding: 32px 20px;
+  text-align: center;
+  border: 1px dashed #e5e7eb;
+  border-radius: 12px;
+  background: #fafafa;
+
+  h3 {
+    margin: 0 0 8px;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 700;
+    color: #14213d;
+  }
+
+  p {
+    max-width: 360px;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+}
+
+.suggestions-list {
+  display: grid;
+  gap: 14px;
+}
+
+.suggestion-card {
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    h3 {
+      margin: 0 0 5px;
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 700;
+      color: #14213d;
+    }
+  }
+}
+
+.suggestion-card-time {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.suggestion-card-confidence {
+  flex-shrink: 0;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: var(--color-text-body);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.suggestion-card-details {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.suggestion-card-field {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+
+  span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #17264d;
+  }
+}
+
+.suggestion-card-evidence {
+  padding: 14px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: #f9fafb;
+
+  .field-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #51627f;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-text-body);
+  }
+}
+
+.suggestion-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid #f3f4f6;
+}
+
 .link-btn {
   border: 0;
   background: transparent;
