@@ -307,7 +307,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
 
                     <div class="progress-inner">
                         <span class="progress-percentage">
-                            {{ project().progressPercentage | number:'1.0-0'}}%
+                            {{ project().progressPercentage | number:'1.0-2'}}%
                         </span>
 
                         <span class="progress-label">
@@ -423,12 +423,11 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                 }
             </div>
             
-            @if (project().members.length > 4) {
             <button class="view-members-btn" type="button" (click)="viewMembers(membersDialog)">
                 <i class="fa-solid fa-user-group"></i>
                 View all members
             </button>
-            }
+
             
         </article>
 

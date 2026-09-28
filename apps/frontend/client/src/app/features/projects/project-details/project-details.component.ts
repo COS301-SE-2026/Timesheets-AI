@@ -7,6 +7,10 @@ Related Requirement: N/A
 
 Patched: 30/07/2026 integration Zamokuhle Zwane
 Intergrated project detail page replacing the hard coded details
+
+Patched: 28/09/2026
+Allow users to update project status, make team members show 4 team members and if there is more have the show team members button open a modal that lists the rest of the memberss.
+Add a edit project button with will open a modal to allow the users to open. Update project routing to hide project id on the url.
 */
 
 import { Component, signal, computed, inject, effect, TemplateRef } from "@angular/core";

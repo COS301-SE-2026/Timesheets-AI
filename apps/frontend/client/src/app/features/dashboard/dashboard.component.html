@@ -329,7 +329,7 @@
                                 </div>
                                 <div class="project-completion" [style.--project-progress]="project.completionPercentage + '%'">
                                     <div class="project-completion-content">
-                                        <strong>{{ project.completionPercentage }}%</strong>
+                                        <strong>{{ project.completionPercentage | number:'1.0-2' }}%</strong>
                                         <span>complete</span>
                                     </div>
                                 </div>
