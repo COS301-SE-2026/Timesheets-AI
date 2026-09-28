@@ -137,7 +137,7 @@ describe('project-mapper', () => {
         startDate: '2026-09-01', endDate: '2026-09-30',
       }));
       expect(mapToProjectDetails({ ...detail, startDate: null, endDate: null }))
-        .toEqual(expect.objectContaining({ startDate: '', endDate: ' '}));
+        .toEqual(expect.objectContaining({ startDate: '', endDate: ''}));
     });
 
     it('should set hoursLoggedLabel and progressPercentageClamped, and mark detailLoaded', () => {

@@ -85,7 +85,7 @@ describe('ProjectsComponent', () => {
     lastName: 'Khumalo',
     avatarUrl: null,
     emailVerified: true,
-    roles: ['DEVELOPER'],
+    roles: ['MANAGER'],
     mfaEnabled: false,
   };
 
@@ -266,16 +266,23 @@ describe('ProjectsComponent', () => {
     });
 
     it('filters My Projects by assignment and preserves the tab while searching', () => {
-      httpMock.expectOne(PROJECTS_ENDPOINT).flush(mockProjectList.map((project, index) =>
-        ({ ...project, myRole: index === 0 ? 'MANAGER' : null })));
-      ALL_PROJECT_IDS.forEach(id => httpMock.expectOne(projectDetailEndpoint(id)).flush(mockDetailFor(id)));
-      internal(component).filterProjects('My Projects');
-      expect(internal(component).filteredProjects.map(project => project.id)).toEqual(['proj-1']);
-      internal(component).searchProjects('Backend');
-      expect(internal(component).filteredProjects).toEqual([]);
-      internal(component).filterProjects('All');
-      expect(internal(component).filteredProjects.map(project => project.id)).toEqual(['proj-2']);
-    });
+  httpMock.expectOne(PROJECTS_ENDPOINT).flush([
+    { ...mockProjectList[0], myRole: 'MANAGER' },
+    { ...mockProjectList[1], myRole: null },
+    { ...mockProjectList[2], myRole: null },
+  ]);
+  ALL_PROJECT_IDS.forEach(id =>
+    httpMock.expectOne(projectDetailEndpoint(id)).flush(mockDetailFor(id)));
+
+  internal(component).filterProjects('My projects');
+  expect(internal(component).filteredProjects.map(p => p.id)).toEqual(['proj-1']);
+
+  internal(component).searchProjects('Backend');
+  expect(internal(component).filteredProjects).toEqual([]);
+
+  internal(component).filterProjects('All');
+  expect(internal(component).filteredProjects.map(p => p.id)).toEqual(['proj-2']);
+});
 
     it('should be loading before the list resolves, and stop loading once it does', () => {
       //checked before AND after the same flush, since loading only toggles off the list response not detail
