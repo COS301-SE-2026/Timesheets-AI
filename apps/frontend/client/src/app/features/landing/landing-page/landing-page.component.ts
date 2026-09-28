@@ -90,6 +90,6 @@ export class LandingPageComponent {
   }
 
   watchDemo(): void{
-        window.open('/docs/demo-2/User-Manual.pdf', '_blank');
+        window.open('https://youtu.be/NED-IekCKc8?si=0AQHgPD3XTn4RCeM', '_blank');
   }
 }
