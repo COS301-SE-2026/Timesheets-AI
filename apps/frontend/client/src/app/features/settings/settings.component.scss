@@ -49,58 +49,74 @@ $orange-light: #fff4e8;
         font-weight: 700;
         letter-spacing: -0.5px;
         color: $text-title;
+        line-height: 1.2;
     }
 
     p{
-        margin: 5px 0 0;
-        font-size: 14px;
+        margin: 8px 0 0;
+        font-size: 15px;
+        line-height: 1.5;
         color: $text-muted;
     }
 }
 
 // SETTINGS CARDS
 .settings-card{
+    width: 100%;
     background: $card-bg;
     border: 1px solid $card-border;
     border-radius: 14px;
 
     display: grid;
-    grid-template-columns: 68px 260px minmax(0, 1fr);
+    grid-template-columns: 76px 270px minmax(0, 1fr);
     column-gap: 16px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02),
+                0 8px 24px rgba(15, 23, 42, 0.025);
+    margin-bottom: 18px;
+    background: $card-bg;
+    border: 1px solid $card-border;
     overflow: hidden;
 
     // CARDS ICONS
     .card-icon{
+        transition: border-color 0.2s ease,
+                    box-shadow 0.2s ease;
+
+        &:hover{
+            border-color: #dce3ee;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.03),
+                0 10px 28px rgba(15, 23, 42, 0.035);
+        }
+
         grid-column: 1;
         grid-row: 1;
         width: 48px;
         height: 48px;
-        margin-top: 14px;
-        border-radius: 14px;
+        margin:  20px 0 0 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 19px;
+        border-radius: 14px;
         flex-shrink: 0;
 
         &.security{
-            background: #e6f0fe;
-            color: #1e40af;
+            background: $primary-light;
+            color: $primary;
         }
 
         &.integrations{
-            background: #efeafe;
-            color: #7c3aed;
+            background: $purple-light;
+            color: $purple;
         }
 
         &.notifications{
-            background: #fef3e0;
-            color: #b45309;
+            background: $orange-light;
+            color: $orange;
         }
 
         &.danger{
-            background: $red-bg;
+            background: $red-light;
             color: $red;
         }
 
