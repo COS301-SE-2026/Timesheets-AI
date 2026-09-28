@@ -1,16 +1,17 @@
-<div class="suggestions-page">
-    <h1> Suggested Work</h1>
+    <div class="suggestions-page">
+    <div class="suggestions-page">
+    <h1>Suggested Work</h1>
 
-    <p> 
-        Review your work detected from your connected activity before adding it to your timesheets of the week. 
+    <p>
+        Review your work detected from your connected activity before adding it to your timesheets of the week.
     </p>
+
+    <button type="button" (click)="generateSuggestions()">
+        Generate Suggestions
+    </button>
 
     <div *ngIf="loading">
         Loading suggestions ...
-    </div>
-
-    <div *ngIf="errorMessage">
-        {{ errorMessage }}
     </div>
 
     <div *ngIf="!loading && suggestions.length === 0">
@@ -46,17 +47,35 @@
                     </td>
 
                     <td>
-                        <div>
+                        <!-- <div>
                             {{ suggestion.projectId || 'No project found'}}
+                        </div> -->
+
+                        <div *ngIf="suggestion.projectId; else selectProject">
+                            {{ getProjectName(suggestion.projectId) }}
                         </div>
 
+                        <ng-template #selectProject>
+                            <select
+                            [value]=""
+                            (change)="assignProject(suggestion, $event)">
+                            <option value="" disabled>Select project</option>
+
+                            <option
+                                *ngFor="let project of projects"
+                                [value]="project.id">
+                                {{ project.name }}
+                            </option>
+                        </select>
+                        </ng-template>
+
                         <div>
-                            {{ suggestion.taskId || 'No task Id found'}}
+                            {{ suggestion.taskId || 'No local task linked'}}
                         </div>
                     </td>
 
                     <td>
-                        {{ suggestion.evidenceEvents.length}} events
+                        {{ suggestion.evidenceEvents ? suggestion.evidenceEvents.length : 0 }} events
 
                         <br>
 
