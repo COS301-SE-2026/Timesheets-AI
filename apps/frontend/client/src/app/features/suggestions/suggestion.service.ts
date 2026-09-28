@@ -22,15 +22,26 @@ export class SuggestionService {
     }
 
     approve(suggestionId: string): Observable<SuggestedWorkSession>{
-        return this.http.post<SuggestedWorkSession>('${this.apiUrl}/${suggestionId}/approve', {});
+        return this.http.post<SuggestedWorkSession>(`${this.apiUrl}/${suggestionId}/approve`, {});
     }
 
     reject(suggestionId: string): Observable<SuggestedWorkSession>{
-        return this.http.post<SuggestedWorkSession>('${this.apiUrl}/${suggestionId}/reject', {});
+        return this.http.post<SuggestedWorkSession>(`${this.apiUrl}/${suggestionId}/reject`, {});
     }
 
     edit(suggestionId: string, request: EditSuggestionRequest): Observable<SuggestedWorkSession>{
-        return this.http.put<SuggestedWorkSession>('${this.apiUrl}/${suggestionId}', request);
+        return this.http.put<SuggestedWorkSession>(`${this.apiUrl}/${suggestionId}`, request);
+    }
+
+    generateSuggestions(workspaceMemberId: string, startTime: string, endTime: string): Observable<SuggestedWorkSession[]>{
+        return this.http.post<SuggestedWorkSession[]>(`${this.apiUrl}/generate`, {}, {
+            params: {
+                workspaceMemberId: workspaceMemberId,
+                startTime: startTime,
+                endTime: endTime
+            }
+        }
+    );
     }
 }
 
