@@ -45,11 +45,20 @@ def generate_weekly_summary(
     prompt = _build_prompt(hours_logged, project_count, latest_score, previous_score, subject_type)
     narrative = _call_gemini_with_retry(prompt)
 
-    return {"narrative": narrative, "week_start": week_start}
+    lines = [line.strip() for line in narrative.split("\n") if line.strip()]
+    if len(lines) <= 1:
+        import logging
+        logging.warning(
+            "weekly summary came back as a single block despite the per-line prompt, "
+            "falling back to sentence-splitting. subject_id=%s", subject_id
+        )
+        import re
+        lines = [s.strip() for s in re.split(r"(?<=[.!?])\s+", narrative) if s.strip()]
 
+    return {"narrative": "\n".join(lines), "week_start": week_start}
 
 def _build_prompt(hours_logged, project_count, latest_score, previous_score, subject_type) -> str:
-    subject_phrase = "the team" if subject_type == "TEAM" else "you"
+    subject_phrase = "The team" if subject_type == "TEAM" else "You"
 
     movement = ""
     if latest_score is not None and previous_score is not None:
@@ -62,11 +71,15 @@ def _build_prompt(hours_logged, project_count, latest_score, previous_score, sub
             movement = f"Productivity held steady at {latest_score}."
 
     return (
-        f"Write a short, plain-language weekly summary for a timesheet app. "
-        f"Two to three sentences, no bullet points, no markdown formatting. "
-        f"{subject_phrase.capitalize()} logged {hours_logged} hours across {project_count} project(s) this week. "
+        "Write a weekly summary for a timesheet app dashboard. For either developer of or manager. "
+        "Output 2 to 4 SHORT SEPARATE LINES, one finding per line, each line its own complete sentence. "
+        "Do not write one paragraph. Do not use bullet points, dashes, numbering, or markdown, just "
+        "plain lines separated by newlines. "
+        f"{subject_phrase} logged {hours_logged} hours across {project_count} project(s) this week. "
         f"{movement} "
-        f"Keep the tone factual and neutral, not congratulatory or alarming."
+        "Keep the tone factual and neutral, not congratulatory or alarming. "
+        "Each line should read like a standalone scannable finding, e.g. "
+        "'Team/You logged 33.5h this week across 2 active projects.' followed by a new line for the next finding."
     )
 
 
