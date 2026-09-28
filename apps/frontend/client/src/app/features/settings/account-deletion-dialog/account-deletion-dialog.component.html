@@ -5,15 +5,23 @@
 
 
 <h2 mat-dialog-title>
-    Request account deletion
+    <span class="title-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+    </span>
+
+    <span>
+        Request account deletion
+    </span>
 </h2>
 
 <mat-dialog-content>
 
-    <p class="dialog-description">
-        Your account will not be deleted immediately. Your 
-        request will be reviewed by an administrator.
-    </p>
+    <div class="warning-panel">
+        <p class="dialog-description">
+            Your account will not be deleted immediately. Your 
+            request will be reviewed by an administrator.
+        </p>
+    </div>
 
     <p>
         Please provide a reason for requesting account deletion.
@@ -59,7 +67,7 @@
             color="warn"
             type="button"
             (click)="submit()"
-            [disabled]="!isSubmitting || !reason.trim()">
+            [disabled]="isSubmitting || !reason.trim()">
             {{ isSubmitting? 'Submitting...': 'Submit request' }}
         </button>
 </mat-dialog-actions>
