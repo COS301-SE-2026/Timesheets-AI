@@ -3,17 +3,25 @@
 // Purpose: Settings page styling matched to the approved
 //  the wireframe
 
-$page-bg: #f7f8fb;
+$page-bg: #f8fafc;
 $card-bg: #ffffff;
-$card-border: #e7e9f0;
-$text-title: #0f172a;
-$text-body: #334155;
-$text-muted: #6b7280;
+$card-border: #e5eaf2;
+$text-title: #172033;
+$text-body: #475569;
+$text-muted: #7b879b;
 $primary: #2563eb;
-$primary-light: #eaf1fe;
+$primary-light: #eaf2ff;
+$primary-dark: #1d4ed8;
+
 $green: #16a34a;
+$green-light: #eaf8ef;
 $red: #dc2626;
 $red-bg: #fdecec;
+$red-light: #fff0f0;
+$purple: #7c3aed;
+$purple-light: #f1ebff;
+$orange: #ea580c;
+$orange-light: #fff4e8;
 
 // SETTINGS ARE
 .settings-page{
@@ -23,21 +31,23 @@ $red-bg: #fdecec;
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 24px 32px 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    margin-bottom: 18px;
+    padding: 34px 42px 48px;
+    // display: flex;
+//     flex-direction: column;
+    // gap: 12px;
     box-sizing: border-box;
 }
 
 // HEADEING AREA
 .settings-header{
-    margin-bottom: 10px;
+    margin-bottom: 28px;
 
     h1{
         margin: 0;
-        font-size: 26px;
+        font-size: 32px;
         font-weight: 700;
+        letter-spacing: -0.5px;
         color: $text-title;
     }
 
