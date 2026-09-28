@@ -93,8 +93,9 @@ public class SuggestionService {
 
     SuggestedWorkSession suggestion = getSuggestion(suggestionId);
 
-    if (suggestion.getStatus() != SuggestionStatus.PENDING) {
-      throw new RuntimeException("Only pending suggestions can be rejected");
+    if (suggestion.getStatus() != SuggestionStatus.PENDING
+        && suggestion.getStatus() != SuggestionStatus.EDITED) {
+      throw new RuntimeException("Only pending or edited suggestions can be rejected");
     }
 
     suggestion.setStatus(SuggestionStatus.REJECTED);
