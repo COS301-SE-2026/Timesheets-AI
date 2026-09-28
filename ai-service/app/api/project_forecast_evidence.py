@@ -13,19 +13,19 @@ from fastapi import APIRouter, Header, HTTPException
 
 from app.schemas.project_forecast_evidence import ProjectForecastEvidenceResponse
 from app.services.project_forecast_evidence import get_project_forecast_evidence
+from typing import Annotated
 
 router = APIRouter()
 
 
 @router.get(
     "/insights/project-forecast/{project_id}/evidence",
-    response_model=ProjectForecastEvidenceResponse,
 )
 def get_external_project_evidence(
     project_id: uuid.UUID,
     start_time: datetime,
     end_time: datetime,
-    authorization: str = Header(...),
+    authorization: str = Annotated[str, Header()],
 ) -> ProjectForecastEvidenceResponse:
     """
     - gets the Jira and GitHub evidence for a project
