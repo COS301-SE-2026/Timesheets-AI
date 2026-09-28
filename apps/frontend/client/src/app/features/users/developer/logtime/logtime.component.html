@@ -527,7 +527,7 @@
                   </div>
 
                   <footer class="suggestion-card-actions">
-                    <button type="button" class="btn btn--ghost" (click)="rejectSuggestion(suggestion)">
+                    <button type="button" class="btn btn--ghost" (click)="confirmRejectSuggestion(suggestion)">
                       Reject 
                     </button>
 
@@ -538,6 +538,26 @@
                 </article>
               }
             </div>
+
+            @if (suggestionPendingReject()){
+              <div class="suggestion-confirmation">
+                <div class="suggestion-confirm">
+                  <h3>Reject suggestion?</h3>
+
+                  <p> Are you sure that you want to reject <strong>{{ suggestionPendingReject()?.title }}</strong>?</p>
+
+                  <div class="suggestion-confirm-actions">
+                    <button type="button" class="btn btn--ghost" (click)="cancelRejectSuggestion()">
+                      Cancel
+                    </button>
+
+                    <button type="button" class="btn btn--primary" (click)="confirmReject()">
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
           }
         </div>
 
