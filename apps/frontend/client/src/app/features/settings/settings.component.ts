@@ -13,7 +13,8 @@ import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dial
 import { AuthService } from '../../core/services/auth.service';
 import { IntegrationBrowserDialogComponent } from './integration-browser-dialog/integration-browser-dialog.component';
 import { IntegrationRequestDialogComponent } from './integration-request-dialog/integration-request-dialog.component';
-import { request } from 'node:http';
+import { AccountDeletionDialogComponent } from './account-deletion-dialog/account-deletion-dialog.component';
+
 @Component({
   selector: 'app-settings',
   standalone: true,
@@ -235,10 +236,19 @@ export class SettingsComponent implements OnInit{
   }
 
   requestAccountDeletion():void{
-    this.settingsService.requestAccountDeletion().subscribe(
-      ()=>{
-        // CONFIRMATION POPUP MAYBE
+    const dialogRef= this.dialog.open(
+      AccountDeletionDialogComponent,
+      {
+        width: '500px',
+        maxWidth: '95vw',
+        disableClose: true
       }
     );
+
+    dialogRef.afterClosed().subscribe((submitted)=>{
+      if(submitted){
+        console.log('Account deletion request submitted successfully.');
+      }
+    });
   }
 }
