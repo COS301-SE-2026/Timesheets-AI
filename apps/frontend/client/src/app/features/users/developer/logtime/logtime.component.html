@@ -531,8 +531,34 @@
                             {{ task.title }}
                           </option>
                         }
+
+                        <option value="CREATE NEW TASK">+ Create new task</option>
                       </select>
                     </label>
+
+                    @if (suggestionCreatingTask() === suggestion.id){
+                      <div class="suggestion-new-task">
+                        <label class="field">
+                          <span class="field-label">
+                            New task
+                          </span>
+
+                          <input 
+                            type="text"
+                            [value]="newSuggestionTaskTitle()"
+                            (input)="newSuggestionTaskTitle .set($any($event.target).value)"
+                            placeholder="Enter task title"/>
+                        </label>
+
+                        <div class="suggestion-new-task-actions">
+                          <button type="button" class="btn btn--ghost" (click)="cancelCreateSuggestionTask()">Cancel</button>
+
+                          <button type="button" class="btn btn--primary" [disabled]="!newSuggestionTaskTitle().trim() (click)="createSuggestionTask(suggestion)">
+                            Create task
+                          </button>
+                        </div>
+                      </div>
+                    }
                   </div>
 
                   <div class="suggestion-card-evidence">
