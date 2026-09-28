@@ -147,16 +147,27 @@ export class ProjectsComponent implements OnInit {
     );
   }
 
-  protected filterProjects(selectedFilter: string): void {
-    this.selectedFilter = selectedFilter;
+  protected get visibleFilters(): string[] {
+    const user = this.authService.currentUser();
+    const isManager = user?.roles.some(role => 
+    ['MANAGER', 'ROLE_MANAGER', 'ADMIN', 'ROLE_ADMIN'].includes(role)) ?? false;
+    return isManager ? this.filters : this.filters.filter(f => f !== 'My projects');
+  }
 
+  protected filterProjects(selectedFilter: string): void {
+    if (selectedFilter === 'My projects' && !this.canSeeMyProjects) {
+      return;
+    }
+    this.selectedFilter = selectedFilter;
 
     this.filteredProjects = this.projects.filter(
       (project) => (selectedFilter === 'All' ||
-        (selectedFilter === 'My Projects' ? project.role !== null : project.status === selectedFilter )) &&
+        (selectedFilter === 'My projects' ? project.role !== null : project.status === selectedFilter )) &&
         project.name.toLowerCase().includes(this.searchTerm.toLowerCase()),
     );
   }
+
+  
 
   protected searchProjects(searchValue: string): void {
     this.searchTerm = searchValue;
