@@ -1338,6 +1338,7 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
     }
   });
 }
+
   assignSuggestionProject(
   suggestion: SuggestedWorkSession,
   event: Event
@@ -1365,6 +1366,8 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
       );
 
       this.suggestions.set(updatedSuggestions);
+      // load the tasks here 
+      this.loadSuggestionTasks(updatedSuggestion.id, projectId);
     },
     error: (error) => {
       console.error('Failed to assign project:', error);
@@ -1373,7 +1376,38 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
 }
 
    
+// this is for fetching all the tasks to display in the suggestion panel 
+// goal here is connect the suggestion's selected project to this existing task 
+  private suggestionTasks = new Map<string, Task[]>;
+  private loadSuggestionTasks(suggestionId: string, projectId: string): void{
+    if (!projectId){
+      this.suggestionTasks.set(suggestionId, []);
+      return;
+    }
 
+    this.http.get<TaskApiResponse[]>(
+      `${this.apiBaseUrl}/tasks/project/${projectId}`,
+      this.requestOptions()
+    ).subscribe({
+      next: (tasks) => {
+        this.suggestionTasks.set(
+          suggestionId,
+          tasks.map((task) => ({
+            id: task.id,
+            projectId: task.projectId,
+            title: task.title
+          }))
+        );
+      },
+      error: (error) => {
+        this.showToast('We could not the tasks for this project.');
+      }
+    });
+  }
+
+  getSuggestionTasks(suggestionId: string): Task[]{
+    return this.suggestionTasks.get(suggestionId) || [];
+  }
   /*
   I decided to deviate from the previous use of the api/tasks/my-tasks GET
   because i think the system to should load every task on the project

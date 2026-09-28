@@ -518,6 +518,21 @@
                         }
                       </select>
                     </label>
+
+                    <label class="field">
+                      <span class="field-label">Task</span>
+
+                      <select
+                        [value]="suggestion.taskId || ''"
+                        (change)="assignSuggestionTask(suggestion, $event)">
+                        <option value="">No task selected</option>
+                        @for (task of getSuggestionTasks(suggestion.id); track task.id){
+                          <option [value]="task.id">
+                            {{ task.title }}
+                          </option>
+                        }
+                      </select>
+                    </label>
                   </div>
 
                   <div class="suggestion-card-evidence">
