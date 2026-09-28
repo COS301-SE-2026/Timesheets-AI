@@ -1,4 +1,4 @@
-  /*
+/*
   - will be for showing the project forcast details
 
   Author: Nyasha
@@ -6,7 +6,7 @@
  */
 
 import { CommonModule } from '@angular/common';
-import {Component, inject, input, OnInit, signal, } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 
@@ -101,6 +101,10 @@ export class ProjectForecastComponent implements OnInit {
   protected readonly budgetChartOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 800,
+      easing: 'easeOutQuart',
+    },
     plugins: {
       legend: {
         display: false,
@@ -126,6 +130,7 @@ export class ProjectForecastComponent implements OnInit {
 
   protected getTaskChartData(): ChartConfiguration<'doughnut'>['data'] {
     const tasks = this.forecast()?.tasks;
+    const completionPercentage = tasks?.completionPercentage ?? 0;
 
     return {
       labels: ['Completed', 'Remaining'],
@@ -135,7 +140,7 @@ export class ProjectForecastComponent implements OnInit {
             tasks?.completedTasks ?? 0,
             tasks?.remainingTasks ?? 0,
           ],
-          backgroundColor: ['#2563eb', '#e5e7eb'],
+          backgroundColor: [ this.getProgressColour(completionPercentage), '#e5e7eb', ],
           borderWidth: 0,
         },
       ],
@@ -146,10 +151,61 @@ export class ProjectForecastComponent implements OnInit {
     responsive: true,
     maintainAspectRatio: false,
     cutout: '72%',
+    animation: {
+      duration: 800,
+      easing: 'easeOutQuart',
+    },
     plugins: {
       legend: {
         display: false,
       },
     },
   };
+
+  protected getRiskClass(risk: string | null | undefined, ): 'success' | 'warning' | 'error' | 'info' {
+    switch (risk?.toUpperCase()) {
+      case 'HEALTHY':
+        return 'success';
+
+      case 'WARNING':
+        return 'warning';
+
+      case 'CRITICAL':
+        return 'error';
+
+      default:
+        return 'info';
+    }
+  }
+
+  protected getProgressClass(
+    percentage: number | null | undefined, ): 'success' | 'warning' | 'error' {
+    const value = percentage ?? 0;
+
+    if (value < 5) {
+      return 'error';
+    }
+
+    if (value <= 30) {
+      return 'warning';
+    }
+
+    return 'success';
+  }
+
+  private getProgressColour(
+    percentage: number | null | undefined, ): string {
+    const status = this.getProgressClass(percentage);
+
+    switch (status) {
+      case 'error':
+        return '#5C0F0F';
+
+      case 'warning':
+        return '#4A2C01';
+
+      default:
+        return '#0E3C0A';
+    }
+  }
 }

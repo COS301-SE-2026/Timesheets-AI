@@ -140,45 +140,183 @@
 
       <div class="forecast-chart-grid">
 
-        <!-- Budget Forecast -->
-        <article class="forecast-card">
+      <!-- Budget Forecast -->
+      <article class="forecast-card budget-forecast-card">
+        <div class="card-heading">
+          <div>
+            <h3>Budget Forecast</h3>
+            <p>Logged, forecast and allocated project hours</p>
+          </div>
+
+          <div class="card-icon">
+            <i class="fa-solid fa-chart-column"></i>
+          </div>
+        </div>
+
+        <div class="chart-container budget-chart">
+          <canvas
+            baseChart
+            [data]="getBudgetChartData()"
+            [options]="budgetChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+
+        <div class="metric-row">
+          <div class="metric">
+            <span>Used</span>
+            <strong>
+              {{ currentForecast.budget.usedHours | number:'1.1-1' }}h
+            </strong>
+          </div>
+
+          <div class="metric">
+            <span>Forecast</span>
+            <strong>
+              {{ currentForecast.budget.forecastTotalHours | number:'1.1-1' }}h
+            </strong>
+          </div>
+
+          <div class="metric">
+            <span>Budget</span>
+            <strong>
+              {{ currentForecast.budget.budgetHours | number:'1.1-1' }}h
+            </strong>
+          </div>
+        </div>
+      </article>
+
+
+      <!-- Right Column -->
+      <div class="forecast-right-column">
+
+        <!-- Forecast Metrics -->
+        <article class="forecast-card forecast-metrics-card">
           <div class="card-heading">
             <div>
-              <h3>Budget Forecast</h3>
-              <p>Logged, forecast and allocated project hours</p>
+              <h3>Forecast Metrics</h3>
+              <p>Key numbers affecting project delivery</p>
             </div>
 
             <div class="card-icon">
-              <i class="fa-solid fa-chart-column"></i>
+              <i class="fa-solid fa-chart-line"></i>
             </div>
           </div>
 
-          <div class="chart-container budget-chart">
-            <canvas baseChart [data]="getBudgetChartData()" [options]="budgetChartOptions" [type]="'bar'"> </canvas>
-          </div>
+          <div class="forecast-metrics-grid">
 
-          <div class="metric-row">
-            <div class="metric">
-              <span>Used</span>
-              <strong> {{ currentForecast.budget.usedHours | number:'1.1-1' }}h </strong>
-            </div>
+            <!-- Remaining Budget -->
+            <div class="forecast-metric-item">
+              <span class="forecast-metric-label">
+                Remaining Budget
+              </span>
 
-            <div class="metric">
-              <span>Forecast</span>
-              <strong> {{ currentForecast.budget.forecastTotalHours | number:'1.1-1' }}h </strong>
-            </div>
-
-            <div class="metric">
-              <span>Budget</span>
-              <strong>
-                {{ currentForecast.budget.budgetHours | number:'1.1-1' }}h
+              <strong class="forecast-metric-value">
+                {{ currentForecast.budget.remainingBudgetHours | number:'1.1-1' }}h
               </strong>
+
+              <span class="forecast-metric-description">
+                allocated hours still available
+              </span>
             </div>
+
+
+            <!-- Forecast Overrun -->
+            <div class="forecast-metric-item">
+              <span class="forecast-metric-label">
+                Forecast Overrun
+              </span>
+
+              @if (currentForecast.budget.forecastOverrunHours !== null) {
+                <strong
+                  class="forecast-metric-value"
+                  [class.budget-at-risk]="currentForecast.budget.forecastOverrunHours > 0"
+                  [class.budget-healthy]="currentForecast.budget.forecastOverrunHours <= 0">
+                  {{ currentForecast.budget.forecastOverrunHours | number:'1.1-1' }}h
+                </strong>
+              } @else {
+                <strong class="forecast-metric-value">
+                  Unknown
+                </strong>
+              }
+
+              <span class="forecast-metric-description">
+                projected hours above budget
+              </span>
+            </div>
+
+
+            <!-- Expected Delay -->
+            <div class="forecast-metric-item">
+              <span class="forecast-metric-label">
+                Expected Delay
+              </span>
+
+              @if (currentForecast.schedule.delayDays === null) {
+                <strong class="forecast-metric-value risk-text unknown">
+                  Unknown
+                </strong>
+
+                <span class="forecast-metric-description">
+                  delay cannot be estimated yet
+                </span>
+
+              } @else if (currentForecast.schedule.delayDays === 0) {
+                <strong class="forecast-metric-value risk-text healthy">
+                  On time
+                </strong>
+
+                <span class="forecast-metric-description">
+                  no delay expected
+                </span>
+
+              } @else if (currentForecast.schedule.delayDays > 0) {
+                <strong
+                  class="forecast-metric-value risk-text"
+                  [class.warning]="currentForecast.risk.schedule === 'WARNING'"
+                  [class.critical]="currentForecast.risk.schedule === 'CRITICAL'"
+                  [class.healthy]="currentForecast.risk.schedule === 'HEALTHY'"
+                  [class.unknown]="currentForecast.risk.schedule === 'UNKNOWN'">
+                  {{ currentForecast.schedule.delayDays }} days
+                </strong>
+
+                <span class="forecast-metric-description">
+                  expected delay against planned completion
+                </span>
+
+              } @else {
+                <strong class="forecast-metric-value risk-text healthy">
+                  {{ -currentForecast.schedule.delayDays }} days early
+                </strong>
+
+                <span class="forecast-metric-description">
+                  ahead of planned completion
+                </span>
+              }
+            </div>
+
+
+            <!-- Remaining Work -->
+            <div class="forecast-metric-item">
+              <span class="forecast-metric-label">
+                Remaining Work
+              </span>
+
+              <strong class="forecast-metric-value">
+                {{ currentForecast.tasks.estimatedRemainingHours | number:'1.1-1' }}h
+              </strong>
+
+              <span class="forecast-metric-description">
+                estimated task hours remaining
+              </span>
+            </div>
+
           </div>
         </article>
 
 
-        <article class="forecast-card">
+        <!-- Task Progress -->
+        <article class="forecast-card task-progress-card">
           <div class="card-heading">
             <div>
               <h3>Task Progress</h3>
@@ -204,6 +342,7 @@
                 <strong>
                   {{ currentForecast.tasks.completionPercentage | number:'1.0-0' }}%
                 </strong>
+
                 <span>Complete</span>
               </div>
             </div>
@@ -214,23 +353,31 @@
 
             <div class="metric">
               <span>Total</span>
-              <strong>{{ currentForecast.tasks.totalTasks }}</strong>
+              <strong>
+                {{ currentForecast.tasks.totalTasks }}
+              </strong>
             </div>
 
             <div class="metric">
               <span>Completed</span>
-              <strong>{{ currentForecast.tasks.completedTasks }}</strong>
+              <strong>
+                {{ currentForecast.tasks.completedTasks }}
+              </strong>
             </div>
 
             <div class="metric">
               <span>Remaining</span>
-              <strong>{{ currentForecast.tasks.remainingTasks }}</strong>
+              <strong>
+                {{ currentForecast.tasks.remainingTasks }}
+              </strong>
             </div>
 
           </div>
         </article>
 
       </div>
+
+    </div>
 
 
       <article class="forecast-card delivery-card">
@@ -432,13 +579,34 @@
               <div class="coverage-heading">
                 <span>Task estimate coverage</span>
 
-                <strong>
+                <strong
+                  [class.coverage-error]="
+                    getProgressClass(currentForecast.confidence.taskEstimateCoveragePercentage) === 'error'
+                  "
+                  [class.coverage-warning]="
+                    getProgressClass(currentForecast.confidence.taskEstimateCoveragePercentage) === 'warning'
+                  "
+                  [class.coverage-success]="
+                    getProgressClass(currentForecast.confidence.taskEstimateCoveragePercentage) === 'success'
+                  ">
                   {{ currentForecast.confidence.taskEstimateCoveragePercentage | number:'1.0-0'}}%
                 </strong>
               </div>
 
               <div class="coverage-track">
-                <div class="coverage-fill" [style.width.%]=" currentForecast.confidence.taskEstimateCoveragePercentage"></div>
+                <div
+                  class="coverage-fill"
+                  [class.coverage-error]="
+                    getProgressClass(currentForecast.confidence.taskEstimateCoveragePercentage) === 'error'
+                  "
+                  [class.coverage-warning]="
+                    getProgressClass(currentForecast.confidence.taskEstimateCoveragePercentage) === 'warning'
+                  "
+                  [class.coverage-success]="
+                    getProgressClass(currentForecast.confidence.taskEstimateCoveragePercentage) === 'success'
+                  "
+                  [style.width.%]="currentForecast.confidence.taskEstimateCoveragePercentage">
+                </div>
               </div>
             </div>
 
