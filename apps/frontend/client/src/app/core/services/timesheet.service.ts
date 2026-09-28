@@ -38,6 +38,22 @@ export interface TimesheetResponse {
 export interface RejectRequest{
   reason: string;
 }
+export interface ManagerAssistantEvidenceSource {
+  sourceName: 'GITHUB' | 'JIRA' | 'CALENDAR';
+  matchCount: number;
+  subScore: number;
+  detail: string;
+}
+
+export interface ManagerAssistantReview {
+  timesheetId: string;
+  confidenceScorePercent: number;
+  verdict: 'LIKELY_APPROVE' | 'LIKELY_REJECT' | 'NEEDS_REVIEW';
+  evidenceSources: ManagerAssistantEvidenceSource[];
+  narrative: string;
+  hasConflict: boolean;
+  hasMissingEvidence: boolean;
+}
 
 @Injectable({ providedIn: 'root' })
 export class TimesheetService {
@@ -122,6 +138,14 @@ getWorkspaceTimesheets(): Observable<TimesheetResponse[]> {
     return this.http
       .post<TimesheetResponse>(`${this.baseUrl}/${id}/reject`, request)
       .pipe(catchError(this.handleError('rejectTimesheet')));
+  }
+  // post not get, this triggers real work on the backend (github/jira/calendar
+  // reads plus a gemini call), only fires when the manager clicks "AI Review",
+  // never on page load
+  generateManagerAssistantReview(timesheetId: string): Observable<ManagerAssistantReview> {
+    return this.http
+      .post<ManagerAssistantReview>(`${this.baseUrl}/${timesheetId}/manager-assistant-review`, null)
+      .pipe(catchError(this.handleError('generateManagerAssistantReview')));
   }
 
   private handleError(operation: string) {

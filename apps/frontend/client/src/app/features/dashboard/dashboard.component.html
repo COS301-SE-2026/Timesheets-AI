@@ -1,11 +1,15 @@
 <main class="dashboard-page">
 
     <header class="page-header">
-        <div class="page-header-content">
-
             <div>
-                <h1 class="page-title">Dashboard</h1>
-                <p class="page-subtitle">Overview of activity</p>
+                <h1>{{ greeting() }}, <span class="greeting-name">{{ firstName() }}</span></h1>
+                <p class="page-subtitle">
+                    {{
+                        isManagerView()
+                        ? "Here's what needs your attention across projects you manage."
+                        : "Here's your work at a glance for today."
+                    }}
+                </p>
             </div>
 
             <div class="header-actions">
@@ -26,17 +30,341 @@
                     }
                 </div>
             </div>
-        </div>
     </header>
 
+<!-- Show loading state while dashboard data is being fetched -->
+    @if (isLoading()) {
+        <section class="dashboard-state">
+            <i class="fa-solid fa-spinner fa-spin"></i> Loading your workspace...
+        </section>
+    } @else {
+        <section class="dashboard-grid" [class.manager-grid]="isManagerView()" [class.admin-grid]="isAdminView()">
+            @if (!isAdminView()) {
+            <article class="card timer-card">
+                <div class="card-heading">
+                    <span class="icon-orb blue"> <i class="fa-solid fa-stopwatch"></i> </span>
+                    <h2>Active timer</h2>
+                    <span class="timer-status" [class.running]="!!activeTimer() && !activeTimer()?.isPaused">
+                        {{ activeTimer()?.isPaused ? "Paused" : activeTimer() ? "Running" : "Not running" }}
+                    </span>
+                </div>
+                <!-- Display active timer details and provide pause, resume and stop controls -->
+                @if (activeTimer(); as timer) {
+                    <strong class="timer-value">
+                        {{formatDuration(timerSeconds()) }}
+                    </strong>
+                    @if (timer.project.name || timer.task.title) {
+                        <p class="context">
+                           {{ timer.project.name || "No project" }} ·
+                           {{ timer.task.title || "No task selected" }}
+                        </p>
+                    }
+                    <div class="timer-actions">
+                        <button class="danger-button" (click)="stopTimer()">
+                            <i class="fa-solid fa-stop"></i> Stop
+                        </button>
+                        <button class="secondary-button" (click)="pauseOrResumeTimer()">
+                            @if (timer.isPaused){
+                                <i class="fa-solid fa-play"></i>Resume
+                            } @else {
+                                <i class="fa-solid fa-pause"></i>Pause
+                            }
+                        </button>
+                    </div>
+                } @else {
+                    <div class="list-empty">
+                        <p>No timer is running.</p>
+                        <a class="start-timer-button" routerLink="/log-time"><i class="fa-solid fa-play"></i> Start timer </a>
+                    </div>
+                }
+            </article>
+        }
+            <!-- Timesheet approval summary card -->
+            @if (isManagerView() && !isAdminView()){
+                <article class="card summary-card approval-card">
+                    <div class="card-heading">
+                        <span class="icon-orb amber">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                        </span>
+                        <h2>Pending approvals</h2>
+                    </div>
+                    <strong> {{ approvalCount() }}</strong>
+                    <a routerLink="/timesheets" [queryParams]="{ tab: 'review'}">
+                        Review approvals
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </article>
+            }
 
-    <section class="dashboard-content">
-        <div class="dashboard-placeholder">
-            <h2>Your workspace at a glance</h2>
-            <p>
-                Dashboard insights and activity will appear here.
-            </p>
+               @if (isAdminView()) {
+                <article class="card summary-card waiting-room-card">
+                    <div class="card-heading">
+                        <span class="icon-orb amber">
+                            <i class="fa-solid fa-user-clock"></i>
+                        </span>
+                        <div>
+                            <h2>Waiting for workskapce</h2>
+                            <p>Members awaiting workspace access</p>
+                        </div>
+                    </div>
+                    <strong>{{ waitingForWorkspaceCount() }}</strong>
+                    <a routerLink="/team" [queryParams]="{ tab: 'waiting'}">
+                        Open waiting room
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <i class="fa-solid fa-users dashboard-illustration dashboard-illustration--waiting" aria-hidden="true"></i>
+                </article>
+            }
+
+            <!-- Total projects summary card -->
+            <article class="card summary-card project-card">
+                <div class="card-heading">
+                    <span class="icon-orb green">
+                        <i class="fa-solid fa-folder"></i>
+                    </span>
+                    <div>
+                    <h2>Active projects</h2>
+                    <p>{{ isAdminView() ? 'Active projects in this workspace' : 'Projects you contribute to' }}</p>
+                    </div>
+                </div>
+                <strong> {{ activeProjects().length }}</strong>
+                
+                <a routerLink="/projects">
+                    View projects
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <i class="fa-solid fa-folder dashboard-illustration dashboard-illustration--project" aria-hidden="true"></i>
+            </article>
+         
+            <!-- Tasks summary card -->
+             @if (!isAdminView()) {
+            <article class="card tasks-card">
+                <div class="card-heading">
+                    <span  class="icon-orb light-blue">
+                     <i class="fa-regular fa-square-check"></i>
+                    </span>
+                    <div>
+                        <h2>My tasks in progress</h2>
+                        <p>Tasks you are currently working on.</p>
+                    </div>
+                    <span class="count-chip">
+                        {{ inProgressTaskCount() }} active
+                    </span>
+                </div>
+                <!-- Tasks in progress -->
+                @if (inProgressTasks().length) {
+                    <div class="task-list">
+                        @for (task of inProgressTasks(); track task.id){
+                            <a class="task-row" routerLink="/my-tasks" [queryParams]="{ taskId: task.id}">
+                                <span class="avatar">{{ initials(task.assignedToName)}} </span>
+                                <span class="task-copy">
+                                    <strong>{{ task.title }}</strong>
+                                    <small>{{ task.projectName || "Project task" }}</small>
+                                </span>
+                                <span class="status-chip">{{ taskStatus(task.status) }}</span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        }
+                    </div>
+                    @if (inProgressTaskCount() > inProgressTasks().length){
+                        <a class="view-more-tasks" routerLink="/my-tasks">
+                            View more tasks
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    }
+                } @else {
+                    <div class="list-empty">
+                        No task in progress.
+                    </div>
+                }
+            </article>
+        }
+            <!-- Calendar summary card -->
+            <article class="card calendar-card">
+                <div class="card-heading">
+                    <span class="icon-orb purple">
+                        <i class="fa-regular fa-calendar"></i>
+                    </span>
+                    <div>
+                        <h2>Today's calendar</h2>
+                        <p>From your calendar integration</p>
+                    </div>
+                </div>
+                @if (todayEvents().length) {
+                    <div class="event-list">
+                        @for (event of todayEvents(); track event.id) {
+                            <a class="event-row" routerLink="/calendar">
+                                <time>
+                                    {{ event.start | date: "HH:mm"}} -
+                                    {{ event.end | date: "HH:mm"}}
+                                </time>
+                                <span>
+                                    <strong>{{ event.title }}</strong>
+                                    <small>{{ event.location || "Calendar event" }}</small>
+                                </span>
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        }
+                    </div>
+                } @else {
+                    <div class="list-empty">
+                        Nothing else scheduled for today.
+                    </div>
+                }
+                <i class="fa-regular fa-calendar-days dashboard-illustration dashboard-illustration--calendar" aria-hidden="true"></i>
+            </article>
+            <!-- Hours logged summary card -->
+             @if (!isAdminView()) {
+            <article class="card hours-card">
+                <div class="card-heading">
+                    <span class="icon-orb blue">
+                        <i class="fa-regular fa-clock"></i>
+                    </span>
+                    <div>
+                        <h2>Hours logged</h2>
+                        <p>Your logged hours for today and this week.</p>
+                    </div>
+                </div>
+                <div class="hours-metric">
+                    <div class="metric">
+                        <span>Today</span>
+                        <strong>{{ formatHours(todayMinutes()) }}</strong>
+                        <small>of 8h</small>
+                        <div class="progress">
+                            <i [style.width.%]="progress(todayMinutes(), 480)"></i>
+                        </div>
+                    </div>
+                    <div class="metric">
+                        <span>This week</span>
+                        <strong> {{ formatHours(weekMinutes()) }}</strong>
+                        <small>of 40h</small>
+                        <div class="progress">
+                            <i [style.width.%]="progress(weekMinutes(), 2400)"></i>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        }
+            <!-- Deadlines summary card -->
+            <article class="card deadlines-card">
+                <div class="card-heading">
+                    <span class="icon-orb blue">
+                        <i class="fa-regular fa-calendar-days"></i>
+                    </span>
+                    <div>
+                        <h2>Upcoming deadlines</h2>
+                        <p>Next {{ deadlineWindowDays() }} days</p>
+                    </div>
+                </div>
+                @if (upcomingDeadlines().length ){
+                    <div class="deadline-list">
+                        @for (deadline of upcomingDeadlines(); track deadline.id) {
+                            @if (deadline.type === "task"){
+                                <a class="deadline-row" routerLink="/my-tasks" [queryParams]="{taskId: deadline.targetId}">
+                                    <time>
+                                        <b> {{ deadline.dueDate | date: "MMM" }} </b>
+                                        <strong> {{deadline.dueDate | date: "dd" }} </strong>
+                                    </time>
+                                    <span>
+                                        <strong>{{ deadline.title }} </strong>
+                                        <small>
+                                            {{deadline.projectName }} ·
+                                            {{ deadline.dueDate | date: "EEE, d MMM"}}
+                                        </small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </a>
+                            } @else {
+                                <a class="deadline-row" [routerLink]="['/projects', deadline.targetId]">
+                                    <time>
+                                        <b>{{ deadline.dueDate | date:"MMM" }}</b>
+                                        <strong>{{ deadline.dueDate | date: "dd" }}</strong>
+                                    </time>
+                                    <span>
+                                        <strong> {{ deadline.title }}</strong>
+                                        <small>
+                                            {{ deadline.projectName }} · {{ deadline.dueDate | date: "EEE, d MMM"}}
+                                        </small>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </a>
+                            }
+                        }
+                    </div>
+                } @else {
+                    <div class="list-empty">
+                        No deadlines in the next {{ deadlineWindowDays() }} days.
+                    </div>
+                }
+            </article>
+        </section>
+
+        @if (isAdminView()) {
+            <section class="active-projects-section" aria-labelledby="active-projects-heading">
+                <div class="active-projects-header">
+                    <div>
+                        <h2 id="active-projects-heading">Active projects</h2>
+                        <p>Project progress and team ownership at a glance.</p>
+                    </div>
+                    <a routerLink="/projects">
+                        View all projects
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+
+                @if (activeProjectCards().length) {
+                    <div class="active-projects-carousel" aria-label="Avtive project cards">
+                        @for (project of activeProjectCards(); track project.id) {
+                            <a class="active-project-card" [routerLink]="['/projects', project.id]">
+                                <div class="project-card-copy">
+                                    <h3>{{ project.name }}</h3>
+                                    <p class="project-leads">
+                                        <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
+                                        {{ project.teamLeads.join(', ')}}
+                                    </p>
+                                    <p class="project-members">
+                                        <i class="fa-solid fa-users" aria-hidden="true"></i>
+                                        {{ project.memberCount }} {{ project.memberCount === 1 ? 'member' : 'members'}}
+                                    </p>
+                                </div>
+                                <div class="project-completion" [style.--project-progress]="project.completionPercentage + '%'">
+                                    <div class="project-completion-content">
+                                        <strong>{{ project.completionPercentage }}%</strong>
+                                        <span>complete</span>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                } @else {
+                    <div class="active-projects-empty">No active projects are available.</div>
+                }
+            </section>
+        }
+    }
+
+    <!-- Timer stopped modal -->
+
+    @if (showTimerStoppedModal()) {
+        <div class="modal-backdrop" (click)="closeTimerStoppedModal()" (keydown)="closeTimerStoppedModal()">
+            <dialog
+                class="success-modal"
+                [open]="showTimerStoppedModal()"
+                aria-labelledby="timer-stopped-title"
+                aria-describedby="timer-stopped-description"
+                (click)="$event.stopPropagation()"
+                (keydown)="$event.stopPropagation()">
+                
+            <span class="icon-orb green">
+                <i class="fa-solid fa-check"></i>
+            </span>
+            <h2>Timer stopped</h2>
+            <p>Your time entry has been saved successfully.</p>
+            <button type="button" class="primary-button" (click)="closeTimerStoppedModal()">
+                Close
+            </button>
+            </dialog>
         </div>
-    </section>
+    }
 
 </main>

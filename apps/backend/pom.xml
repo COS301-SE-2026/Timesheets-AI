@@ -244,6 +244,14 @@ it must end with:
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+        <!-- MFA Flow -->
+        <!-- OTP AND 6 CODE VALIDATION -->
+        <dependency>
+            <groupId>com.warrenstrange</groupId>
+            <artifactId>googleauth</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
     </dependencies>
 
    <build>

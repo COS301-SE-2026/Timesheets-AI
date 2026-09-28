@@ -26,7 +26,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService, TaskResponse, UpdateTaskRequest, } from '../../core/services/task.service';
 import { ProjectService, ProjectResponse } from '../../core/services/project.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -182,6 +182,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
 
 
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly taskService = inject(TaskService);
   private readonly projectService = inject(ProjectService);
   private readonly authService = inject(AuthService);
@@ -337,6 +338,10 @@ export class MyTasksComponent implements OnInit, OnDestroy {
     this.loadTasks();
     this.loadProjects();
     this.checkJiraConnection();
+    const taskId = this.route.snapshot.queryParamMap.get('taskId');
+    if (taskId) {
+      this.openTaskDetail(taskId);
+    }
     this.loadTeamTasks();
   }
 
@@ -911,11 +916,14 @@ export class MyTasksComponent implements OnInit, OnDestroy {
 
   //opens the task detail modal, wired to GET /api/tasks/{taskId} for the full record
   public onViewTask(task: Task): void {
+    this.openTaskDetail(task.id);
+  }
+  private openTaskDetail(taskId: string): void {
     this.detailError.set(null);
     this.isDetailOpen.set(true);
     this.isDetailLoading.set(true);
 
-    this.taskService.getTaskById(task.id).subscribe({
+    this.taskService.getTaskById(taskId).subscribe({
       next: (response: TaskResponse) => {
         this.selectedTask.set(this.mapToTask(response));
         this.isDetailLoading.set(false);

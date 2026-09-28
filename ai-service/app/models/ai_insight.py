@@ -7,6 +7,7 @@ Date: 12/07/2026
 
 Patch: added scop and narrative fields
 Patch: added workspace id
+Patch: added resolved, resolved_at, resolved_by_workspace_member_id
 """
 
 import uuid
@@ -14,6 +15,8 @@ from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import Boolean, DateTime, ForeignKey, Numeric, String, Text
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 from zoneinfo import ZoneInfo
 
@@ -57,4 +60,9 @@ class AIInsight(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=lambda: datetime.now(ZoneInfo("Africa/Johannesburg")).replace(tzinfo=None),
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    resolved: Mapped[bool] = mapped_column(Boolean, default=False)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    resolved_by_workspace_member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("workspace_members.id"), nullable=True
     )

@@ -16,8 +16,8 @@ public class TotpUtils {
   @Value("${app.mfa.issuer:Timesheets AI}")
   private String issuer;
 
-  @Value("${app.mfa.code-length:6}")
-  private int codeLength;
+  // @Value("${app.mfa.code-length:6}")
+  // private int codeLength;
 
   public TotpUtils() {
     this.googleAuthenticator = new GoogleAuthenticator();

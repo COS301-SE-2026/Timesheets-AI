@@ -552,6 +552,7 @@ public class ProjectService {
                       projectMembership.getIsProjectManager()
                           ? WorkspaceRole.MANAGER
                           : WorkspaceRole.DEVELOPER)
+                  .isProjectManager(projectMembership.getIsProjectManager())
                   .hoursLogged(hoursLogged)
                   .joinedAt(projectMembership.getCreatedAt())
                   .build();

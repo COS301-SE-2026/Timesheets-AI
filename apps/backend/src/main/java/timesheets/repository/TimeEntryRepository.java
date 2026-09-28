@@ -62,6 +62,8 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, UUID> {
   // finds all the time entries on a particular project
   List<TimeEntry> findByProjectId(UUID projectId);
 
+  List<TimeEntry> findByWorkspaceMemberId(UUID workspaceMemberId);
+
   // finds all the time entries on a project based on a timeframe
   List<TimeEntry> findByProjectIdAndStartTimeBetween(
       UUID projectId, LocalDateTime start, LocalDateTime end);
