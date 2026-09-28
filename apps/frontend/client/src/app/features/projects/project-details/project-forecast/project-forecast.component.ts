@@ -179,7 +179,7 @@ export class ProjectForecastComponent implements OnInit {
   }
 
   protected getProgressClass(
-    percentage: number | null | undefined, ): 'success' | 'warning' | 'error' {
+    percentage: number | null = 0 ): 'success' | 'warning' | 'error' {
     const value = percentage ?? 0;
 
     if (value < 5) {
