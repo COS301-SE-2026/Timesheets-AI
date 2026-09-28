@@ -27,11 +27,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import timesheets.dto.response.AiDashboardResponse;
 import timesheets.dto.response.ManagerDashboardResponse;
-import timesheets.dto.response.ResolveInsightResponse;
-import timesheets.dto.response.WeeklySummaryResponse;
 import timesheets.dto.response.ProjectForecastResponse;
 import timesheets.dto.response.ResolveInsightResponse;
 import timesheets.dto.response.SavedProjectForecastResponse;
+import timesheets.dto.response.WeeklySummaryResponse;
 
 @Component
 @RequiredArgsConstructor
@@ -110,6 +109,8 @@ public class AiServiceClient {
             weekStart)
         .retrieve()
         .body(new ParameterizedTypeReference<WeeklySummaryResponse>() {});
+  }
+
   /*
   - gets the recent project from the ai service
   - allows springboot to expose the last synced forcast to the frontend
