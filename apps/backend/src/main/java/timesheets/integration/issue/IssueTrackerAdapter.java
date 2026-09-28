@@ -1,20 +1,37 @@
 package timesheets.integration.issue;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import timesheets.dto.request.CreateJiraIssueRequest;
-import timesheets.dto.response.JiraIssueResponse;
+import timesheets.dto.request.CreateIssueRequest;
+import timesheets.dto.response.CommentResponse;
+import timesheets.dto.response.IssueResponse;
+import timesheets.dto.response.StatusChangeResponse;
+import timesheets.dto.response.WorklogResponse;
 
 public interface IssueTrackerAdapter {
 
   String getProvider();
 
-  List<JiraIssueResponse> getIssues(UUID workspaceMemberId);
+  List<IssueResponse> getIssues(UUID workspaceMemberId);
 
-  JiraIssueResponse getIssue(UUID workspaceMemberId, String issueKey);
+  IssueResponse getIssue(UUID workspaceMemberId, String issueKey);
+
+  // getting issue within time window
+  List<IssueResponse> getIssues(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
+
+  List<WorklogResponse> getWorklogs(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
+
+  List<CommentResponse> getComments(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
+
+  List<StatusChangeResponse> getStatusChanges(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime);
 
   // the write operations
-  JiraIssueResponse createIssue(UUID workspaceMemberId, CreateJiraIssueRequest request);
+  IssueResponse createIssue(UUID workspaceMemberId, CreateIssueRequest request);
 
   // the link operations
   void linkTaskToIssue(UUID workspaceMemberId, UUID taskId, String issueKey);

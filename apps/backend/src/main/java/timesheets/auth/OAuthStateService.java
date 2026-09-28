@@ -57,14 +57,19 @@ public class OAuthStateService {
     return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
   }
 
+  public String generateState(UUID workspaceMemberId, String provider) {
+    return generateState(workspaceMemberId, provider, null);
+  }
+
   // temporary state sent to Google
   // shows that workspace member started this particular OAuth operation
-  public String generateState(UUID workspaceMemberId, String provider) {
+  public String generateState(UUID workspaceMemberId, String provider, String returnPath) {
     return Jwts.builder()
         // add workspace member
         .claim("workspaceMemberId", workspaceMemberId.toString())
         // add provider
         .claim("provider", provider)
+        .claim("returnPath", returnPath)
         .issuedAt(new Date())
         // expiration time of 10 minutes
         .expiration(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
@@ -74,19 +79,19 @@ public class OAuthStateService {
         .compact();
   }
 
-  public OAuthState verifyState(String state) {
-    Claims claims =
-        Jwts.parser()
-            .verifyWith((javax.crypto.SecretKey) getSigningKey())
-            .build()
-            .parseSignedClaims(state)
-            .getPayload();
+  // public OAuthState verifyState(String state) {
+  //   Claims claims =
+  //       Jwts.parser()
+  //           .verifyWith((javax.crypto.SecretKey) getSigningKey())
+  //           .build()
+  //           .parseSignedClaims(state)
+  //           .getPayload();
 
-    UUID workspaceMemberId = UUID.fromString(claims.get("workspaceMemberId", String.class));
-    String provider = claims.get("provider", String.class);
-    // has workspacememberid and provider
-    return new OAuthState(workspaceMemberId, provider);
-  }
+  //   UUID workspaceMemberId = UUID.fromString(claims.get("workspaceMemberId", String.class));
+  //   String provider = claims.get("provider", String.class);
+  //   // has workspacememberid and provider
+  //   return new OAuthState(workspaceMemberId, provider);
+  // }
 
   // MUST DO: validate that the provided state is the same as returned state by Google
   public OAuthState validateState(String state) {
@@ -99,7 +104,8 @@ public class OAuthStateService {
 
     UUID workspaceMemberId = UUID.fromString(claims.get("workspaceMemberId", String.class));
     String provider = claims.get("provider", String.class);
+    String returnPath = claims.get("returnPath", String.class);
 
-    return new OAuthState(workspaceMemberId, provider);
+    return new OAuthState(workspaceMemberId, provider, returnPath);
   }
 }

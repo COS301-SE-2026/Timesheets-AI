@@ -376,6 +376,25 @@
     "@csstools/css-tokenizer" "^3.0.3"
     lru-cache "^10.4.3"
 
+"@azure/msal-angular@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@azure/msal-angular/-/msal-angular-5.3.1.tgz#bb5e0e2dcddc2bff184b4ce65634be7ae738c713"
+  integrity sha512-Tg591W1DmDQZwaCN/QlI/hOpza2p4QlognEcu0O5XCw6c5JxlP7ylCs8fCMNZHb+f14LnPmdqOwlHPOxGjlrxA==
+  dependencies:
+    tslib "^2.3.0"
+
+"@azure/msal-browser@^5.22.0":
+  version "5.22.0"
+  resolved "https://registry.yarnpkg.com/@azure/msal-browser/-/msal-browser-5.22.0.tgz#4b8362fa8f768c713d3d4ee4a4c0aa117ccf5eea"
+  integrity sha512-5kgu9xeEKgGc2JeidxAtU15NJTqiH/CMCRRQAJ4Rac56kB7KVg91vbNmn+z3RO1vNomPN69UvjKG9h1Pghx6dQ==
+  dependencies:
+    "@azure/msal-common" "16.14.1"
+
+"@azure/msal-common@16.14.1":
+  version "16.14.1"
+  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-16.14.1.tgz#2c987f31da858e544e72b6faa986fecdb3de20f8"
+  integrity sha512-Or6xhPNyi4zHW25158yxBoyxuCqNSPa5YBVqfF1J5Ks4MJWBo/USXdp05DQIPu1Zli00YZu6t0+h6KvHJealxQ==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.26.2", "@babel/code-frame@^7.27.1", "@babel/code-frame@^7.29.7":
   version "7.29.7"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.29.7.tgz#f2fbbfea87c44a21590ec515b778b2c26d8866e7"

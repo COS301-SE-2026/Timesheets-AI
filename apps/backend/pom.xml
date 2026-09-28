@@ -218,6 +218,18 @@ it must end with:
             <version>1.24.0</version>
         </dependency>
 
+        <!-- this is to give JWT support to validate Microsoft ID tokens -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+
+        <!-- give spring security oAuth 2 resource-server JWT infrastructure -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+        </dependency>
+
         <!-- library to automatically load environment variable from the .env file to the application-->
         <!-- was having trouble with manually loading things-->
         <dependency>
@@ -230,6 +242,14 @@ it must end with:
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+        <!-- MFA Flow -->
+        <!-- OTP AND 6 CODE VALIDATION -->
+        <dependency>
+            <groupId>com.warrenstrange</groupId>
+            <artifactId>googleauth</artifactId>
+            <version>1.5.0</version>
         </dependency>
 
     </dependencies>

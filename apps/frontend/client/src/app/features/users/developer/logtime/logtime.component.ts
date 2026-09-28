@@ -634,9 +634,24 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   pauseTimer(): void {
-    this.clearTimerInterval();
-    this.isTimerPaused.set(true);
-    this.pausedElapsedSeconds.set(this.elapsedSeconds());
+    if (!this.activeTimer() || this.isTimerPaused()){
+      return;
+    }
+
+    this.timerService.pauseTimer().subscribe({
+      next: (response) => {
+        const elapsed = response.elapsedSeconds ?? this.elapsedSeconds();
+        this.clearTimerInterval();
+        this.elapsedSeconds.set(elapsed);
+        this.pausedElapsedSeconds.set(elapsed);
+        this.isTimerPaused.set(response.isPaused ?? true);
+      },
+      error: (error) =>
+        this.conflictMessage.set(
+          error.error?.message ?? 'Unable to pause the timer'
+        ),
+    })
+
   }
 
   resumeTimer(): void {
@@ -645,16 +660,23 @@ export class LogtimeComponent implements OnDestroy {
       return;
     }
 
-    this.isTimerPaused.set(false);
-    this.clearTimerInterval();
+   if (!this.isTimerPaused()) {
+    return;
+   }
 
-    // Calculate the offset to continue from paused time
-    const pausedSeconds = this.pausedElapsedSeconds();
-    const startTime = Date.now() - pausedSeconds * 1000;
-
-    this.timerIntervalId = setInterval(() => {
-      this.elapsedSeconds.set(Math.floor((Date.now() - startTime) / 1000));
-    }, 1000);
+    this.timerService.resumeTimer().subscribe({
+      next: (response) => {
+        const elapsed = response.elapsedSeconds ?? this.pausedElapsedSeconds();
+        this.isTimerPaused.set(response.isPaused ?? false);
+        this.elapsedSeconds.set(elapsed);
+        this.pausedElapsedSeconds.set(elapsed);
+        this.startElapsedInterval(elapsed);
+      },
+      error: (error) => 
+        this.conflictMessage.set(
+          error.error?.message ?? 'Unable to resume timer.'
+        ),
+    });
   }
 
   //Evaluates the active time tracking segment and builds a concrete log entry
@@ -1270,19 +1292,25 @@ export class LogtimeComponent implements OnDestroy {
       this.pausedElapsedSeconds.set(response.elapsedSeconds ?? 0);
       this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
     } else {
-      this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
-      this.timerIntervalId = setInterval(() => {
-        this.elapsedSeconds.set(
-          Math.floor((Date.now() - timer.startedAt.getTime()) / 1000),
-        );
-      }, 1000);
+     this.startElapsedInterval(response.elapsedSeconds ?? 0);
     }
   }
 
   //helper function to force the string timestamp into a valid ISO format for Date parsing, appending 'Z' if no timezone is present
+
+  private startElapsedInterval(elapsed: number): void {
+    this.clearTimerInterval();
+    this.elapsedSeconds.set(elapsed);
+    const clientStartTime = Date.now() - elapsed * 1000;
+    this.timerIntervalId = setInterval(() => {
+      this.elapsedSeconds.set(
+        Math.max(0, Math.floor((Date.now() - clientStartTime) / 1000)),
+      );
+    }, 1000)
+  }
+
   private parseServerTimestamp(value: string): Date {
-    const hasTimeZone = /Z$|[+-]\d{2}:\d{2}$/.test(value);
-    return new Date(hasTimeZone ? value : `${value}Z`); // Append 'Z' if no timezone is present
+    return new Date(value);
   }
 
   /*

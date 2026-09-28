@@ -1,0 +1,120 @@
+<!--
+This handles the markup for the evidence review modal, matches the two wireframe
+states exactly, low confidence/red banner/reject button vs high confidence/green banner/close button
+Author: Zamokuhle Zwane
+Date: 20 September 2026
+-->
+<button type="button" class="modal-backdrop" aria-label="Close evidence review" (click)="onClose()"></button>
+ 
+<dialog class="modal modal--evidence" aria-labelledby="evidence-modal-title" open>
+ 
+  <header class="evidence-modal-header">
+    <div class="header-icon"
+    [class.icon-alert]="isLikelyReject()"
+    [class.icon-review]="isNeedsReview()"
+    [class.icon-ai]="isLikelyApprove()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+        <path d="M10 3Q10.8 9.2 17 11Q10.8 12.8 10 19Q9.2 12.8 3 11Q9.2 9.2 10 3Z"/>
+        <path d="M19 2Q19.4 4.6 22 5Q19.4 5.4 19 8Q18.6 5.4 16 5Q18.6 4.6 19 2Z"/>
+    </svg>
+    </div>
+    <div class="task-cell-text">
+      <strong id="evidence-modal-title" class="review-modal-name">Evidence Review</strong>
+      <span class="task-cell-meta">We analysed this timesheet against GitHub, Jira and calendar activity.</span>
+    </div>
+    <button type="button" class="icon-close" aria-label="Close" (click)="onClose()">
+      <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
+  </header>
+ 
+  @if (loading()) {
+    <output class="state-panel state-panel--loading">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>Generating evidence review...</p>
+    </output>
+  }
+ 
+  @if (errorMessage() && !loading()) {
+    <div class="state-panel state-panel--error" role="alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      <p>{{ errorMessage() }}</p>
+    </div>
+  }
+ 
+  @if (review() && !loading()) {
+    <div class="score-banner" [class.banner-reject]="isLikelyReject()" [class.banner-approve]="isLikelyApprove()" [class.banner-review]="isNeedsReview()">
+      <div class="score-ring-wrap">
+        <svg class="score-ring" viewBox="0 0 100 100">
+          <circle class="ring-track" cx="50" cy="50" r="42" />
+          <circle
+            class="ring-progress"
+            cx="50" cy="50" r="42"
+            [style.stroke-dasharray]="264"
+            [style.stroke-dashoffset]="264 - (264 * review()!.confidenceScorePercent / 100)"
+          />
+        </svg>
+        <span class="score-number">{{ review()!.confidenceScorePercent }}%</span>
+      </div>
+ 
+      <div class="score-copy">
+        <div class="score-title-row">
+          <span>{{ isLikelyReject() ? 'Low confidence' : 'Confidence score' }}</span>
+          <i class="fa-regular fa-circle-question info-icon" aria-hidden="true" title="Weighted score from GitHub, Jira, and calendar evidence"></i>
+        </div>
+        <p>{{ shortSummary() }}</p>
+      </div>
+ 
+      <div class="verdict-badge" [class.badge-reject]="isLikelyReject()" [class.badge-approve]="isLikelyApprove()">
+        <i class="fa-solid" [class.fa-xmark]="isLikelyReject()" [class.fa-check]="!isLikelyReject()" aria-hidden="true"></i>
+        {{ verdictLabel() }}
+      </div>
+    </div>
+ 
+    <div class="evidence-grid">
+      <h3>Evidence found</h3>
+      <div class="evidence-cards">
+        @for (source of review()!.evidenceSources; track source.sourceName) {
+          <div class="evidence-card"
+            [class.source-github]="source.sourceName === 'GITHUB'"
+            [class.source-jira]="source.sourceName === 'JIRA'"
+            [class.source-calendar]="source.sourceName === 'CALENDAR'">
+            <i class="evidence-icon"
+              [class.fa-brands]="source.sourceName === 'GITHUB' || source.sourceName === 'JIRA'"
+              [class.fa-solid]="source.sourceName === 'CALENDAR'"
+              [class.fa-github]="source.sourceName === 'GITHUB'"
+              [class.fa-jira]="source.sourceName === 'JIRA'"
+              [class.fa-calendar-days]="source.sourceName === 'CALENDAR'"
+              aria-hidden="true"></i>
+            <span class="evidence-label">{{ source.sourceName | titlecase }}</span>
+            <span class="evidence-detail">{{ source.detail }}</span>
+          </div>
+        }
+      </div>
+    </div>
+ 
+    @if (isLikelyReject() || isNeedsReview()) {
+    <div class="narrative-box narrative-warning">
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        <div>
+        <strong>Why this matters</strong>
+        <p>{{ review()!.narrative }}</p>
+        </div>
+    </div>
+    } @else {
+    <p class="narrative-plain">{{ review()!.narrative }}</p>
+    }
+ 
+    <div class="modal-actions">
+      @if (isLikelyReject() || isNeedsReview()) {
+        <button type="button" class="btn btn--secondary" (click)="onClose()">View details</button>
+        <button type="button" class="btn btn--danger-solid" (click)="onReject()">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          Reject timesheet
+        </button>
+      } @else {
+        <button type="button" class="btn btn--primary" (click)="onClose()">Close</button>
+      }
+    </div>
+  }
+</dialog>

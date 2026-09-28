@@ -39,6 +39,7 @@ public class ProjectDetailResponse {
     private String lastName;
     private String email;
     private WorkspaceRole role; // manager or a dev
+    private Boolean isProjectManager;
     private BigDecimal hoursLogged;
     private LocalDateTime joinedAt;
   }

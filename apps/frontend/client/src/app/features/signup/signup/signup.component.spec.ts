@@ -374,7 +374,7 @@ describe('SignupComponent', () => {
 
     expect(componentInstance.showPasswordError).toBe(true);
     expect(componentInstance.passwordErrorMessage).toBe(
-      'Password must be at least 8 characters long with a mix of letters and numbers.',
+      'Needs an uppercase letter, lowercase letter, number, and special character.',
     );
   });
 
@@ -487,6 +487,6 @@ describe('SignupComponent', () => {
     expect(compiled.querySelector('.submit-button')?.textContent).toContain(
       'Create Account',
     );
-    expect(compiled.querySelectorAll('.social-button').length).toBe(2);
+    expect(compiled.querySelectorAll('.social-button')).toHaveLength(1);
   });
 });

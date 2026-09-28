@@ -5,7 +5,7 @@ Author: Zamokuhle Zwane
 Date: 02/09/2026
 */
 
-package timesheets.auth;
+package timesheets.integration.github;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

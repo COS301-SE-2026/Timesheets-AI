@@ -44,7 +44,7 @@
 .compare-row .name { font-size: var(--font-size-caption); font-weight: var(--font-weight-semibold); }
 .compare-row .val { font-family: var(--font-mono); font-size: var(--font-size-caption); text-align: right; color: var(--color-text-primary); font-weight: var(--font-weight-semibold); }
 .compare-track { background: var(--color-gray-light); border-radius: var(--radius-pill); height: 8px; overflow: hidden; }
-.compare-fill { height: 100%; border-radius: var(--radius-pill); background: var(--color-primary-hover); }
+.compare-fill { height: 100%; border-radius: var(--radius-pill); background: var(--color-primary-hover); transition: width 0.4s ease;}
 .compare-fill.you { background: var(--color-secondary); }
 
 .page-header {

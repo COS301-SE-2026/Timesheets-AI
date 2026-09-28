@@ -24,6 +24,14 @@ export class InsightsService {
   getAiDashboard(): Observable<AiDashboardResponse> {
     return this.http.get<AiDashboardResponse>(`${this.baseUrl}/ai`);
   }
+  getCalendarVsTracked(from: string, to: string): Observable<{connected: boolean; calendarHours: number; trackedHours: number; unmatchedHours: number}> {
+    const params = new HttpParams().set('from', from).set('to', to);
+    return this.http.get<any>(`${environment.apiUrl}/calendar/vs-tracked`, { params });
+  }
+
+  getJiraVsLogged(): Observable<{ticket: string; estimateHours: number; loggedHours: number}[]> {
+    return this.http.get<any>(`${environment.apiUrl}/integrations/jira/vs-logged`);
+  }
   getInsightsSummary(
     from: string,
     to: string,

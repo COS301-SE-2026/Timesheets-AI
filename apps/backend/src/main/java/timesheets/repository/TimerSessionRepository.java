@@ -1,5 +1,6 @@
 package timesheets.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,4 +40,29 @@ public interface TimerSessionRepository extends JpaRepository<TimerSession, UUID
   // there is a timer that is true
   Optional<TimerSession> findFirstByWorkspaceMemberIdInAndIsRunningTrue(
       List<UUID> workspaceMemberIds);
+
+  /*
+  Query to get timers that are:
+      - actively running
+      - started before the threshold, because it means that they have been running for over 8hrs
+      - that have not already recieved a long-running timer notification
+
+  Note: I am doing this so that there is filtering in PostgreSQL so that it can avoid loading all the active timers
+      and so that there is no extra notification for every timer
+   */
+  @Query(
+      "SELECT timer "
+          + "FROM TimerSession timer "
+          + "WHERE timer.isRunning = true "
+          + "AND timer.startedAt <= :threshold "
+          + "AND NOT EXISTS ("
+          + "SELECT notification.id "
+          + "FROM Notification notification "
+          + "WHERE notification.workspaceMemberId = timer.workspaceMemberId "
+          + "AND notification.type = 'TIMER_LONG_RUNNING' "
+          + "AND notification.entityType = 'TIMER' "
+          + "AND notification.entityId = timer.id"
+          + ")")
+  List<TimerSession> findLongRunningTimersWithoutNotification(
+      @Param("threshold") LocalDateTime threshold);
 }

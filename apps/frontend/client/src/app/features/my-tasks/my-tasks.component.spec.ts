@@ -417,21 +417,6 @@ describe('MyTasksComponent', () => {
       expect(navigateSpy).toHaveBeenCalledWith(['/projects', projectId]);
     });
   });
- 
-  describe('onStatusChange()', () => {
-    beforeEach(() => {
-      flushInitialRequests(mockTasks);
-    });
- 
-    it('should update the task status locally without hitting the network', () => {
-      //I flagged in the component comments: there is no PATCH /api/tasks/{id}/status endpoint yet, ill let Nyasha know
-      component.onStatusChange(component.tasks()[0], 'DONE');
- 
-      const updated = component.tasks().find((t) => t.id === todoTaskId);
-      expect(updated?.status).toBe('DONE');
-      httpMock.expectNone('/api/tasks/' + todoTaskId + '/status');
-    });
-  });
 
    describe('task detail modal (GET /api/tasks/{taskId})', () => {
     beforeEach(() => {

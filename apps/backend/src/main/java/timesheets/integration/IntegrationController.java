@@ -1,6 +1,7 @@
 package timesheets.integration;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,10 +16,14 @@ import timesheets.auth.GoogleTokenResponse;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
 import timesheets.domain.IntegrationToken;
-import timesheets.dto.response.JiraIssueResponse;
+import timesheets.domain.Task;
+import timesheets.domain.TimeEntry;
+import timesheets.dto.response.IssueResponse;
 import timesheets.integration.issue.JiraAdapter;
 import timesheets.integration.issue.JiraOAuthService;
 import timesheets.repository.IntegrationTokenRepository;
+import timesheets.repository.TaskRepository;
+import timesheets.repository.TimeEntryRepository;
 import timesheets.security.SecurityUtils;
 
 @RestController
@@ -32,6 +37,8 @@ public class IntegrationController {
   private final IntegrationTokenRepository integrationTokenRepository;
   private final JiraOAuthService jiraOAuthService;
   private final JiraAdapter jiraAdapter;
+  private final TaskRepository taskRepository;
+  private final TimeEntryRepository timeEntryRepository;
 
   @Value("${app.frontend-url}")
   private String frontendUrl;
@@ -244,17 +251,71 @@ public class IntegrationController {
 
   // this will get all the current issues for the user
   @GetMapping("/jira/issues")
-  public ResponseEntity<List<JiraIssueResponse>> getJiraIssues() {
+  public ResponseEntity<List<IssueResponse>> getJiraIssues() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    List<JiraIssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
+    List<IssueResponse> issues = jiraAdapter.getIssues(workspaceMemberId);
     return ResponseEntity.ok(issues);
   }
 
   // this will get a specific Jira issue by it's key
   @GetMapping("/jira/issues/{issueKey}")
-  public ResponseEntity<JiraIssueResponse> getJiraIssue(@PathVariable String issueKey) {
+  public ResponseEntity<IssueResponse> getJiraIssue(@PathVariable String issueKey) {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    JiraIssueResponse issue = jiraAdapter.getIssue(workspaceMemberId, issueKey);
+    IssueResponse issue = jiraAdapter.getIssue(workspaceMemberId, issueKey);
     return ResponseEntity.ok(issue);
+  }
+
+  // mirrors GET /api/calendar/status so the frontend can check the jira connection the same way
+  public record IntegrationStatus(boolean connected, String provider) {}
+
+  @GetMapping("/jira/status")
+  public ResponseEntity<IntegrationStatus> getJiraStatus() {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    // a stored token row means the user finished the oauth flow
+    boolean connected =
+        integrationTokenRepository
+            .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "JIRA")
+            .isPresent();
+
+    return ResponseEntity.ok(new IntegrationStatus(connected, connected ? "jira" : null));
+  }
+
+  public record JiraVsLoggedRow(String ticket, double estimateHours, double loggedHours) {}
+
+  @GetMapping("/jira/vs-logged")
+  public ResponseEntity<List<JiraVsLoggedRow>> getJiraVsLogged() {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    List<Task> jiraTasks =
+        taskRepository
+            .findByAssignedWorkspaceMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(workspaceMemberId)
+            .stream()
+            .filter(t -> t.getJiraTicketKey() != null)
+            .toList();
+
+    List<JiraVsLoggedRow> rows = new ArrayList<>();
+    for (Task task : jiraTasks) {
+      List<TimeEntry> entries =
+          timeEntryRepository.findByWorkspaceMemberIdAndTaskId(workspaceMemberId, task.getId());
+
+      double loggedHours =
+          entries.stream()
+              .filter(t -> !Boolean.TRUE.equals(t.getIsDeleted()))
+              .mapToDouble(
+                  t -> (t.getDurationSeconds() != null ? t.getDurationSeconds() : 0) / 3600.0)
+              .sum();
+
+      double estimateHours =
+          task.getEstimatedHours() != null ? task.getEstimatedHours().doubleValue() : 0;
+
+      rows.add(
+          new JiraVsLoggedRow(
+              task.getJiraTicketKey(),
+              Math.round(estimateHours * 100.0) / 100.0,
+              Math.round(loggedHours * 100.0) / 100.0));
+    }
+
+    return ResponseEntity.ok(rows);
   }
 }

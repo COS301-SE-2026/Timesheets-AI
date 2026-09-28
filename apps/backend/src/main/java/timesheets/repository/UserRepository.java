@@ -16,11 +16,12 @@ import timesheets.domain.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-  // finds a user by their email address, used during login and registration checks
-  Optional<User> findByEmail(String email);
+  // finds a user by their email address, used during login and registration checks, ignores the
+  // case
+  Optional<User> findByEmailIgnoreCase(String email);
 
-  // checks if an email already exists without loading the full user object
-  boolean existsByEmail(String email);
+  // checks if an email already exists without loading the full user object, ignores the case
+  boolean existsByEmailIgnoreCase(String email);
 
   // this finds the user id and loads their workspace, so that it loads user data with their
   // workspace

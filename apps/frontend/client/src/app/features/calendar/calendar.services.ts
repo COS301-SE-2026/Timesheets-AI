@@ -9,15 +9,16 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable, map } from "rxjs";
 import{
     AppEvent,
+    CalendarProvider,
 }from './calendar.model';
 
 
 // BACKEND RESPONSES
-// export interface CalendarStatus{
-//     connected: boolean;
-//     provider: string;
-//     lastSyncedAt: string | null;
-// }
+export interface CalendarStatus{
+    connected: boolean;
+    provider: CalendarProvider| null;
+    lastSyncedAt: string | null;
+}
 
 interface BackenCalendarEvent{
     title: string;
@@ -108,6 +109,12 @@ export class CalendarService{
     //         `${this.googleCalendarApiUrl}/status`
     //     );
     // }
+
+    getCalendarStatus(): Observable<CalendarStatus>{
+        return this.http.get<CalendarStatus>(
+            `${this.apiUrl}/status`
+        );
+    }
 
     connectGoogleCalendar(): Observable<string>{
         return this.http.get(
