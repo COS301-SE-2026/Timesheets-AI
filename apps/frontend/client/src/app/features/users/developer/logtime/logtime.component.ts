@@ -38,6 +38,7 @@ import {
 } from '../../../../core/services/time-entry.service';
 import { SuggestedWorkSession } from '../../../suggestions/models/suggested.model';
 import { SuggestionService } from '../../../suggestions/suggestion.service';
+import { sign } from 'node:crypto';
 //type definitions and interface
 
 type ViewOption = 'Day' | 'Week' | 'Month';
@@ -227,6 +228,9 @@ export class LogtimeComponent implements OnDestroy {
 
   readonly suggestions = signal<SuggestedWorkSession[]>([]);
   readonly suggestionsLoading = signal(false);
+  // to store the suggestion id 
+  readonly suggestionCreatingTask = signal<string | null>(null);
+  readonly newSuggestionTaskTitle = signal('');
 
   //Reactive from groups
 
@@ -1379,6 +1383,12 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
 assignSuggestionTask(suggestion: SuggestedWorkSession, event: Event): void {
   const select = event.target as HTMLSelectElement;
   const taskId = select.value;
+
+  if (taskId === 'CREATE NEW TASK'){
+    this.suggestionCreatingTask.set(suggestion.id);
+    this.newSuggestionTaskTitle.set('');
+    return;
+  }
 
   this.suggestionService.edit(suggestion.id, {
     title: suggestion.title,
