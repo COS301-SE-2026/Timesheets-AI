@@ -59,7 +59,8 @@ public class JiraOAuthService {
     read:me --> read the authenticated user's identity
   */
   public String buildAuthorizationUrl(String state) {
-    String scopes = "read:jira-work " + "write:jira-work " + "read:jira-user " + "read:me ";
+    String scopes =
+        "read:jira-work " + "write:jira-work " + "read:jira-user " + "read:me " + "offline_access";
 
     return AUTHORIZATION_URL
         + "?audience=api.atlassian.com"
