@@ -25,6 +25,7 @@ CONSECUTIVE_LONG_DAYS_THRESHOLD = 3  # this can be changed to maybe 6 days
 RISK_SCORE_BASELINE = 20.0
 RISK_SCORE_PER_STREAK_DAY = 25.0
 
+
 def calculate_burnout_risk(
     db: Session, workspace_member_id: uuid.UUID, period_start: date, period_end: date
 ) -> dict:

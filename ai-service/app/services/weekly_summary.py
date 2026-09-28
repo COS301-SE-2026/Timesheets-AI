@@ -48,14 +48,18 @@ def generate_weekly_summary(
     lines = [line.strip() for line in narrative.split("\n") if line.strip()]
     if len(lines) <= 1:
         import logging
+
         logging.warning(
             "weekly summary came back as a single block despite the per-line prompt, "
-            "falling back to sentence-splitting. subject_id=%s", subject_id
+            "falling back to sentence-splitting. subject_id=%s",
+            subject_id,
         )
         import re
+
         lines = [s.strip() for s in re.split(r"(?<=[.!?])\s+", narrative) if s.strip()]
 
     return {"narrative": "\n".join(lines), "week_start": week_start}
+
 
 def _build_prompt(hours_logged, project_count, latest_score, previous_score, subject_type) -> str:
     subject_phrase = "The team" if subject_type == "TEAM" else "You"

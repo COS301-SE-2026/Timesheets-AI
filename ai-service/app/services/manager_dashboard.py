@@ -19,7 +19,6 @@ WEEKS_LOOKBACK = 6  # matches the wireframe's "last 6 weeks" completion chart
 
 
 def project_completion_forecast(db: Session, project_id: UUID) -> dict:
-
     total_tasks = (
         db.execute(
             text(
@@ -151,13 +150,15 @@ def task_overview(db: Session, project_id: UUID) -> dict:
     for row in rows:
         status_counts[row["status"]] = status_counts.get(row["status"], 0) + row["count"]
         if row["priority"]:
-            priority_counts[row["priority"]] = priority_counts.get(row["priority"], 0) + row["count"]
+            priority_counts[row["priority"]] = (
+                priority_counts.get(row["priority"], 0) + row["count"]
+            )
 
     total = sum(status_counts.values())
     blocked_count = status_counts.get("BLOCKED", 0)
 
-    #only build a "most open tasks are X priority" clause if there's an open task at all,
-    #avoids a nonsense sentence on an empty/all-done project
+    # only build a "most open tasks are X priority" clause if there's an open task at all,
+    # avoids a nonsense sentence on an empty/all-done project
     open_statuses_priority_counts: dict[str, int] = {}
     for row in rows:
         if row["status"] in ("TODO", "IN_PROGRESS") and row["priority"]:
@@ -169,11 +170,15 @@ def task_overview(db: Session, project_id: UUID) -> dict:
         top_priority = max(open_statuses_priority_counts, key=open_statuses_priority_counts.get)
         narrative = f"Most open tasks are {top_priority.title()} priority"
         if blocked_count > 0:
-            narrative += f"; {blocked_count} task{'s' if blocked_count != 1 else ''} are currently blocked."
+            narrative += (
+                f"; {blocked_count} task{'s' if blocked_count != 1 else ''} are currently blocked."
+            )
         else:
             narrative += "."
     elif blocked_count > 0:
-        narrative = f"{blocked_count} task{'s' if blocked_count != 1 else ''} are currently blocked."
+        narrative = (
+            f"{blocked_count} task{'s' if blocked_count != 1 else ''} are currently blocked."
+        )
     else:
         narrative = "No open tasks right now."
 
@@ -222,7 +227,11 @@ def velocity(db: Session, project_id: UUID, weeks: int = 8) -> dict:
         )
         weekly_counts.append({"week_label": f"W{weeks - week_offset}", "completed": count})
 
-    average = round(sum(w["completed"] for w in weekly_counts) / len(weekly_counts), 1) if weekly_counts else 0.0
+    average = (
+        round(sum(w["completed"] for w in weekly_counts) / len(weekly_counts), 1)
+        if weekly_counts
+        else 0.0
+    )
 
     return {"weeks": weekly_counts, "rolling_average": average}
 
@@ -288,16 +297,27 @@ def project_health(db: Session, project_id: UUID) -> dict:
             else:
                 at_risk_count += 1
 
-        if row["estimated_hours"] is not None and row["actual_hours"] is not None and row["estimated_hours"] > 0:
-            accuracy = 1 - (abs(float(row["actual_hours"]) - float(row["estimated_hours"])) / float(row["estimated_hours"]))
+        if (
+            row["estimated_hours"] is not None
+            and row["actual_hours"] is not None
+            and row["estimated_hours"] > 0
+        ):
+            accuracy = 1 - (
+                abs(float(row["actual_hours"]) - float(row["estimated_hours"]))
+                / float(row["estimated_hours"])
+            )
             estimate_matches.append(max(accuracy, 0.0))
 
     on_time_percent = (on_time_done / done_with_due_date * 100) if done_with_due_date > 0 else 100.0
-    estimate_accuracy_percent = (sum(estimate_matches) / len(estimate_matches) * 100) if estimate_matches else 100.0
+    estimate_accuracy_percent = (
+        (sum(estimate_matches) / len(estimate_matches) * 100) if estimate_matches else 100.0
+    )
     blocked_ratio_percent = (blocked_count / total) * 100
 
     score = round(
-        (on_time_percent * 0.5) + (estimate_accuracy_percent * 0.3) + ((100 - blocked_ratio_percent) * 0.2)
+        (on_time_percent * 0.5)
+        + (estimate_accuracy_percent * 0.3)
+        + ((100 - blocked_ratio_percent) * 0.2)
     )
     score = max(0, min(100, score))
 
@@ -348,6 +368,7 @@ def jira_ticket_breakdown(db: Session, project_id: UUID) -> dict:
         ],
     }
 
+
 BURNOUT_FLAG_THRESHOLD = 60.0
 BURNOUT_HIGH_RISK_THRESHOLD = 80.0
 
@@ -355,10 +376,16 @@ BURNOUT_HIGH_RISK_THRESHOLD = 80.0
 def flagged_burnout_members(db: Session, project_id: UUID) -> list[dict]:
     from app.models.ai_insight import AIInsight
 
-    project_member_rows = db.execute(
-        text("SELECT workspace_member_id FROM project_members WHERE project_id = :project_id AND is_active = true"),
-        {"project_id": project_id},
-    ).mappings().all()
+    project_member_rows = (
+        db.execute(
+            text(
+                "SELECT workspace_member_id FROM project_members WHERE project_id = :project_id AND is_active = true"
+            ),
+            {"project_id": project_id},
+        )
+        .mappings()
+        .all()
+    )
     project_member_ids = [row["workspace_member_id"] for row in project_member_rows]
     if not project_member_ids:
         return []

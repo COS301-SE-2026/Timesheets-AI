@@ -37,23 +37,33 @@ router = APIRouter(prefix="/insights", tags=["Manager Dashboard"])
 
 
 def _get_managed_project_ids(db: Session, workspace_member_id: UUID) -> list[UUID]:
-    rows = db.execute(
-        text(
-            """
+    rows = (
+        db.execute(
+            text(
+                """
             SELECT project_id FROM project_members
             WHERE workspace_member_id = :member_id AND is_project_manager = true AND is_active = true
             """
-        ),
-        {"member_id": workspace_member_id},
-    ).mappings().all()
+            ),
+            {"member_id": workspace_member_id},
+        )
+        .mappings()
+        .all()
+    )
     return [row["project_id"] for row in rows]
 
 
 def _get_project_member_ids(db: Session, project_id: UUID) -> list[UUID]:
-    rows = db.execute(
-        text("SELECT workspace_member_id FROM project_members WHERE project_id = :project_id AND is_active = true"),
-        {"project_id": project_id},
-    ).mappings().all()
+    rows = (
+        db.execute(
+            text(
+                "SELECT workspace_member_id FROM project_members WHERE project_id = :project_id AND is_active = true"
+            ),
+            {"project_id": project_id},
+        )
+        .mappings()
+        .all()
+    )
     return [row["workspace_member_id"] for row in rows]
 
 
@@ -74,7 +84,9 @@ def get_manager_dashboard(
     managed_projects_rows = (
         db.query(Project.id, Project.name).filter(Project.id.in_(managed_ids)).all()
     )
-    managed_projects = [ManagedProject(project_id=p_id, project_name=name) for p_id, name in managed_projects_rows]
+    managed_projects = [
+        ManagedProject(project_id=p_id, project_name=name) for p_id, name in managed_projects_rows
+    ]
 
     period_end = date.today()
     period_start = period_end - timedelta(weeks=4)
@@ -101,7 +113,9 @@ def get_manager_dashboard(
     for p_id in all_project_ids:
         hours_result = team_logged_hours(db, p_id, period_start, period_end)
         for member in hours_result["members"]:
-            combined_hours[member["member_name"]] = combined_hours.get(member["member_name"], 0.0) + member["hours"]
+            combined_hours[member["member_name"]] = (
+                combined_hours.get(member["member_name"], 0.0) + member["hours"]
+            )
 
         for flagged in flagged_burnout_members(db, p_id):
             combined_burnout.append(FlaggedBurnoutMember(**flagged))
@@ -125,11 +139,17 @@ def get_manager_dashboard(
             member = db.query(WorkspaceMember).filter(WorkspaceMember.id == member_id).first()
             if member is None:
                 continue
-            user_row = db.execute(
-                text("SELECT first_name, last_name FROM users WHERE id = :user_id"),
-                {"user_id": member.user_id},
-            ).mappings().first()
-            member_name = f"{user_row['first_name']} {user_row['last_name']}" if user_row else "Unknown"
+            user_row = (
+                db.execute(
+                    text("SELECT first_name, last_name FROM users WHERE id = :user_id"),
+                    {"user_id": member.user_id},
+                )
+                .mappings()
+                .first()
+            )
+            member_name = (
+                f"{user_row['first_name']} {user_row['last_name']}" if user_row else "Unknown"
+            )
             activity = get_github_activity(db, member_id, github_start, github_end)
             combined_github[member_id] = {
                 "workspace_member_id": member_id,
@@ -140,7 +160,10 @@ def get_manager_dashboard(
 
     team_logged_hours_result = {
         "members": sorted(
-            [{"member_name": name, "hours": round(hours, 1)} for name, hours in combined_hours.items()],
+            [
+                {"member_name": name, "hours": round(hours, 1)}
+                for name, hours in combined_hours.items()
+            ],
             key=lambda m: m["hours"],
             reverse=True,
         )
@@ -152,9 +175,13 @@ def get_manager_dashboard(
             {
                 "issue_type": issue_type,
                 "count": count,
-                "percentage": round((count / combined_jira_total) * 100, 1) if combined_jira_total > 0 else 0.0,
+                "percentage": round((count / combined_jira_total) * 100, 1)
+                if combined_jira_total > 0
+                else 0.0,
             }
-            for issue_type, count in sorted(combined_jira_by_type.items(), key=lambda item: item[1], reverse=True)
+            for issue_type, count in sorted(
+                combined_jira_by_type.items(), key=lambda item: item[1], reverse=True
+            )
         ],
     }
 
