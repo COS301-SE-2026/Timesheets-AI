@@ -14,7 +14,6 @@ public class SuggestedWorkSession {
   private UUID workspaceMemberId;
   private LocalDateTime startTime;
   private LocalDateTime endTime;
-  // what we think the developer is using - will use AI to make it more readable
   private String title;
   private UUID projectId;
   private UUID taskId;
@@ -26,6 +25,8 @@ public class SuggestedWorkSession {
   private String explanation;
   private SuggestionStatus status;
   private String description;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
   public SuggestedWorkSessionEntity toEntity() {
 
@@ -37,11 +38,14 @@ public class SuggestedWorkSession {
         .title(title)
         .projectId(projectId)
         .taskId(taskId)
+        .evidenceEvents(evidenceEvents)
         .confidenceScore(confidenceScore)
         .durationMinutes(durationMinutes)
         .description(description)
         .explanation(explanation)
         .status(status != null ? status.name() : null)
+        .createdAt(createdAt)
+        .updatedAt(updatedAt)
         .build();
   }
 
@@ -56,10 +60,13 @@ public class SuggestedWorkSession {
     suggestion.setTitle(entity.getTitle());
     suggestion.setProjectId(entity.getProjectId());
     suggestion.setTaskId(entity.getTaskId());
+    suggestion.setEvidenceEvents(entity.getEvidenceEvents());
     suggestion.setConfidenceScore(entity.getConfidenceScore());
     suggestion.setDurationMinutes(entity.getDurationMinutes());
     suggestion.setDescription(entity.getDescription());
     suggestion.setExplanation(entity.getExplanation());
+    suggestion.setCreatedAt(entity.getCreatedAt());
+    suggestion.setUpdatedAt(entity.getUpdatedAt());
 
     if (entity.getStatus() != null) {
       suggestion.setStatus(SuggestionStatus.valueOf(entity.getStatus()));
