@@ -25,6 +25,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
+
 import {
   TimerService,
   ActiveTimerResponse,
@@ -34,11 +36,13 @@ import {
   TimeEntryService,
   TimeEntryRequest as TimeEntryApiRequest,
 } from '../../../../core/services/time-entry.service';
+import { SuggestedWorkSession } from '../../../suggestions/models/suggested.model';
+import { SuggestionService } from '../../../suggestions/suggestion.service';
 //type definitions and interface
 
 type ViewOption = 'Day' | 'Week' | 'Month';
 type StatusOption = 'All' | TimeEntryStatus;
-type PanelType = 'manual' | 'timer' | null;
+type PanelType = 'manual' | 'timer' | 'suggestions' | null;
 type TimeEntryStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
 
 //was: type EntryType = 'manual' | 'timer' | 'import' | 'api';
@@ -138,7 +142,7 @@ interface TaskApiResponse {
 
 @Component({
   selector: 'app-logtime',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DecimalPipe],
   templateUrl: './logtime.component.html',
   styleUrl: './logtime.component.scss',
 })
@@ -152,6 +156,8 @@ export class LogtimeComponent implements OnDestroy {
   private readonly apiBaseUrl = '/api';
   private readonly timerService = inject(TimerService);
   private readonly timeEntryService = inject(TimeEntryService);
+  private readonly suggestionService = inject(SuggestionService);
+
   private readonly route = inject(ActivatedRoute);
   private  pendingTaskId: string | null = null;
 
@@ -188,8 +194,11 @@ export class LogtimeComponent implements OnDestroy {
   readonly newTaskTitleError = signal(false);
   readonly isTimerPaused = signal(false);
   readonly pausedElapsedSeconds = signal(0);
-  readonly filterFrom = signal(this.today());
-  readonly filterTo = signal(this.today());
+  // readonly filterFrom = signal(this.today());
+  // readonly filterTo = signal(this.today());
+  // this is to make it 7 days (week) and not cuurent day 
+  readonly filterFrom = signal(this.todayStartOfWeek());
+  readonly filterTo = signal(this.todayEndOfWeek());
   readonly durationPreviewSeconds = signal(3600);
 
   /*  
@@ -214,6 +223,9 @@ export class LogtimeComponent implements OnDestroy {
   loadTasks, loadEntries, loadCurrentTimesheet, saveEntry, startTimer, stopTimer, deleteEntry, submitTimesheet), so this now assumes a live backend connection is always available.
   */
   readonly entries = signal<TimeEntry[]>([]);
+
+  readonly suggestions = signal<SuggestedWorkSession[]>([]);
+  readonly suggestionsLoading = signal(false);
 
   //Reactive from groups
 
@@ -347,6 +359,31 @@ export class LogtimeComponent implements OnDestroy {
     );
   }); 
 
+  // to get 7 days (week)
+  private todayStartOfWeek(): string {
+  const date = new Date();
+  const day = date.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+
+  date.setDate(date.getDate() + diff);
+
+  return this.formatDateForInput(date);
+}
+
+  private todayEndOfWeek(): string {
+    const date = new Date();
+    const day = date.getDay();
+    const diff = day === 0 ? 0 : 7 - day;
+
+    date.setDate(date.getDate() + diff);
+
+    return this.formatDateForInput(date);
+  }
+
+  private formatDateForInput(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
   //Native asynchronous timer allocation reference tracking context
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -419,6 +456,7 @@ export class LogtimeComponent implements OnDestroy {
   }
   private onDateRangeChange(): void {
     this.loadCurrentTimesheet();
+    this.loadSuggestions();
   }
 
   //Returns true if the template end time is at or before the input start time bounds
@@ -484,6 +522,17 @@ export class LogtimeComponent implements OnDestroy {
     }
     this.resetNewTaskState();
     this.activePanel.set('timer');
+  }
+
+  //suggestions panel
+  openSuggestionsPanel() : void {
+    if (!this.canEditEntries()){
+      this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+      return;
+    }
+
+    this.activePanel.set('suggestions');
+    this.loadSuggestions();
   }
 
   closePanel(): void {
@@ -917,6 +966,10 @@ export class LogtimeComponent implements OnDestroy {
     );
   }
 
+  getSourceSummary(suggestion: SuggestedWorkSession): string {
+    return suggestion?.explanation || 'Automated Suggestion';
+  }
+
   /*
   This submits the whole current timesheet, not a single entry.
   because status, submittedAt, approvedAt, and isLocked all live on the timesheets table per backend schema (see TimesheetResponse in swagger),
@@ -1194,6 +1247,106 @@ export class LogtimeComponent implements OnDestroy {
       });
   }
 
+  
+  private loadSuggestions(): void {
+    this.suggestionsLoading.set(true);
+
+    // fetch or create suggestions 24 hours range 
+    this.suggestionService.generateSuggestions(this.workspaceMemberId, `${this.filterFrom()}T00:00:00`,
+  `${this.filterTo()}T23:59:59`).subscribe({
+    next: (suggestions) => {
+      this.suggestions.set(suggestions);
+      this.suggestionsLoading.set(false);
+    },
+    error: (error) => {
+      this.suggestionsLoading.set(false);
+    }
+  });
+  }
+
+  rejectSuggestion(suggestion: SuggestedWorkSession): void {
+  this.suggestionService.reject(suggestion.id).subscribe({
+    next: () => {
+      this.suggestions.set(
+        this.suggestions().filter(
+          (item) => item.id !== suggestion.id
+        )
+      );
+
+      // display a friendly message 
+    },
+    error: (error) => {
+      console.error('Failed to reject suggestion:', error);
+    }
+  });
+}
+
+
+approveSuggestion(suggestion: SuggestedWorkSession): void {
+  this.suggestionService.approve(suggestion.id).subscribe({
+    next: (response) => {
+      console.log('APPROVE: response =', response);
+
+      this.suggestions.set(
+        this.suggestions().filter(
+          (item) => item.id !== suggestion.id
+        )
+      );
+
+      this.loadEntries();
+
+      // adding nice closing after clicing approve 
+
+      this.toastMessage.set('Suggested work added to your timesheet.');
+      setTimeout(() => {
+        this.toastMessage.set('');
+      }, 3000);
+    },
+    error: (error) => {
+      console.error('APPROVE: error =', error);
+
+      this.toastMessage.set('Failed to add suggested work to your timesheet.');
+
+      setTimeout(() => {
+        this.toastMessage.set('');
+      }, 3000);
+    }
+  });
+}
+  assignSuggestionProject(
+  suggestion: SuggestedWorkSession,
+  event: Event
+): void {
+  const select = event.target as HTMLSelectElement;
+  const projectId = select.value;
+
+  if (!projectId) {
+    return;
+  }
+
+  this.suggestionService.edit(suggestion.id, {
+    title: suggestion.title,
+    projectId: projectId,
+    taskId: suggestion.taskId || undefined,
+    startTime: suggestion.startTime,
+    endTime: suggestion.endTime,
+    description: suggestion.description || undefined
+  }).subscribe({
+    next: (updatedSuggestion) => {
+      const updatedSuggestions = this.suggestions().map((item) =>
+        item.id === updatedSuggestion.id
+          ? updatedSuggestion
+          : item
+      );
+
+      this.suggestions.set(updatedSuggestions);
+    },
+    error: (error) => {
+      console.error('Failed to assign project:', error);
+    }
+  });
+}
+
   /*
   I decided to deviate from the previous use of the api/tasks/my-tasks GET
   because i think the system to should load every task on the project
@@ -1360,5 +1513,20 @@ export class LogtimeComponent implements OnDestroy {
       durationSeconds: entry.durationMinutes, 
       durationMinutes: Math.round(entry.durationMinutes / 60),
     };
+  }
+
+  formatDate(date: string | Date): string {
+    if (!date) return '';
+
+    return new Date(date).toLocaleDateString();
+  }
+
+  formatTime(date: string | Date): string {
+    if (!date) return '';
+
+    return new Date(date).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 }
