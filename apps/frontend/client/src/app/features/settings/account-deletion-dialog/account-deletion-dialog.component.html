@@ -1,0 +1,65 @@
+<!--  Author: Cleopatra Kwenda
+    Date:2026-09-28
+    Purpose: this is for the requesting account deletiom
+    Related Requirement: N/A -->
+
+
+<h2 mat-dialog-title>
+    Request account deletion
+</h2>
+
+<mat-dialog-content>
+
+    <p class="dialog-description">
+        Your account will not be deleted immediately. Your 
+        request will be reviewed by an administrator.
+    </p>
+
+    <p>
+        Please provide a reason for requesting account deletion.
+    </p>
+
+    <mat-form-field 
+            appearance="outline"
+            class="full-width">
+            <mat-label>
+                Reason
+            </mat-label>
+            <textarea
+                matInput
+                [(ngModel)]="reason"
+                rows="5"
+                maxlength="500"
+                placeholder="Enter your reason for deleting your account">
+            </textarea>
+            <mat-hint align="end">
+                {{ reason.length }}/500
+            </mat-hint>
+        </mat-form-field>
+
+        @if(errorMessage){
+            <p class="error-message">
+                {{ errorMessage }}
+            </p>
+        }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    
+        <button
+            mat-button
+            type="button"
+            [disabled]="isSubmitting"
+            (click)="cancel()">
+            Cancel
+        </button>
+
+        <button
+            mat-flat-button
+            color="warn"
+            type="button"
+            (click)="submit()"
+            [disabled]="!isSubmitting || !reason.trim()">
+            {{ isSubmitting? 'Submitting...': 'Submit request' }}
+        </button>
+</mat-dialog-actions>
