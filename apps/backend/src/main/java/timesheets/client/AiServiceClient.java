@@ -5,6 +5,8 @@ its a rest client not webclient.
 Author: Zamokuhle Zwane
 Date: 02/09/2026
 
+Updated: Nyasha
+date 25/09/2026
 Patch: added includeResolved param to getDashboardInsights, added resolveInsight (V19)
 Patch: added period param to getDashboardInsights (Developer Insights v2)
 */
@@ -27,6 +29,9 @@ import timesheets.dto.response.AiDashboardResponse;
 import timesheets.dto.response.ManagerDashboardResponse;
 import timesheets.dto.response.ResolveInsightResponse;
 import timesheets.dto.response.WeeklySummaryResponse;
+import timesheets.dto.response.ProjectForecastResponse;
+import timesheets.dto.response.ResolveInsightResponse;
+import timesheets.dto.response.SavedProjectForecastResponse;
 
 @Component
 @RequiredArgsConstructor
@@ -105,6 +110,31 @@ public class AiServiceClient {
             weekStart)
         .retrieve()
         .body(new ParameterizedTypeReference<WeeklySummaryResponse>() {});
+  /*
+  - gets the recent project from the ai service
+  - allows springboot to expose the last synced forcast to the frontend
+  - returned response has the saved forecast and the last sync
+   */
+  public SavedProjectForecastResponse getProjectForecast(UUID projectId) {
+    RestClient client = buildClient();
+
+    return client
+        .get()
+        .uri("/insights/project-forecast/{projectId}", projectId)
+        .retrieve()
+        .body(new ParameterizedTypeReference<SavedProjectForecastResponse>() {});
+  }
+
+  public ProjectForecastResponse syncProjectForecast(UUID projectId, String authorization) {
+
+    RestClient client = buildClient();
+
+    return client
+        .post()
+        .uri("/insights/project-forecast/{projectId}/sync", projectId)
+        .header("Authorization", authorization)
+        .retrieve()
+        .body(new ParameterizedTypeReference<ProjectForecastResponse>() {});
   }
 
   public ResolveInsightResponse resolveInsight(UUID insightId, UUID resolvedByWorkspaceMemberId) {

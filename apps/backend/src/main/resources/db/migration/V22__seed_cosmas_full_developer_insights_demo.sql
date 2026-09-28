@@ -198,7 +198,8 @@ LEFT JOIN tasks t
    AND t.project_id = '00000000-0000-0000-0001-000000000040'
    AND t.assigned_workspace_member_id = '00000000-0000-0000-0002-000000000021'
    AND t.due_date = (date_trunc('week', NOW()) - (wk.n || ' weeks')::interval + (tmpl.link_task_day || ' days')::interval)::date
-WHERE wk.n NOT IN (3, 9, 10);
+WHERE wk.n NOT IN (3, 9, 10)
+ON CONFLICT DO NOTHING;
 
 -- ============================================================
 -- 4. HISTORICAL TIME ENTRIES on her other two projects (Client Portal
