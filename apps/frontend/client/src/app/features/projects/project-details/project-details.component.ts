@@ -15,7 +15,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { AuthService } from "../../../core/services/auth.service";
 import { ProjectDetailResponse, ProjectService } from "../../../core/services/project.service";
 import { EditProjectDialogComponent } from "./edit-project-dialog.component";
-import { CommonModule } from "@angular/common";
+import { CommonModule, Location } from "@angular/common";
 //import { PROJECT_DETAIL } from "../mock/project-details.mock";
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { ProjectDetails, ProjectMember } from "./models/project-details.model";
@@ -74,6 +74,7 @@ const EMPTY_PROJECT_DETAILS: ProjectDetails = {
 
 export class ProjectDetailsComponent {
     private readonly route = inject(ActivatedRoute);
+    private readonly location = inject(Location);
     private readonly dialog = inject(MatDialog);
     private readonly auth = inject(AuthService);
     private detail: ProjectDetailResponse | null = null;
@@ -108,6 +109,13 @@ export class ProjectDetailsComponent {
     protected readonly tasks=signal<ProjectTask[]>([]);
 
     constructor(){
+        const legacyProjectId = this.route.snapshot.paramMap.get('id');
+        if (legacyProjectId) {
+            this.location.replaceState('/projects/details', '', {
+                ...(this.location.getState() as object), projectId: legacyProjectId,
+        });
+    }
+        
         this.loadProject();
 
         //this should keep the chart in sync whenever fresh project data comes in, because ng2-charts doesnt pick up mutations
@@ -151,8 +159,13 @@ export class ProjectDetailsComponent {
     }
 
     protected readonly projectId= computed(()=>
-        this.route.snapshot.paramMap.get('id') ?? '',
+        this.route.snapshot.paramMap.get('id') ?? this.projectIdFromHistory(),
     )
+
+    private projectIdFromHistory(): string {
+        const state = this.location.getState() as { projectId?: unknown } | null;
+        return typeof state?.projectId === 'string' ? state.projectId : '';
+    }
 
     protected readonly project= signal<ProjectDetails>(
         EMPTY_PROJECT_DETAILS,
