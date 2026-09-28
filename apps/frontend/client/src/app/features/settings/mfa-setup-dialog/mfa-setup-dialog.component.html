@@ -1,0 +1,111 @@
+<!--  Author: Cleopatra Kwenda
+    Date:2026-09-22
+    Purpose: this is for the MFA qr code and otp
+    code pop-up
+    Related Requirement: N/A -->
+
+
+<h2 mat-dialog-title>
+    Set up multi-factor authentication
+</h2>
+
+<mat-dialog-content>
+
+    @if(isLoading){
+        <div class="loading-state">
+            <p>Preparing MFA setup...</p>
+        </div>
+    }@else if(isSuccess){
+        <div class="success-state">
+            <div class="success-icon">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3> MFA enabled successfully</h3>
+            <p>Multi-factor authentication is now enabled for your account.</p>
+        </div>
+    }@else{
+        <p class="dialog-description">
+            Scan the QR code with your preferred authenticator app, 
+            such as Google Authenticator, Auth or Microsoft Authenticator.
+        </p>
+
+        @if(qrCodeUrl){
+            <div class="qr-container">
+                <img
+                    [src]="qrCodeUrl"
+                    alt="MFA setup QR code"
+                    class="qr-code">
+            </div>
+        }
+
+        <div class="manual-key">
+            <span class="manual-key-label">
+                Can't scan the QR code?
+            </span>
+
+            <p class="manual-key-instruction">
+                Open your authenticator app and choose<br><br>
+                <strong> Enter setup key manually</strong>:
+            </p>
+            <span class="manual-key-value">
+                {{ secretKey }}
+            </span>
+
+        </div>
+
+        <mat-form-field 
+            appearance="outline"
+            class="dialog-field">
+            <mat-label>
+                6-digit verification code
+            </mat-label>
+
+            <input
+                matInput
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                autocomplete="one-time-code"
+                [(ngModel)]="totpCode"
+                [disabled]="isSubmitting">
+        </mat-form-field>
+
+        @if(errorMessage){
+            <p class="dialog-error">
+                {{ errorMessage}}
+            </p>
+        }
+    }
+    
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    @if(isSuccess){
+        <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="done()">
+            Done
+        </button>
+    
+    }@else{
+        <button
+            mat-button
+            type="button"
+            (click)="cancel()"
+            [disabled]="isSubmitting">
+            Cancel
+        </button>
+
+        <button
+            mat-flat-button
+            color="primary"
+            type="button"
+            (click)="verify()"
+            [disabled]="isLoading || isSubmitting">
+            {{ isSubmitting? 'Verifying...': 'Verify and enable'}}
+    </button>
+
+    }
+</mat-dialog-actions>
