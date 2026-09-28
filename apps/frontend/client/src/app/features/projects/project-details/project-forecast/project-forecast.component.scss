@@ -307,23 +307,23 @@
 }
 
 .status-healthy {
-  background: #a7ffca;
-  color: #145c32;
+  background: #D6F4D3;
+  color: #15550f;
 }
 
 .status-warning {
-  background: #ffe1bf;
-  color: #8f400d;
+  background: #F0D59B;
+  color: #4A2C01;
 }
 
 .status-critical {
-  background: #fdecec;
-  color: #b42318;
+  background: #EEB2B3;
+  color: #5C0F0F;
 }
 
 .status-unknown {
-  background: #f1f3f5;
-  color: #525a6c;
+  background: #EDE1FE;
+  color: #3B0F8C;
 }
 
 
@@ -394,11 +394,143 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+  align-items: stretch;
 }
 
+
+.budget-forecast-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.budget-forecast-card .budget-chart {
+  flex: 1;
+  min-height: 245px;
+  height: auto;
+}
+
+.budget-forecast-card .metric-row {
+  flex-shrink: 0;
+}
+
+
+.forecast-right-column {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  min-width: 0;
+}
+
+.forecast-right-column .forecast-card {
+  min-width: 0;
+  min-height: 0;
+}
+
+
+//CHART CONTAINERS
 .chart-container {
   position: relative;
   width: 100%;
+}
+
+//FORECAST METRICS
+.forecast-metrics-card {
+  background: #f7f2ff;
+  border-color: #ded0f5;
+}
+
+.forecast-metrics-card .card-icon {
+  background: #e9ddfb;
+  color: #6b3fa0;
+}
+
+.forecast-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.forecast-metric-item {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  padding: 14px 16px;
+  border: 1px solid #ded0f5;
+  border-radius: 10px;
+  background: #ede3fb;
+}
+
+.forecast-metric-label {
+  color: #5d4778;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.forecast-metric-value {
+  color: #3b0f8c;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.forecast-metric-description {
+  color: #76668a;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+
+//BUDGET STATUS INSIDE FORECAST METRICS
+
+.forecast-metric-value.budget-at-risk {
+  color: #5c0f0f;
+}
+
+.forecast-metric-value.budget-healthy {
+  color: #15550f;
+}
+
+
+//SCHEDULE STATUS INSIDE FORECAST METRICS
+
+.forecast-metric-value.risk-text.healthy {
+  color: #15550f;
+}
+
+.forecast-metric-value.risk-text.warning {
+  color: #7a4a00;
+}
+
+.forecast-metric-value.risk-text.critical {
+  color: #5c0f0f;
+}
+
+.forecast-metric-value.risk-text.unknown {
+  color: #3b0f8c;
+}
+
+
+//TASK PROGRESS
+
+.task-progress-card .card-heading {
+  margin-bottom: 10px;
+}
+
+.task-progress-card .task-chart {
+  width: 145px;
+  height: 145px;
+}
+
+.task-progress-card .chart-center-label strong {
+  font-size: 22px;
+}
+
+.task-progress-card .metric-row {
+  margin-top: 10px;
+  padding-top: 10px;
 }
 
 .budget-chart {
@@ -524,15 +656,19 @@
 }
 
 .risk-text.healthy {
-  color: #145c32;
+  color: #15550f;
 }
 
 .risk-text.warning {
-  color: #8f400d;
+  color: #4A2C01;
 }
 
 .risk-text.critical {
-  color: #b42318;
+  color: #5C0F0F;
+}
+
+.risk-text.unknown {
+  color: #3B0F8C;
 }
 
 
@@ -580,20 +716,39 @@
 .ai-explanation-card {
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--color-border);
-  background: rgba(255, 255, 255, 0.94);
+  background-color: #E6F1FB;
+
+  box-shadow:
+    0 8px 20px rgba(31, 121, 234, 0.12),
+    0 2px 6px rgba(31, 121, 234, 0.06);
 }
 
 
+.ai-explanation-card .card-heading h3 {
+  color: #102b61;
+}
+
+.ai-explanation-card .card-heading h3 i {
+  color: #1a65bf;
+}
+
+.ai-explanation-card .card-heading p {
+  color: #49657f;
+}
+
+
+// main AI summary
 .explanation-summary {
   padding: 16px 18px;
+  border: 1px solid #cfe5ff;
   border-radius: 9px;
-  background: var(--color-primary-surface);
+  background: #BFD4F4;
   color: #1f2937;
   font-size: 14px;
   font-weight: 500;
   line-height: 22px;
 }
+
 
 .explanation-section {
   margin-top: 20px;
@@ -601,7 +756,7 @@
 
 .explanation-section h4 {
   margin: 0 0 8px;
-  color: #122d61;
+  color: #102b61;
   font-size: 14px;
   font-weight: 700;
 }
@@ -612,7 +767,6 @@
   font-size: 14px;
   line-height: 22px;
 }
-
 
 
 //CONTRIBUTING FACTORS
@@ -638,7 +792,7 @@
 .factor-list i {
   margin-top: 4px;
   flex-shrink: 0;
-  color: var(--color-primary);
+  color: #1a65bf;
   font-size: 10px;
 }
 
@@ -810,8 +964,33 @@
 .coverage-fill {
   height: 100%;
   border-radius: inherit;
-  background: var(--color-primary);
-  transition: width 300ms ease;
+  transition:
+    width 800ms ease-out,
+    background-color 300ms ease;
+}
+
+.coverage-fill.coverage-error {
+  background: #5C0F0F;
+}
+
+.coverage-fill.coverage-warning {
+  background: #4A2C01;
+}
+
+.coverage-fill.coverage-success {
+  background: #15550f;
+}
+
+.coverage-heading strong.coverage-error {
+  color: #5C0F0F;
+}
+
+.coverage-heading strong.coverage-warning {
+  color: #4A2C01;
+}
+
+.coverage-heading strong.coverage-success {
+  color: #15550f;
 }
 
 
