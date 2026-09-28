@@ -1,7 +1,7 @@
 package timesheets.dto.request;
 
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -13,7 +13,7 @@ public class UpdateProjectRequest {
   private String name;
   private String description;
 
-  @Positive(regexp =  "ACTIVE|ON_HOLD|COMPLETED|ARCHIVED")
+  @Pattern(regexp = "ACTIVE|ON_HOLD|COMPLETED|ARCHIVED")
   private String status;
 
   @Positive(message = "Budget hours must be positive")

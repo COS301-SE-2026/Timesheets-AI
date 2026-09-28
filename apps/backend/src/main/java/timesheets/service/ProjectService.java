@@ -181,7 +181,7 @@ public class ProjectService {
     //   throw new StateConflictException("Cannot update an archived project");
     // }
 
-    if (request.getStatus() != null ) {
+    if (request.getStatus() != null) {
       project.setStatus(request.getStatus());
     }
 
@@ -294,7 +294,10 @@ public class ProjectService {
     BigDecimal totalHoursLogged = calculateProjectTotalHours(projectId);
     BigDecimal progressPercentage = calculateProgressPercentage(project, totalHoursLogged);
 
-    boolean showCostInfo = securityUtils.isAdmin() || securityUtils.isManager() || isProjectManager(projectId, workspaceMemberId);
+    boolean showCostInfo =
+        securityUtils.isAdmin()
+            || securityUtils.isManager()
+            || isProjectManager(projectId, workspaceMemberId);
 
     // calling the helper to build the response
     return buildProjectDetailResponse(

@@ -33,8 +33,8 @@ import { ProjectDetailResponse, ProjectService } from "../../../core/services/pr
         </mat-dialog-content>
 
         <mat-dialog-actions align="end">
-            <button mat-button type="button" [disabled]="saving" (click)="dialogRef.close()"> Cancel </button>
-            <button mat-flat-button type="submit" [disabled]="form.invalid || !draft.name.trim() || invalidDates || saving">{{ saving ? 'Saving...' : 'Save changes '}}</button>
+            <button mat-button type="button" class="cancel-btn" [disabled]="saving" (click)="dialogRef.close()"> Cancel </button>
+            <button mat-flat-button type="submit" class="save-btn" [disabled]="form.invalid || !draft.name.trim() || invalidDates || saving">{{ saving ? 'Saving...' : 'Save changes '}}</button>
         </mat-dialog-actions>
     </form>
     `,
@@ -62,6 +62,18 @@ import { ProjectDetailResponse, ProjectService } from "../../../core/services/pr
         font: inherit;
     }
 
+    .save-btn {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+    border-radius: 10px;
+    padding: 0.6rem 1.25rem;
+    font-weight: 600;
+    }
+
+    .save-btn:disabled {
+        opacity: 0.5;
+    }
+
     .wide {
         grid-column: 1 / -1;
     }
@@ -69,6 +81,15 @@ import { ProjectDetailResponse, ProjectService } from "../../../core/services/pr
     p {
         color: #b42318;
     }
+
+   .cancel-btn {
+    background-color: #ffffff !important;
+    color: #415673 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 10px;
+    padding: 0.6rem 1.25rem;
+    font-weight: 600;
+}
 
     @media (max-width: 500px) { 
         .fields {
@@ -86,11 +107,15 @@ export class EditProjectDialogComponent {
 
     private readonly projects = inject(ProjectService);
     readonly draft = {
-        status: this.draft.status,
-        name: this.data.name, description: this.data.description ?? '',
-        budgetHours: this.data.budgetHours, hourlyRate: this.data.hourlyRate,
-        budgetCost: this.data.budgetCost, startDate: this.data.startDate ?? '', endDate: this.data.endDate ?? '',
-    };
+    status: this.data.status,
+    name: this.data.name,
+    description: this.data.description ?? '',
+    budgetHours: this.data.budgetHours,
+    hourlyRate: this.data.hourlyRate,
+    budgetCost: this.data.budgetCost,
+    startDate: this.data.startDate ?? '',
+    endDate: this.data.endDate ?? '',
+};
 
     saving= false;
     error= '';

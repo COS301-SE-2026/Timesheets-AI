@@ -91,7 +91,7 @@ export class ProjectDetailsComponent {
     // edit project
     protected editProject(): void {
         if (!this.canEdit() || !this.detail ) return;
-        this.dialog.open(EditProjectDialogComponent, { data: this.detail, width: '640px', maxWidth: '95vw' })
+        this.dialog.open(EditProjectDialogComponent, { data: this.detail, width: '640px', maxWidth: '95vw', panelClass: 'edit-project-dialog' })
             .afterClosed().subscribe(saved => { if (saved) this.loadProject(); });
     
     }

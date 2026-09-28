@@ -60,7 +60,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
 
         <div class="project-header-right">
             @if (canEdit()) {
-                <button mat-flat-button type="button" (click)="editProject()">Edit project</button>
+                <button mat-flat-button class="edit-project-btn" type="button" (click)="editProject()">Edit project</button>
             }
             <span
                 class="project-status-badge"
