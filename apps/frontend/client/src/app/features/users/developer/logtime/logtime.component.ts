@@ -1375,6 +1375,7 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
   });
 }
 
+
 assignSuggestionTask(suggestion: SuggestedWorkSession, event: Event): void {
   const select = event.target as HTMLSelectElement;
   const taskId = select.value;
@@ -1401,7 +1402,6 @@ assignSuggestionTask(suggestion: SuggestedWorkSession, event: Event): void {
     }
   });
 }
-
    
 // this is for fetching all the tasks to display in the suggestion panel 
 // goal here is connect the suggestion's selected project to this existing task 
