@@ -71,6 +71,14 @@ export const routes: Routes = [
         .then(m => m.ProjectsComponent)
   },
 
+  {
+    path: 'projects/details',
+    canActivate: [authGuard, workspaceGuard],
+    loadComponent: () =>
+      import('./features/projects/project-details/project-details.component')
+        .then(m => m.ProjectDetailsComponent)
+  },
+
   /* Project Details Page */
   {
     path: 'projects/:id',

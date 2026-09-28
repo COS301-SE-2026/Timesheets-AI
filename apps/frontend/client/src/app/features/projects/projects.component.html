@@ -81,7 +81,8 @@ Related Requirements: N/A
       @for (project of filteredProjects; track project.id){
         <article 
           class="project-card"
-          [routerLink]="['/projects', project.id]"
+          routerLink="/projects/details"
+          [state]="{ projectId: project.id }"
         >
           <div class="project-card-header">
             <div class="project-title-row">
