@@ -45,6 +45,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly isLoading = signal(true);
   readonly showTimerStoppedModal = signal(false);
   readonly activeTimer = signal<ActiveTimerResponse | null>(null);
+  private readonly timerReceivedAt = signal(0);
   readonly projects = signal<ProjectResponse[]>([]);
   readonly tasks = signal<TaskResponse[]>([]);
   readonly calendarEvents = signal<AppEvent[]>([]);
@@ -163,9 +164,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!t) return 0;
     const elapsed = t.elapsedSeconds ?? t.elapsedMinutes * 60;
     return t.active && !t.isPaused
-    ? elapsed +
-    Math.max(0, Math.floor((Date.now() - +new Date(t.startedAt)) / 1000) - elapsed,) : elapsed;
+      ? elapsed + Math.max(0, Math.floor((Date.now() - this.timerReceivedAt()) / 1000))
+      : elapsed;
   });
+
+  private setActiveTimer(timer: ActiveTimerResponse | null): void {
+    this.timerReceivedAt.set(Date.now());
+    this.activeTimer.set(timer);
+  }
 
   readonly weekLabel = this.formatWeek(new Date());
   constructor() {
@@ -195,13 +201,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     (t.isPaused
       ? this.timers.resumeTimer()
       : this.timers.pauseTimer()
-    ).subscribe({ next: (v) => this.activeTimer.set(v) });
+    ).subscribe({ next: (v) => this.setActiveTimer(v) });
   }
 
   stopTimer(): void {
     this.timers.stopTimer().subscribe({
       next: () => {
-        this.activeTimer.set(null);
+        this.setActiveTimer(null);
         this.loadTimeTotals();
         this.showTimerStoppedModal.set(true);
       },
@@ -254,7 +260,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     })
     .pipe(finalize(() => this.isLoading.set(false)))
     .subscribe((data) => {
-      this.activeTimer.set(data.timer);
+      this.setActiveTimer(data.timer);
       this.projects.set(data.projects);
       this.calendarEvents.set(data.events);
       this.availableUsers.set(data.availableUsers);

@@ -939,10 +939,12 @@ export class LogtimeComponent implements OnDestroy {
     );
   }
 
+  private readonly taskTitles = signal<Record<string, string>>({});
+
   getTaskTitle(taskId: string | null): string {
     return (
       this.tasks().find((task) => task.id === taskId)?.title ??
-      'No task selected'
+      (taskId ? this.taskTitles()[taskId] ?? 'Unknown task' : 'No task selected')
     );
   }
 
@@ -1244,6 +1246,19 @@ export class LogtimeComponent implements OnDestroy {
             this.timerForm.controls.projectId.setValue(firstProjectId);
           }
           this.loadTasksForProject(firstProjectId); //populate tasks for whichever project
+          // Entries can belong to any project, independent of the form selection
+          for (const project of projects) {
+            if (project.id !== firstProjectId) {
+              this.http.get<TaskApiResponse[]>(
+                `${this.apiBaseUrl}/tasks/project/${project.id}`,
+                this.requestOptions(),
+              )
+              .subscribe({
+                next: (tasks) => this.cacheTaskTitles(tasks),
+                error: () => {},
+              });
+            }
+          }
         },
         error: (error) =>
           this.conflictMessage.set(
@@ -1259,6 +1274,12 @@ export class LogtimeComponent implements OnDestroy {
   so now tasks i fetched per project with the api/tasks/project GET
   */
   private lastLoadedTaskProjectId: string | null = null;
+  private cacheTaskTitles(tasks: TaskApiResponse[]): void {
+    this.taskTitles.update((title) => ({
+      ...title,
+      ...Object.fromEntries(tasks.map((task) => [task.id, task.title])),
+    }));
+  }
   private loadTasksForProject(projectId: string): void {
     if (!projectId) {
       this.tasks.set([{ id: '', projectId: '', title: 'No task selected' }]);
@@ -1275,6 +1296,7 @@ export class LogtimeComponent implements OnDestroy {
       )
       .subscribe({
         next: (tasks) => {
+          this.cacheTaskTitles(tasks);
           this.tasks.set([
             { id: '', projectId: '', title: 'No task selected' },
             ...tasks.map((t) => ({
