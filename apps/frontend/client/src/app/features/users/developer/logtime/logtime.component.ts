@@ -1539,6 +1539,17 @@ updateSuggestionDescription(
   });
 }
    
+
+suggestionEvidence = signal<SuggestedWorkSession | null>(null);
+
+seeSuggestionEvidence(suggestion: SuggestedWorkSession): void {
+  this.suggestionEvidence.set(suggestion);
+}
+
+closeSuggestionEvidence(): void {
+  this.suggestionEvidence.set(null);
+}
+
 // this is for fetching all the tasks to display in the suggestion panel 
 // goal here is connect the suggestion's selected project to this existing task 
   private suggestionTasks = new Map<string, Task[]>;
