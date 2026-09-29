@@ -34,6 +34,7 @@ import {
   TimeEntryService,
   TimeEntryRequest as TimeEntryApiRequest,
 } from '../../../../core/services/time-entry.service';
+import { error } from 'node:console';
 //type definitions and interface
 
 type ViewOption = 'Day' | 'Week' | 'Month';
@@ -622,15 +623,36 @@ export class LogtimeComponent implements OnDestroy {
       projectId: timer.projectId,
       taskId: timer.taskId,
     };
-    this.http
-      .post(`${this.apiBaseUrl}/timers/start`, request, this.requestOptions())
-      .subscribe({
-        next: () => activateTimer(timer),
-        error: (error) =>
-          this.conflictMessage.set(
-            error.error?.message ?? 'Unable to start the timer.',
-          ),
-      });
+    // this.http
+    //   .post(`${this.apiBaseUrl}/timers/start`, request, this.requestOptions())
+    //   .subscribe({
+    //     next: () => activateTimer(timer),
+    //     error: (error) =>
+    //       this.conflictMessage.set(
+    //         error.error?.message ?? 'Unable to start the timer.',
+    //       ),
+    //   });
+    this.timerService.startTimer(request).subscribe({
+      next:(response)=>{
+        const activateTimer: ActiveTimer={
+          id: response.id,
+          projectId: response.project.id,
+          taskId: response.task?.id?? null,
+          notes: timer.notes,
+          startedAt: new Date(response.startedAt),
+        };
+
+        this.activeTimer.set(activateTimer);
+        this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
+        this.isTimerPaused.set(response.isPaused ?? false);
+        this.pausedElapsedSeconds.set(response.elapsedSeconds ?? 0);
+        this.timerForm.disable({ emitEvent: false});
+      },
+
+      error: (error)=> this.conflictMessage.set(
+        error.error?.message?? 'Unable to start the timer.',
+      ),
+    })
   }
 
   pauseTimer(): void {
