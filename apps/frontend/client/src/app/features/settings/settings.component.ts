@@ -76,27 +76,27 @@ export class SettingsComponent implements OnInit{
     });
   }
 
-  browseIntegrations(): void{
-    if(!this.canAddIntegrations()){
-      return;
-    }
+  // browseIntegrations(): void{
+  //   if(!this.canAddIntegrations()){
+  //     return;
+  //   }
 
-    const dialogRef= this.dialog.open(
-      IntegrationBrowserDialogComponent,{
-        width: '700px',
-        maxWidth: '120vw',
-        disableClose: true
-      }
-    );
+  //   const dialogRef= this.dialog.open(
+  //     IntegrationBrowserDialogComponent,{
+  //       width: '700px',
+  //       maxWidth: '120vw',
+  //       disableClose: true
+  //     }
+  //   );
 
-    dialogRef.afterClosed().subscribe((integration)=> {
-      if(!integration){
-        return;
-      }
+  //   dialogRef.afterClosed().subscribe((integration)=> {
+  //     if(!integration){
+  //       return;
+  //     }
 
-      console.log('Integration selected:', integration);
-    });
-  }
+  //     console.log('Integration selected:', integration);
+  //   });
+  // }
 
   changePassword():void{
     // i need the password change flow that our app uses
@@ -183,27 +183,27 @@ export class SettingsComponent implements OnInit{
     return this.syncingIntegration()=== integrationId;
   }
 
-  syncIntegration(integration: IntegrationStatus):void{
-    if(!integration.connected){
-      return;
-    }
+  // syncIntegration(integration: IntegrationStatus):void{
+  //   if(!integration.connected){
+  //     return;
+  //   }
 
-    this.syncingIntegration.set(integration.id);
+  //   this.syncingIntegration.set(integration.id);
 
-    this.settingsService.syncIntegration(integration.id).subscribe({
-      next: ()=>{
-        this.syncingIntegration.set(null);
-      },
-      error:(error)=>{
-        console.error(
-          `Failed to sync ${integration.name}:`,
-          error
-        );
+  //   this.settingsService.syncIntegration(integration.id).subscribe({
+  //     next: ()=>{
+  //       this.syncingIntegration.set(null);
+  //     },
+  //     error:(error:unknown)=>{
+  //       console.error(
+  //         `Failed to sync ${integration.name}:`,
+  //         error
+  //       );
 
-        this.syncingIntegration.set(null);
-      }
-  });
-  }
+  //       this.syncingIntegration.set(null);
+  //     }
+  // });
+  // }
 
   requestAccountDeletion():void{
     const dialogRef= this.dialog.open(
