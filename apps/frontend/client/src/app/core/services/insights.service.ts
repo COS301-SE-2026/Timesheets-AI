@@ -18,6 +18,10 @@ import {
   PeriodOption,
   PersonalInsightsResponse,
 } from '../../features/insights/models/ai-insights.model';
+import {
+  GenerateInsightsResponse,
+  ManagerDashboardResponse,
+} from '../../features/insights/models/manager-dashboard.model';
 
 @Injectable({
   providedIn: 'root',
@@ -86,5 +90,27 @@ export class InsightsService {
     return this.http.get<PersonalInsightsResponse>(`${this.baseUrl}/summary`, {
       params,
     });
+  }
+    getManagerDashboard(
+    projectId: string | null,
+    period: string = '8w',
+  ): Observable<ManagerDashboardResponse> {
+    let params = new HttpParams().set('period', period);
+    if (projectId) {
+      params = params.set('projectId', projectId);
+    }
+    return this.http.get<ManagerDashboardResponse>(`${this.baseUrl}/manager-dashboard`, { params });
+  }
+
+  generateInsights(projectId: string): Observable<GenerateInsightsResponse> {
+    const params = new HttpParams().set('projectId', projectId);
+    return this.http.post<GenerateInsightsResponse>(`${this.baseUrl}/generate`, {}, { params });
+  }
+
+  resolveBurnoutInsight(insightId: string): Observable<{ id: string; resolved: boolean }> {
+    return this.http.patch<{ id: string; resolved: boolean }>(`${this.baseUrl}/${insightId}/resolve`, {});
+  }
+    getTeamWeeklySummary(): Observable<{ narrative: string }> {
+    return this.http.get<{ narrative: string }>(`${this.baseUrl}/weekly-summary/team`);
   }
 }
