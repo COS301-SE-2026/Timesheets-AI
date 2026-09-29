@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, inject, signal, } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { catchError, finalize, forkJoin, of, map } from 'rxjs';
@@ -25,7 +25,7 @@ interface ActiveProjectCard {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [ NotificationPanelComponent, DatePipe, RouterLink],
+  imports: [ NotificationPanelComponent, DatePipe, RouterLink, DecimalPipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -310,7 +310,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (!project.budgetHours || project.budgetHours <= 0) return 0;
 
     const loggedHours = project.hoursLogged / 60;
-    return Math.max(0, Math.min(100, Math.round((loggedHours / project.budgetHours) * 100)));
+    const percentage = (loggedHours / project.budgetHours) * 100;
+
+    return Math.max(0, Math.min(100, percentage));
   }
 
   private loadPendingApprovals(): void {
