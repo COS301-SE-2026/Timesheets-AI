@@ -19,6 +19,8 @@ import { Component, signal, inject, computed} from '@angular/core'; // UI compon
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { FloatingTimerComponent } from '../floating-timer/floating-timer.component';
+import { TimerService } from '../../../core/services/timer.service';
 
 interface NavItem {
   label: string, //text shown in sidebar
@@ -30,15 +32,27 @@ interface NavItem {
 
 @Component({
   selector: 'app-sidebar', // HTML tag to show this UI component
-  imports: [MatIconModule, RouterModule],
+  imports: [MatIconModule, RouterModule, FloatingTimerComponent],
   standalone: true,
+  host: {
+    '[class.collapsed]': 'isCollapsed()',
+  },
   templateUrl: './sidebar.component.html', // links the HTML for the UI component 
   styleUrl: './sidebar.component.scss' // links SCSS file 
 })
 
 export class SidebarComponent {
+
+  readonly isCollapsed = signal(false);
+
+  toggleSidebar(): void {
+    this.isCollapsed.update(collapsed => !collapsed);
+    this.isMenuOpen.set(false);
+  }
+
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  readonly timerService= inject(TimerService);
 
   // create reactive state variable so it stores state, update UI automatically when changed 
   navItems = signal<NavItem[]>([
@@ -48,8 +62,6 @@ export class SidebarComponent {
     { label: 'Projects', icon: 'folder', route: '/projects', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
     { label: 'My Tasks', icon: 'task', route: '/my-tasks', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER']},
     { label: 'Calendar', icon: 'calendar_month', route: '/calendar', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
-    { label: 'Leave Requests', icon: 'business_center', route: '/leave-requests', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
-    //{ label: 'Reports', icon: 'bar_chart', route: '/reports', requiresWorkspace: true},
     { label: 'Insights', icon: 'trending_up', route: '/insights', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
     { label: 'Team', icon: 'groups', route: '/team', requiresWorkspace: true, allowedRoles: ['ROLE_ADMIN', 'ROLE_MANAGER']},
     { label: 'Settings', icon: 'settings', route: '/settings', allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN'] }
