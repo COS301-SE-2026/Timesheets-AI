@@ -295,7 +295,7 @@
           <!-- Timer form fields are disabled once the timer is running -->
           <form class="timer-form" [formGroup]="timerForm">
             <label class="field">
-              <span class="field__label">Project</span>
+              <span class="field_label">Project</span>
               <select formControlName="projectId">
                 @for (project of projects(); track project.id) {
                   <option [value]="project.id">{{ project.name }}</option>
@@ -466,53 +466,59 @@
           @else {
             <div class="suggestions-list">
               @for (suggestion of suggestions(); track suggestion.id){
-                <article class="suggestion-card">
-                  <header>
-                    <div>
-                      <h3>
-                        {{ suggestion.title }}
-                      </h3>
+              <article class="suggestion-card">
+                <header class="suggestion-card-header">
+                  <div class="suggestion-card-header-main-one">
+                    <div class="suggestion-card">
+                      <span>{{ formatDate(suggestion.startTime) }}</span>
 
-                      <p class="suggestion-card-time">
-                        {{ formatDate(suggestion.startTime) }}
+                      <span>.</span>
+
+                      <span>
                         {{ formatTime(suggestion.startTime) }}
-
                         @if (suggestion.endTime){
                           - {{ formatTime(suggestion.endTime) }}
                         }
-                      </p>
-                    </div>
-
-                    @if (suggestion.confidenceScore !== null){
-                      <span class="suggestion-card-confidence">
-                        {{ suggestion.confidenceScore * 100 | number:'1.0-0' }}%
                       </span>
-                    }
-                  </header>
 
-                  <div class="suggestion-card-details">
+                      <span>.</span>
 
-                    <div class="suggestion-card-field">
-
-                      <!-- @if (suggestion.durationMinutes !== null){
+                      @if (suggestion.durationMinutes && suggestion.durationMinutes > 0) {
                         <span>
-                          {{ suggestion.durationMinutes }} min
-                        </span>
-                      } @else {
-                        <span>Not determined</span>
-                      } -->
-                        @if (suggestion.durationMinutes && suggestion.durationMinutes > 0) {
-                        <span>
-                          {{ suggestion.durationMinutes }} min
+                          ~{{ suggestion.durationMinutes }} min estimated 
                         </span>
                       } @else {
                         <span>Duration not determined</span>
                       }
                     </div>
 
-                    <label class="field">
-                      <span class="field-label">Project</span>
+                    <h3 class="suggestion-card-title">
+                      {{ suggestion.title }}
+                    </h3>
 
+                    <div class="suggestion-card-summary">
+                      <span class="suggestion-source-summary">
+                        {{ getSourceSummary(suggestion) }}
+                      </span>
+
+                      @if (suggestion.confidenceScore !== null){
+                        <span class="suggestion-confidence" title="How strongly the availiable evidence matches this suggested work session based on timing, project context and related activity.">
+                          {{ suggestion.confidenceScore * 100 | number:'1.0-0'}}% AI Confidence Match
+                        </span>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="suggestion-card-status">
+                    <span class="suggestion-pending-badge">
+                      Pending
+                    </span>
+                  </div>
+                </header>
+
+                <div class="suggestion-card-fields">
+                  <label class="field">
+                    <span class="field-label">Project</span>
                       <select
                       [value]="suggestion.projectId || ''"
                       (change)="assignSuggestionProject(suggestion, $event)">
@@ -568,110 +574,45 @@
                       </div>
                     }
 
-                  <label class="field">
-                    <span class="field-label">Description</span>
+                    <label class="field">
+                      <span class="field-label">Description</span>
 
-                    <textarea
-                      [value]="suggestion.description || ''"
-                      (input)="updateSuggestionDescription(suggestion, $event)"
-                      rows="4"
-                      placeholder="Add a description of this work...">
-                    </textarea>
-                  </label>
+                      <textarea
+                        [value]="suggestion.description || ''"
+                        (input)="updateSuggestionDescription(suggestion, $event)"
+                        rows="4"
+                        placeholder="Add a description of this work...">
+                      </textarea>
+                    </label>
                   </div>
 
+                    <footer class="suggestion-card-actions">
+                      <button
+                          type="button"
+                          class="btn btn--secondary"
+                          (click)="seeSuggestionEvidence(suggestion)">
+                          See Evidence
+                        </button>
 
-                  <!--<div class="suggestion-card-evidence">
-                    <span class="field-label">Evidence</span>
+                        <button
+                          type="button"
+                          class="btn btn--ghost"
+                          (click)="confirmRejectSuggestion(suggestion)">
+                          Reject
+                        </button>
 
-                    <p> {{ getSourceSummary(suggestion) }} </p>
-                  </div>-->
-                    <div class="suggestion-card-evidence">
-                      <div class="suggestion-card-evidence-header">
-                        <div>
-                          <span class="field-label">Evidence supporting this work session suggestion</span>
-                          <p>
-                            These activities were grouped together based on their timing and shared context.
-                          </p>
-                          <p>{{ getSourceSummary(suggestion) }}</p>
-                        </div>
-
-                        <span class="evidence-count">
-                          {{ suggestion.evidenceEvents?.length || 0 }}
-                          evidence
-                        </span>
-                      </div>
-
-                      @if (suggestion.evidenceEvents?.length) {
-                        <div class="evidence-list">
-
-                          @for (event of suggestion.evidenceEvents; track event.id) {
-                            <div class="evidence-item">
-
-                              <div class="evidence-item-icon">
-                                @if (event.source === 'GITHUB') {
-                                  <span>GH</span>
-                                } @else if (event.source === 'JIRA') {
-                                  <span>JR</span>
-                                } @else if (event.source === 'GOOGLE_CALENDAR') {
-                                  <span>CA</span>
-                                } @else {
-                                  <span>EV</span>
-                                }
-                              </div>
-
-                              <div class="evidence-item-content">
-                                <div class="evidence-tem-header">
-                                  <strong>
-                                    @if (event.source === 'GITHUB'){
-                                      GitHub
-                                    } @else if (event.source === 'JIRA'){
-                                      Jira
-                                    } @else if (event.source === 'GOOGLE_CALENDAR'){
-                                      Calendar
-                                    } @else {
-                                      {{ event.source }}
-                                    }
-                                  </strong>
-
-                                  <span class="evidence-item-type"> {{ event.activityType }} </span>
-
-                                  @if (event.timestamp){
-                                    <span class="evidence-item-time">
-                                      {{ formatTime(event.timestamp )}}
-                                    </span>
-                                  }
-                                </div>
-
-                                <p>
-                                  {{ event.description || 'Evidence event detected' }}
-                                </p>
-                              </div>
-
-                            </div>
-                          }
-
-                        </div>
-                      } @else {
-                        <p class="evidence-empty">
-                          No detailed evidence is available for this suggestion.
-                        </p>
-                      }
-                    </div>
-                  
-
-                  <footer class="suggestion-card-actions">
-                    <button type="button" class="btn btn--ghost" (click)="confirmRejectSuggestion(suggestion)">
-                      Reject 
-                    </button>
-
-                     <button type="button" class="btn btn--primary" [disabled]="!suggestion.projectId" (click)="approveSuggestion(suggestion)">
-                      Approve &amp; Add  
-                    </button>
-                  </footer>
-                </article>
+                        <button
+                          type="button"
+                          class="btn btn--primary"
+                          [disabled]="!suggestion.projectId"
+                          (click)="approveSuggestion(suggestion)">
+                          Approve &amp; Add
+                        </button>
+                    </footer>
+              </article>
               }
             </div>
+          
 
             @if (suggestionPendingReject()){
               <div class="suggestion-confirmation">
@@ -697,6 +638,272 @@
 
 
       </article>
+
+      <!-- See the Evidence Modal -->
+      @if (suggestionEvidence(); as evidence) {
+
+        <div
+          class="suggestion-evidence-overlay"
+          (click)="closeSuggestionEvidence()">
+
+          <section
+            class="suggestion-evidence-modal"
+            aria-labelledby="suggestion-evidence-title"
+            (click)="$event.stopPropagation()">
+
+            <header class="suggestion-evidence-header">
+
+              <div>
+                <span class="suggestion-evidence-eyebrow">
+                  Evidence Supporting Work Session
+                </span>
+
+                <h2 id="suggestion-evidence-title">
+                  Evidence Supporting Work Session
+                </h2>
+
+                <p>
+                  Grouped based on timing, workspace metadata &amp;
+                  shared issue context.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                class="icon-btn"
+                aria-label="Close evidence"
+                (click)="closeSuggestionEvidence()">
+
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18"></path>
+                </svg>
+
+              </button>
+
+            </header>
+
+
+            <div class="suggestion-evidence-content">
+
+              <section class="evidence-target-session">
+
+                <span class="field-label">
+                  Target Session
+                </span>
+
+                <h3>
+                  {{ evidence.title }}
+                </h3>
+
+                <p>
+                  Generated from
+                  {{ evidence.evidenceEvents?.length || 0 }}
+
+                  @if (evidence.evidenceEvents?.length === 1) {
+                    correlated evidence event
+                  } @else {
+                    correlated evidence events
+                  }
+
+                  between
+
+                  {{ formatTime(evidence.startTime) }}
+
+                  @if (evidence.endTime) {
+                    - {{ formatTime(evidence.endTime) }}
+                  }
+                </p>
+
+              </section>
+
+
+              <section class="gemini-evidence-section">
+
+                <div class="gemini-evidence-header">
+
+                  <div>
+                    <span class="field-label">
+                       AI Narrative Analysis
+                    </span>
+
+                    <p>
+                      Analyse the available evidence and explain why
+                      these activities may represent one work session.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="btn btn--secondary">
+                    Break down the evidence
+                  </button>
+
+                </div>
+
+
+                <div class="gemini-evidence-placeholder">
+
+                  <span class="field-label">
+                     AI Explanation
+                  </span>
+
+                  <p>
+                    AI analysis will appear here after the evidence
+                    is analysed.
+                  </p>
+
+                </div>
+
+              </section>
+
+
+              <section class="raw-evidence-section">
+
+                <div class="raw-evidence-header">
+
+                  <div>
+                    <span class="field-label">
+                      Raw Evidence Log
+                    </span>
+
+                    <h3>
+                      {{ evidence.evidenceEvents?.length || 0 }}
+                      Signals
+                    </h3>
+                  </div>
+
+                </div>
+
+
+                @if (evidence.evidenceEvents?.length) {
+
+                  <div class="raw-evidence-list">
+
+                    @for (
+                      event of evidence.evidenceEvents;
+                      track event.id
+                    ) {
+
+                      <article class="raw-evidence-item">
+
+                        <div class="raw-evidence-source">
+
+                          @if (event.source === 'GITHUB') {
+                            <span>GH</span>
+                          }
+
+                          @else if (event.source === 'JIRA') {
+                            <span>JR</span>
+                          }
+
+                          @else if (event.source === 'GOOGLE_CALENDAR') {
+                            <span>CA</span>
+                          }
+
+                          @else {
+                            <span>EV</span>
+                          }
+
+                        </div>
+
+
+                        <div class="raw-evidence-content">
+
+                          <div class="raw-evidence-meta">
+
+                            <strong>
+
+                              @if (event.source === 'GITHUB') {
+                                GitHub Commit
+                              }
+
+                              @else if (event.source === 'JIRA') {
+                                Jira Activity
+                              }
+
+                              @else if (event.source === 'GOOGLE_CALENDAR') {
+                                Google Calendar
+                              }
+
+                              @else {
+                                {{ event.source }}
+                              }
+
+                            </strong>
+
+                            @if (event.timestamp) {
+                              <span>
+                                {{ formatTime(event.timestamp) }}
+                              </span>
+                            }
+
+                          </div>
+
+
+                          <h4>
+                            {{ event.description || 'Evidence event' }}
+                          </h4>
+
+
+                          @if (event.metadata) {
+
+                            <div class="raw-evidence-metadata">
+
+                              @if (event.metadata['repositoryName']) {
+                                <span>
+                                  Repo:
+                                  {{ event.metadata['repositoryName'] }}
+                                </span>
+                              }
+
+                              @if (event.metadata['commitHash']) {
+                                <span>
+                                  Commit:
+                                  {{ event.metadata['commitHash'] }}
+                                </span>
+                              }
+
+                              @if (event.metadata['issueKey']) {
+                                <span>
+                                  Jira:
+                                  {{ event.metadata['issueKey'] }}
+                                </span>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </article>
+                    }
+                  </div>
+                } @else {
+                  <p class="evidence-empty">
+                    No detailed evidence is available for this suggestion.
+                  </p>
+                }
+              </section>
+            </div>
+
+
+            <footer class="suggestion-evidence-footer">
+
+              <button
+                type="button"
+                class="btn btn--ghost"
+                (click)="closeSuggestionEvidence()">
+                Close
+              </button>
+
+              <button
+                type="button"
+                class="btn btn--primary"
+                [disabled]="!evidence.projectId"
+                (click)="approveSuggestion(evidence); closeSuggestionEvidence()">
+                Approve Work Session
+              </button>
+            </footer>
+          </section>
+        </div>
+      }
     </section>
    }
 
