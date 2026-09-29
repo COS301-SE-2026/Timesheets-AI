@@ -634,7 +634,7 @@ describe('LogtimeComponent', () => {
   it('should return fallback labels for unknown project and task ids', () => {
     expect(component.getProjectName('unknown')).toBe('Unknown project');
 
-    expect(component.getTaskTitle('unknown')).toBe('No task selected');
+    expect(component.getTaskTitle('unknown')).toBe('Unknown task');
   });
 
   // Timer started label

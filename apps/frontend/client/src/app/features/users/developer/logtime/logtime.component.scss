@@ -380,6 +380,7 @@
 
 .entries-card__header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
@@ -412,7 +413,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -445,6 +446,7 @@
 
 .entries-toolbar__filters {
   display: flex;
+  margin-inline-start: auto;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
