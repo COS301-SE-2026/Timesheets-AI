@@ -33,9 +33,6 @@ $orange-light: #fff4e8;
     margin: 0 auto;
     margin-bottom: 18px;
     padding: 34px 42px 48px;
-    // display: flex;
-//     flex-direction: column;
-    // gap: 12px;
     box-sizing: border-box;
 }
 
@@ -230,8 +227,6 @@ $orange-light: #fff4e8;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    // color: $text-title;
-    // transition: background 0.2s ease, border-color 0.2s ease;
 
     &:hover{
         transition: 
@@ -260,8 +255,7 @@ $orange-light: #fff4e8;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    // transition: background 0.2s ease;
-
+    
     &:hover{
         transition: 
                     background 0.2s ease,
