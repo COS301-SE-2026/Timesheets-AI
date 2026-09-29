@@ -34,7 +34,70 @@ Related Requirement: N/A
         box-shadow 0.25s ease,
         border-color 0.25s ease;
 
-    animation: timeAppear 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    animation: timerAppear 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.floating-timer--collapsed{
+    width: 64px;
+    min-width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    padding: 0;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border-radius: 16px;
+}
+
+.floating-timer__clock{
+    position: relative;
+    width: 28px;
+    height: 28px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+}
+
+.floating-timer__clock::after{
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #fff;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.floating-timer__clock-hand{
+    position: absolute;
+    width: 2px;
+    border-radius: 2px;
+    left: 50%;
+    bottom: 50%;
+    background: #fff;
+    transform-origin: bottom center;
+}
+
+.floating-timer__clock-hand--hour{
+    height: 8px;
+    transform: translateX(-50%) rotate(35deg);
+}
+
+.floating-timer__clock-hand--minute{
+    height: 11px;
+    transform: translateX(-50%) rotate(130deg);
+    animation: timer-clock-rotate 60s linear infinite;
+}
+
+.floating-timer__running-dot{
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: timer-pulse 1.8s ease-in-out infinite;
 }
 
 .floating-timer:active{
@@ -125,6 +188,14 @@ Related Requirement: N/A
     height: 12px;
 }
 
+.floating-timer__small-label{
+    font-family: "Prompt", sans-serif;
+    font-size: 6px;
+    font-weight: 300;
+    letter-spacing: 0.08rem;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.75);
+}
 
 .floating-timer:hover{
     transform: translateY(-2px);
@@ -132,6 +203,16 @@ Related Requirement: N/A
     box-shadow: 
         0 12px 28px rgba(0, 0, 0, 0.16);
 }
+
+.floating-timer__running-status{
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 8px;
+    justify-content: center;
+}
+
+
 
 @keyframes timer-pulse{
     0%, 100%{
@@ -159,5 +240,15 @@ Related Requirement: N/A
     100%{
         opacity: 1;
         transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes timer-clock-rotate{
+    from{
+        transform: translateX(-50%) rotate(0deg);
+    }
+
+    to{
+        transform: translateX(-50%) rotate(360deg);
     }
 }
