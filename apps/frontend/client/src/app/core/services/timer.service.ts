@@ -101,9 +101,9 @@ export class TimerService {
       .pipe(catchError(this.handleError('resumeTimer')));
   }
   //it'll stop the time and converts it to a real time entry, and will return the created entry
-  stopTimer(): Observable<ActiveTimerResponse> {
+  stopTimer(): Observable<StopTimerResponse> {
     return this.http
-      .post<ActiveTimerResponse>(`${this.baseUrl}/stop`, {})
+      .post<StopTimerResponse>(`${this.baseUrl}/stop`, {})
       .pipe(catchError(this.handleError('stopTimer')));
   }
   //fetches whatever timer is currently active for the logged in user, used on page load refresh/load
