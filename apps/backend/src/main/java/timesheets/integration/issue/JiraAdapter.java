@@ -70,11 +70,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
   @Override
   public List<IssueResponse> getIssues(UUID workspaceMemberId) {
     // find the Jira integration token  for this workspace member
-    IntegrationToken integrationToken =
-        integrationTokenRepository
-            .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "JIRA")
-            .orElseThrow(() -> new RuntimeException("Jira is not connected."));
-
+    IntegrationToken integrationToken = getValidToken(workspaceMemberId);
     String cloudId = integrationToken.getProviderResourceId();
 
     String url =
@@ -237,7 +233,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
     for (IssueResponse issue : issues) {
       String url =
-          "https://api.atlassian.com/ex/jira"
+          "https://api.atlassian.com/ex/jira/"
               + cloudId
               + "/rest/api/3/issue/"
               + issue.getKey()
@@ -308,7 +304,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
     for (IssueResponse issue : issues) {
       String url =
-          "https://api.atlassian.com/ex/jira"
+          "https://api.atlassian.com/ex/jira/"
               + cloudId
               + "/rest/api/3/issue/"
               + issue.getKey()
@@ -377,7 +373,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
     for (IssueResponse issue : issues) {
       String url =
-          "https://api.atlassian.com/ex/jira"
+          "https://api.atlassian.com/ex/jira/"
               + cloudId
               + "/rest/api/3/issue/"
               + issue.getKey()
