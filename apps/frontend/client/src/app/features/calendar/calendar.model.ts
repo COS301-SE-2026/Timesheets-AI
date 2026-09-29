@@ -4,7 +4,7 @@
 // the calendar page with objects for google and outlook
 // Related Requirements: N/A
 
-export type CalendarProvider='outlook' | 'google';
+export type CalendarProvider='microsoft' | 'google';
 
 export type EventCategory= | 'meetings' | 'work' | 'calls'| 'deadline';
 
@@ -18,6 +18,7 @@ export interface AppEvent {
     provider: CalendarProvider;
     category?:  EventCategory;
     categoryLabel?:string;
+    participants?: string[];
 
     organizer?:{
         name?: string;
