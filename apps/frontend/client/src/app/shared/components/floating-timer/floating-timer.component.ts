@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { TimerService } from '../../../core/services/timer.service';
-import { error } from 'node:console';
 
 @Component({
   selector: 'app-floating-timer',
@@ -38,6 +37,7 @@ export class FloatingTimerComponent {
 
   openTimer(): void{
     this.router.navigate(['/log-time']);
+    this.timerService.requestOpenTimerPanel();
   }
 
   formatElapsed(totalSeconds: number): string{

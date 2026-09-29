@@ -84,6 +84,7 @@ export class TimerService {
   readonly elapsedSeconds= signal(0);
   readonly isTimerPaused= signal(false);
   private timerIntervalId: ReturnType<typeof setInterval>| null= null;
+  readonly openTimerPanel= signal(false);
   //starts a new timer for a given project + task, backend hardcodes entryType to a TIMER
   startTimer(request: StartTimerRequest): Observable<ActiveTimerResponse> {
     return this.http
@@ -102,6 +103,15 @@ export class TimerService {
       .post<ActiveTimerResponse>(`${this.baseUrl}/resume`, {})
       .pipe(catchError(this.handleError('resumeTimer')));
   }
+
+  requestOpenTimerPanel(): void{
+    this.openTimerPanel.set(true);
+  }
+
+  closeTimerPanel(): void{
+    this.openTimerPanel.set(false);
+  }
+  
   //it'll stop the time and converts it to a real time entry, and will return the created entry
   stopTimer(): Observable<StopTimerResponse> {
     return this.http
