@@ -7,8 +7,9 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { CalendarProvider, AppEvent } from './calendar.model';
 import { CalendarService } from './calendar.services';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router} from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+
 export type CalendarView= 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 @Component({
   selector: 'app-calendar',
@@ -24,9 +25,9 @@ export class CalendarComponent implements OnInit{
   calendarComponent!: FullCalendarComponent;
 
   private readonly calendarService= inject(CalendarService);
-  private readonly http= inject(HttpClient);
   private readonly route= inject(ActivatedRoute);
   private readonly router= inject(Router);
+  private readonly authService = inject(AuthService);
 
 
   activeView= signal<CalendarView>('dayGridMonth');
@@ -52,16 +53,22 @@ export class CalendarComponent implements OnInit{
     editable: false,
     selectable: false,
     events: (fetchInfo, successCallback, failureCallback)=>{
+      const provider = this.provider();
+
+      if (!provider) {
+          successCallback([]);
+          return;
+      }
+
       this.calendarService.getEvents(
-        this.formatCalendarDate(fetchInfo.start),
-        this.formatCalendarDate(fetchInfo.end)
-      ).subscribe(
+          this.formatCalendarDate(fetchInfo.start),
+          this.formatCalendarDate(fetchInfo.end), ).subscribe(
         {
           next: (events)=>{
             successCallback(events);
           },
           error: (error)=>{
-            console.error('Failed to load calendar evemts.', error);
+            console.error('Failed to load calendar events.', error);
             this.isConnected.set(false);
             failureCallback(error);
           }
@@ -111,7 +118,6 @@ export class CalendarComponent implements OnInit{
         if(params['connected']=== 'true'){
           // this.isConnected.set(true);
           this.loadCalendarStatus();
-          this.syncCalendar();
 
           // CLEANING PARAM FROM BROWSER BAR
           this.router.navigate(
@@ -137,23 +143,29 @@ export class CalendarComponent implements OnInit{
   private loadCalendarStatus():void{
     this.calendarService.getCalendarStatus().subscribe(
       {
-        next: (status)=> {
-          this.isConnected.set(status.connected);
-          this.provider.set(status.provider);
+        next: (status) => {
+        this.isConnected.set(status.connected);
+        this.provider.set(status.provider);
 
-          if (status.lastSyncedAt){
+        if (status.lastSyncedAt) {
             this.lastSyncedLabel.set(
-              this.formatSyncedLabel(status.lastSyncedAt)
+                this.formatSyncedLabel(status.lastSyncedAt)
             );
-          }else{
+        } else {
             this.lastSyncedLabel.set(null);
-          }
-        },
+        }
+
+        if (status.connected && status.provider) {
+            const api = this.calendarComponent?.getApi();
+
+            if (api) {
+                api.refetchEvents();
+            }
+        }
+    },
 
         error:(error)=>{
-          console.error(
-            'Failed to load calendar connection statuts.'
-          );
+          console.error('Failed to load calendar connection statuts.');
 
           this.isConnected.set(false);
           this.provider.set(null);
@@ -163,19 +175,22 @@ export class CalendarComponent implements OnInit{
     );
   }
 
-  connectCalendar():void{
-    this.http.get('/api/integrations/google/calendar/connect',{
-      responseType: 'text'
-    }).subscribe(
-      {
-        next:(authUrl: string)=>{
-          window.location.href= authUrl;
-        },
-        error:(error)=>{
-          console.error('Failed to connect Google Calendar', error);
-        }
+  connectCalendar(): void {
+    const authProvider = this.authService.getAuthProvider();
+
+    if (authProvider !== 'GOOGLE' && authProvider !== 'MICROSOFT') {
+      console.error('Calendar connection requires Google or Microsoft authentication.');
+      return;
+    }
+
+    this.calendarService.connectCalendar(authProvider).subscribe({
+      next: (authUrl: string) => {
+        window.location.href = authUrl;
+      },
+      error: (error) => {
+        console.error(`Failed to connect ${authProvider} Calendar`, error);
       }
-    );
+    });
   }
 
   private formatCalendarDate(date: Date): string{
@@ -221,6 +236,7 @@ export class CalendarComponent implements OnInit{
       description: rawProps['description'],
       location: rawProps['location'],
       provider: this.provider()?? 'google',
+      participants: rawProps['participants'] ?? [],
       category: categoryKey,
       categoryLabel: rawProps['categoryLabel'] || this.getCategoryLabel(categoryKey),
       organizer: rawProps['organizer']
