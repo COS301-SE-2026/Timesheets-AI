@@ -1,7 +1,43 @@
 :host {
   display: block;
   height: 100vh;
+  flex: 0 0 260px;
+  width: 260px;
 }
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.sidebar-toggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-toggle:focus-visible,
+.nav-item:focus-visible,
+.user-profile:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 
 .sidebar {
   width: 100%;
@@ -11,7 +47,7 @@
   display: flex;
   flex-direction: column;
 
-  overflow-y: auto;
+  // overflow-y: visible;
 
   padding: 24px 16px;
   box-sizing: border-box;
@@ -22,7 +58,6 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 40px;
   padding-left: 8px;
 
   .logo-icon {
@@ -50,6 +85,7 @@
     }
   }
 }
+
 
 // Navigation list flex layout
 .nav-links {
@@ -91,6 +127,10 @@
   line-height: 20px;
 }
 
+.user-profile-wrapper {
+  position: relative;
+}
+
 // Bottom Profile section
 .user-profile {
   display: flex;
@@ -98,13 +138,22 @@
   gap: 12px;
   padding: 16px 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
   cursor: pointer;
+  background: transparent;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  width: 100%;
+  color: inherit;
+  font: inherit;
+  text-align: left;
 
   .avatar {
     width: 36px;
     height: 36px;
     background: rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;        // ← add: prevent flex from squashing it
+  min-width: 36px;  
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -117,9 +166,12 @@
     display: flex;
     flex-direction: column;
     flex: 1;
+    min-width: 0;
+    align-items: flex-start;
+    overflow: hidden;
     
     .user-name { font-size: 14px; font-weight: 500; }
-    .user-email { font-size: 11px; opacity: 0.7; }
+    .user-email { font-size: 11px; opacity: 0.7; max-width: 100%; overflow: hidden; }
     .user-role { font-size: 11px; opacity: 0.7; margin-top: 2px; }
   }
 
@@ -142,7 +194,7 @@
   background: var(--color-white);
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
+ 
   z-index: 10;
 }
 .user-menu-item {
@@ -160,5 +212,54 @@
 
   &:hover {
     background-color: var(--color-background-subtle);
+  }
+}
+
+:host.collapsed {
+
+  flex-basis: 80px;
+  width: 80px;
+
+  .sidebar{
+    padding: 16px 8px;
+
+  }
+  .sidebar-header {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .sidebar-toggle {
+    align-self: center;
+    margin: 0;
+  }
+  .logo-container {
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+  }
+  .logo-text, .nav-label, .user-info, .dropdown-arrow {
+    display: none;
+  }
+  .nav-item {
+    justify-content: center;
+    padding: 12px;
+  }
+  .user-profile {
+    justify-content: center;
+    padding: 16px 0;
+  }
+  .user-menu {
+    left: 0;
+    right: 0;
+  }
+  .user-menu-item {
+    justify-content: center;
+    padding: 12px;
+  }
+  .user-menu-item span {
+    display: none;
   }
 }

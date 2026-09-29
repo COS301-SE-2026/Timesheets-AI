@@ -1,14 +1,5 @@
 <div class="sidebar">
-
-  <button type="button" class="sidebar-toggle"
-    [attr.aria-label]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
-    [attr.title]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
-    [attr.aria-expanded]="!isCollapsed()"
-    aria-controls="sidebar-navigation"
-    (click)="toggleSidebar()">
-    <mat-icon aria-hidden="true">{{ isCollapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>  
-  </button>
-
+  <div class="sidebar-header">
   <!-- branding -->
   <div class="logo-container">
     <img class="logo-icon" src="/assets/momently.png" alt="" />
@@ -16,6 +7,16 @@
       <h2><span>m</span>omently</h2>
       <p>Every moment counts</p>
     </div>
+  </div>
+
+   <button type="button" class="sidebar-toggle"
+    [attr.aria-label]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+    [attr.title]="isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+    [attr.aria-expanded]="!isCollapsed()"
+    aria-controls="sidebar-navigation"
+    (click)="toggleSidebar()">
+    <mat-icon aria-hidden="true">{{ isCollapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>  
+  </button>
   </div>
 
   <!-- navigation -->
@@ -38,6 +39,7 @@
   </nav>
 
   <!-- user profile -->
+   <div class="user-profile-wrapper">
   <button
   type="button"
   class="user-profile"
@@ -51,7 +53,7 @@
     <span class="user-email">{{ currentUser()?.email }}</span>
     <span class="user-role">{{ displayRole() }}</span>
   </div>
-  <span class="dropdown-arrow" [class.open]="isMenuOpen()">⌄</span>
+ <span class="dropdown-arrow" [class.open]="isMenuOpen()"><i class="fa-solid fa-angle-down"></i> </span>
 </button>
 
     @if(isMenuOpen()){
@@ -63,4 +65,5 @@
       </div>
     }
  
+</div>
 </div>
