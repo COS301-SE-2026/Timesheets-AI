@@ -46,7 +46,7 @@ Related Requirement: N/A
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 4px;
+    gap: 7px;
     border-radius: 16px;
 }
 
@@ -89,12 +89,12 @@ Related Requirement: N/A
 .floating-timer__clock-hand--minute{
     height: 11px;
     transform: translateX(-50%) rotate(130deg);
-    animation: timer-clock-rotate 60s linear infinite;
+    animation: timer-clock-rotate 10s linear infinite;
 }
 
 .floating-timer__running-dot{
-    width: 2px;
-    height: 2px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: #22c55e;
     animation: timer-pulse 1.8s ease-in-out infinite;
@@ -190,7 +190,7 @@ Related Requirement: N/A
 
 .floating-timer__small-label{
     font-family: "Prompt", sans-serif;
-    font-size: 6px;
+    font-size: 10px;
     font-weight: 300;
     letter-spacing: 0.08rem;
     line-height: 1;
