@@ -56,21 +56,21 @@ describe('SidebarCoponent', () => {
 
     // Load all sidebar navigation items
     it('should contain all navigation items', () => {
-        expect(component.navItems()).toHaveLength(10); //i removed report feild from nav bar so the test should affirm that
+        expect(component.navItems()).toHaveLength(9); //i removed report feild from nav bar so the test should affirm that
     });
 
     it.each([
         [
             'ROLE_DEVELOPER',
-            ['Dashboard', 'Timesheets', 'Log Time', 'Projects', 'My Tasks', 'Calendar', 'Leave Requests', 'Insights', 'Settings'],
+            ['Dashboard', 'Timesheets', 'Log Time', 'Projects', 'My Tasks', 'Calendar', 'Insights', 'Settings'],
         ],
         [
             'ROLE_MANAGER',
-            ['Dashboard', 'Timesheets', 'Log Time', 'Projects', 'My Tasks', 'Calendar', 'Leave Requests', 'Insights', 'Team', 'Settings'],
+            ['Dashboard', 'Timesheets', 'Log Time', 'Projects', 'My Tasks', 'Calendar', 'Insights', 'Team', 'Settings'],
         ],
         [
             'ROLE_ADMIN',
-            ['Dashboard', 'Projects', 'Calendar', 'Leave Requests', 'Insights', 'Team', 'Settings'],
+            ['Dashboard', 'Projects', 'Calendar', 'Insights', 'Team', 'Settings'],
         ],
     ])('shows the correct navigation items for %s', (role, expectedLabels) => {
         currentUser.set({ firstName: 'John', lastName: 'Doe', roles: [role] });
