@@ -1,4 +1,6 @@
 import { SidebarComponent } from './sidebar.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { AuthService } from '../../../core/services/auth.service';
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
@@ -40,7 +42,9 @@ describe('SidebarCoponent', () => {
             imports: [SidebarComponent],
             providers: [
                 { provide: Router, useValue: routerMock},
-                { provide: AuthService, useValue: authServiceMock}
+                { provide: AuthService, useValue: authServiceMock},
+                provideHttpClient(),
+                provideHttpClientTesting(),
             ],
         });
 
