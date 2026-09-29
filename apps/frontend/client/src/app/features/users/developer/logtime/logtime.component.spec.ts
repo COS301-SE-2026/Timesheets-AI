@@ -85,6 +85,10 @@ describe('LogtimeComponent', () => {
 
     httpMock.expectOne(`/api/tasks/project/${projectOneId}`).flush(
       mockTasks.filter((t)=> t.projectId === projectOneId),);
+
+      httpMock.expectOne(`/api/tasks/project/${projectTwoId}`).flush(
+    mockTasks.filter((t) => t.projectId === projectTwoId),
+  );
   }
 
   beforeEach(async () => {
