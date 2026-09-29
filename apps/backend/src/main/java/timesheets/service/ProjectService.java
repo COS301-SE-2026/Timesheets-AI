@@ -89,8 +89,8 @@ public class ProjectService {
   public ProjectResponse createProject(
       CreateProjectRequest request, UUID createdByWorkspaceMemberId) {
 
-    if (!securityUtils.isAdmin()) {
-      throw new AccessDeniedException("Only Admins can create projects");
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      throw new AccessDeniedException("Only Admins and Managers can create projects");
     }
 
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
