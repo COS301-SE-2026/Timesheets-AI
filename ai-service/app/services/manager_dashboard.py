@@ -171,7 +171,7 @@ def task_overview(db: Session, project_id: UUID) -> dict:
         .all()
     )
 
-    status_counts, priority_counts, open_priority_counts = _count_tasks(rows)
+    status_counts, _, open_priority_counts = _count_tasks(rows)
     total = sum(status_counts.values())
     blocked_count = status_counts.get("BLOCKED", 0)
     narrative = _task_narrative(open_priority_counts, blocked_count)
