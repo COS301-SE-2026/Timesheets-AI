@@ -678,6 +678,7 @@ export class LogtimeComponent implements OnDestroy {
       next: (response) => {
         const elapsed = response.elapsedSeconds ?? this.elapsedSeconds();
         this.clearTimerInterval();
+        this.timerService.setActiveTimer(response);
         this.elapsedSeconds.set(elapsed);
         this.pausedElapsedSeconds.set(elapsed);
         this.isTimerPaused.set(response.isPaused ?? true);
@@ -704,6 +705,7 @@ export class LogtimeComponent implements OnDestroy {
       next: (response) => {
         const elapsed = response.elapsedSeconds ?? this.pausedElapsedSeconds();
         this.isTimerPaused.set(response.isPaused ?? false);
+        this.timerService.setActiveTimer(response);
         this.elapsedSeconds.set(elapsed);
         this.pausedElapsedSeconds.set(elapsed);
         this.startElapsedInterval(elapsed);
