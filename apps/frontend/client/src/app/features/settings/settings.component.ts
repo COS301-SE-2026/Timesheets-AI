@@ -4,14 +4,13 @@ import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/sl
 import { MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from './settings.services';
-import { UserSettings, UserRole, IntegrationStatus } from './settings.model';
+import { UserSettings, UserRole } from './settings.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
 import { MfaSetupDialogComponent } from './mfa-setup-dialog/mfa-setup-dialog.component';
 import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dialog.component';
 import { AuthService } from '../../core/services/auth.service';
-import { IntegrationBrowserDialogComponent } from './integration-browser-dialog/integration-browser-dialog.component';
 import { AccountDeletionDialogComponent } from './account-deletion-dialog/account-deletion-dialog.component';
 
 @Component({
@@ -182,28 +181,6 @@ export class SettingsComponent implements OnInit{
   isSyncing(integrationId: string): boolean{
     return this.syncingIntegration()=== integrationId;
   }
-
-  // syncIntegration(integration: IntegrationStatus):void{
-  //   if(!integration.connected){
-  //     return;
-  //   }
-
-  //   this.syncingIntegration.set(integration.id);
-
-  //   this.settingsService.syncIntegration(integration.id).subscribe({
-  //     next: ()=>{
-  //       this.syncingIntegration.set(null);
-  //     },
-  //     error:(error:unknown)=>{
-  //       console.error(
-  //         `Failed to sync ${integration.name}:`,
-  //         error
-  //       );
-
-  //       this.syncingIntegration.set(null);
-  //     }
-  // });
-  // }
 
   requestAccountDeletion():void{
     const dialogRef= this.dialog.open(
