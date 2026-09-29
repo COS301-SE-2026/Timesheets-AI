@@ -34,7 +34,6 @@ import {
   TimeEntryService,
   TimeEntryRequest as TimeEntryApiRequest,
 } from '../../../../core/services/time-entry.service';
-import { error } from 'node:console';
 //type definitions and interface
 
 type ViewOption = 'Day' | 'Week' | 'Month';
