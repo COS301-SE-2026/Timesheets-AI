@@ -97,6 +97,7 @@ export class ProjectService {
   updateProject(projectId: string, request: Partial<Omit<CreateProjectRequest, 'managerIds' | 'status'>> & { status?: ProjectResponse['status'] }): Observable<ProjectResponse> {
     return this.http.patch<ProjectResponse>(`${this.baseUrl}/${projectId}`, request)
     .pipe(catchError(this.handleError('updateProject')));
+  }
     
   // gets the latest saved project forecast
   getProjectForecast(projectId: string): Observable<SavedProjectForecast> {
