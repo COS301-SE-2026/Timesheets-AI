@@ -113,6 +113,15 @@ Realated Requirement: N/A
                                 </span>
                             }
 
+                            <button 
+                                class="sync-button"
+                                type="button"
+                                [disabled]="isSyncing(integration.id)"
+                                (click)="synncIntegration(integration)">
+                                <i class="fa-solid fa-rotate"></i>
+                                {{ isSyncing(integration.id)? 'Syncing...': 'Sync now' }}
+                            </button>
+
                         </div>
                     </div>
                 }
