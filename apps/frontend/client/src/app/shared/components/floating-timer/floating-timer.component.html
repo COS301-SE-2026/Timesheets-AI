@@ -1,0 +1,42 @@
+<!--
+Author: Cleopatra Kwenda
+Date: 2026-09-29
+Purpose: will display our desired wireframe of 
+the hovering timer.
+Related Requirements: N/A
+-->
+
+@if(timerService.activeTimer(); as timer){
+    <button
+        type="button"
+        class="floating-timer"
+        (click)="openTimer()"
+        aria-label="Open active timer">
+        <span class="floating-timer__indicator">
+
+        </span>
+
+        <span class="floating-timer__content">
+            <span class="floating-timer__label">
+                TIMER RUNNING
+            </span>
+
+            <strong class="floating-timer__time">
+                {{ formatElapsed(timerService.elapsedSeconds()) }}
+            </strong>
+
+            <span class="floating-timer__details">
+                {{ timer.project.name }}
+
+                @if(timer.task){
+                    {{ timer.task.title }}
+                }
+            </span>
+        </span>
+
+        <span 
+            class="fa-solid fa-arrow-right floating-timer__arrow"
+            aria-hidden="true">
+        </span>
+    </button>
+}
