@@ -9,7 +9,7 @@ import { TimerService } from '../../../core/services/timer.service';
   templateUrl: './floating-timer.component.html',
   styleUrl: './floating-timer.component.scss'
 })
-export class FloatingTimerComponent {
+export class FloatingTimerComponent implements OnInit{
   readonly timerService= inject(TimerService);
   private readonly router= inject(Router);
 
