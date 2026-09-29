@@ -40,6 +40,8 @@ public class SuggestedWorkSession {
         .taskId(taskId)
         .evidenceEvents(evidenceEvents)
         .confidenceScore(confidenceScore)
+        .durationSeconds(durationSeconds)
+        .entryType(entryType)
         .durationMinutes(durationMinutes)
         .description(description)
         .explanation(explanation)
@@ -63,6 +65,8 @@ public class SuggestedWorkSession {
     suggestion.setEvidenceEvents(entity.getEvidenceEvents());
     suggestion.setConfidenceScore(entity.getConfidenceScore());
     suggestion.setDurationMinutes(entity.getDurationMinutes());
+    suggestion.setDurationSeconds(entity.getDurationSeconds());
+    suggestion.setEntryType(entity.getEntryType());
     suggestion.setDescription(entity.getDescription());
     suggestion.setExplanation(entity.getExplanation());
     suggestion.setCreatedAt(entity.getCreatedAt());
