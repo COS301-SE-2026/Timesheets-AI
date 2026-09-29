@@ -15,11 +15,10 @@ so i added it to the log time page and it now shows up correctly
 Patched: Cleopatra Kwenda, 29 Sept 2026
 adding the hovering timer logic/feature*/
 
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { time } from 'node:console';
 
 //so these mirror the schema on swagger exactly, so there's no silent mismatch later
 
