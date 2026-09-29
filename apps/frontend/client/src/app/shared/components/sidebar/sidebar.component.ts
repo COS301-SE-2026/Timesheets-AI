@@ -19,6 +19,8 @@ import { Component, signal, inject, computed} from '@angular/core'; // UI compon
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { FloatingTimerComponent } from '../floating-timer/floating-timer.component';
+import { TimerService } from '../../../core/services/timer.service';
 
 interface NavItem {
   label: string, //text shown in sidebar
@@ -30,7 +32,7 @@ interface NavItem {
 
 @Component({
   selector: 'app-sidebar', // HTML tag to show this UI component
-  imports: [MatIconModule, RouterModule],
+  imports: [MatIconModule, RouterModule, FloatingTimerComponent],
   standalone: true,
   templateUrl: './sidebar.component.html', // links the HTML for the UI component 
   styleUrl: './sidebar.component.scss' // links SCSS file 
@@ -39,6 +41,7 @@ interface NavItem {
 export class SidebarComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  readonly timerService= inject(TimerService);
 
   // create reactive state variable so it stores state, update UI automatically when changed 
   navItems = signal<NavItem[]>([
