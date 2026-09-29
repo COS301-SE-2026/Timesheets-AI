@@ -465,7 +465,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
     IssueResponse dto = new IssueResponse();
     dto.setKey(key);
-    dto.setTitle(getString(fields, "summary"));
+    dto.setSummary(getString(fields, "summary"));
     dto.setStatus(getNestedString(fields, "status", "name"));
     dto.setIssueType(getNestedString(fields, "issuetype", "name"));
     dto.setDescription(getString(fields, "description"));
@@ -553,7 +553,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
         + escapeJson(request.getProjectKey())
         + "\"},"
         + "\"summary\":\""
-        + escapeJson(request.getTitle())
+        + escapeJson(request.getSummary())
         + "\","
         + "\"description\":"
         + (description != null ? description : "null")

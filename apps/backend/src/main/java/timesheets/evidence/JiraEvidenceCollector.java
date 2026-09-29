@@ -37,7 +37,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
 
       LocalDateTime timestamp = parseTimestamp(issue.getCreatedAt());
       evidenceEvent.setTimestamp(timestamp);
-      evidenceEvent.setDescription(issue.getTitle());
+      evidenceEvent.setDescription(issue.getSummary());
 
       Map<String, Object> metadata = new HashMap<String, Object>();
 
