@@ -59,6 +59,9 @@ Wrapped in loading error guard since now content now comes from GET /api/project
         </div>
 
         <div class="project-header-right">
+            @if (canEdit()) {
+                <button mat-flat-button class="edit-project-btn" type="button" (click)="editProject()">Edit project</button>
+            }
             <span
                 class="project-status-badge"
                 [ngClass]="{
@@ -87,6 +90,30 @@ Wrapped in loading error guard since now content now comes from GET /api/project
 
     <section class="project-meta-grid">
         <div class="meta-card">
+            <div class="icon-wrapper green"><i class="fa-regular fa-calendar"></i></div>
+            <div class="meta-info">
+                <span class="meta-title">Start Date</span>
+                <strong>{{ project().startDate ? (project().startDate | date:'mediumDate') : 'Not set' }}</strong>
+            </div>
+        </div>
+
+        <div class="meta-card">
+            <div class="icon-wrapper orange">
+                <i class="fa-regular fa-calendar"></i>
+            </div>
+            
+            <div class="meta-info">
+                <span class="meta-title">
+                    End Date
+                </span>
+
+                <strong>
+                    {{ project().endDate ? (project().endDate | date:'mediumDate') : 'Not set' }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="meta-card">    
             <div class="icon-wrapper blue">
                 <i class="fa-regular fa-clock"></i>
             </div>
@@ -102,6 +129,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             </div>
         </div>
 
+        @if (canEdit()) {
         <div class="meta-card">
             <div class="icon-wrapper blue-light">
                 <i class="fa-solid fa-coins"></i>
@@ -133,22 +161,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                 </strong>
             </div>
         </div>
-
-        <div class="meta-card">
-            <div class="icon-wrapper orange">
-                <i class="fa-regular fa-calendar"></i>
-            </div>
-            
-            <div class="meta-info">
-                <span class="meta-title">
-                    End Date
-                </span>
-
-                <strong>
-                    {{ project().endDate | date }}
-                </strong>
-            </div>
-        </div>
+    }
         
 
         <div class="meta-card">
@@ -190,6 +203,12 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             Tasks
 
         </button>
+
+        @if (canViewForecast()) {
+            <button class="tab-button" [class.active]="activeTab() === 'forecast'" (click)="setActiveTab('forecast')">
+                Forecast
+            </button>
+        }
     </nav>
 
     <!--
@@ -236,7 +255,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                                 Logged
                             </span>
                             <span class="kpi-value primary">
-                                {{ project().hoursLoggedLabel }}h
+                                {{ project().hoursLoggedLabel }}
                             </span>
                         </div>
 
@@ -290,11 +309,11 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             <div class="progress-circle-wrapper">
                 <div 
                     class="progress-circle"
-                    [style.--progress]="project().progressPercentage">
+                    [style.--progress]="project().progressPercentageClamped">
 
                     <div class="progress-inner">
                         <span class="progress-percentage">
-                            {{ project().progressPercentage }}%
+                            {{ project().progressPercentage | number:'1.0-2'}}%
                         </span>
 
                         <span class="progress-label">
@@ -317,7 +336,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                     </div>
 
                     <span class="summary-value">
-                        {{ project().hoursLoggedLabel }}h
+                        {{ project().hoursLoggedLabel }}
                     </span>
                 </div>
 
@@ -355,7 +374,7 @@ Wrapped in loading error guard since now content now comes from GET /api/project
             
 
             <div class="team-list">
-                @for (member of project().members; track member.workspaceMemberId) {
+                @for (member of project().members.slice(0, 4); track member.workspaceMemberId) {
                 <div class="team-member-row">
 
                     <div class="member-top-row">
@@ -409,16 +428,39 @@ Wrapped in loading error guard since now content now comes from GET /api/project
                 </div>
                 }
             </div>
- 
-            <button class="view-members-btn">
+            
+            <button class="view-members-btn" type="button" (click)="viewMembers(membersDialog)">
                 <i class="fa-solid fa-user-group"></i>
                 View all members
             </button>
+
             
         </article>
 
     </section>
     }
+
+    <!-- View members template -->
+     <ng-template #membersDialog>
+        <h2 mat-dialog-title>All Team Members ({{ project().members.length }})</h2>
+        <mat-dialog-content>
+            <div class="team-list">
+            @for (member of project().members; track member.workspaceMemberId ){
+                <div class="member-list">
+                <span class="team-avatar" [ngClass]="getAvatarColour(member)">{{ getInitials(member) }}</span>
+                <div class="member-details">
+                    <span class="member-name">{{ getMemberName(member) }}</span>
+                    <span class="member-role">{{ member.role }} · {{ member.email }}</span>
+                    <span class="member-hours">{{ member.hoursLoggedLabel }} Logged</span>
+                </div>
+                </div>
+            }
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions align="end">
+            <button mat-button mat-dialog-close>Close</button>
+        </mat-dialog-actions>
+     </ng-template>
 
     <!--
     TASKS TAB
@@ -501,6 +543,10 @@ Wrapped in loading error guard since now content now comes from GET /api/project
         </article>
 
     </section>
+    }
+
+    @if (activeTab() === 'forecast' && canViewForecast()) {
+        <app-project-forecast [projectId]="projectId()"> </app-project-forecast>
     }
 </div>
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { AuthService } from '../../core/services/auth.service';
@@ -33,7 +34,7 @@ interface NewProjectForm {
 @Component({
   selector: 'app-teams',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, OverlayModule],
   templateUrl: './teams.component.html',
   styleUrl: './teams.component.scss'
 })
@@ -126,6 +127,10 @@ protected openAssignment(member: TeamMember): void {
 
 protected openProjectRemoval(member: TeamMember) : void {
   this.openActionMenuUserId = '';
+  if (!member.projectIds.length) {
+    this.showError(`${member.firstName} ${member.lastName} is not part of any project.`);
+    return
+  }
   this.selectedMember = member;
   this.selectedProjectId = member.projectIds[0] ?? '';
   this.assignmentMode = 'remove';
@@ -200,6 +205,11 @@ protected closeCreateProject(): void {
   if (!this.actionInProgress) this.showCreateProjectDialog = false;
 }
 
+protected toggleDeveloper(workspaceMemberId: string, selected: boolean): void {
+  const remaining = this.newProject.developerIds.filter(id => id !== workspaceMemberId);
+  this.newProject.developerIds = selected ? [...remaining, workspaceMemberId] : remaining;
+}
+
 // Create project
 
 protected createProject(): void {
@@ -239,9 +249,11 @@ protected createProject(): void {
 
 // admin assigns member to workspace
 protected addToWorkspace(member: TeamMember): void {
+  const role = this.workspaceRoleFor(member);
+  if (!role) return;
   const actionKey = `workspace-${member.userId}`;
   this.startAction(actionKey);
-  this.teamService.addToWorkspace(member.userId, this.workspaceRoleFor(member))
+  this.teamService.addToWorkspace(member.userId, role)
   .pipe(finalize(() => this.finishAction())).subscribe({
     next: (workspaceMember) => {
       this.workspaceMemberIdsByUser.set(member.userId, workspaceMember.workspaceMemberId);
@@ -263,8 +275,8 @@ protected addToWorkspace(member: TeamMember): void {
   });
 }
 
-protected workspaceRoleFor(member: TeamMember): WorkspaceRole {
-  return this.workspaceRolesByUser.get(member.userId) ?? 'DEVELOPER';
+protected workspaceRoleFor(member: TeamMember): WorkspaceRole | '' {
+  return this.workspaceRolesByUser.get(member.userId) ?? '';
 }
 
 protected setWorkspaceRole(member: TeamMember, role: WorkspaceRole): void {

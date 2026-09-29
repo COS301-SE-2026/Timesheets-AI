@@ -7,10 +7,18 @@ Related Requirement: N/A
 
 Patched: 30/07/2026 integration Zamokuhle Zwane
 Intergrated project detail page replacing the hard coded details
+
+Patched: 28/09/2026
+Allow users to update project status, make team members show 4 team members and if there is more have the show team members button open a modal that lists the rest of the memberss.
+Add a edit project button with will open a modal to allow the users to open. Update project routing to hide project id on the url.
 */
 
-import { Component, signal, computed, inject, effect } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { Component, signal, computed, inject, effect, TemplateRef } from "@angular/core";
+import { MatDialog, MatDialogModule,  MatDialogActions, MatDialogClose } from "@angular/material/dialog";
+import { MatButtonModule } from "@angular/material/button";
+import { ProjectDetailResponse, ProjectService } from "../../../core/services/project.service";
+import { EditProjectDialogComponent } from "./edit-project-dialog.component";
+import { CommonModule, Location } from "@angular/common";
 //import { PROJECT_DETAIL } from "../mock/project-details.mock";
 import { ActivatedRoute, RouterModule } from "@angular/router";
 import { ProjectDetails, ProjectMember } from "./models/project-details.model";
@@ -20,9 +28,11 @@ import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 //import { PROJECT_TASK } from "../mock/project-task.mock";
 import { ProjectTask } from "../models/project-task.model";
-import { ProjectService } from "../../../core/services/project.service";
 import { TaskService } from "../../../core/services/task.service";
 import {mapToProjectDetails, mapToProjectTask} from "../utils/project-mapper";
+import { ProjectForecastComponent } from './project-forecast/project-forecast.component';
+import { AuthService } from '../../../core/services/auth.service';
+
 
 //this is used to keep every template binding valid while real data is being loaded
 const EMPTY_PROJECT_DETAILS: ProjectDetails = {
@@ -55,30 +65,65 @@ const EMPTY_PROJECT_DETAILS: ProjectDetails = {
     selector: 'app-project-details',
     standalone: true,
     imports: [
-        CommonModule,
-        RouterModule,
-        BaseChartDirective,
-    ],
+    CommonModule,
+    RouterModule,
+    BaseChartDirective,
+    MatDialogModule,
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogClose,
+    ProjectForecastComponent,
+],
     templateUrl: './project-details.component.html',
     styleUrls: ['./project-details.component.scss']
 })
 
 export class ProjectDetailsComponent {
     private readonly route = inject(ActivatedRoute);
+    private readonly location = inject(Location);
+    private readonly dialog = inject(MatDialog);
+    private readonly auth = inject(AuthService);
+    private detail: ProjectDetailResponse | null = null;
+    protected readonly canEdit = computed(() => {
+        const user = this.auth.currentUser();
+        return this.project().myRole === ProjectRole.MANAGER ||
+            (user?.roles.some(role => ['ADMIN', 'ROLE_ADMIN', 'MANAGER', 'ROLE_MANAGER'].includes(role)) ?? false);
+    })
 
+    // View all members
+    protected viewMembers(template: TemplateRef<unknown>): void {
+        this.dialog.open(template, {width: '640px', maxWidth: '95vw', ariaLabel: 'All project members'});
+    }
+
+    // edit project
+    protected editProject(): void {
+        if (!this.canEdit() || !this.detail ) return;
+        this.dialog.open(EditProjectDialogComponent, { data: this.detail, width: '640px', maxWidth: '95vw', panelClass: 'edit-project-dialog' })
+            .afterClosed().subscribe(saved => { if (saved) this.loadProject(); });
+    
+    }
 
     protected readonly ProjectStatus= ProjectStatus;
     protected readonly ProjectRole= ProjectRole;
 
     private readonly projectService = inject(ProjectService);
     private readonly taskService = inject(TaskService);
+    private readonly authService = inject(AuthService);
 
     protected readonly loading = signal<boolean>(true);
     protected readonly error = signal<boolean>(false);
 
     protected readonly tasks=signal<ProjectTask[]>([]);
 
+
     constructor(){
+        const legacyProjectId = this.route.snapshot.paramMap.get('id');
+        if (legacyProjectId) {
+            this.location.replaceState('/projects/details', '', {
+                ...(this.location.getState() as object), projectId: legacyProjectId,
+        });
+    }
+        
         this.loadProject();
 
         //this should keep the chart in sync whenever fresh project data comes in, because ng2-charts doesnt pick up mutations
@@ -122,18 +167,33 @@ export class ProjectDetailsComponent {
     }
 
     protected readonly projectId= computed(()=>
-        this.route.snapshot.paramMap.get('id') ?? '',
+        this.route.snapshot.paramMap.get('id') ?? this.projectIdFromHistory(),
     )
+
+    private projectIdFromHistory(): string {
+        const state = this.location.getState() as { projectId?: unknown } | null;
+        return typeof state?.projectId === 'string' ? state.projectId : '';
+    }
 
     protected readonly project= signal<ProjectDetails>(
         EMPTY_PROJECT_DETAILS,
     )
+    
+    protected readonly canViewForecast = computed(() => {
+        const workspaceRoles = this.authService.currentUser()?.roles ?? [];
+        const projectRole = this.project().myRole;
+
+        const isWorkspaceManager = workspaceRoles.includes('ROLE_MANAGER') || workspaceRoles.includes('ROLE_ADMIN');
+        const isProjectManager = projectRole === ProjectRole.MANAGER;
+
+        return isWorkspaceManager || isProjectManager;
+    });
 
     // protected readonly project= signal<Project>(PROJECTS[0]);
 
-    protected readonly activeTab=signal<'overview' | 'tasks'>('overview');
+    protected readonly activeTab = signal<'overview' | 'tasks' | 'forecast'>('overview');
 
-    protected setActiveTab( tab: 'overview' | 'tasks'):void{
+    protected setActiveTab( tab: 'overview' | 'tasks' | 'forecast'):void{
         this.activeTab.set(tab);
     }
 
@@ -151,7 +211,12 @@ export class ProjectDetailsComponent {
 
         this.projectService.getProjectDetail(id).subscribe({
             next: (detail) => {
-                this.project.set(mapToProjectDetails(detail));
+                this.detail = detail;
+                const project = mapToProjectDetails(detail);
+                const email = this.auth.currentUser()?.email.toLowerCase();
+                const membership = detail.members.find(member => member.email.toLowerCase() === email);
+                project.myRole = membership?.isProjectManager ? ProjectRole.MANAGER : ProjectRole.DEVELOPER;
+                this.project.set(project);
                 this.loading.set(false);
                 this.loadTasks(id);
             },
@@ -194,26 +259,6 @@ export class ProjectDetailsComponent {
 
     });
 
-
-    // protected readonly projectTitle= computed(
-    //     ()=> this.project().name,
-    // );
-
-    // protected readonly projectStatus= computed(
-    //     ()=> this.project().status,
-    // );
-
-    // protected readonly projectRole= computed(
-    //     ()=> this.project().role,
-    // );
-
-    // protected readonly projectTags= computed(
-    //     ()=> this.project().tags,
-    // );
-
-    // protected readonly projectMembers= computed(
-    //     ()=> this.project().teamMembers,
-    // );
 
     protected readonly hoursSummary= computed(()=>{
         const project= this.project();

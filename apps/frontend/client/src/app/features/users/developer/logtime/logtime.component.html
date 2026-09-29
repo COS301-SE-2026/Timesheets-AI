@@ -19,20 +19,6 @@
       </label>
 
       <!-- View mode selector  -->
-      <label class="header-pill">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="4" y="5" width="16" height="15" rx="2"></rect>
-          <path d="M8 3v4M16 3v4M4 10h16"></path>
-        </svg>
-        <select
-          [value]="selectedView()"
-          (change)="selectedView.set($any($event.target).value)"
-        >
-          @for (view of viewOptions; track view) {
-            <option [value]="view">{{ view }}</option>
-          }
-        </select>
-      </label>
 
       <!--
         timesheet-level submit action, replaces the old per-entry submit
@@ -102,7 +88,7 @@
   @if (activeTimer() && activePanel() !== "timer") {
     <section class="banner banner--info">
       <span class="timer-status"
-        ><span class="timer-status__dot"></span> Timer running —
+        ><span class="timer-status__dot"></span> Timer running: 
         {{ formatElapsed(elapsedSeconds()) }}</span
       >
       <button type="button" class="link-btn" (click)="openTimerPanel()">
@@ -202,10 +188,6 @@
             <label class="field">
               <span class="field__label">Start Time</span>
               <span class="field__control field__control--icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="8"></circle>
-                  <path d="M12 8v4l3 2"></path>
-                </svg>
                 <input type="time" formControlName="startTime" />
               </span>
             </label>
@@ -213,10 +195,6 @@
             <label class="field">
               <span class="field__label">End Time</span>
               <span class="field__control field__control--icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="8"></circle>
-                  <path d="M12 8v4l3 2"></path>
-                </svg>
                 <input type="time" formControlName="endTime" />
               </span>
               <!-- Validation error shown when end time is before start time -->
@@ -436,38 +414,12 @@
             >Total: {{ formatDuration(totalSeconds()) }}</span
           >
         </div>
-      </header>
 
-      <div class="entries-toolbar">
         <!-- Status filter chips (e.g. All, Draft, Submitted, Approved) -->
-        <div class="status-filters">
-          @for (status of statusOptions; track status) {
-            <button
-              type="button"
-              class="status-chip"
-              [class.status-chip--active]="selectedStatus() === status"
-              (click)="selectStatus(status)"
-            >
-              {{ status }}
-            </button>
-          }
-        </div>
 
         <!-- Project and date range filters -->
         <div class="entries-toolbar__filters" [formGroup]="filterForm">
-          <label class="filter-date" for="entries-filter-project">
-            <span class="visually-hidden">Project</span>
-            <select
-              id="entries-filter-project"
-              [value]="selectedProjectId()"
-              (change)="selectedProjectId.set($any($event.target).value)"
-            >
-              <option value="">All projects</option>
-              @for (project of projects(); track project.id) {
-                <option [value]="project.id">{{ project.name }}</option>
-              }
-            </select>
-          </label>
+
           <label class="filter-date">
             <span>From</span>
             <input type="date" formControlName="from" />
@@ -477,7 +429,7 @@
             <input type="date" formControlName="to" />
           </label>
         </div>
-      </div>
+      </header>
 
       <!-- Entries table -->
       <div class="table-wrap">
@@ -519,12 +471,7 @@
                   @if ( currentTimesheet()?.status === "APPROVED") {
                     <em class="status-note status-note--approved">Approved</em>
                   }
-                  <!-- Rejection reason shown for rejected entries -->
-                  @if (currentTimesheet()?.status === "REJECTED") {
-                    <em class="status-note status-note--rejected">
-                      {{ currentTimesheet()?.rejectionReason }}
-                    </em>
-                  }
+              
                 </td>
                 <td class="col-actions">
                  <!-- Draft and rejected timesheets expose all row actions through one menu  -->

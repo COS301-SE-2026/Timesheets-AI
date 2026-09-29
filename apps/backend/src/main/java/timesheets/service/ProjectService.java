@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import timesheets.client.AiServiceClient;
 import timesheets.domain.Project;
 import timesheets.domain.ProjectMember;
 import timesheets.domain.TimeEntry;
@@ -20,8 +21,10 @@ import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateProjectRequest;
 import timesheets.dto.request.UpdateProjectRequest;
 import timesheets.dto.response.ProjectDetailResponse;
+import timesheets.dto.response.ProjectForecastResponse;
 import timesheets.dto.response.ProjectMemberResponse;
 import timesheets.dto.response.ProjectResponse;
+import timesheets.dto.response.SavedProjectForecastResponse;
 import timesheets.enums.WorkspaceRole;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
@@ -42,6 +45,7 @@ public class ProjectService {
   private final TimeEntryRepository timeEntryRepository;
   private final UserRepository userRepository;
   private final TaskRepository taskRepository;
+  private final AiServiceClient aiServiceClient;
 
   /*
   - gets all the projects for the current user
@@ -85,8 +89,8 @@ public class ProjectService {
   public ProjectResponse createProject(
       CreateProjectRequest request, UUID createdByWorkspaceMemberId) {
 
-    if (!securityUtils.isAdmin()) {
-      throw new AccessDeniedException("Only Admins can create projects");
+    if (!securityUtils.isAdmin() && !securityUtils.isManager()) {
+      throw new AccessDeniedException("Only Admins and Managers can create projects");
     }
 
     UUID workspaceId = securityUtils.getCurrentWorkspaceId();
@@ -179,6 +183,10 @@ public class ProjectService {
     // if a project is archived then it cannot be updated
     if ("ARCHIVED".equals(project.getStatus())) {
       throw new StateConflictException("Cannot update an archived project");
+    }
+
+    if (request.getStatus() != null) {
+      project.setStatus(request.getStatus());
     }
 
     // the provided details will be the one updated
@@ -290,7 +298,10 @@ public class ProjectService {
     BigDecimal totalHoursLogged = calculateProjectTotalHours(projectId);
     BigDecimal progressPercentage = calculateProgressPercentage(project, totalHoursLogged);
 
-    boolean showCostInfo = securityUtils.isAdmin() || securityUtils.isManager();
+    boolean showCostInfo =
+        securityUtils.isAdmin()
+            || securityUtils.isManager()
+            || isProjectManager(projectId, workspaceMemberId);
 
     // calling the helper to build the response
     return buildProjectDetailResponse(
@@ -446,6 +457,29 @@ public class ProjectService {
     taskRepository.unassignActiveTasksFromProjectMember(projectId, workspaceMemberId, removedAt);
   }
 
+  // gets the last saved forcast to display until the manager syncs
+  @Transactional(readOnly = true)
+  public SavedProjectForecastResponse getProjectForecast(UUID projectId, UUID workspaceMemberId) {
+
+    if (!userHasAccessToProject(projectId, workspaceMemberId)) {
+      throw new AccessDeniedException("No access to this project");
+    }
+
+    return aiServiceClient.getProjectForecast(projectId);
+  }
+
+  // this actually calculates the new project forecast
+  public ProjectForecastResponse syncProjectForecast(
+      UUID projectId, UUID workspaceMemberId, String authorization) {
+
+    if (!userHasAccessToProject(projectId, workspaceMemberId)) {
+      throw new AccessDeniedException("No access to this project");
+    }
+
+    // sending the auth token so that the service can get the external evidence
+    return aiServiceClient.syncProjectForecast(projectId, authorization);
+  }
+
   // ! helper functions
   // determines a users role on a project
   // determines a user's current role on a project
@@ -590,10 +624,11 @@ public class ProjectService {
             .myRole(role)
             .createdAt(project.getCreatedAt())
             .updatedAt(project.getUpdatedAt())
-            .budgetHours(project.getBudgetHours())
-            .hourlyRate(project.getHourlyRate());
+            .budgetHours(project.getBudgetHours());
 
-    if (showCostInfo) {
+    if (showCostInfo || role == WorkspaceRole.MANAGER) {
+      builder.hourlyRate(project.getHourlyRate());
+      builder.budgetHours(project.getBudgetHours());
       builder.budgetCost(project.getBudgetCost());
     }
 
@@ -614,14 +649,16 @@ public class ProjectService {
             .description(project.getDescription())
             .status(project.getStatus())
             .members(memberInfos)
+            .startDate(project.getStartDate())
+            .endDate(project.getEndDate())
             .hoursLogged(totalHoursLogged)
             .progressPercentage(progressPercentage)
             .createdAt(project.getCreatedAt())
             .updatedAt(project.getUpdatedAt())
-            .budgetHours(project.getBudgetHours())
-            .hourlyRate(project.getHourlyRate());
+            .budgetHours(project.getBudgetHours());
 
     if (showCostInfo) {
+      builder.hourlyRate(project.getHourlyRate());
       builder.budgetCost(project.getBudgetCost());
 
       if (project.getBudgetHours() != null && project.getHourlyRate() != null) {

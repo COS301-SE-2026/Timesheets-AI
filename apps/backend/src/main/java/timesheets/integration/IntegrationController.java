@@ -3,8 +3,10 @@ package timesheets.integration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -13,15 +15,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import timesheets.auth.GoogleOAuthService;
 import timesheets.auth.GoogleTokenResponse;
+import timesheets.auth.MicrosoftOAuthService;
+import timesheets.auth.MicrosoftTokenResponse;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
 import timesheets.domain.IntegrationToken;
+import timesheets.domain.JiraTicket;
 import timesheets.domain.Task;
 import timesheets.domain.TimeEntry;
 import timesheets.dto.response.IssueResponse;
 import timesheets.integration.issue.JiraAdapter;
 import timesheets.integration.issue.JiraOAuthService;
 import timesheets.repository.IntegrationTokenRepository;
+import timesheets.repository.JiraTicketRepository;
 import timesheets.repository.TaskRepository;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.security.SecurityUtils;
@@ -33,10 +39,12 @@ public class IntegrationController {
 
   private final OAuthStateService oauthStateService;
   private final GoogleOAuthService googleOAuthService;
+  private final MicrosoftOAuthService microsoftOAuthService;
   private final SecurityUtils securityUtils;
   private final IntegrationTokenRepository integrationTokenRepository;
   private final JiraOAuthService jiraOAuthService;
   private final JiraAdapter jiraAdapter;
+  private final JiraTicketRepository jiraTicketRepository;
   private final TaskRepository taskRepository;
   private final TimeEntryRepository timeEntryRepository;
 
@@ -45,9 +53,16 @@ public class IntegrationController {
 
   @GetMapping("/google/calendar/connect")
   public ResponseEntity<String> connectGoogleCalender() {
+
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    // Use the email of the user currently signed into Timesheets AI
+    // so Google can target the same account when connecting Calendar.
+    String currentUserEmail = securityUtils.getCurrentEmail();
     String state = oauthStateService.generateState(workspaceMemberId, "GOOGLE_CALENDAR");
-    String authorizationUrl = googleOAuthService.buildAuthorizationUrl(state);
+
+    String authorizationUrl = googleOAuthService.buildAuthorizationUrl(state, currentUserEmail);
+
     return ResponseEntity.ok(authorizationUrl);
   }
 
@@ -317,5 +332,115 @@ public class IntegrationController {
     }
 
     return ResponseEntity.ok(rows);
+  }
+
+  public record JiraStatusCount(String status, long count, double percentage) {}
+
+  public record JiraTicketsBreakdownResponse(int totalTickets, List<JiraStatusCount> byStatus) {}
+
+  // "Jira Tickets" donut on the Developer Insights page - same task -> jira_ticket_key join as
+  // getJiraVsLogged(), grouping on status instead
+  @GetMapping("/jira/tickets-breakdown")
+  public ResponseEntity<JiraTicketsBreakdownResponse> getJiraTicketsBreakdown() {
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    List<String> ticketKeys =
+        taskRepository
+            .findByAssignedWorkspaceMemberIdAndIsDeletedFalseOrderByCreatedAtDesc(workspaceMemberId)
+            .stream()
+            .map(Task::getJiraTicketKey)
+            .filter(key -> key != null)
+            .toList();
+
+    if (ticketKeys.isEmpty()) {
+      return ResponseEntity.ok(new JiraTicketsBreakdownResponse(0, List.of()));
+    }
+
+    List<JiraTicket> tickets = jiraTicketRepository.findByJiraTicketKeyIn(ticketKeys);
+    int total = tickets.size();
+
+    Map<String, Long> countsByStatus =
+        tickets.stream()
+            .collect(
+                Collectors.groupingBy(
+                    t -> Optional.ofNullable(t.getJiraStatus()).orElse("UNKNOWN"),
+                    Collectors.counting()));
+
+    List<JiraStatusCount> byStatus =
+        countsByStatus.entrySet().stream()
+            .map(
+                entry ->
+                    new JiraStatusCount(
+                        entry.getKey(),
+                        entry.getValue(),
+                        Math.round((entry.getValue() * 100.0 / total) * 10.0) / 10.0))
+            .sorted((a, b) -> Long.compare(b.count(), a.count()))
+            .toList();
+
+    return ResponseEntity.ok(new JiraTicketsBreakdownResponse(total, byStatus));
+  }
+
+  // this is the endpoint for teh microsoft calendar oauth
+  @GetMapping("/microsoft/calendar/connect")
+  public ResponseEntity<String> connectMicrosoftCalendar() {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    /*
+    - I want it to use the email of the user who is signed in
+    - microsoft should go to that account when the calendar is connected
+     */
+    String currentUserEmail = securityUtils.getCurrentEmail();
+
+    /*
+    - in order to protect the callback being used by another user, link the state value to an auth request
+    */
+    String state = oauthStateService.generateState(workspaceMemberId, "MICROSOFT_CALENDAR");
+    String authorizationUrl = microsoftOAuthService.buildAuthorizationUrl(state, currentUserEmail);
+
+    return ResponseEntity.ok(authorizationUrl);
+  }
+
+  // microsoft will go back to this endpoint after authorization
+  @GetMapping("/microsoft/calendar/callback")
+  public ResponseEntity<Void> microsoftCalendarCallback(
+      @RequestParam String code, @RequestParam String state) {
+
+    /*
+    - for security; making sure that the user who started the connection is linked to the state
+     */
+    OAuthState validatedState = oauthStateService.validateState(state);
+    UUID workspaceMemberId = validatedState.getWorkspaceMemberId();
+
+    // auth code is temporary so getting tokens instead
+    MicrosoftTokenResponse tokenResponse = microsoftOAuthService.exchangeCodeForToken(code);
+    LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn());
+
+    Optional<IntegrationToken> existingToken =
+        integrationTokenRepository.findByWorkspaceMemberIdAndProvider(
+            workspaceMemberId, "MICROSOFT_CALENDAR");
+
+    IntegrationToken integrationToken;
+
+    if (existingToken.isEmpty()) {
+      integrationToken = new IntegrationToken();
+    } else {
+      integrationToken = existingToken.get();
+    }
+
+    integrationToken.setWorkspaceMemberId(workspaceMemberId);
+    integrationToken.setProvider("MICROSOFT_CALENDAR");
+    integrationToken.setAccessToken(tokenResponse.getAccessToken());
+    integrationToken.setExpiresAt(expiresAt);
+
+    if (tokenResponse.getRefreshToken() != null) {
+      integrationToken.setRefreshToken(tokenResponse.getRefreshToken());
+    }
+
+    integrationTokenRepository.save(integrationToken);
+
+    return ResponseEntity.status(HttpStatus.FOUND)
+        .header(HttpHeaders.LOCATION, frontendUrl + "/calendar?connected=true")
+        .build();
   }
 }

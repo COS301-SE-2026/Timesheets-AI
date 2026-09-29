@@ -11,8 +11,17 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { AiDashboardResponse } from '../../features/insights/models/ai-insights.model';
-import { PersonalInsightsResponse } from '../../features/insights/models/ai-insights.model';
+import {
+  AiDashboardResponse,
+  DeveloperProject,
+  JiraTicketsBreakdown,
+  PeriodOption,
+  PersonalInsightsResponse,
+} from '../../features/insights/models/ai-insights.model';
+import {
+  GenerateInsightsResponse,
+  ManagerDashboardResponse,
+} from '../../features/insights/models/manager-dashboard.model';
 
 @Injectable({
   providedIn: 'root',
@@ -21,16 +30,57 @@ export class InsightsService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/insights`;
 
-  getAiDashboard(): Observable<AiDashboardResponse> {
-    return this.http.get<AiDashboardResponse>(`${this.baseUrl}/ai`);
-  }
-  getCalendarVsTracked(from: string, to: string): Observable<{connected: boolean; calendarHours: number; trackedHours: number; unmatchedHours: number}> {
-    const params = new HttpParams().set('from', from).set('to', to);
-    return this.http.get<any>(`${environment.apiUrl}/calendar/vs-tracked`, { params });
+  getAiDashboard(period: PeriodOption = '8w'): Observable<AiDashboardResponse> {
+    const params = new HttpParams().set('period', period);
+    return this.http.get<AiDashboardResponse>(`${this.baseUrl}/ai`, { params });
   }
 
-  getJiraVsLogged(): Observable<{ticket: string; estimateHours: number; loggedHours: number}[]> {
-    return this.http.get<any>(`${environment.apiUrl}/integrations/jira/vs-logged`);
+  getMyProjects(): Observable<DeveloperProject[]> {
+    return this.http.get<DeveloperProject[]>(`${this.baseUrl}/my-projects`);
+  }
+
+  getJiraTicketsBreakdown(): Observable<JiraTicketsBreakdown> {
+    return this.http.get<JiraTicketsBreakdown>(
+      `${environment.apiUrl}/integrations/jira/tickets-breakdown`,
+    );
+  }
+
+  generateWeeklySummary(
+  subjectId: string,
+  weekStart: string,
+): Observable<{ narrative: string; weekStart: string }> {
+  const params = new HttpParams()
+    .set('subject_type', 'USER')
+    .set('week_start', weekStart);
+  return this.http.post<{ narrative: string; weekStart: string }>(
+    `${environment.aiServiceUrl}/insights/weekly-summary/${subjectId}/generate`,
+    {},
+    { params },
+  );
+}
+  getCalendarVsTracked(
+    from: string,
+    to: string,
+  ): Observable<{
+    connected: boolean;
+    calendarHours: number;
+    trackedHours: number;
+    unmatchedHours: number;
+  }> {
+    const params = new HttpParams().set('from', from).set('to', to);
+    return this.http.get<any>(`${environment.apiUrl}/calendar/vs-tracked`, {
+      params,
+    });
+  }
+  getCurrentWorkspaceMemberId(): Observable<{ workspaceMemberId: string }> {
+    return this.http.get<{ workspaceMemberId: string }>(`${this.baseUrl}/me`);
+  }
+  getJiraVsLogged(): Observable<
+    { ticket: string; estimateHours: number; loggedHours: number }[]
+  > {
+    return this.http.get<any>(
+      `${environment.apiUrl}/integrations/jira/vs-logged`,
+    );
   }
   getInsightsSummary(
     from: string,
@@ -40,5 +90,27 @@ export class InsightsService {
     return this.http.get<PersonalInsightsResponse>(`${this.baseUrl}/summary`, {
       params,
     });
+  }
+    getManagerDashboard(
+    projectId: string | null,
+    period: string = '8w',
+  ): Observable<ManagerDashboardResponse> {
+    let params = new HttpParams().set('period', period);
+    if (projectId) {
+      params = params.set('projectId', projectId);
+    }
+    return this.http.get<ManagerDashboardResponse>(`${this.baseUrl}/manager-dashboard`, { params });
+  }
+
+  generateInsights(projectId: string): Observable<GenerateInsightsResponse> {
+    const params = new HttpParams().set('projectId', projectId);
+    return this.http.post<GenerateInsightsResponse>(`${this.baseUrl}/generate`, {}, { params });
+  }
+
+  resolveBurnoutInsight(insightId: string): Observable<{ id: string; resolved: boolean }> {
+    return this.http.patch<{ id: string; resolved: boolean }>(`${this.baseUrl}/${insightId}/resolve`, {});
+  }
+    getTeamWeeklySummary(): Observable<{ narrative: string }> {
+    return this.http.get<{ narrative: string }>(`${this.baseUrl}/weekly-summary/team`);
   }
 }
