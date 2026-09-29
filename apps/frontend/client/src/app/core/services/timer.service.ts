@@ -29,10 +29,12 @@ export interface ActiveTimerResponse {
     id: string;
     name: string;
   };
+
   task: {
     id: string;
     title: string;
   }| null;
+  
   startedAt: string;
   elapsedMinutes: number;
   elapsedSeconds: number;
