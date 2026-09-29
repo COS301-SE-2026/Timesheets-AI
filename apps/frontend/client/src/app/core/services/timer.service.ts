@@ -152,6 +152,28 @@ export class TimerService {
   }
 
   // TIMER DISPLAY
+  private startElapsedInterval(intialElapsed: number): void{
+    this.stopElapsedInterval();
+
+    this.elapsedSeconds.set(intialElapsed);
+
+    const clientStartTime= Date.now()- intialElapsed*1000;
+
+    this.timerIntervalId= setInterval(()=> {
+      this.elapsedSeconds.set(
+        Math.max(
+          0, Math.floor((Date.now()- clientStartTime)/1000)
+        )
+      );
+    }, 1000);
+  }
+
+  private stopElapsedInterval(): void{
+    if(this.timerIntervalId){
+      clearInterval(this.timerIntervalId);
+      this.timerIntervalId= null;
+    }
+  }
 
   private handleError(operation: string) {
     return (error: HttpErrorResponse) => { //was: (error: any)
