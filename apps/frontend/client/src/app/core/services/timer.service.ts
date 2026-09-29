@@ -34,7 +34,7 @@ export interface ActiveTimerResponse {
     id: string;
     title: string;
   }| null;
-  
+
   startedAt: string;
   elapsedMinutes: number;
   elapsedSeconds: number;
@@ -67,7 +67,7 @@ export interface StopTimerResponse {
 
 export interface StartTimerRequest {
   projectId: string;
-  taskId: string;
+  taskId: string| null;
 }
 
 @Injectable({ providedIn: 'root' })
