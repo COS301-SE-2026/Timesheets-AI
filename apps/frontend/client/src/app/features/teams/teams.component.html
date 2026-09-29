@@ -17,7 +17,7 @@
     </header>
 
 @if (errorMessage) {
-    <div class="notice" [class.notice--success]="actionMessageKind === 'success'" [class.notice--error]="actionMessageKind === 'error'" role="status">{{ actionMessage }}</div>
+    <div class="notice" [class.notice--success]="actionMessageKind === 'success'" [class.notice--error]="actionMessageKind === 'error'" role="status">{{ errorMessage }}</div>
 }
 @if (actionMessage) {
     <div class="notice" [class.notice--success]="actionMessageKind === 'success'" [class.notice--error]="actionMessageKind === 'error'">
@@ -125,15 +125,19 @@
                                     @if (activeTab === 'waiting') {
                                         <div class="workspace-add-controls">
                                             <label class="sr-only" [for]=" 'workspace-role-' + member.userId">Workspace role</label>
+                                            <div class="workspace-role-control">
+                                                <i class="fa-solid fa-user-gear" aria-hidden="true"></i>
                                                 <select [id]="'workspace-role-' + member.userId"
                                                 [ngModel]="workspaceRoleFor(member)"
                                                 (ngModelChange)="setWorkspaceRole(member, $event)">
+                                                <option value="" disabled>Select role</option>
                                                 <option value="ADMIN">Admin</option>
                                                 <option value="MANAGER">Manager</option>
                                                 <option value="DEVELOPER">Developer</option>
                                                 </select>
+                                            </div>
                                                 <button type="button" class="primary-button small" (click)="addToWorkspace(member)"
-                                                [disabled]="isActionInProgress('workspace-' + member.userId)">
+                                                [disabled]="!workspaceRoleFor(member) || isActionInProgress('workspace-' + member.userId)">
                                                 <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
                                                 @if (isActionInProgress('workspace-' + member.userId)) { Adding...} @else { Add to Workspace }
                                             </button>                                   
@@ -250,15 +254,22 @@
                     }
                 </select>
                 </label>
-               <label>Developers
-                <select [(ngModel)]="newProject.developerIds" multiple>
+               <fieldset class="developer-selector">
+                <legend>Developers</legend>
+                <div class="developer-options">
                     @for (member of workspaceMembers; track member.userId) {
                         @if (member.workspaceMemberId) {
-                            <option [value]="member.workspaceMemberId" [disabled]="member.workspaceMemberId === newProject.managerId">{{ member.firstName }} {{ member.lastName }} </option>
+                            <label class="developer-option">
+                                <input type="checkbox"
+                                    [checked]="member.workspaceMemberId !== newProject.managerId && newProject.developerIds.includes(member.workspaceMemberId)"
+                                    [disabled]="member.workspaceMemberId === newProject.managerId"
+                                    (change)="toggleDeveloper(member.workspaceMemberId, $any($event.target).checked)" />
+                                    <span>{{ member.firstName }} {{ member.lastName }} {{member.workspaceMemberId === newProject.managerId ? ' (Project manager)' : '' }}</span>
+                            </label>
                         }
                     }
-                </select>
-               </label>
+               </div>
+               </fieldset>
                </div>
                <p class="form-help">Choose one project manager, then select the remaining project members as developers.</p>
             <div class="dialog-actions">

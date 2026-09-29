@@ -205,6 +205,11 @@ protected closeCreateProject(): void {
   if (!this.actionInProgress) this.showCreateProjectDialog = false;
 }
 
+protected toggleDeveloper(workspaceMemberId: string, selected: boolean): void {
+  const remaining = this.newProject.developerIds.filter(id => id !== workspaceMemberId);
+  this.newProject.developerIds = selected ? [...remaining, workspaceMemberId] : remaining;
+}
+
 // Create project
 
 protected createProject(): void {
@@ -244,9 +249,11 @@ protected createProject(): void {
 
 // admin assigns member to workspace
 protected addToWorkspace(member: TeamMember): void {
+  const role = this.workspaceRoleFor(member);
+  if (!role) return;
   const actionKey = `workspace-${member.userId}`;
   this.startAction(actionKey);
-  this.teamService.addToWorkspace(member.userId, this.workspaceRoleFor(member))
+  this.teamService.addToWorkspace(member.userId, role)
   .pipe(finalize(() => this.finishAction())).subscribe({
     next: (workspaceMember) => {
       this.workspaceMemberIdsByUser.set(member.userId, workspaceMember.workspaceMemberId);
@@ -268,8 +275,8 @@ protected addToWorkspace(member: TeamMember): void {
   });
 }
 
-protected workspaceRoleFor(member: TeamMember): WorkspaceRole {
-  return this.workspaceRolesByUser.get(member.userId) ?? 'DEVELOPER';
+protected workspaceRoleFor(member: TeamMember): WorkspaceRole | '' {
+  return this.workspaceRolesByUser.get(member.userId) ?? '';
 }
 
 protected setWorkspaceRole(member: TeamMember, role: WorkspaceRole): void {
