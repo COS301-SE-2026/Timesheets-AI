@@ -12,7 +12,6 @@ import { MfaSetupDialogComponent } from './mfa-setup-dialog/mfa-setup-dialog.com
 import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dialog.component';
 import { AuthService } from '../../core/services/auth.service';
 import { IntegrationBrowserDialogComponent } from './integration-browser-dialog/integration-browser-dialog.component';
-import { IntegrationRequestDialogComponent } from './integration-request-dialog/integration-request-dialog.component';
 import { AccountDeletionDialogComponent } from './account-deletion-dialog/account-deletion-dialog.component';
 
 @Component({
@@ -35,6 +34,7 @@ export class SettingsComponent implements OnInit{
   private readonly authService= inject( AuthService);
   private readonly dialog=inject(MatDialog);
 
+  syncingIntegration= signal<string | null>(null);
   settings= signal<UserSettings | null>(null);
   role= signal<UserRole>('DEVELOPER');
   isLoading= signal<boolean>(true);
@@ -48,20 +48,6 @@ export class SettingsComponent implements OnInit{
   );
   isDeveloper= computed(
     ()=> this.role()=== 'DEVELOPER'
-  );
-
-  // DEVS CAN ONLY SEE INTEGRATIONS
-  canToggleIntegrations= computed(
-    ()=> this.isAdmin() || this.isManager()
-  );
-
-  // ONLY ADMIN CAN ADD NEW INTEGRATIONS + MANAGER REQUEST NEW ONES
-  canAddIntegrations= computed(
-    ()=> this.isAdmin()
-  );
-
-  canRequestIntegrations= computed(
-    ()=> this.isManager()
   );
 
   ngOnInit(): void{
@@ -193,46 +179,30 @@ export class SettingsComponent implements OnInit{
     });
   }
 
-  toggleIntegration(integration: IntegrationStatus, enabled:boolean):void{
-    if(!this.canToggleIntegrations()){
-      return;
-    }
-
-    this.settingsService.toggleIntegration(integration.id, enabled).subscribe(
-      ()=>{
-        this.settings.update(
-          (s)=>{
-            if(!s) return s;
-
-            const integrations= s.integrations.map(
-              (i)=> i.id === integration.id? {...i, enabled}: i
-            );
-            return { ...s, integrations};
-          });
-      });
+  isSyncing(integrationId: string): boolean{
+    return this.syncingIntegration()=== integrationId;
   }
 
-  requestIntegration():void{
-    if(!this.canRequestIntegrations()){
+  syncIntegration(integration: IntegrationStatus):void{
+    if(!integration.connected){
       return;
     }
 
-    const dialogRef= this.dialog.open(
-      IntegrationRequestDialogComponent,
-      {
-        width:'500px',
-        maxWidth: '95vw',
-        disableClose: true
-      }
-    );
+    this.syncingIntegration.set(integration.id);
 
-    dialogRef.afterClosed().subscribe((request)=> {
-      if(!request){
-        return;
-      }
+    this.settingsService.syncIntegration(integration.id).subscribe({
+      next: ()=>{
+        this.syncingIntegration.set(null);
+      },
+      error:(error)=>{
+        console.error(
+          `Failed to sync ${integration.name}:`,
+          error
+        );
 
-      console.log('Integration request:', request);
-    });
+        this.syncingIntegration.set(null);
+      }
+  });
   }
 
   requestAccountDeletion():void{
