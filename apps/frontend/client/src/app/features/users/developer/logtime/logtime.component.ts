@@ -22,7 +22,7 @@
  */
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, computed, inject, OnDestroy, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, signal, effect } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import {
@@ -416,7 +416,15 @@ export class LogtimeComponent implements OnDestroy {
     meant most of the project/task dropdown was picking IDs the backend had never heard of. Loading real data removes that trap entirely
     */
     this.loadProjects();
+
+    effect(()=>{
+      if(this.timerService.openTimerPanel()){
+        this.openTimerPanel();
+        this.timerService.closeTimerPanel();
+      }
+    });
   }
+
   private onDateRangeChange(): void {
     this.loadCurrentTimesheet();
   }
@@ -622,15 +630,43 @@ export class LogtimeComponent implements OnDestroy {
       projectId: timer.projectId,
       taskId: timer.taskId,
     };
-    this.http
-      .post(`${this.apiBaseUrl}/timers/start`, request, this.requestOptions())
-      .subscribe({
-        next: () => activateTimer(timer),
-        error: (error) =>
-          this.conflictMessage.set(
-            error.error?.message ?? 'Unable to start the timer.',
-          ),
-      });
+    // this.http
+    //   .post(`${this.apiBaseUrl}/timers/start`, request, this.requestOptions())
+    //   .subscribe({
+    //     next: () => activateTimer(timer),
+    //     error: (error) =>
+    //       this.conflictMessage.set(
+    //         error.error?.message ?? 'Unable to start the timer.',
+    //       ),
+    //   });
+    this.timerService.startTimer(request).subscribe({
+      next:(response)=>{
+        const activateTimer: ActiveTimer={
+          id: response.id,
+          projectId: response.project.id,
+          taskId: response.task?.id?? null,
+          notes: timer.notes,
+          startedAt: new Date(response.startedAt),
+        };
+
+        this.activeTimer.set(activateTimer);
+        this.timerService.setActiveTimer(response);
+        this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
+        this.isTimerPaused.set(response.isPaused ?? false);
+        this.pausedElapsedSeconds.set(response.elapsedSeconds ?? 0);
+        this.timerForm.disable({ emitEvent: false});
+
+        if(response.isPaused){
+          this.clearTimerInterval();
+        }else{
+          this.startElapsedInterval(response.elapsedSeconds?? 0);
+        }
+      },
+
+      error: (error)=> this.conflictMessage.set(
+        error.error?.message?? 'Unable to start the timer.',
+      ),
+    })
   }
 
   pauseTimer(): void {
@@ -1389,6 +1425,7 @@ export class LogtimeComponent implements OnDestroy {
   */
  private resetTimerState(toastMessage: string): void {
     this.activeTimer.set(null);
+    this.timerService.clearActiveTimer();
     this.elapsedSeconds.set(0);
     this.isTimerPaused.set(false);
     this.pausedElapsedSeconds.set(0);
