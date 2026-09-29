@@ -28,7 +28,7 @@ public class EvidenceService {
           evidenceEvents.addAll(collectorEvents);
         }
       } catch (Exception e) {
-        log.error("Failed to collect evidence using", collector.getClass().getSimpleName(), e);
+        log.error("Failed to collect evidence using {}", collector.getClass().getSimpleName(), e);
       }
     }
 
