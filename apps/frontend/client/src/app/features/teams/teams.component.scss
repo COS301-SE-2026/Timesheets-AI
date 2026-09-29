@@ -357,10 +357,6 @@ h1 {
     box-shadow: var(--elevation-3);
     min-width: 190px;
     padding: var(--space-1);
-    position: relative;
-    right: 0;
-    top: calc(100% + var(--space-1));
-    z-index: 3;
 }
 
 .action-menu button {
@@ -511,6 +507,7 @@ h1 {
     display: flex;
     gap: var(--space-3);
     justify-content: flex-end;
+    margin-top: var(--space-6);
 }
 
 .assignment-dialog input, .assignment-dialog textarea {

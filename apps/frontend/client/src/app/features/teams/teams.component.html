@@ -140,11 +140,22 @@
                                         </div>
                                     } @else {
                                         <button type="button" class="menu-trigger" (click)="toggleActionMenu(member)"
+                                        cdkOverlayOrigin #actionOrigin="cdkOverlayOrigin"
                                         [attr.aria-expanded]="openActionMenuUserId === member.userId"
                                         [attr.aria-label]=" 'Actions for ' + member.firstName + ' ' + member.lastName">
                                         <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
                                         </button>
-                                        @if (openActionMenuUserId === member.userId) {
+                                        <ng-template cdkConnectedOverlay
+                                            [cdkConnectedOverlayOrigin]="actionOrigin"
+                                            [cdkConnectedOverlayOpen]="openActionMenuUserId === member.userId"
+                                            [cdkConnectedOverlayPositions]="[
+                                                {originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 4},
+                                                {originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -4}
+                                            ]"
+                                            [cdkConnectedOverlayHasBackdrop]="true"
+                                            cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+                                            (backdropClick)="openActionMenuUserId = ''"
+                                            (overlayKeydown)="$event.key === 'Escape' && (openActionMenuUserId = '')">
                                             <div class="action-menu" role="menu">
                                                 <button type="button" role="menuitem" (click)="openAssignment(member)"
                                                 [disabled]="!canManageProjects(member)"
@@ -152,7 +163,7 @@
                                                 <i class="fa-solid fa-folder-plus" aria-hidden="true"></i> Add to project
                                                 </button>
 
-                                                <button type="button" role="menuitem" (click)="openProjectRemoval(member)" [disabled]="!member.projectIds.length">
+                                                <button type="button" role="menuitem" (click)="openProjectRemoval(member)">
                                                    <i class="fa-solid fa-folder-minus" aria-hidden="true"></i> Remove from project
                                                 </button>
                                                 @if (isAdmin) {
@@ -164,7 +175,7 @@
                                                 }
                                             </div>
 
-                                        }
+                                        </ng-template>
                                     }
                                 </div>
                             </td>

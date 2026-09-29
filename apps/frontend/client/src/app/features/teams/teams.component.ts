@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { OverlayModule } from '@angular/cdk/overlay';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { AuthService } from '../../core/services/auth.service';
@@ -33,7 +34,7 @@ interface NewProjectForm {
 @Component({
   selector: 'app-teams',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, OverlayModule],
   templateUrl: './teams.component.html',
   styleUrl: './teams.component.scss'
 })
@@ -126,6 +127,10 @@ protected openAssignment(member: TeamMember): void {
 
 protected openProjectRemoval(member: TeamMember) : void {
   this.openActionMenuUserId = '';
+  if (!member.projectIds.length) {
+    this.showError(`${member.firstName} ${member.lastName} is not part of any project.`);
+    return
+  }
   this.selectedMember = member;
   this.selectedProjectId = member.projectIds[0] ?? '';
   this.assignmentMode = 'remove';
