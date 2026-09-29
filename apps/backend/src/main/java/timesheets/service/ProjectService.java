@@ -181,9 +181,9 @@ public class ProjectService {
     }
 
     // if a project is archived then it cannot be updated
-    // if ("ARCHIVED".equals(project.getStatus())) {
-    //   throw new StateConflictException("Cannot update an archived project");
-    // }
+    if ("ARCHIVED".equals(project.getStatus())) {
+      throw new StateConflictException("Cannot update an archived project");
+    }
 
     if (request.getStatus() != null) {
       project.setStatus(request.getStatus());
@@ -629,6 +629,7 @@ public class ProjectService {
     if (showCostInfo || role == WorkspaceRole.MANAGER) {
       builder.hourlyRate(project.getHourlyRate());
       builder.budgetHours(project.getBudgetHours());
+      builder.budgetCost(project.getBudgetCost());
     }
 
     return builder.build();
