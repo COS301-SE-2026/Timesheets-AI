@@ -6,6 +6,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import timesheets.evidence.EvidenceAnalysisClient;
 import timesheets.evidence.correlation.EvidenceEngineService;
 
 @RestController
@@ -14,6 +15,7 @@ import timesheets.evidence.correlation.EvidenceEngineService;
 public class SuggestionController {
   private final SuggestionService suggestionService;
   private final EvidenceEngineService evidenceEngineService;
+  private final EvidenceAnalysisClient evidenceAnalysisClient;
 
   @GetMapping("/workspace-member/{workspaceMemberId}")
   public List<SuggestedWorkSession> getSuggestions(@PathVariable UUID workspaceMemberId) {
@@ -58,4 +60,13 @@ public class SuggestionController {
         request.getStartTime(),
         request.getEndTime());
   }
+
+  @PostMapping("/{suggestionId}/evidence-analysis")
+  public EvidenceAnalysisResponse analyseEvidence(@PathVariable UUID suggestionId) {
+    SuggestedWorkSession suggestion = suggestionService.getSuggestion(suggestionId);
+    String narrative = evidenceAnalysisClient.analyseEvidence(suggestion);
+    return new EvidenceAnalysisResponse(narrative);
+  }
+
+  public record EvidenceAnalysisResponse(String narrative) {}
 }
