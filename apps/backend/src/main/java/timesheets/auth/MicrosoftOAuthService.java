@@ -7,13 +7,15 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
-//this will handle the microsoft OAuth flow
+// this will handle the microsoft OAuth flow
 @Service
 public class MicrosoftOAuthService {
 
-  private static final String MICROSOFT_AUTHORIZATION_URL = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize";
+  private static final String MICROSOFT_AUTHORIZATION_URL =
+      "https://login.microsoftonline.com/common/oauth2/v2.0/authorize";
 
-  private static final String MICROSOFT_TOKEN_URL = "https://login.microsoftonline.com/common/oauth2/v2.0/token";
+  private static final String MICROSOFT_TOKEN_URL =
+      "https://login.microsoftonline.com/common/oauth2/v2.0/token";
 
   @Value("${app.microsoft.sso.client-id}")
   private String clientId;
@@ -28,7 +30,6 @@ public class MicrosoftOAuthService {
 
   public String buildAuthorizationUrl(String state, String loginHint) {
 
-    
     return UriComponentsBuilder.fromHttpUrl(MICROSOFT_AUTHORIZATION_URL)
         .queryParam("client_id", clientId)
         .queryParam("response_type", "code")
@@ -40,7 +41,7 @@ public class MicrosoftOAuthService {
         .build()
         .encode()
         .toUriString();
-        //the offline_access is so that microsoft can give a refresh token
+    // the offline_access is so that microsoft can give a refresh token
   }
 
   public MicrosoftTokenResponse exchangeCodeForToken(String code) {
