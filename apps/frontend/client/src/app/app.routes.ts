@@ -89,14 +89,6 @@ export const routes: Routes = [
         .then(m => m.MyTasksComponent)
   },
 
-  {
-    path: 'leave-requests',
-    canActivate: [authGuard, workspaceGuard],
-    loadComponent: () =>
-      import('./features/leave-requests/leave-requests.component')
-        .then(m => m.LeaveRequestsComponent)
-  },
-
   // Team page
 
   {
