@@ -494,12 +494,19 @@
 
                     <div class="suggestion-card-field">
 
-                      @if (suggestion.durationMinutes !== null){
+                      <!-- @if (suggestion.durationMinutes !== null){
                         <span>
                           {{ suggestion.durationMinutes }} min
                         </span>
                       } @else {
                         <span>Not determined</span>
+                      } -->
+                        @if (suggestion.durationMinutes && suggestion.durationMinutes > 0) {
+                        <span>
+                          {{ suggestion.durationMinutes }} min
+                        </span>
+                      } @else {
+                        <span>Duration not determined</span>
                       }
                     </div>
 
@@ -574,11 +581,84 @@
                   </div>
 
 
-                  <div class="suggestion-card-evidence">
+                  <!--<div class="suggestion-card-evidence">
                     <span class="field-label">Evidence</span>
 
                     <p> {{ getSourceSummary(suggestion) }} </p>
-                  </div>
+                  </div>-->
+                    <div class="suggestion-card-evidence">
+                      <div class="suggestion-card-evidence-header">
+                        <div>
+                          <span class="field-label">Evidence supporting this work session suggestion</span>
+                          <p>
+                            These activities were grouped together based on their timing and shared context.
+                          </p>
+                          <p>{{ getSourceSummary(suggestion) }}</p>
+                        </div>
+
+                        <span class="evidence-count">
+                          {{ suggestion.evidenceEvents?.length || 0 }}
+                          evidence
+                        </span>
+                      </div>
+
+                      @if (suggestion.evidenceEvents?.length) {
+                        <div class="evidence-list">
+
+                          @for (event of suggestion.evidenceEvents; track event.id) {
+                            <div class="evidence-item">
+
+                              <div class="evidence-item-icon">
+                                @if (event.source === 'GITHUB') {
+                                  <span>GH</span>
+                                } @else if (event.source === 'JIRA') {
+                                  <span>JR</span>
+                                } @else if (event.source === 'GOOGLE_CALENDAR') {
+                                  <span>CA</span>
+                                } @else {
+                                  <span>EV</span>
+                                }
+                              </div>
+
+                              <div class="evidence-item-content">
+                                <div class="evidence-tem-header">
+                                  <strong>
+                                    @if (event.source === 'GITHUB'){
+                                      GitHub
+                                    } @else if (event.source === 'JIRA'){
+                                      Jira
+                                    } @else if (event.source === 'GOOGLE_CALENDAR'){
+                                      Calendar
+                                    } @else {
+                                      {{ event.source }}
+                                    }
+                                  </strong>
+
+                                  <span class="evidence-item-type"> {{ event.activityType }} </span>
+
+                                  @if (event.timestamp){
+                                    <span class="evidence-item-time">
+                                      {{ formatTime(event.timestamp )}}
+                                    </span>
+                                  }
+                                </div>
+
+                                <p>
+                                  {{ event.description || 'Evidence event detected' }}
+                                </p>
+                              </div>
+
+                            </div>
+                          }
+
+                        </div>
+                      } @else {
+                        <p class="evidence-empty">
+                          No detailed evidence is available for this suggestion.
+                        </p>
+                      }
+                    </div>
+                  
 
                   <footer class="suggestion-card-actions">
                     <button type="button" class="btn btn--ghost" (click)="confirmRejectSuggestion(suggestion)">
