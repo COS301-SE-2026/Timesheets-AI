@@ -102,7 +102,7 @@
   @if (activeTimer() && activePanel() !== "timer") {
     <section class="banner banner--info">
       <span class="timer-status"
-        ><span class="timer-status__dot"></span> Timer running —
+        ><span class="timer-status__dot"></span> Timer running: 
         {{ formatElapsed(elapsedSeconds()) }}</span
       >
       <button type="button" class="link-btn" (click)="openTimerPanel()">
