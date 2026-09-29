@@ -103,6 +103,10 @@ describe('LogtimeComponent', () => {
 
     httpMock.expectOne(`/api/tasks/project/${projectOneId}`).flush(
       mockTasks.filter((t)=> t.projectId === projectOneId),);
+
+      httpMock.expectOne(`/api/tasks/project/${projectTwoId}`).flush(
+    mockTasks.filter((t) => t.projectId === projectTwoId),
+  );
   }
 
   beforeEach(async () => {
@@ -676,7 +680,7 @@ describe('LogtimeComponent', () => {
   it('should return fallback labels for unknown project and task ids', () => {
     expect(component.getProjectName('unknown')).toBe('Unknown project');
 
-    expect(component.getTaskTitle('unknown')).toBe('No task selected');
+    expect(component.getTaskTitle('unknown')).toBe('Unknown task');
   });
 
   // Timer started label

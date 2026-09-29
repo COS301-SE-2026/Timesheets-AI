@@ -35,7 +35,7 @@ public class MicrosoftCalendarAdapter implements CalendarAdapter {
 
   private final RestClient restClient = RestClient.create();
 
-  ZoneId southAfricaZone = ZoneId.of("Africa/Johannesburg");
+  private static final ZoneId SOUTH_AFRICA_ZONE = ZoneId.of("Africa/Johannesburg");
 
   // the provider name
   @Override
@@ -53,8 +53,8 @@ public class MicrosoftCalendarAdapter implements CalendarAdapter {
             .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "MICROSOFT_CALENDAR")
             .orElseThrow(() -> new RuntimeException("Microsoft Calendar is not connected"));
 
-    String startDateTime = startTime.atZone(southAfricaZone).toOffsetDateTime().toString();
-    String endDateTime = endTime.atZone(southAfricaZone).toOffsetDateTime().toString();
+    String startDateTime = startTime.atZone(SOUTH_AFRICA_ZONE).toLocalDateTime().toString();
+    String endDateTime = endTime.atZone(SOUTH_AFRICA_ZONE).toLocalDateTime().toString();
 
     String url =
         UriComponentsBuilder.fromHttpUrl(MICROSOFT_GRAPH_CALENDAR_URL)
@@ -69,6 +69,7 @@ public class MicrosoftCalendarAdapter implements CalendarAdapter {
             .get()
             .uri(url)
             .header("Authorization", "Bearer " + token.getAccessToken())
+            .header("Prefer", "outlook.timezone=\"South Africa Standard Time\"")
             .retrieve()
             .body(MicrosoftGraphEventResponse.class);
 
