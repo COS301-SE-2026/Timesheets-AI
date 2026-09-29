@@ -12,13 +12,17 @@ Related Requirements: N/A
         class="floating-timer"
         (click)="openTimer()"
         aria-label="Open active timer">
-        <span class="floating-timer__indicator">
-
-        </span>
 
         <span class="floating-timer__content">
-            <span class="floating-timer__label">
-                TIMER RUNNING
+            <span class="floating-timer__status">
+                <span 
+                    class="floating-timer__indicator"
+                    aria-hidden="true">
+                </span>
+                
+                <span class="floating-timer__label">
+                    TIMER RUNNING
+                </span>
             </span>
 
             <strong class="floating-timer__time">
@@ -29,6 +33,7 @@ Related Requirements: N/A
                 {{ timer.project.name }}
 
                 @if(timer.task){
+                    <span class="floating-timer__separator">·</span>
                     {{ timer.task.title }}
                 }
             </span>
