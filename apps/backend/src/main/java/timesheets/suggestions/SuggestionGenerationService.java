@@ -99,7 +99,7 @@ public class SuggestionGenerationService {
   private String generateExplanation(EvidenceGroup group) {
 
     int evidenceCount = group.getEvidenceEvents().size();
+    return "This suggestion was generated from "+ evidenceCount + " related evidence events.";
 
-    return "This suggestion was generated from " + evidenceCount + " related evidence events.";
   }
 }
