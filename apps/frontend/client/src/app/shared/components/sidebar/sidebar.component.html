@@ -24,7 +24,7 @@
       <a
         class="nav-item"
         tabindex="0"
-        [attr.aria-labe]="item.label"
+        [attr.aria-label]="item.label"
         [attr.title]="isCollapsed() ? item.label : null"
         [class.active]="item.route === activeRoute()"
         (click)="setActive(item.route)"
@@ -62,5 +62,5 @@
         </button>
       </div>
     }
-  </div>
+ 
 </div>

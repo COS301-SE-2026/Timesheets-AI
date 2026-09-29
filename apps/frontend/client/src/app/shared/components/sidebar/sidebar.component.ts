@@ -32,11 +32,22 @@ interface NavItem {
   selector: 'app-sidebar', // HTML tag to show this UI component
   imports: [MatIconModule, RouterModule],
   standalone: true,
+  host: {
+    '[class.collapsed]': 'isCollapsed()',
+  },
   templateUrl: './sidebar.component.html', // links the HTML for the UI component 
   styleUrl: './sidebar.component.scss' // links SCSS file 
 })
 
 export class SidebarComponent {
+
+  readonly isCollapsed = signal(false);
+
+  toggleSidebar(): void {
+    this.isCollapsed.update(collapsed => !collapsed);
+    this.isMenuOpen.set(false);
+  }
+
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
 
