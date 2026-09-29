@@ -45,3 +45,21 @@ Related Requirements: N/A
         </span>
     </button>
 }
+
+@if(sidebarCollapsed){
+    <button
+        type="button"
+        class="floating-timer floating-timer--collapsed"
+        (click)="openTimer()"
+        aria-label="Timer running">
+        <span 
+            class="floating-timer__clock"
+            aria-hidden="true">
+            <span class="floating-timer__clock-hand floating-timer__clock-hand--hour"></span>
+            <span class="floating-timer__clock-hand floating-timer__clock-hand--minute"></span>
+        </span>
+
+        <span class="floating-timer__running-dot"></span>
+
+    </button>
+}
