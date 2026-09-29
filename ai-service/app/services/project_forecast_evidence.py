@@ -49,7 +49,7 @@ def get_project_forecast_evidence(
             url,
             params=params,
             headers=headers,
-            timeout=10.0,
+            timeout=30.0,
         )
 
         response.raise_for_status()
