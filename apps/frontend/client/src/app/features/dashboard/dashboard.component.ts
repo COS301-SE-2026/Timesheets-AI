@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, inject, signal, } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { catchError, finalize, forkJoin, of, map } from 'rxjs';
@@ -13,7 +13,6 @@ import { AvailableTeamUser, TeamService } from '../../core/services/team.service
 import { AppEvent } from '../calendar/calendar.model';
 import { CalendarService } from '../calendar/calendar.services';
 import { NotificationPanelComponent } from '../notifications/notification-panel.component';
-import { DecimalPipe } from '@angular/common';
 
 interface ActiveProjectCard {
   id: string;

@@ -16,7 +16,6 @@ Add a edit project button with will open a modal to allow the users to open. Upd
 import { Component, signal, computed, inject, effect, TemplateRef } from "@angular/core";
 import { MatDialog, MatDialogModule,  MatDialogActions, MatDialogClose } from "@angular/material/dialog";
 import { MatButtonModule } from "@angular/material/button";
-import { AuthService } from "../../../core/services/auth.service";
 import { ProjectDetailResponse, ProjectService } from "../../../core/services/project.service";
 import { EditProjectDialogComponent } from "./edit-project-dialog.component";
 import { CommonModule, Location } from "@angular/common";
