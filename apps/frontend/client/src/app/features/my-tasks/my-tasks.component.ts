@@ -823,7 +823,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   //navigate to project
 
   public navigateToProject(projectId: string): void {
-    void this.router.navigate(['/projects', projectId]);
+    void this.router.navigate(['/projects/details'], { state: { projectId } });
   }
 
   public onOverlayKeydown(event: KeyboardEvent): void {

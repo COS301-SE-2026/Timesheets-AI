@@ -3,7 +3,6 @@ package timesheets.dto.request;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,7 +27,6 @@ public class CreateProjectRequest {
   @Positive(message = "Budget cost must be positive")
   private BigDecimal budgetCost;
 
-  @PastOrPresent(message = "Start date cannot be in the future")
   private LocalDate startDate;
 
   @Future(message = "End date must be in the future")

@@ -1,33 +1,292 @@
 @use '../insights-shared' as *;
 
-.git-effort-layout {
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: var(--space-6);
-  align-items: start;
-  margin-top: 4px;
+/*
+ * Weekly Summary (mirrors developer-insights.component.scss's block, this
+ * page just also handles multiple lines instead of always one)
+ */
+
+.weekly-summary-content {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
 }
 
-.project-read-note {
+.weekly-summary-content .summary-lines {
+  flex: 1;
+  max-width: 950px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.weekly-summary-content .summary {
+  flex: 1;
+  max-width: 950px;
+}
+
+.weekly-summary-content .export-btn {
+  flex-shrink: 0;
+}
+
+/*
+ * Project Row
+ */
+
+.project-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+.project-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  height: 38px;
+  padding: 0 16px;
+
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #173b78;
+  background: #ffffff;
+
+  border: 1px solid var(--color-input-border);
+  border-radius: 999px;
+
+  cursor: pointer;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.pill:hover {
+  border-color: var(--color-primary);
+}
+
+.pill.pill-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.project-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sync-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
   font-size: 12.5px;
   color: var(--color-text-muted);
-  line-height: var(--line-height-loose);
-  margin: 0;
 }
-//added this because text was spilling out of card
-.delivery-forecast-row {
-  flex-wrap: wrap;
 
-  .l-main { flex: 1 1 100%; }
+.sync-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-status-approved-dot);
+}
+.donut-wrap {
+  position: relative;
+}
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 1; 
+}
+/*
+ * Forecast footer
+ */
 
-  .l-val {
-    white-space: normal;
-    flex: 1 1 100%;
-    text-align: left;
-    margin-top: 2px;
+.forecast-footer {
+  margin-top: 12px;
+}
+
+.forecast-footer .metric-label {
+  margin-top: 0;
+}
+
+.forecast-footer .metric-sm {
+  margin: 2px 0 8px;
+}
+
+.forecast-footer .bar-track {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+/*
+ * Burnout list rows (built on top of .list-row from the shared partial,
+ * which already handles the risk-high / risk-medium background + spacing)
+ */
+
+.burnout-row-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  width: 100%;
+}
+
+.burnout-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-circle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.burnout-header .l-main {
+  flex: 1;
+}
+
+.resolve-btn {
+  width: 100%;
+  justify-content: center;
+
+  background: #ffffff;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.resolve-btn:hover:not(:disabled) {
+  background: var(--color-status-in-progress-bg);
+}
+
+/*
+ * Project Health ring
+ */
+
+.health-layout {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  align-items: center;
+  gap: 22px;
+}
+
+.health-ring-wrap {
+  position: relative;
+  width: 130px;
+  height: 130px;
+}
+
+.health-ring circle {
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.health-ring-center {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  pointer-events: none;
+}
+
+.health-legend-list .list-row {
+  min-height: auto;
+  padding: 8px 4px;
+}
+
+/*
+ * Narrative note (Task Overview's highlighted one-liner)
+ */
+
+.narrative-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  margin-top: 14px;
+  padding: 10px 12px;
+
+  background: var(--color-primary-tint, #eaf1fb);
+  border-radius: 8px;
+
+  color: #173b78;
+}
+
+.narrative-note i {
+  margin-top: 2px;
+}
+.compare-row .name {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  color: #173b78;
+}
+.compare-row .name-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;   /* <-- required for ellipsis to work inside a flex item */
+  flex-shrink: 1;
+}
+.compare-row .name-suffix {
+  flex-shrink: 0;  /* "— hours" / "— commits" never gets cut */
+  white-space: nowrap;
+}
+/*
+ * Responsive
+ */
+
+@media (max-width: 900px) {
+  .health-layout {
+    grid-template-columns: 130px minmax(0, 1fr);
   }
 }
 
-@media (max-width: 700px) {
-  .git-effort-layout { grid-template-columns: 1fr; }
+@media (max-width: 600px) {
+  .project-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .project-row-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
