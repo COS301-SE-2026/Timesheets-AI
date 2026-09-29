@@ -21,7 +21,6 @@ Related Requirement: N/A
     min-width: 0;
     padding: 13px 14px;
     border: none;
-    // border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.10);
     backdrop-filter: blur(14px);
@@ -42,10 +41,6 @@ Related Requirement: N/A
     transform: translateY(0);
 }
 
-.floating-timer:focus-visible{
-    // outline: 2px solid rgba(255, 255, 255, 0.45);
-    // outline-offset: 2px;
-}
 
 .floating-timer__indicator{
     width: 4px;
@@ -130,10 +125,6 @@ Related Requirement: N/A
     height: 12px;
 }
 
-// .floating-timer__arrow{
-//     color: #111827;
-//     transform: translateY(3px);
-// }
 
 .floating-timer:hover{
     transform: translateY(-2px);
@@ -170,13 +161,3 @@ Related Requirement: N/A
         transform: translateY(0) scale(1);
     }
 }
-
-
-// @media (max-width: 600px){
-//     .floating-timer{
-//         right: 16px;
-//         bottom: 16px;
-//         width: calc(100vw - 32px);
-//         max-width: 280px;
-//     }
-// }
