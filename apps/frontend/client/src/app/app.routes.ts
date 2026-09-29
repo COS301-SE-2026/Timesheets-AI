@@ -71,6 +71,14 @@ export const routes: Routes = [
         .then(m => m.ProjectsComponent)
   },
 
+  {
+    path: 'projects/details',
+    canActivate: [authGuard, workspaceGuard],
+    loadComponent: () =>
+      import('./features/projects/project-details/project-details.component')
+        .then(m => m.ProjectDetailsComponent)
+  },
+
   /* Project Details Page */
   {
     path: 'projects/:id',
@@ -87,14 +95,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/my-tasks/my-tasks.component')
         .then(m => m.MyTasksComponent)
-  },
-
-  {
-    path: 'leave-requests',
-    canActivate: [authGuard, workspaceGuard],
-    loadComponent: () =>
-      import('./features/leave-requests/leave-requests.component')
-        .then(m => m.LeaveRequestsComponent)
   },
 
   // Team page
