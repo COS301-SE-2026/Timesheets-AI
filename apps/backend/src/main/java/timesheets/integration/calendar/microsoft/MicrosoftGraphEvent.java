@@ -9,12 +9,12 @@ import lombok.Data;
 @Data
 public class MicrosoftGraphEvent {
 
-  //this will be the identifier from microsoft graph
-  private String id; 
+  // this will be the identifier from microsoft graph
+  private String id;
 
-  //microsoft returns the title as subject
+  // microsoft returns the title as subject
   private String subject;
-  
+
   private MicrosoftGraphDateTime start;
   private MicrosoftGraphDateTime end;
   private List<MicrosoftGraphAttendee> attendees;

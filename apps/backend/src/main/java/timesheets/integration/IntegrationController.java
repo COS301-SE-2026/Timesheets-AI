@@ -380,7 +380,7 @@ public class IntegrationController {
     return ResponseEntity.ok(new JiraTicketsBreakdownResponse(total, byStatus));
   }
 
-  //this is the endpoint for teh microsoft calendar oauth
+  // this is the endpoint for teh microsoft calendar oauth
   @GetMapping("/microsoft/calendar/connect")
   public ResponseEntity<String> connectMicrosoftCalendar() {
 
@@ -401,9 +401,10 @@ public class IntegrationController {
     return ResponseEntity.ok(authorizationUrl);
   }
 
-  //microsoft will go back to this endpoint after authorization
+  // microsoft will go back to this endpoint after authorization
   @GetMapping("/microsoft/calendar/callback")
-  public ResponseEntity<Void> microsoftCalendarCallback(@RequestParam String code, @RequestParam String state) {
+  public ResponseEntity<Void> microsoftCalendarCallback(
+      @RequestParam String code, @RequestParam String state) {
 
     /*
     - for security; making sure that the user who started the connection is linked to the state
@@ -415,14 +416,15 @@ public class IntegrationController {
     MicrosoftTokenResponse tokenResponse = microsoftOAuthService.exchangeCodeForToken(code);
     LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn());
 
-    Optional<IntegrationToken> existingToken = integrationTokenRepository.findByWorkspaceMemberIdAndProvider( workspaceMemberId, "MICROSOFT_CALENDAR");
+    Optional<IntegrationToken> existingToken =
+        integrationTokenRepository.findByWorkspaceMemberIdAndProvider(
+            workspaceMemberId, "MICROSOFT_CALENDAR");
 
     IntegrationToken integrationToken;
 
     if (existingToken.isEmpty()) {
       integrationToken = new IntegrationToken();
-    } 
-    else {
+    } else {
       integrationToken = existingToken.get();
     }
 
@@ -437,6 +439,8 @@ public class IntegrationController {
 
     integrationTokenRepository.save(integrationToken);
 
-    return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, frontendUrl + "/calendar?connected=true").build();
+    return ResponseEntity.status(HttpStatus.FOUND)
+        .header(HttpHeaders.LOCATION, frontendUrl + "/calendar?connected=true")
+        .build();
   }
 }

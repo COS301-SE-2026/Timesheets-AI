@@ -13,7 +13,7 @@ public class MicrosoftGraphEventResponse {
 
   private List<MicrosoftGraphEvent> value;
 
-  //this will be the link when another page of results is available
+  // this will be the link when another page of results is available
   @JsonProperty("@odata.nextLink")
   private String nextLink;
 }
