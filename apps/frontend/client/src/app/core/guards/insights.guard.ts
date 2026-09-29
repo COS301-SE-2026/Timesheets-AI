@@ -1,6 +1,6 @@
 // core/guards/insights.guard.ts
 import { inject } from '@angular/core';
-import { CanActivateFn, CanDeactivateFn, Router } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 export const insightsGaurd: CanActivateFn = () => {
