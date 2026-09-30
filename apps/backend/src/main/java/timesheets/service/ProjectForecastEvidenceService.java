@@ -35,31 +35,34 @@ public class ProjectForecastEvidenceService {
   private final TaskRepository taskRepository;
 
   /*
-  - this is what will get the evidence of each member in a project
-  - I used helpers to break down the function logic
-   */
+  - this gets the external evidence that belongs to a specific project
+  - GitHub evidence is collected for the active members of the project
+  - Jira evidence is collected separately because Jira evidence should be scoped using the project's linked tasks, not only the Jira issues assigned to each user
+  */
   public List<EvidenceEvent> collectProjectEvidence(
       UUID projectId, LocalDateTime startTime, LocalDateTime endTime) {
 
     List<ProjectMember> projectMembers =
         projectMemberRepository.findByProjectIdAndIsActiveTrue(projectId);
+
     List<EvidenceEvent> projectEvidence = new ArrayList<>();
 
-    // collect evidence for every active member that belongs to the project
     for (ProjectMember projectMember : projectMembers) {
-
       UUID workspaceMemberId = projectMember.getWorkspaceMemberId();
-      projectEvidence.addAll(collectExternalEvidence(workspaceMemberId, startTime, endTime));
+
+      projectEvidence.addAll(collectGitHubEvidence(workspaceMemberId, startTime, endTime));
     }
 
-    /*
-    - remember team members can be part of multiple projects
-    - so I want to make sure that info only related to this project is what is kept
-     */
     List<EvidenceEvent> filteredEvidence = new ArrayList<>();
 
     filteredEvidence.addAll(filterGitHubEvidence(projectEvidence, projectId));
-    filteredEvidence.addAll(filterJiraEvidence(projectEvidence, projectId));
+
+    /*
+    - Jira is different from GitHub
+    - the Jira tickets used for forecasting should come from the tasks linked to this project rather than from tickets assigned to each member
+    */
+    filteredEvidence.addAll(
+        collectProjectJiraEvidence(projectId, projectMembers, startTime, endTime));
 
     return filteredEvidence;
   }
@@ -85,6 +88,57 @@ public class ProjectForecastEvidenceService {
     } catch (RuntimeException exception) {
       return new ArrayList<>();
     }
+  }
+
+  /*
+  - collects Jira evidence that belongs to the project
+  - the project's local tasks determine which Jira tickets are relevant
+  - the Jira connection is only used to authenticate requests to Jira
+  */
+  private List<EvidenceEvent> collectProjectJiraEvidence(
+      UUID projectId,
+      List<ProjectMember> projectMembers,
+      LocalDateTime startTime,
+      LocalDateTime endTime) {
+
+    List<Task> projectTasks = taskRepository.findByProjectIdAndIsDeletedFalse(projectId);
+
+    List<String> projectJiraKeys =
+        projectTasks.stream()
+            .map(Task::getJiraTicketKey)
+            .filter(key -> key != null && !key.isBlank())
+            .distinct()
+            .toList();
+
+    if (projectJiraKeys.isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    List<EvidenceEvent> jiraEvidence = new ArrayList<>();
+
+    // finding the Jira evidence and then getting the tickets for this project
+    for (ProjectMember projectMember : projectMembers) {
+
+      UUID workspaceMemberId = projectMember.getWorkspaceMemberId();
+
+      List<EvidenceEvent> memberEvidence =
+          jiraEvidenceCollector.collectForIssueKeys(
+              workspaceMemberId, projectJiraKeys, startTime, endTime);
+
+      for (EvidenceEvent event : memberEvidence) {
+        if (!"JIRA".equals(event.getSource()) || event.getMetadata() == null) {
+          continue;
+        }
+
+        Object issueKey = event.getMetadata().get("issueKey");
+
+        if (issueKey != null && projectJiraKeys.contains(issueKey.toString())) {
+          jiraEvidence.add(event);
+        }
+      }
+    }
+
+    return jiraEvidence;
   }
 
   // want to combine the evidence into one list
