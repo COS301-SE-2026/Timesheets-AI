@@ -203,7 +203,7 @@ export class LogtimeComponent implements OnDestroy {
   readonly filterTo = signal(this.todayEndOfWeek());
   readonly durationPreviewSeconds = signal(3600);
   readonly suggestionPendingReject = signal<SuggestedWorkSession | null>(null);
-
+  readonly currentSuggestionIndex = signal(0);
   /*  
   tracks the current period's timesheet, submit now happens at this level not per entry, since status/submittedAt/approvedAt/isLocked all live on
   the timesheets table per backend schema, not on time_entries
@@ -554,6 +554,48 @@ export class LogtimeComponent implements OnDestroy {
   closePanel(): void {
     this.activePanel.set(null);
   }
+
+    getCurrentSuggestion(): SuggestedWorkSession | null {
+  const suggestions = this.suggestions();
+
+  if (suggestions.length === 0) {
+    return null;
+  }
+
+  return suggestions[this.currentSuggestionIndex()];
+}
+
+previousSuggestion(): void {
+  const suggestions = this.suggestions();
+
+  if (suggestions.length === 0) {
+    return;
+  }
+
+  const currentIndex = this.currentSuggestionIndex();
+
+  this.currentSuggestionIndex.set(
+    currentIndex === 0
+      ? suggestions.length - 1
+      : currentIndex - 1
+  );
+}
+
+nextSuggestion(): void {
+  const suggestions = this.suggestions();
+
+  if (suggestions.length === 0) {
+    return;
+  }
+
+  const currentIndex = this.currentSuggestionIndex();
+
+  this.currentSuggestionIndex.set(
+    currentIndex === suggestions.length - 1
+      ? 0
+      : currentIndex + 1
+  );
+}
 
   /*
    Persists log form values into the records array.
@@ -924,7 +966,6 @@ export class LogtimeComponent implements OnDestroy {
       : '';
   }
 
-  // Converts numerical raw seconds parameters into visual presentation standard "HH:MM:SS" formats
   formatElapsed(totalSeconds: number): string {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -935,7 +976,6 @@ export class LogtimeComponent implements OnDestroy {
       .join(':');
   }
 
-  // Custom visual modifier turning simple dynamic counts into compressed time descriptors
   formatDuration(totalSeconds = 0): string {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -952,7 +992,6 @@ export class LogtimeComponent implements OnDestroy {
     this.selectedStatus.set(status);
   }
 
-  // Resolves contextual CSS formatting handles depending on workflow state settings
   entryDotClass(entry: TimeEntry): string {
     return `status-dot status-dot--${(entry.status ?? 'draft').toLowerCase()}`;
   }
@@ -974,8 +1013,6 @@ export class LogtimeComponent implements OnDestroy {
       'No task selected'
     );
   }
-
-  //populates editing controls with targets extraction contexts to alter parameters
 
   editEntry(entry: TimeEntry): void {
     if (!this.canEditEntries()) {
@@ -1086,8 +1123,6 @@ export class LogtimeComponent implements OnDestroy {
       });
   }
 
-  // data sanitization methods
-
   private resetEntryForm(): void {
     this.resetNewTaskState();
     this.entryForm.setValue({
@@ -1178,7 +1213,6 @@ export class LogtimeComponent implements OnDestroy {
     return this.timeToMinutes(endTime) - this.timeToMinutes(startTime);
   }
 
-  // Checks overlap conditions by comparing raw mathematical minute counters
   private timesOverlap(
     startA: string,
     endA: string,
@@ -1191,7 +1225,6 @@ export class LogtimeComponent implements OnDestroy {
     );
   }
 
-  // Parses textual time records into flat integer values relative to midnight
   private timeToMinutes(time: string): number {
     const timeValue = this.timeFromDateTime(time);
     const [safeHours, safeMinutes] = timeValue.split(':').map(Number);
@@ -1320,6 +1353,121 @@ export class LogtimeComponent implements OnDestroy {
   });
 }
 
+getSuggestionStartTime(suggestion: SuggestedWorkSession): string {
+  return this.timeFromDateTime(suggestion.startTime);
+}
+
+getSuggestionEndTime(suggestion: SuggestedWorkSession): string {
+  return this.timeFromDateTime(suggestion.endTime);
+}
+
+getSuggestionDurationSeconds(
+  suggestion: SuggestedWorkSession
+): number {
+
+  if (!suggestion.startTime || !suggestion.endTime) {
+    return 0;
+  }
+
+  const startTime = this.timeFromDateTime(suggestion.startTime);
+  const endTime = this.timeFromDateTime(suggestion.endTime);
+
+  const startMinutes = this.timeToMinutes(startTime);
+  const endMinutes = this.timeToMinutes(endTime);
+
+  const durationMinutes = endMinutes - startMinutes;
+
+  if (durationMinutes <= 0) {
+    return 0;
+  }
+
+  return durationMinutes * 60;
+}
+
+getSuggestionDurationMinutes(
+  suggestion: SuggestedWorkSession
+): number {
+  return Math.floor(
+    this.getSuggestionDurationSeconds(suggestion) / 60
+  );
+}
+
+isSuggestionEndTimeInvalid(
+  suggestion: SuggestedWorkSession
+): boolean {
+  if (!suggestion.startTime || !suggestion.endTime) {
+    return true;
+  }
+
+  const startTime = this.timeFromDateTime(suggestion.startTime);
+  const endTime = this.timeFromDateTime(suggestion.endTime);
+
+  return this.calculateDuration(startTime, endTime) <= 0;
+}
+
+updateSuggestionTime(
+  suggestion: SuggestedWorkSession,
+  event: Event,
+  field: 'startTime' | 'endTime'
+): void {
+  const input = event.target as HTMLInputElement;
+  const time = input.value;
+
+  if (!time) {
+    return;
+  }
+
+  const date = this.dateFromDateTime(suggestion.startTime);
+
+  const startTime =
+    field === 'startTime'
+      ? time
+      : this.timeFromDateTime(suggestion.startTime);
+
+  const endTime =
+    field === 'endTime'
+      ? time
+      : this.timeFromDateTime(suggestion.endTime);
+
+  const duration = this.calculateDuration(
+    startTime,
+    endTime
+  );
+
+  if (duration <= 0) {
+    this.showToast(
+      field === 'startTime'
+        ? 'Start time must be before end time.'
+        : 'End time must be after start time.'
+    );
+    return;
+  }
+
+  this.suggestionService.edit(suggestion.id, {
+    title: suggestion.title,
+    projectId: suggestion.projectId || undefined,
+    taskId: suggestion.taskId || undefined,
+    startTime: this.toDateTimeValue(date, startTime),
+    endTime: this.toDateTimeValue(date, endTime),
+    description: suggestion.description || undefined
+  }).subscribe({
+    next: (updatedSuggestion) => {
+      this.suggestions.set(
+        this.suggestions().map((item) =>
+          item.id === updatedSuggestion.id
+            ? updatedSuggestion
+            : item
+        )
+      );
+    },
+    error: (error) => {
+      this.showToast(
+        error.error?.message ?? 'Unable to update the time.'
+      );
+    }
+  });
+}
+
 // this is when the user reject suggestion, we should alert them of this action 
 confirmRejectSuggestion(suggestion: SuggestedWorkSession): void {
   this.suggestionPendingReject.set(suggestion);
@@ -1340,67 +1488,28 @@ confirmReject(): void {
   this.rejectSuggestion(suggestion);
 }
 
-updateSuggestionDuration(
-  suggestion: SuggestedWorkSession,
-  event: Event
-): void {
-  const input = event.target as HTMLInputElement;
-  const durationMinutes = Number(input.value);
-
-  if (!Number.isInteger(durationMinutes) || durationMinutes <= 0) {
-    this.showToast('Please enter a duration greater than 0 minutes.');
-    return;
-  }
-
-  if (!suggestion.startTime) {
-    this.showToast('A start time is required.');
-    return;
-  }
-
-  const startTime = new Date(suggestion.startTime);
-
-  const endTime = new Date(
-    startTime.getTime() + durationMinutes * 60 * 1000
-  );
-
-  this.suggestionService.edit(suggestion.id, {
-    title: suggestion.title,
-    projectId: suggestion.projectId || undefined,
-    taskId: suggestion.taskId || undefined,
-    startTime: suggestion.startTime,
-    endTime: endTime.toISOString(),
-    description: suggestion.description || undefined
-  }).subscribe({
-    next: (updatedSuggestion) => {
-      const updatedSuggestions = this.suggestions().map(
-        (item) =>
-          item.id === updatedSuggestion.id
-            ? updatedSuggestion
-            : item
-      );
-
-      this.suggestions.set(updatedSuggestions);
-
-      this.showToast('Duration updated.');
-    },
-    error: (error) => {
-      this.showToast(
-        error.error?.message ?? 'Unable to update the duration.'
-      );
-    }
-  });
-}
-
-
 approveSuggestion(suggestion: SuggestedWorkSession): void {
 
-  if (suggestion.durationMinutes === null) {
-        this.showToast('Duration is not known. Please enter start and end time before approving.');
-        return;
-    }
+  if (!suggestion.projectId) {
+    this.showToast('Please select a project before approving.');
+    return;
+  }
+
+  if (this.isSuggestionEndTimeInvalid(suggestion)) {
+    this.showToast('End time must be after start time.');
+    return;
+  }
+
+  const durationSeconds =
+    this.getSuggestionDurationSeconds(suggestion);
+
+  if (durationSeconds <= 0) {
+    this.showToast('Please enter a valid start and end time.');
+    return;
+  }
 
   this.suggestionService.approve(suggestion.id).subscribe({
-    next: (response) => {
+    next: () => {
       this.suggestions.set(
         this.suggestions().filter(
           (item) => item.id !== suggestion.id
@@ -1412,7 +1521,10 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
       this.showToast('Suggested work added to your timesheet.');
     },
     error: (error) => {
-      this.showToast(error.error?.message ?? 'Failed to add suggested work to your timesheet.');
+      this.showToast(
+        error.error?.message ??
+        'Failed to add suggested work to your timesheet.'
+      );
     }
   });
 }
