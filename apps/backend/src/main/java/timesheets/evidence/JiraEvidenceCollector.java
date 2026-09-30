@@ -112,6 +112,10 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       evidenceEvent.setActivityType("WORKLOG");
       evidenceEvent.setDescription(worklog.getDescription());
 
+      if (worklog.getStartedAt() != null && worklog.getTimeSpentSeconds() > 0) {
+        evidenceEvent.setEndTime(worklog.getStartedAt().plusSeconds(worklog.getTimeSpentSeconds()));
+      }
+
       Map<String, Object> metadata = new HashMap<String, Object>();
       metadata.put("issueKey", worklog.getIssueKey());
       metadata.put("worklogId", worklog.getWorklogId());
