@@ -265,6 +265,38 @@ $orange-light: #fff4e8;
     }
 }
 
+.connect-button{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        color: #ffffff;
+        background: $primary;
+        border: none;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover{
+            background: $card-border
+        }
+
+        &:hover:not(:disabled){
+            background: $primary-dark
+        }
+
+        &:active:not(:disabled){
+            transform: scale(0.98);
+        }
+
+        &:disabled{
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+}
+
 // TEXT LINKS
 .text-link{
     align-self: flex-start;
@@ -376,6 +408,7 @@ $orange-light: #fff4e8;
     border-radius: 50%;
     display: inline-block;
     flex-shrink: 0;
+    background: #c2c7cf;
 
     &.connected{
         background: $green;
