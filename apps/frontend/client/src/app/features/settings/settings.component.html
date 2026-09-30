@@ -113,32 +113,9 @@ Realated Requirement: N/A
                                 </span>
                             }
 
-                            <mat-slide-toggle
-                                [checked]="integration.enabled"
-                                (change)="toggleIntegration(integration, $event.checked)">
-                            </mat-slide-toggle>
 
-                            <!-- @if(canToggleIntegrations()){
-                                <i class="fa-solid fa-chevron-right chevron"></i>
-                            } -->
                         </div>
                     </div>
-                }
-
-                @if(canAddIntegrations()){
-                    <button 
-                        class="text-link"
-                        (click)="browseIntegrations()">
-                        Browse more integrations <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                }
-
-                @if(canRequestIntegrations()){
-                    <button 
-                        class="text-link"
-                        (click)="requestIntegration()">
-                        Request an integration <i class="fa-solid fa-arrow-right"></i>
-                    </button>
                 }
             </div>
         </section>

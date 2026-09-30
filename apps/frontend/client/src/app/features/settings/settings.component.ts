@@ -4,15 +4,13 @@ import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/sl
 import { MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from './settings.services';
-import { UserSettings, UserRole, IntegrationStatus } from './settings.model';
+import { UserSettings, UserRole } from './settings.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
 import { MfaSetupDialogComponent } from './mfa-setup-dialog/mfa-setup-dialog.component';
 import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dialog.component';
 import { AuthService } from '../../core/services/auth.service';
-import { IntegrationBrowserDialogComponent } from './integration-browser-dialog/integration-browser-dialog.component';
-import { IntegrationRequestDialogComponent } from './integration-request-dialog/integration-request-dialog.component';
 import { AccountDeletionDialogComponent } from './account-deletion-dialog/account-deletion-dialog.component';
 
 @Component({
@@ -35,6 +33,7 @@ export class SettingsComponent implements OnInit{
   private readonly authService= inject( AuthService);
   private readonly dialog=inject(MatDialog);
 
+  syncingIntegration= signal<string | null>(null);
   settings= signal<UserSettings | null>(null);
   role= signal<UserRole>('DEVELOPER');
   isLoading= signal<boolean>(true);
@@ -48,20 +47,6 @@ export class SettingsComponent implements OnInit{
   );
   isDeveloper= computed(
     ()=> this.role()=== 'DEVELOPER'
-  );
-
-  // DEVS CAN ONLY SEE INTEGRATIONS
-  canToggleIntegrations= computed(
-    ()=> this.isAdmin() || this.isManager()
-  );
-
-  // ONLY ADMIN CAN ADD NEW INTEGRATIONS + MANAGER REQUEST NEW ONES
-  canAddIntegrations= computed(
-    ()=> this.isAdmin()
-  );
-
-  canRequestIntegrations= computed(
-    ()=> this.isManager()
   );
 
   ngOnInit(): void{
@@ -90,27 +75,27 @@ export class SettingsComponent implements OnInit{
     });
   }
 
-  browseIntegrations(): void{
-    if(!this.canAddIntegrations()){
-      return;
-    }
+  // browseIntegrations(): void{
+  //   if(!this.canAddIntegrations()){
+  //     return;
+  //   }
 
-    const dialogRef= this.dialog.open(
-      IntegrationBrowserDialogComponent,{
-        width: '700px',
-        maxWidth: '120vw',
-        disableClose: true
-      }
-    );
+  //   const dialogRef= this.dialog.open(
+  //     IntegrationBrowserDialogComponent,{
+  //       width: '700px',
+  //       maxWidth: '120vw',
+  //       disableClose: true
+  //     }
+  //   );
 
-    dialogRef.afterClosed().subscribe((integration)=> {
-      if(!integration){
-        return;
-      }
+  //   dialogRef.afterClosed().subscribe((integration)=> {
+  //     if(!integration){
+  //       return;
+  //     }
 
-      console.log('Integration selected:', integration);
-    });
-  }
+  //     console.log('Integration selected:', integration);
+  //   });
+  // }
 
   changePassword():void{
     // i need the password change flow that our app uses
@@ -193,46 +178,8 @@ export class SettingsComponent implements OnInit{
     });
   }
 
-  toggleIntegration(integration: IntegrationStatus, enabled:boolean):void{
-    if(!this.canToggleIntegrations()){
-      return;
-    }
-
-    this.settingsService.toggleIntegration(integration.id, enabled).subscribe(
-      ()=>{
-        this.settings.update(
-          (s)=>{
-            if(!s) return s;
-
-            const integrations= s.integrations.map(
-              (i)=> i.id === integration.id? {...i, enabled}: i
-            );
-            return { ...s, integrations};
-          });
-      });
-  }
-
-  requestIntegration():void{
-    if(!this.canRequestIntegrations()){
-      return;
-    }
-
-    const dialogRef= this.dialog.open(
-      IntegrationRequestDialogComponent,
-      {
-        width:'500px',
-        maxWidth: '95vw',
-        disableClose: true
-      }
-    );
-
-    dialogRef.afterClosed().subscribe((request)=> {
-      if(!request){
-        return;
-      }
-
-      console.log('Integration request:', request);
-    });
+  isSyncing(integrationId: string): boolean{
+    return this.syncingIntegration()=== integrationId;
   }
 
   requestAccountDeletion():void{

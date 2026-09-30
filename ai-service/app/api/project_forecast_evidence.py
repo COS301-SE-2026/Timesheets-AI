@@ -30,7 +30,7 @@ def get_external_project_evidence(
     project_id: uuid.UUID,
     start_time: datetime,
     end_time: datetime,
-    authorization: str = Annotated[str, Header()],
+    authorization: Annotated[str, Header()],
 ) -> ProjectForecastEvidenceResponse:
     """
     - gets the Jira and GitHub evidence for a project
