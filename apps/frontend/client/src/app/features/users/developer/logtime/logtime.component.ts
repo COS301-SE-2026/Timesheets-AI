@@ -1340,12 +1340,67 @@ confirmReject(): void {
   this.rejectSuggestion(suggestion);
 }
 
+updateSuggestionDuration(
+  suggestion: SuggestedWorkSession,
+  event: Event
+): void {
+  const input = event.target as HTMLInputElement;
+  const durationMinutes = Number(input.value);
+
+  if (!Number.isInteger(durationMinutes) || durationMinutes <= 0) {
+    this.showToast('Please enter a duration greater than 0 minutes.');
+    return;
+  }
+
+  if (!suggestion.startTime) {
+    this.showToast('A start time is required.');
+    return;
+  }
+
+  const startTime = new Date(suggestion.startTime);
+
+  const endTime = new Date(
+    startTime.getTime() + durationMinutes * 60 * 1000
+  );
+
+  this.suggestionService.edit(suggestion.id, {
+    title: suggestion.title,
+    projectId: suggestion.projectId || undefined,
+    taskId: suggestion.taskId || undefined,
+    startTime: suggestion.startTime,
+    endTime: endTime.toISOString(),
+    description: suggestion.description || undefined
+  }).subscribe({
+    next: (updatedSuggestion) => {
+      const updatedSuggestions = this.suggestions().map(
+        (item) =>
+          item.id === updatedSuggestion.id
+            ? updatedSuggestion
+            : item
+      );
+
+      this.suggestions.set(updatedSuggestions);
+
+      this.showToast('Duration updated.');
+    },
+    error: (error) => {
+      this.showToast(
+        error.error?.message ?? 'Unable to update the duration.'
+      );
+    }
+  });
+}
+
 
 approveSuggestion(suggestion: SuggestedWorkSession): void {
+
+  if (suggestion.durationMinutes === null) {
+        this.showToast('Duration is not known. Please enter start and end time before approving.');
+        return;
+    }
+
   this.suggestionService.approve(suggestion.id).subscribe({
     next: (response) => {
-      console.log('APPROVE: response =', response);
-
       this.suggestions.set(
         this.suggestions().filter(
           (item) => item.id !== suggestion.id
@@ -1354,14 +1409,10 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
 
       this.loadEntries();
 
-      // adding nice closing after clicing approve 
-
       this.showToast('Suggested work added to your timesheet.');
     },
     error: (error) => {
-      console.error('APPROVE: error =', error);
-
-      this.showToast('Failed to add suggested work to your timesheet.');
+      this.showToast(error.error?.message ?? 'Failed to add suggested work to your timesheet.');
     }
   });
 }
@@ -1538,7 +1589,7 @@ updateSuggestionDescription(
     }
   });
 }
-   
+  
 
 suggestionEvidence = signal<SuggestedWorkSession | null>(null);
 

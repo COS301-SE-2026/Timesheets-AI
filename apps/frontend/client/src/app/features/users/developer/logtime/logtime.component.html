@@ -430,66 +430,59 @@
     </section>
   }
 
-  <!-- Suggestion works panel for suggested works -->
-   @if (activePanel() === "suggestions"){
-    <section class="entry-panel" aria-labelledby="suggestions-panel-title">
-      <article class="card entry-panel_card">
-        <header class="card_header">
-          <div>
-            <h2 id="suggestions-panel-title">Suggested Work</h2>
-            <p> We found work that may be missing from your timesheet.</p>
+    
+<!-- Suggestion works panel for suggested works -->
+@if (activePanel() === "suggestions") {
+  <section class="entry-panel" aria-labelledby="suggestions-panel-title">
+    <article class="card entry-panel_card">
+
+      <header class="card_header">
+        <div>
+          <h2 id="suggestions-panel-title">Suggested Work</h2>
+          <p>We found work that may be missing from your timesheet.</p>
+        </div>
+
+        <button
+          type="button"
+          class="icon-btn"
+          aria-label="Close"
+          (click)="closePanel()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18"></path>
+          </svg>
+        </button>
+      </header>
+
+      <div class="suggestions-panel">
+
+        @if (suggestionsLoading()) {
+          <div class="suggestions-state">
+            <p>Looking for suggested work...</p>
           </div>
+        }
 
-          <button type="button" class="icon-btn" aria-label="Close" (click)="closePanel()">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 6l12 12M18 6 6 18"></path>
-            </svg>
-          </button>
-        </header>
+        @else if (suggestions().length === 0) {
+          <div class="suggestions-state">
+            <h3>No suggested work found</h3>
+            <p>
+              We could not find any additional work for this period.
+            </p>
+          </div>
+        }
 
-        <div class="suggestions-panel">
-          @if (suggestionsLoading()){
-            <div class="suggestions-state">
-              <p>Looking for suggested work...</p>
-            </div>
-          }
+        @else {
+          <div class="suggestions-list">
 
-          @else if (suggestions().length === 0){
-            <div class="suggestions-state">
-              <h3>No suggested work found</h3>
-              <p>
-                We could not find any additional work for this period.
-              </p>
-            </div>
-          }
+            @for (suggestion of suggestions(); track suggestion.id) {
 
-          @else {
-            <div class="suggestions-list">
-              @for (suggestion of suggestions(); track suggestion.id){
               <article class="suggestion-card">
+
                 <header class="suggestion-card-header">
+
                   <div class="suggestion-card-header-main-one">
-                    <div class="suggestion-card">
+
+                    <div class="suggestion-card-date">
                       <span>{{ formatDate(suggestion.startTime) }}</span>
-
-                      <span>.</span>
-
-                      <span>
-                        {{ formatTime(suggestion.startTime) }}
-                        @if (suggestion.endTime){
-                          - {{ formatTime(suggestion.endTime) }}
-                        }
-                      </span>
-
-                      <span>.</span>
-
-                      @if (suggestion.durationMinutes && suggestion.durationMinutes > 0) {
-                        <span>
-                          ~{{ suggestion.durationMinutes }} min estimated 
-                        </span>
-                      } @else {
-                        <span>Duration not determined</span>
-                      }
                     </div>
 
                     <h3 class="suggestion-card-title">
@@ -497,16 +490,22 @@
                     </h3>
 
                     <div class="suggestion-card-summary">
+
                       <span class="suggestion-source-summary">
                         {{ getSourceSummary(suggestion) }}
                       </span>
 
-                      @if (suggestion.confidenceScore !== null){
-                        <span class="suggestion-confidence" title="How strongly the availiable evidence matches this suggested work session based on timing, project context and related activity.">
-                          {{ suggestion.confidenceScore * 100 | number:'1.0-0'}}% AI Confidence Match
+                      @if (
+                        suggestion.durationMinutes !== null
+                        && suggestion.durationMinutes > 0
+                      ) {
+                        <span class="suggestion-duration-summary">
+                          {{ suggestion.durationMinutes }} min
                         </span>
                       }
+
                     </div>
+
                   </div>
 
                   <div class="suggestion-card-status">
@@ -514,375 +513,452 @@
                       Pending
                     </span>
                   </div>
+
                 </header>
 
+
                 <div class="suggestion-card-fields">
+
+                  <!-- Duration -->
+                  <label class="field">
+                    <span class="field-label">Duration</span>
+
+                    @if (
+                      suggestion.durationMinutes === null
+                    ) {
+
+                      <div class="suggestion-duration-input">
+
+                        <input
+                          type="number"
+                          min="1"
+                          step="1"
+                          placeholder="Enter duration"
+                          [value]="''"
+                          (change)="updateSuggestionDuration(suggestion, $event)"
+                        />
+
+                        <span>minutes</span>
+
+                      </div>
+
+                      <p class="suggestion-duration-help">
+                        Duration could not be determined from the available
+                        evidence. Please enter how long you worked.
+                      </p>
+
+                    } @else {
+
+                      <div class="suggestion-duration-display">
+                        {{ suggestion.durationMinutes }} minutes
+                      </div>
+
+                    }
+                  </label>
+
+
+                  <!-- Project -->
                   <label class="field">
                     <span class="field-label">Project</span>
-                      <select
+
+                    <select
                       [value]="suggestion.projectId || ''"
                       (change)="assignSuggestionProject(suggestion, $event)">
 
-                        <option value="">Select project</option>
+                      <option value="">Select project</option>
 
-                        @for (project of projects(); track project.id){
-                          <option [value]="project.id">
-                            {{ project.name }}
-                          </option>
-                        }
-                      </select>
-                    </label>
+                      @for (project of projects(); track project.id) {
+                        <option [value]="project.id">
+                          {{ project.name }}
+                        </option>
+                      }
 
-                    <label class="field">
-                      <span class="field-label">Task</span>
+                    </select>
+                  </label>
 
-                      <select
-                        [value]="suggestion.taskId || ''"
-                        (change)="assignSuggestionTask(suggestion, $event)">
-                        <option value="">No task selected</option>
-                        @for (task of getSuggestionTasks(suggestion.id); track task.id){
-                          <option [value]="task.id">
-                            {{ task.title }}
-                          </option>
-                        }
 
-                        <option value="CREATE NEW TASK">+ Create new task</option>
-                      </select>
-                    </label>
+                  <!-- Task -->
+                  <label class="field">
+                    <span class="field-label">Task</span>
 
-                    @if (suggestionCreatingTask() === suggestion.id){
-                      <div class="suggestion-new-task">
-                        <label class="field">
-                          <span class="field-label">
-                            New task
-                          </span>
+                    <select
+                      [value]="suggestion.taskId || ''"
+                      (change)="assignSuggestionTask(suggestion, $event)">
 
-                          <input 
-                            type="text"
-                            [value]="newSuggestionTaskTitle()"
-                            (input)="newSuggestionTaskTitle .set($any($event.target).value)"
-                            placeholder="Enter task title"/>
-                        </label>
+                      <option value="">No task selected</option>
 
-                        <div class="suggestion-new-task-actions">
-                          <button type="button" class="btn btn--ghost" (click)="cancelCreateSuggestionTask()">Cancel</button>
+                      @for (
+                        task of getSuggestionTasks(suggestion.id);
+                        track task.id
+                      ) {
+                        <option [value]="task.id">
+                          {{ task.title }}
+                        </option>
+                      }
 
-                          <button type="button" class="btn btn--primary" [disabled]="!newSuggestionTaskTitle().trim()" (click)="createSuggestionTask(suggestion)">
-                            Create task
-                          </button>
-                        </div>
-                      </div>
-                    }
+                      <option value="CREATE NEW TASK">
+                        + Create new task
+                      </option>
 
-                    <label class="field">
-                      <span class="field-label">Description</span>
+                    </select>
+                  </label>
 
-                      <textarea
-                        [value]="suggestion.description || ''"
-                        (input)="updateSuggestionDescription(suggestion, $event)"
-                        rows="4"
-                        placeholder="Add a description of this work...">
-                      </textarea>
-                    </label>
-                  </div>
 
-                    <footer class="suggestion-card-actions">
-                      <button
-                          type="button"
-                          class="btn btn--secondary"
-                          (click)="seeSuggestionEvidence(suggestion)">
-                          See Evidence
-                        </button>
+                  <!-- Create new task -->
+                  @if (suggestionCreatingTask() === suggestion.id) {
+
+                    <div class="suggestion-new-task">
+
+                      <label class="field">
+                        <span class="field-label">
+                          New task
+                        </span>
+
+                        <input
+                          type="text"
+                          [value]="newSuggestionTaskTitle()"
+                          (input)="newSuggestionTaskTitle.set($any($event.target).value)"
+                          placeholder="Enter task title" />
+                      </label>
+
+                      <div class="suggestion-new-task-actions">
 
                         <button
                           type="button"
                           class="btn btn--ghost"
-                          (click)="confirmRejectSuggestion(suggestion)">
-                          Reject
+                          (click)="cancelCreateSuggestionTask()">
+                          Cancel
                         </button>
 
                         <button
                           type="button"
                           class="btn btn--primary"
-                          [disabled]="!suggestion.projectId"
-                          (click)="approveSuggestion(suggestion)">
-                          Approve &amp; Add
+                          [disabled]="!newSuggestionTaskTitle().trim()"
+                          (click)="createSuggestionTask(suggestion)">
+                          Create task
                         </button>
-                    </footer>
-              </article>
-              }
-            </div>
-          
 
-            @if (suggestionPendingReject()){
-              <div class="suggestion-confirmation">
-                <div class="suggestion-confirm">
-                  <h3>Reject suggestion?</h3>
+                      </div>
 
-                  <p> Are you sure that you want to reject <strong>{{ suggestionPendingReject()?.title }}</strong>?</p>
+                    </div>
+                  }
 
-                  <div class="suggestion-confirm-actions">
-                    <button type="button" class="btn btn--ghost" (click)="cancelRejectSuggestion()">
-                      Cancel
-                    </button>
 
-                    <button type="button" class="btn btn--primary" (click)="confirmReject()">
-                      Reject
-                    </button>
-                  </div>
+                  <!-- Description -->
+                  <label class="field">
+                    <span class="field-label">Description</span>
+
+                    <textarea
+                      [value]="suggestion.description || ''"
+                      (input)="updateSuggestionDescription(suggestion, $event)"
+                      rows="4"
+                      placeholder="Add a description of this work...">
+                    </textarea>
+                  </label>
+
                 </div>
-              </div>
-            }
-          }
-        </div>
 
 
-      </article>
-
-      <!-- See the Evidence Modal -->
-      @if (suggestionEvidence(); as evidence) {
-
-        <div
-          class="suggestion-evidence-overlay"
-          (click)="closeSuggestionEvidence()">
-
-          <section
-            class="suggestion-evidence-modal"
-            aria-labelledby="suggestion-evidence-title"
-            (click)="$event.stopPropagation()">
-
-            <header class="suggestion-evidence-header">
-
-              <div>
-                <span class="suggestion-evidence-eyebrow">
-                  Evidence Supporting Work Session
-                </span>
-
-                <h2 id="suggestion-evidence-title">
-                  Evidence Supporting Work Session
-                </h2>
-
-                <p>
-                  Grouped based on timing, workspace metadata &amp;
-                  shared issue context.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                class="icon-btn"
-                aria-label="Close evidence"
-                (click)="closeSuggestionEvidence()">
-
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M6 6l12 12M18 6 6 18"></path>
-                </svg>
-
-              </button>
-
-            </header>
-
-
-            <div class="suggestion-evidence-content">
-
-              <section class="evidence-target-session">
-
-                <span class="field-label">
-                  Target Session
-                </span>
-
-                <h3>
-                  {{ evidence.title }}
-                </h3>
-
-                <p>
-                  Generated from
-                  {{ evidence.evidenceEvents?.length || 0 }}
-
-                  @if (evidence.evidenceEvents?.length === 1) {
-                    correlated evidence event
-                  } @else {
-                    correlated evidence events
-                  }
-
-                  between
-
-                  {{ formatTime(evidence.startTime) }}
-
-                  @if (evidence.endTime) {
-                    - {{ formatTime(evidence.endTime) }}
-                  }
-                </p>
-
-              </section>
-
-
-              <section class="gemini-evidence-section">
-
-                <div class="gemini-evidence-header">
-
-                  <div>
-                    <span class="field-label">
-                       AI Narrative Analysis
-                    </span>
-
-                    <p>
-                      Analyse the available evidence and explain why
-                      these activities may represent one work session.
-                    </p>
-                  </div>
+                <footer class="suggestion-card-actions">
 
                   <button
                     type="button"
-                    class="btn btn--secondary">
-                    Break down the evidence
+                    class="btn btn--secondary"
+                    (click)="seeSuggestionEvidence(suggestion)">
+                    See Evidence
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn--ghost"
+                    (click)="confirmRejectSuggestion(suggestion)">
+                    Reject
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn--primary"
+                    [disabled]="
+                      !suggestion.projectId ||
+                      suggestion.durationMinutes === null ||
+                      suggestion.durationMinutes <= 0
+                    "
+                    (click)="approveSuggestion(suggestion)">
+                    Approve &amp; Add
+                  </button>
+
+                </footer>
+
+              </article>
+            }
+
+          </div>
+
+
+          @if (suggestionPendingReject()) {
+
+            <div class="suggestion-confirmation">
+
+              <div class="suggestion-confirm">
+
+                <h3>Reject suggestion?</h3>
+
+                <p>
+                  Are you sure that you want to reject
+                  <strong>
+                    {{ suggestionPendingReject()?.title }}
+                  </strong>?
+                </p>
+
+                <div class="suggestion-confirm-actions">
+
+                  <button
+                    type="button"
+                    class="btn btn--ghost"
+                    (click)="cancelRejectSuggestion()">
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn--primary"
+                    (click)="confirmReject()">
+                    Reject
                   </button>
 
                 </div>
 
+              </div>
 
-                <div class="gemini-evidence-placeholder">
+            </div>
+          }
 
-                  <span class="field-label">
-                     AI Explanation
-                  </span>
+        }
 
-                  <p>
-                    AI analysis will appear here after the evidence
-                    is analysed.
-                  </p>
+      </div>
 
-                </div>
-
-              </section>
+    </article>
+  </section>
+}
 
 
-              <section class="raw-evidence-section">
 
-                <div class="raw-evidence-header">
+     <!-- See the Evidence Modal -->
+@if (suggestionEvidence(); as evidence) {
 
-                  <div>
-                    <span class="field-label">
-                      Raw Evidence Log
-                    </span>
+  <div
+    class="suggestion-evidence-overlay"
+    (click)="closeSuggestionEvidence()">
 
-                    <h3>
-                      {{ evidence.evidenceEvents?.length || 0 }}
-                      Signals
-                    </h3>
-                  </div>
+    <section
+      class="suggestion-evidence-modal"
+      aria-labelledby="suggestion-evidence-title"
+      (click)="$event.stopPropagation()">
 
-                </div>
+      <header class="suggestion-evidence-header">
 
+        <div>
+          <span class="suggestion-evidence-eyebrow">
+            Evidence Supporting Work Session
+          </span>
 
-                @if (evidence.evidenceEvents?.length) {
+          <h2 id="suggestion-evidence-title">
+            Evidence Supporting Work Session
+          </h2>
 
-                  <div class="raw-evidence-list">
+          <p>
+            Grouped based on timing, workspace metadata &amp;
+            shared issue context.
+          </p>
+        </div>
 
-                    @for (
-                      event of evidence.evidenceEvents;
-                      track event.id
-                    ) {
+        <button
+          type="button"
+          class="icon-btn"
+          aria-label="Close evidence"
+          (click)="closeSuggestionEvidence()">
 
-                      <article class="raw-evidence-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18"></path>
+          </svg>
 
-                        <div class="raw-evidence-source">
+        </button>
 
-                          @if (event.source === 'GITHUB') {
-                            <span>GH</span>
-                          }
-
-                          @else if (event.source === 'JIRA') {
-                            <span>JR</span>
-                          }
-
-                          @else if (event.source === 'GOOGLE_CALENDAR') {
-                            <span>CA</span>
-                          }
-
-                          @else {
-                            <span>EV</span>
-                          }
-
-                        </div>
+      </header>
 
 
-                        <div class="raw-evidence-content">
+      <div class="suggestion-evidence-content">
 
-                          <div class="raw-evidence-meta">
+        <!-- Target Session -->
+        <section class="evidence-target-session">
 
-                            <strong>
+          <span class="field-label">
+            Target Session
+          </span>
 
-                              @if (event.source === 'GITHUB') {
-                                GitHub Commit
-                              }
+          <h3>
+            {{ evidence.title }}
+          </h3>
 
-                              @else if (event.source === 'JIRA') {
-                                Jira Activity
-                              }
+          <p>
+            Generated from
+            {{ evidence.evidenceEvents?.length || 0 }}
 
-                              @else if (event.source === 'GOOGLE_CALENDAR') {
-                                Google Calendar
-                              }
+            @if (evidence.evidenceEvents?.length === 1) {
+              correlated evidence event.
+            } @else {
+              correlated evidence events.
+            }
+          </p>
 
-                              @else {
-                                {{ event.source }}
-                              }
-
-                            </strong>
-
-                            @if (event.timestamp) {
-                              <span>
-                                {{ formatTime(event.timestamp) }}
-                              </span>
-                            }
-
-                          </div>
+        </section>
 
 
-                          <h4>
-                            {{ event.description || 'Evidence event' }}
-                          </h4>
+        <!-- Raw Evidence -->
+        <section class="raw-evidence-section">
 
+          <div class="raw-evidence-header">
 
-                          @if (event.metadata) {
+            <div>
+              <span class="field-label">
+                Raw Evidence Log
+              </span>
 
-                            <div class="raw-evidence-metadata">
-
-                              @if (event.metadata['repositoryName']) {
-                                <span>
-                                  Repo:
-                                  {{ event.metadata['repositoryName'] }}
-                                </span>
-                              }
-
-                              @if (event.metadata['commitHash']) {
-                                <span>
-                                  Commit:
-                                  {{ event.metadata['commitHash'] }}
-                                </span>
-                              }
-
-                              @if (event.metadata['issueKey']) {
-                                <span>
-                                  Jira:
-                                  {{ event.metadata['issueKey'] }}
-                                </span>
-                              }
-                            </div>
-                          }
-                        </div>
-                      </article>
-                    }
-                  </div>
+              <h3>
+                {{ evidence.evidenceEvents?.length || 0 }}
+                @if (evidence.evidenceEvents?.length === 1) {
+                  Signal
                 } @else {
-                  <p class="evidence-empty">
-                    No detailed evidence is available for this suggestion.
-                  </p>
+                  Signals
                 }
-              </section>
+              </h3>
             </div>
 
+          </div>
+
+
+          @if (evidence.evidenceEvents?.length) {
+
+            <div class="raw-evidence-list">
+
+              @for (
+                event of evidence.evidenceEvents;
+                track event.id
+              ) {
+
+                <article class="raw-evidence-item">
+
+                  <div class="raw-evidence-source">
+
+                    @if (event.source === 'GITHUB') {
+                      <span>GH</span>
+                    }
+
+                    @else if (event.source === 'JIRA') {
+                      <span>JR</span>
+                    }
+
+                    @else if (event.source === 'GOOGLE_CALENDAR') {
+                      <span>CA</span>
+                    }
+
+                    @else {
+                      <span>EV</span>
+                    }
+
+                  </div>
+
+
+                  <div class="raw-evidence-content">
+
+                    <div class="raw-evidence-meta">
+
+                      <strong>
+
+                        @if (event.source === 'GITHUB') {
+                          GitHub Commit
+                        }
+
+                        @else if (event.source === 'JIRA') {
+                          Jira Activity
+                        }
+
+                        @else if (event.source === 'GOOGLE_CALENDAR') {
+                          Google Calendar
+                        }
+
+                        @else {
+                          {{ event.source }}
+                        }
+
+                      </strong>
+
+                      @if (event.timestamp) {
+                        <span>
+                          {{ formatTime(event.timestamp) }}
+                        </span>
+                      }
+
+                    </div>
+
+
+                    <h4>
+                      {{ event.description || 'Evidence event' }}
+                    </h4>
+
+
+                    @if (event.metadata) {
+
+                      <div class="raw-evidence-metadata">
+
+                        @if (event.metadata['repositoryName']) {
+                          <span>
+                            Repo:
+                            {{ event.metadata['repositoryName'] }}
+                          </span>
+                        }
+
+                        @if (event.metadata['commitHash']) {
+                          <span>
+                            Commit:
+                            {{ event.metadata['commitHash'] }}
+                          </span>
+                        }
+
+                        @if (event.metadata['issueKey']) {
+                          <span>
+                            Jira:
+                            {{ event.metadata['issueKey'] }}
+                          </span>
+                        }
+
+                      </div>
+                    }
+
+                  </div>
+
+                </article>
+              }
+
+            </div>
+
+          } @else {
+
+            <p class="evidence-empty">
+              No detailed evidence is available for this suggestion.
+            </p>
+
+          }
+
+        </section>
+
+      </div>
+
+    </section>
+
+  </div>
+
+}
 
             <footer class="suggestion-evidence-footer">
 
