@@ -66,7 +66,6 @@ public class JiraEvidenceCollector implements EvidenceCollector {
     return evidenceEvents;
   }
 
-  
   /*
   - this is for the project forecast evidence
   - unlinke the the other collector, this one does not get issues based on the user
@@ -91,9 +90,11 @@ public class JiraEvidenceCollector implements EvidenceCollector {
         LocalDateTime createdAt = parseTimestamp(issue.getCreatedAt());
         LocalDateTime updatedAt = parseTimestamp(issue.getUpdatedAt());
 
-        boolean createdInPeriod = createdAt != null && !createdAt.isBefore(startTime) && !createdAt.isAfter(endTime);
+        boolean createdInPeriod =
+            createdAt != null && !createdAt.isBefore(startTime) && !createdAt.isAfter(endTime);
 
-        boolean updatedInPeriod = updatedAt != null && !updatedAt.isBefore(startTime) && !updatedAt.isAfter(endTime);
+        boolean updatedInPeriod =
+            updatedAt != null && !updatedAt.isBefore(startTime) && !updatedAt.isAfter(endTime);
 
         if (createdInPeriod || updatedInPeriod) {
 
@@ -133,7 +134,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
         }
 
       } catch (RuntimeException exception) {
-        //if one Jira ticket fails should not break everything
+        // if one Jira ticket fails should not break everything
       }
     }
     return evidenceEvents;
