@@ -45,12 +45,21 @@
 <summary><strong>Demo 4 Documentation</strong></summary>
 <br>
 
-<div align="center">
-  
-[Demo 4 Docs](./docs/demo-4) 
+| Document | Link |
+|---|---|
+| Software Requirements Specification | [View PDF](./docs/demo-4/Software%20Requirements%20Specifications.pdf) |
+| Software Architecture Specification | [View PDF](./docs/demo-4/Software%20Architecture%20Specifications.pdf) |
+| API Service Contract | [View PDF](./docs/demo-4/API%20Service%20Contract.pdf) |
+| Mapping Quality Requirements to Architectural Decisions | [View PDF](./docs/demo-4/Mapping%20Quality%20Requirements%20to%20Architectural%20Decisions.pdf) |
+| Acceptance Criteria | [View PDF](./docs/demo-4/Acceptance%20Criteria%20%281%29.pdf) |
+| Coding Standards Handbook | [View PDF](./docs/demo-4/Final%20Coding%20Standards%20Handbook%20%281%29.pdf) |
+| Testing Policy | [View PDF](./docs/demo-4/Testing%20Policy.pdf) |
+| NFR Testing | [View PDF](./docs/demo-4/NFR%20TESTING.pdf) |
+| User Manual | [View PDF](./docs/demo-4/User_Manual_updated%20%282%29.pdf) |
+| Project Forecast (Wow Factor) | [View PDF](./docs/demo-4/Project%20forecast%20wow%20factor%20explained.pdf) |
+| Domain Model | [View Diagram](./docs/demo-4/Domain%20model.drawio.png) |
+| Deployment Diagram | [View Diagram](./docs/demo-4/Deployment%20diagram.png) |
 
-
-</div>
 </details>
 
 
