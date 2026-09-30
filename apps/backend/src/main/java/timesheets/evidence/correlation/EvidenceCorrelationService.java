@@ -43,7 +43,7 @@ import timesheets.evidence.EvidenceEvent;
 @Service
 public class EvidenceCorrelationService {
   // this is for temporal correlation - max time
-  private static final long MAX_SESSION_GAP_MINUTES = 30;
+  private static final long MAX_SESSION_GAP_MINUTES = 120;
   private static final double MIN_CORRELATION_THRESHOLD = 0.40;
 
   // create a lists of evidene events for a specific member into clustered evidence groups
@@ -92,19 +92,19 @@ public class EvidenceCorrelationService {
     double maxScore = -1.0;
 
     for (EvidenceGroup group : groups) {
-      if (group.getEndTime() == null){
+      if (group.getEndTime() == null) {
         continue;
       }
 
       long gapMinutes = Duration.between(group.getEndTime(), event.getTimestamp()).toMinutes();
 
       // 30 MIN MAX!!!
-      if (gapMinutes > MAX_SEESION_GAP_MINUTES){
+      if (gapMinutes > MAX_SESSION_GAP_MINUTES) {
         continue;
       }
 
       double score = calculateCorrelationScore(event, group);
-      if (score >= MIN_CORRELATION_THRESHOLD && score > maxScore){
+      if (score >= MIN_CORRELATION_THRESHOLD && score > maxScore) {
         maxScore = score;
         bestGroup = group;
       }
@@ -120,7 +120,8 @@ public class EvidenceCorrelationService {
     shared metadata details like Jira and GitHub repos (20%)
   */
 
- // the 30minute is LIMIT despite the correlation score otherwise it will include events from different days 
+  // the 30minute is LIMIT despite the correlation score otherwise it will include events from
+  // different days
   private double calculateCorrelationScore(EvidenceEvent event, EvidenceGroup group) {
     if (group.getStartTime() == null
         || group.getEndTime() == null
@@ -132,16 +133,16 @@ public class EvidenceCorrelationService {
     LocalDateTime groupEnd = group.getEndTime();
     long gapMinutes = Duration.between(groupEnd, eventTime).toMinutes();
 
-    if (gapMinutes > MAX_SESSION_GAP_MINUTES){
+    if (gapMinutes > MAX_SESSION_GAP_MINUTES) {
       return 0.0;
+    }
 
-      double temporalScore; 
+    double temporalScore;
 
-      if (gapMinutes <= 0){
-        temporalScore = 1.0;
-      } else {
-        temporalScore = 1.0 - ((double) gapMinutes / MAX_SESSION_GAP_MINUTES);
-      }
+    if (gapMinutes <= 0) {
+      temporalScore = 1.0;
+    } else {
+      temporalScore = 1.0 - ((double) gapMinutes / MAX_SESSION_GAP_MINUTES);
     }
 
     double projectScore = projectMatchedScore(event, group);
