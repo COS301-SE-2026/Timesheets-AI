@@ -65,11 +65,17 @@ public class SuggestionService {
 
     Integer durationSeconds = null;
 
-    if (suggestion.getStartTime() != null && suggestion.getEndTime() != null) {
+    if (suggestion.getDurationMinutes() != null && suggestion.getDurationMinutes() > 0) {
+      durationSeconds = suggestion.getDurationMinutes() * 60;
+    } else if (suggestion.getStartTime() != null
+        && suggestion.getEndTime() != null
+        && suggestion.getEndTime().isAfter(suggestion.getStartTime())) {
       durationSeconds =
           (int) Duration.between(suggestion.getStartTime(), suggestion.getEndTime()).toSeconds();
-    } else if (suggestion.getDurationMinutes() != null) {
-      durationSeconds = suggestion.getDurationMinutes() * 60;
+    }
+
+    if (durationSeconds == null || durationSeconds <= 0) {
+      throw new RuntimeException("Duration is required before this suggestion can be approved");
     }
 
     TimeEntryRequest request = new TimeEntryRequest();
@@ -129,11 +135,18 @@ public class SuggestionService {
     suggestion.setStartTime(startTime);
     suggestion.setEndTime(endTime);
 
-    if (startTime != null && endTime != null) {
+    if (startTime != null && endTime != null && endTime.isAfter(startTime)) {
 
       long minutes = Duration.between(startTime, endTime).toMinutes();
 
-      suggestion.setDurationMinutes((int) minutes);
+      if (minutes > 0) {
+        suggestion.setDurationMinutes((int) minutes);
+      } else {
+        suggestion.setDurationMinutes(null);
+      }
+
+    } else {
+      suggestion.setDurationMinutes(null);
     }
 
     suggestion.setStatus(SuggestionStatus.EDITED);
