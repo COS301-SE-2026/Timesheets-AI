@@ -43,9 +43,8 @@ import timesheets.evidence.EvidenceEvent;
 @Service
 public class EvidenceCorrelationService {
   // this is for temporal correlation - max time
-  private static final long CORRELATION_WINDOW = 60;
-
-  private static final double MINIMUM_CORRELATION_SCORE = 0.60;
+  private static final long MAX_SESSION_GAP_MINUTES = 30;
+  private static final double MIN_CORRELATION_THRESHOLD = 0.40;
 
   // create a lists of evidene events for a specific member into clustered evidence groups
   public List<EvidenceGroup> correlate(UUID workspaceMemberId, List<EvidenceEvent> evidenceEvents) {
@@ -71,7 +70,7 @@ public class EvidenceCorrelationService {
         continue;
       }
 
-      // attempt to find the best existing group for this event
+      // attempt to find the best existing group for this event based on weighted score 
       EvidenceGroup matchingGroup = findMatchingGroup(event, groups);
       if (matchingGroup != null) {
         addEventToGroup(matchingGroup, event);
@@ -83,26 +82,24 @@ public class EvidenceCorrelationService {
     return groups;
   }
 
-  // find the highest scoring existing group
+  // find the highest scoring existing group (best group )
   private EvidenceGroup findMatchingGroup(EvidenceEvent event, List<EvidenceGroup> groups) {
-    EvidenceGroup bestGroup = null;
-    double bestScore = 0.0;
+        if (groups.isEmpty() || event.getTimestamp() == null) {
+            return null;
+        }
 
-    for (EvidenceGroup group : groups) {
-      double score = calculateCorrelationScore(event, group);
+        EvidenceGroup bestGroup = null;
+        double maxScore = -1.0;
 
-      if (score > bestScore) {
-        bestScore = score;
-        bestGroup = group;
-      }
-    }
+        for (EvidenceGroup group : groups) {
+            double score = calculateCorrelationScore(event, group);
+            if (score >= MIN_CORRELATION_THRESHOLD && score > maxScore) {
+                maxScore = score;
+                bestGroup = group;
+            }
+        }
 
-    if (bestGroup != null && bestScore >= MINIMUM_CORRELATION_SCORE) {
-      bestGroup.setCorrelationScore(bestScore);
-      return bestGroup;
-    }
-
-    return null;
+        return bestGroup;
   }
 
   // calculates a weighted correlation score between an event and an existing group
@@ -112,43 +109,47 @@ public class EvidenceCorrelationService {
     shared metadata details like Jira and GitHub repos (20%)
   */
   private double calculateCorrelationScore(EvidenceEvent event, EvidenceGroup group) {
-    if (event.getTimestamp() == null
-        || group.getStartTime() == null
-        || group.getEndTime() == null) {
-      return 0.0;
+        if (group.getStartTime() == null || group.getEndTime() == null || event.getTimestamp() == null) {
+            return 0.0;
+        }
+
+        double temporalScore = 0.0;
+        LocalDateTime eventTime = event.getTimestamp();
+
+        // Check if event falls inside the group window
+        if (!eventTime.isBefore(group.getStartTime()) && !eventTime.isAfter(group.getEndTime())) {
+            temporalScore = 1.0;
+        } else {
+            long minutesFromStart = Math.abs(Duration.between(group.getStartTime(), eventTime).toMinutes());
+            long minutesFromEnd = Math.abs(Duration.between(group.getEndTime(), eventTime).toMinutes());
+            long gapMinutes = Math.min(minutesFromStart, minutesFromEnd);
+
+            if (gapMinutes <= MAX_SESSION_GAP_MINUTES) {
+                temporalScore = 1.0 - ((double) gapMinutes / MAX_SESSION_GAP_MINUTES);
+            }
+        }
+
+        double projectScore = projectMatchedScore(event, group);
+
+        double contextScore = contextMatchScore(event, group);
+
+        return (temporalScore * 0.50) + (projectScore * 0.30) + (contextScore * 0.20);
     }
-
-    long minutesFromStart =
-        Math.abs(Duration.between(group.getStartTime(), event.getTimestamp()).toMinutes());
-    long minutesFromEnd =
-        Math.abs(Duration.between(group.getEndTime(), event.getTimestamp()).toMinutes());
-    long related = Math.min(minutesFromStart, minutesFromEnd);
-
-    if (related > CORRELATION_WINDOW) {
-      return 0.0;
-    }
-
-    double temporalScore = 1.0 - ((double) related / CORRELATION_WINDOW);
-    double projectScore = projectMatchedScore(event, group);
-    double contextScore = contextMatchScore(event, group);
-
-    return (temporalScore * 0.50) + (projectScore * 0.30) + (contextScore * 0.20);
-  }
-
   //  check if there is shared project id with any event in the group
-  private double projectMatchedScore(EvidenceEvent event, EvidenceGroup group) {
-    if (event.getProjectId() == null) {
-      return 0.0;
-    }
 
-    for (EvidenceEvent existingEvent : group.getEvidenceEvents()) {
-      if (event.getProjectId().equals(existingEvent.getProjectId())) {
-        return 1.0;
-      }
-    }
+    private double projectMatchedScore(EvidenceEvent event, EvidenceGroup group) {
+        if (event.getProjectId() == null) {
+            return 0.0;
+        }
 
-    return 0.0;
-  }
+        for (EvidenceEvent existingEvent : group.getEvidenceEvents()) {
+            if (event.getProjectId().equals(existingEvent.getProjectId())) {
+                return 1.0;
+            }
+        }
+
+        return 0.0;
+    }
 
   // check for similar metadata info
   private double contextMatchScore(EvidenceEvent event, EvidenceGroup group) {
@@ -211,20 +212,26 @@ public class EvidenceCorrelationService {
   }
 
   private void addEventToGroup(EvidenceGroup group, EvidenceEvent event) {
-    group.getEvidenceEvents().add(event);
+  double eventScore = calculateCorrelationScore(event, group);
 
-    if (event.getTimestamp() != null
-        && (group.getStartTime() == null || event.getTimestamp().isBefore(group.getStartTime()))) {
-      group.setStartTime(event.getTimestamp());
-    }
+  group.getEvidenceEvents().add(event);
 
-    LocalDateTime eventEndTime = getEventEndTime(event);
-
-    if (eventEndTime != null
-        && (group.getEndTime() == null || eventEndTime.isAfter(group.getEndTime()))) {
-      group.setEndTime(eventEndTime);
-    }
+  if (event.getTimestamp() != null
+      && (group.getStartTime() == null || event.getTimestamp().isBefore(group.getStartTime()))) {
+    group.setStartTime(event.getTimestamp());
   }
+
+  LocalDateTime eventEndTime = getEventEndTime(event);
+
+  if (eventEndTime != null
+      && (group.getEndTime() == null || eventEndTime.isAfter(group.getEndTime()))) {
+    group.setEndTime(eventEndTime);
+  }
+
+  if (eventScore > group.getCorrelationScore()) {
+    group.setCorrelationScore(eventScore);
+  }
+}
 
   private LocalDateTime getEventEndTime(EvidenceEvent event) {
     if (event.getEndTime() != null) {
@@ -233,4 +240,5 @@ public class EvidenceCorrelationService {
 
     return event.getTimestamp();
   }
+
 }
