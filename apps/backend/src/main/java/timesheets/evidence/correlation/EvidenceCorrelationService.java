@@ -92,8 +92,19 @@ public class EvidenceCorrelationService {
     double maxScore = -1.0;
 
     for (EvidenceGroup group : groups) {
+      if (group.getEndTime() == null){
+        continue;
+      }
+
+      long gapMinutes = Duration.between(group.getEndTime(), event.getTimestamp()).toMinutes();
+
+      // 30 MIN MAX!!!
+      if (gapMinutes > MAX_SEESION_GAP_MINUTES){
+        continue;
+      }
+
       double score = calculateCorrelationScore(event, group);
-      if (score >= MIN_CORRELATION_THRESHOLD && score > maxScore) {
+      if (score >= MIN_CORRELATION_THRESHOLD && score > maxScore){
         maxScore = score;
         bestGroup = group;
       }
@@ -108,6 +119,8 @@ public class EvidenceCorrelationService {
     shared project (30%)
     shared metadata details like Jira and GitHub repos (20%)
   */
+
+ // the 30minute is LIMIT despite the correlation score otherwise it will include events from different days 
   private double calculateCorrelationScore(EvidenceEvent event, EvidenceGroup group) {
     if (group.getStartTime() == null
         || group.getEndTime() == null
@@ -115,19 +128,18 @@ public class EvidenceCorrelationService {
       return 0.0;
     }
 
-    double temporalScore = 0.0;
     LocalDateTime eventTime = event.getTimestamp();
+    LocalDateTime groupEnd = group.getEndTime();
+    long gapMinutes = Duration.between(groupEnd, eventTime).toMinutes();
 
-    // Check if event falls inside the group window
-    if (!eventTime.isBefore(group.getStartTime()) && !eventTime.isAfter(group.getEndTime())) {
-      temporalScore = 1.0;
-    } else {
-      long minutesFromStart =
-          Math.abs(Duration.between(group.getStartTime(), eventTime).toMinutes());
-      long minutesFromEnd = Math.abs(Duration.between(group.getEndTime(), eventTime).toMinutes());
-      long gapMinutes = Math.min(minutesFromStart, minutesFromEnd);
+    if (gapMinutes > MAX_SESSION_GAP_MINUTES){
+      return 0.0;
 
-      if (gapMinutes <= MAX_SESSION_GAP_MINUTES) {
+      double temporalScore; 
+
+      if (gapMinutes <= 0){
+        temporalScore = 1.0;
+      } else {
         temporalScore = 1.0 - ((double) gapMinutes / MAX_SESSION_GAP_MINUTES);
       }
     }
