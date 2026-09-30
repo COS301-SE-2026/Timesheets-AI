@@ -1,7 +1,9 @@
 package timesheets.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.jsonwebtoken.JwtException;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -62,6 +64,15 @@ class OAuthStateServiceTest {
       String state = service.generateState(UUID.randomUUID(), "JIRA");
 
       assertThat(service.validateState(state)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("should reject a tampered state")
+    void rejectsTampered() {
+      String state = service.generateState(UUID.randomUUID(), "GITHUB");
+      String tampered = state.substring(0, state.length() - 2) + "xx";
+
+      assertThatThrownBy(() -> service.validateState(tampered)).isInstanceOf(JwtException.class);
     }
   }
 }
