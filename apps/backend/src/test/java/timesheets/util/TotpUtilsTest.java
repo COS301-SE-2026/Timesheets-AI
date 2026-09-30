@@ -36,4 +36,22 @@ class TotpUtilsTest {
       assertThat(totpUtils.generateSecret()).isNotEqualTo(totpUtils.generateSecret());
     }
   }
+
+  @Nested
+  @DisplayName("generateQrCodeUrl")
+  class GenerateQrCodeUrlTests {
+
+    @Test
+    @DisplayName("should build an otpauth url containing the secret and issuer")
+    void buildsOtpAuthUrl() {
+      String secret = totpUtils.generateSecret();
+
+      String url = totpUtils.generateQrCodeUrl(secret, "john.doe@momentum.co.za", "Timesheets");
+
+      assertThat(url).startsWith("https://api.qrserver.com/v1/create-qr-code/");
+      assertThat(url).contains("data=otpauth%3A%2F%2Ftotp%2F");
+      assertThat(url).contains("secret%3D" + secret);
+      assertThat(url).contains("issuer%3DTimesheets");
+    }
+  }
 }
