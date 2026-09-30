@@ -41,7 +41,7 @@ export class SettingsService{
                 id: 'calendar',
                 name: 'Calendar',
                 description: 'Sync your calendar events and availability.',
-                icon: 'fa-brands fa-calendar-days',
+                icon: 'fa-solid fa-calendar-days',
                 connected: true,
             },
         ],
@@ -62,8 +62,8 @@ export class SettingsService{
 
     getSettings(mfaEnabled: boolean): Observable<UserSettings>{
         return forkJoin({
-            github: this.isConnected('api/integration/github/status'),
-            jira: this.isConnected('api/integration/jira/status'),
+            github: this.isConnected('api/integrations/github/status'),
+            jira: this.isConnected('api/integrations/jira/status'),
             calendar: this.isConnected('api/calendar/status'),
         }).pipe(
             map(({ github, jira, calendar})=>{
@@ -96,8 +96,8 @@ export class SettingsService{
         calendarProvider: 'google' | 'microsoft' = 'google'
     ): Observable<string>{
         const urls: Record<string, string>={
-            github: 'api/integration/github/connect',
-            jira: 'api/integration/jira/connect',
+            github: 'api/integrations/github/connect',
+            jira: 'api/integrations/jira/connect',
             calendar: 'api/integrations/google/calendar/connect',
         };
 
