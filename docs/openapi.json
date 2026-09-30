@@ -467,10 +467,12 @@
         "tags": [
           "project-controller"
         ],
+        "summary": "Get projects",
+        "description": "Gets the projects available to the current user.",
         "operationId": "getProjects",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Projects retrieved successfully",
             "content": {
               "*/*": {
                 "schema": {
@@ -488,6 +490,8 @@
         "tags": [
           "project-controller"
         ],
+        "summary": "Create project",
+        "description": "Creates a new project in the current workspace.",
         "operationId": "createProject",
         "requestBody": {
           "content": {
@@ -500,8 +504,18 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Project created successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have permission to create projects",
             "content": {
               "*/*": {
                 "schema": {
@@ -518,6 +532,8 @@
         "tags": [
           "project-controller"
         ],
+        "summary": "Assign project member",
+        "description": "Assigns a workspace member to a project.",
         "operationId": "assignMemberToProject",
         "parameters": [
           {
@@ -541,8 +557,18 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Member assigned successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectMemberResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project or member not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -559,6 +585,8 @@
         "tags": [
           "project-controller"
         ],
+        "summary": "Sync project forecast",
+        "description": "Recalculates and updates the project forecast.",
         "operationId": "syncProjectForecast",
         "parameters": [
           {
@@ -581,7 +609,17 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Project forecast updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectForecastResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have access to the project",
             "content": {
               "*/*": {
                 "schema": {
@@ -1315,7 +1353,7 @@
           "account-controller"
         ],
         "summary": "Request account deletion",
-        "description": "Submits an account deletion request for the authenticated user. The request is sent for administrative review before the account is deleted.",
+        "description": "Submits an account deletion request for the authenticated user.",
         "operationId": "requestDeletion",
         "requestBody": {
           "content": {
@@ -1331,12 +1369,9 @@
           "202": {
             "description": "Account deletion request submitted successfully",
             "content": {
-              "application/json": {
+              "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponse"
-                },
-                "example": {
-                  "message": "Account deletion request submitted successfully. An admin will review your request."
                 }
               }
             }
@@ -1344,13 +1379,41 @@
           "400": {
             "description": "Invalid account deletion request",
             "content": {
-              "application/json": {}
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
             }
           },
           "401": {
-            "description": "Authentication is required to request account deletion",
+            "description": "User is not authenticated",
             "content": {
-              "application/json": {}
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Account deletion request cannot be processed",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
             }
           }
         }
@@ -1431,6 +1494,8 @@
         "tags": [
           "project-controller"
         ],
+        "summary": "Get project details",
+        "description": "Gets the details of a specific project.",
         "operationId": "getProjectDetail",
         "parameters": [
           {
@@ -1445,7 +1510,17 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Project retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDetailResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -1460,6 +1535,8 @@
         "tags": [
           "project-controller"
         ],
+        "summary": "Delete project",
+        "description": "Deletes an existing project.",
         "operationId": "deleteProject",
         "parameters": [
           {
@@ -1473,8 +1550,11 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "Project deleted successfully"
+          },
+          "403": {
+            "description": "User does not have permission to delete projects"
           }
         }
       },
@@ -1482,6 +1562,8 @@
         "tags": [
           "project-controller"
         ],
+        "summary": "Update project",
+        "description": "Updates the details of an existing project.",
         "operationId": "patchProject",
         "parameters": [
           {
@@ -1506,7 +1588,17 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Project updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -1523,6 +1615,8 @@
         "tags": [
           "project-controller"
         ],
+        "summary": "Archive project",
+        "description": "Archives an existing project.",
         "operationId": "archiveProject",
         "parameters": [
           {
@@ -1537,7 +1631,10 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Project archived successfully"
+          },
+          "403": {
+            "description": "User does not have permission to archive projects"
           }
         }
       }
@@ -2078,6 +2175,8 @@
         "tags": [
           "project-controller"
         ],
+        "summary": "Get project forecast",
+        "description": "Gets the latest saved forecast for a project.",
         "operationId": "getProjectForecast",
         "parameters": [
           {
@@ -2092,7 +2191,17 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Project forecast retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedProjectForecastResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have access to the project",
             "content": {
               "*/*": {
                 "schema": {
@@ -3087,6 +3196,8 @@
         "tags": [
           "project-controller"
         ],
+        "summary": "Remove project member",
+        "description": "Removes a member from a project.",
         "operationId": "removeMemberFromProject",
         "parameters": [
           {
@@ -3109,8 +3220,11 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "Member removed successfully"
+          },
+          "404": {
+            "description": "Project or member not found"
           }
         }
       }

@@ -1,9 +1,6 @@
 package timesheets.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -27,35 +24,16 @@ public class AccountController {
 
   @Operation(
       summary = "Request account deletion",
-      description =
-          "Submits an account deletion request for the authenticated user. "
-              + "The request is sent for administrative review before the account is deleted.")
+      description = "Submits an account deletion request for the authenticated user.")
   @ApiResponses({
     @ApiResponse(
         responseCode = "202",
-        description = "Account deletion request submitted successfully",
-        content =
-            @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = MessageResponse.class),
-                examples =
-                    @ExampleObject(
-                        value =
-                            """
-                            {
-                              "message": "Account deletion request submitted successfully. An admin will review your request."
-                            }
-                            """))),
-    @ApiResponse(
-        responseCode = "400",
-        description = "Invalid account deletion request",
-        content = @Content(mediaType = "application/json")),
-    @ApiResponse(
-        responseCode = "401",
-        description = "Authentication is required to request account deletion",
-        content = @Content(mediaType = "application/json"))
+        description = "Account deletion request submitted successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid account deletion request"),
+    @ApiResponse(responseCode = "401", description = "User is not authenticated"),
+    @ApiResponse(responseCode = "404", description = "User not found"),
+    @ApiResponse(responseCode = "409", description = "Account deletion request cannot be processed")
   })
-  // user requests for account deletion
   @PostMapping("/deletion/request")
   public ResponseEntity<MessageResponse> requestDeletion(
       @Valid @RequestBody AccountDeletionRequest.Request request) {
