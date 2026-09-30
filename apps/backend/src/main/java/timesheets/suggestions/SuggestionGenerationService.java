@@ -50,9 +50,15 @@ public class SuggestionGenerationService {
   }
 
   private Integer calculateDurationMinutes(LocalDateTime startTime, LocalDateTime endTime) {
-
+    // if it is null - user must enter duration 
+    // pos nr - duration is known
+    // 0 -> never generated
     if (startTime == null || endTime == null) {
-      return 0;
+      return null;
+    }
+
+    if (!endTime.isAfter(startTime)){
+      return null;
     }
 
     return (int) Duration.between(startTime, endTime).toMinutes();
