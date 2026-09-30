@@ -206,6 +206,8 @@ public class TaskService {
       task.setCompletedAt(LocalDateTime.now());
     }
 
+    Task savedTask = taskRepository.save(task);
+
     // if the user wants to create a Jira issue then this is requested, want to make this optional
     // for the user
     if (request.isCreateJiraIssue() && request.getJiraDetails() != null) {
@@ -225,12 +227,36 @@ public class TaskService {
           }
         }
 
+        // Jira needs the email of the person assigned to the local task
+        UUID assignedWorkspaceMemberId = savedTask.getAssignedWorkspaceMemberId();
+
+        WorkspaceMember assignedWorkspaceMember =
+            workspaceMemberRepository
+                .findById(assignedWorkspaceMemberId)
+                .orElseThrow(
+                    () ->
+                        new ResourceNotFoundException(
+                            "Assigned workspace member not found: " + assignedWorkspaceMemberId));
+
+        String assigneeEmail =
+            userRepository
+                .findById(assignedWorkspaceMember.getUserId())
+                .orElseThrow(
+                    () ->
+                        new ResourceNotFoundException(
+                            "User not found for assigned workspace member: "
+                                + assignedWorkspaceMemberId))
+                .getEmail();
+
+        request.getJiraDetails().setAssigneeEmail(assigneeEmail);
+
         // going to be using the adapter to create the issue
         IssueResponse jiraIssue =
             jiraAdapter.createIssue(workspaceMemberId, request.getJiraDetails());
 
         // the jira ticket will be stored here, so that it is stored in the system
-        task.setJiraTicketKey(jiraIssue.getKey());
+        savedTask.setJiraTicketKey(jiraIssue.getKey());
+        savedTask = taskRepository.save(savedTask);
 
         log.info("Created Jira issue {} for task '{}'", jiraIssue.getKey(), request.getTitle());
 
@@ -241,8 +267,6 @@ public class TaskService {
         throw new RuntimeException("Failed to create Jira issue: " + e.getMessage(), e);
       }
     }
-
-    Task savedTask = taskRepository.save(task);
 
     String projectName = project.getName();
     String assignedToName = getAssignedToName(savedTask.getAssignedWorkspaceMemberId());
