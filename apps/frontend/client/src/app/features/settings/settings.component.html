@@ -93,9 +93,7 @@ Realated Requirement: N/A
 
             <div class="card-body">
                 @for(integration of s.integrations; track integration.id){
-                    <div 
-                        class="integration-row"
-                        [class.read-only]="isDeveloper()">
+                    <div class="integration-row">
                         <i [class]="integration.icon"></i>
                         <div class="integration-info">
                             <span class="label-title">
@@ -107,48 +105,31 @@ Realated Requirement: N/A
                         </div>
 
                         <div class="integration-control">
-                            @if(integration.connected){
-                                <span class="status-dot connected">
+                                <span class="status-dot"
+                                    [class.connected]="integration.connected">
                                 </span>
                                 <span class="status-text">
-                                    Connected
+                                    {{ integration.connected? 'Connected': 'Not connected' }}
                                 </span>
-                            }
 
-                            <mat-slide-toggle
-                                [checked]="integration.enabled"
-                                [disabled]="!canToggleIntegrations()"
-                                (change)="toggleIntegration(integration, $event.checked)">
-                            </mat-slide-toggle>
+                            <button 
+                                class="connect-button"
+                                type="button"
+                                [disabled]="isSyncing(integration.id)"
+                                (click)="connectIntegration(integration)">
+                                <i class="fa-solid fa-link"></i>
+                                
+                                @if(isSyncing(integration.id)){
+                                    Connecting...
+                                }@else if(integration.connected){
+                                    Reconnect
+                                }@else{
+                                    Connect
+                                }
+                            </button>
 
-                            @if(canToggleIntegrations()){
-                                <i class="fa-solid fa-chevron-right chevron"></i>
-                            }
                         </div>
                     </div>
-                }
-
-                @if(canAddIntegrations()){
-                    <button 
-                        class="text-link"
-                        (click)="requestIntegration()">
-                        Browse more integrations <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                }
-
-                @if(canRequestIntegrations()){
-                    <button 
-                        class="text-link"
-                        (click)="requestIntegration()">
-                        Request an integration <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                }
-
-                @if(isDeveloper()){
-                    <p class="read-only-note">
-                        <i class="fa-solid fa-lock"></i>
-                        Only admins and managers can manage integrations.
-                    </p>
                 }
             </div>
         </section>

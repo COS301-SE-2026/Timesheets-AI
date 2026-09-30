@@ -11,6 +11,8 @@ import { ChangePasswordDialogComponent } from './change-password-dialog/change-p
 import { MfaSetupDialogComponent } from './mfa-setup-dialog/mfa-setup-dialog.component';
 import { MfaDisableDialogComponent } from './mfa-disable-dialog/mfa-disable-dialog.component';
 import { AuthService } from '../../core/services/auth.service';
+import { AccountDeletionDialogComponent } from './account-deletion-dialog/account-deletion-dialog.component';
+
 @Component({
   selector: 'app-settings',
   standalone: true,
@@ -31,6 +33,7 @@ export class SettingsComponent implements OnInit{
   private readonly authService= inject( AuthService);
   private readonly dialog=inject(MatDialog);
 
+  syncingIntegration= signal<string | null>(null);
   settings= signal<UserSettings | null>(null);
   role= signal<UserRole>('DEVELOPER');
   isLoading= signal<boolean>(true);
@@ -46,19 +49,6 @@ export class SettingsComponent implements OnInit{
     ()=> this.role()=== 'DEVELOPER'
   );
 
-  // DEVS CAN ONLY SEE INTEGRATIONS
-  canToggleIntegrations= computed(
-    ()=> this.isAdmin() || this.isManager()
-  );
-
-  // ONLY ADMIN CAN ADD NEW INTEGRATIONS + MANAGER REQUEST NEW ONES
-  canAddIntegrations= computed(
-    ()=> this.isAdmin()
-  );
-
-  canRequestIntegrations= computed(
-    ()=> this.isManager()
-  );
 
   ngOnInit(): void{
     const user= this.authService.currentUser();
@@ -86,13 +76,39 @@ export class SettingsComponent implements OnInit{
     });
   }
 
+  connectIntegration(integration: IntegrationStatus): void{
+    this.syncingIntegration.set(integration.id);
+  
+    this.settingsService.getConnectUrl(integration.id, this.calendarProvider()).subscribe({
+      next:(url)=>{
+        window.location.href=url;
+      },
+      error:(error: unknown)=>{
+        console.error(`Failed to connect ${integration.name}:`, error);
+        this.syncingIntegration.set(null);
+      },
+    });
+  }
+
+  private calendarProvider(): 'google' | 'microsoft'{
+    const signedInWith= this.authService.getAuthProvider();
+
+    if(signedInWith=== 'MICROSOFT')return 'microsoft';
+    if(signedInWith=== 'GOOGLE')return 'google';
+
+    const email= this.authService.currentUser()?.email?? '';
+    return /@(outlook|hotmail|live)\./i.test(email)? 'microsoft': 'google';
+
+  }
+
   changePassword():void{
     // i need the password change flow that our app uses
     const dialogRef= this.dialog.open(
       ChangePasswordDialogComponent,{
         width:'450px',
         maxWidth: '95vw',
-        disableClose: true
+        disableClose: true,
+        panelClass: 'integration-browser-dialog'
       }
     );
 
@@ -166,37 +182,25 @@ export class SettingsComponent implements OnInit{
     });
   }
 
-  toggleIntegration(integration: IntegrationStatus, enabled:boolean):void{
-    if(!this.canToggleIntegrations()){
-      return;
-    }
-
-    this.settingsService.toggleIntegration(integration.id, enabled).subscribe(
-      ()=>{
-        this.settings.update(
-          (s)=>{
-            if(!s) return s;
-
-            const integrations= s.integrations.map(
-              (i)=> i.id === integration.id? {...i, enabled}: i
-            );
-            return { ...s, integrations};
-          });
-      });
+  isSyncing(integrationId: string): boolean{
+    return this.syncingIntegration()=== integrationId;
   }
 
-  requestIntegration():void{
-    this.settingsService.requestIntegration().subscribe(
-      ()=>{
-        // NOTIFICATION CONFIRMATION HOWEVER THATS DONE
-      });
-  }
 
   requestAccountDeletion():void{
-    this.settingsService.requestAccountDeletion().subscribe(
-      ()=>{
-        // CONFIRMATION POPUP MAYBE
+    const dialogRef= this.dialog.open(
+      AccountDeletionDialogComponent,
+      {
+        width: '500px',
+        maxWidth: '95vw',
+        disableClose: true
       }
     );
+
+    dialogRef.afterClosed().subscribe((submitted)=>{
+      if(submitted){
+        console.log('Account deletion request submitted successfully.');
+      }
+    });
   }
 }

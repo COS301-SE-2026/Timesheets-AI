@@ -60,6 +60,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       evidenceEvent.setDescription(issue.getTitle());
       evidenceEvent.setTaskId(issue.getLocalTaskId());
       evidenceEvent.setProjectId(issue.getLocalProjectId());
+      evidenceEvent.setDescription(issue.getSummary());
 
       Map<String, Object> metadata = new HashMap<String, Object>();
 
@@ -85,6 +86,80 @@ public class JiraEvidenceCollector implements EvidenceCollector {
     evidenceEvents.addAll(collectWorklogEvidence(workspaceMemberId, startTime, endTime));
     evidenceEvents.addAll(collectCommentEvidence(workspaceMemberId, startTime, endTime));
     evidenceEvents.addAll(collectStatusChangeEvidence(workspaceMemberId, startTime, endTime));
+    return evidenceEvents;
+  }
+
+  /*
+  - this is for the project forecast evidence
+  - unlinke the the other collector, this one does not get issues based on the user
+  - workspace member is just used to access Jira
+  */
+  public List<EvidenceEvent> collectForIssueKeys(
+      UUID workspaceMemberId,
+      List<String> issueKeys,
+      LocalDateTime startTime,
+      LocalDateTime endTime) {
+
+    List<EvidenceEvent> evidenceEvents = new ArrayList<>();
+    for (String issueKey : issueKeys) {
+
+      try {
+        IssueResponse issue = issueTrackerAdapter.getIssue(workspaceMemberId, issueKey);
+
+        if (issue == null) {
+          continue;
+        }
+
+        LocalDateTime createdAt = parseTimestamp(issue.getCreatedAt());
+        LocalDateTime updatedAt = parseTimestamp(issue.getUpdatedAt());
+
+        boolean createdInPeriod =
+            createdAt != null && !createdAt.isBefore(startTime) && !createdAt.isAfter(endTime);
+
+        boolean updatedInPeriod =
+            updatedAt != null && !updatedAt.isBefore(startTime) && !updatedAt.isAfter(endTime);
+
+        if (createdInPeriod || updatedInPeriod) {
+
+          EvidenceEvent evidenceEvent = new EvidenceEvent();
+
+          evidenceEvent.setId(UUID.randomUUID());
+          evidenceEvent.setSource("JIRA");
+          evidenceEvent.setWorkspaceMemberId(workspaceMemberId);
+          evidenceEvent.setActivityType("ISSUE");
+
+          /*
+          - if the issue was updated during the period then the update is the most useful timestamp for forecasting
+          - otherwise use when the issue was created
+          */
+          evidenceEvent.setTimestamp(updatedInPeriod ? updatedAt : createdAt);
+          evidenceEvent.setDescription(issue.getSummary());
+
+          Map<String, Object> metadata = new HashMap<>();
+
+          metadata.put("issueKey", issue.getKey());
+          metadata.put("status", issue.getStatus());
+          metadata.put("issueType", issue.getIssueType());
+          metadata.put("projectKey", issue.getProjectKey());
+          metadata.put("projectName", issue.getProjectName());
+          metadata.put("description", issue.getDescription());
+          metadata.put("priority", issue.getPriority());
+          metadata.put("assigneeEmail", issue.getAssigneeEmail());
+          metadata.put("assigneeDisplayName", issue.getAssigneeDisplayName());
+          metadata.put("createdAt", issue.getCreatedAt());
+          metadata.put("updatedAt", issue.getUpdatedAt());
+          metadata.put("dueDate", issue.getDueDate());
+          metadata.put("localTaskId", issue.getLocalTaskId());
+
+          evidenceEvent.setMetadata(metadata);
+
+          evidenceEvents.add(evidenceEvent);
+        }
+
+      } catch (RuntimeException exception) {
+        // if one Jira ticket fails should not break everything
+      }
+    }
     return evidenceEvents;
   }
 

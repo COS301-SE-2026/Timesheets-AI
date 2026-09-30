@@ -53,10 +53,10 @@
                     <strong class="timer-value">
                         {{formatDuration(timerSeconds()) }}
                     </strong>
-                    @if (timer.project.name || timer.task.title) {
+                    @if (timer.project.name || timer.task?.title) {
                         <p class="context">
                            {{ timer.project.name || "No project" }} ·
-                           {{ timer.task.title || "No task selected" }}
+                           {{ timer.task?.title || "No task selected" }}
                         </p>
                     }
                     <div class="timer-actions">
@@ -275,7 +275,7 @@
                                     <i class="fa-solid fa-chevron-right"></i>
                                 </a>
                             } @else {
-                                <a class="deadline-row" [routerLink]="['/projects', deadline.targetId]">
+                                <a class="deadline-row" routerLink="/projects/details" [state]="{ projectId: deadline.targetId }">
                                     <time>
                                         <b>{{ deadline.dueDate | date:"MMM" }}</b>
                                         <strong>{{ deadline.dueDate | date: "dd" }}</strong>
@@ -315,7 +315,7 @@
                 @if (activeProjectCards().length) {
                     <div class="active-projects-carousel" aria-label="Avtive project cards">
                         @for (project of activeProjectCards(); track project.id) {
-                            <a class="active-project-card" [routerLink]="['/projects', project.id]">
+                            <a class="active-project-card" routerLink="/projects/details" [state]="{ projectId: project.id}">
                                 <div class="project-card-copy">
                                     <h3>{{ project.name }}</h3>
                                     <p class="project-leads">
@@ -329,7 +329,7 @@
                                 </div>
                                 <div class="project-completion" [style.--project-progress]="project.completionPercentage + '%'">
                                     <div class="project-completion-content">
-                                        <strong>{{ project.completionPercentage }}%</strong>
+                                        <strong>{{ project.completionPercentage | number:'1.0-2' }}%</strong>
                                         <span>complete</span>
                                     </div>
                                 </div>

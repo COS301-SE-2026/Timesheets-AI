@@ -60,6 +60,7 @@ export interface Task {
   deletedAt?: string;
   jiraStatus?: string;   
   jiraIssueType?: string;
+  jiraUrl?: string;
 }
 
 export interface ProjectOption {
@@ -704,6 +705,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
       estimatedHours: response.estimatedHours ?? 0,
       actualHours: response.actualHours ?? 0,
       jiraTicketKey: response.jiraTicketKey ?? undefined,
+      jiraUrl: response.jiraUrl ?? undefined,
       jiraStatus: (response as any).jiraStatus ?? undefined,
       jiraIssueType: (response as any).jiraIssueType ?? undefined,
       assignedToName: response.assignedToName ?? 'Unassigned',
@@ -823,7 +825,7 @@ export class MyTasksComponent implements OnInit, OnDestroy {
   //navigate to project
 
   public navigateToProject(projectId: string): void {
-    void this.router.navigate(['/projects', projectId]);
+    void this.router.navigate(['/projects/details'], { state: { projectId } });
   }
 
   public onOverlayKeydown(event: KeyboardEvent): void {

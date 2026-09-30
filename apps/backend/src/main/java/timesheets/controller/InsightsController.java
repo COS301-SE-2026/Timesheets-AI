@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import timesheets.dto.request.ProductivityReportRequest;
 import timesheets.dto.response.AiDashboardResponse;
 import timesheets.dto.response.DeveloperProjectResponse;
+import timesheets.dto.response.GenerateInsightsResponse;
+import timesheets.dto.response.ManagerDashboardResponse;
 import timesheets.dto.response.PersonalInsightsResponse;
 import timesheets.dto.response.ResolveInsightResponse;
+import timesheets.dto.response.WeeklySummaryResponse;
 import timesheets.security.SecurityUtils;
 import timesheets.service.InsightsService;
 
@@ -69,5 +72,23 @@ public class InsightsController {
   @GetMapping("/my-projects")
   public ResponseEntity<List<DeveloperProjectResponse>> getMyProjects() {
     return ResponseEntity.ok(insightsService.getMyProjects());
+  }
+
+  @GetMapping("/manager-dashboard")
+  public ResponseEntity<ManagerDashboardResponse> getManagerDashboard(
+      @RequestParam(required = false) UUID projectId,
+      @RequestParam(required = false, defaultValue = "8w") String period) {
+    return ResponseEntity.ok(insightsService.getManagerDashboard(projectId, period));
+  }
+
+  @GetMapping("/weekly-summary/team")
+  public ResponseEntity<WeeklySummaryResponse> getTeamWeeklySummary(
+      @RequestParam(required = false) java.time.LocalDate weekStart) {
+    return ResponseEntity.ok(insightsService.getTeamWeeklySummary(weekStart));
+  }
+
+  @PostMapping("/generate")
+  public ResponseEntity<GenerateInsightsResponse> generateInsights(@RequestParam UUID projectId) {
+    return ResponseEntity.ok(insightsService.generateInsights(projectId));
   }
 }

@@ -3,7 +3,6 @@ package timesheets.integration.issue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -76,22 +75,21 @@ public class JiraOAuthService {
         + "&prompt=consent";
   }
 
-  // exchange authorizatiion code for an access token and refresh token
+  // exchange authorization code for an access token and refresh token
   public JiraTokenResponse exchangeCode(String code) {
+
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    String credentials = clientId + ":" + clientSecret;
-
-    String encodedCredentials =
-        Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-
-    headers.set("Authorization", "Basic " + encodedCredentials);
-
-    // Build JSON request body required by the OAuth token endpoint
     String body =
         "{"
             + "\"grant_type\":\"authorization_code\","
+            + "\"client_id\":\""
+            + escapeJson(clientId)
+            + "\","
+            + "\"client_secret\":\""
+            + escapeJson(clientSecret)
+            + "\","
             + "\"code\":\""
             + escapeJson(code)
             + "\","
@@ -100,57 +98,75 @@ public class JiraOAuthService {
             + "\""
             + "}";
 
-    HttpEntity<String> request = new HttpEntity<String>(body, headers);
+    HttpEntity<String> request = new HttpEntity<>(body, headers);
 
     ResponseEntity<String> response =
         restTemplate.exchange(TOKEN_URL, HttpMethod.POST, request, String.class);
 
     try {
-
       JsonNode json = objectMapper.readTree(response.getBody());
-      // extract the access token, refresh token and expiry time
 
-      return new JiraTokenResponse(
-          json.get("access_token").asText(),
-          json.has("refresh_token") ? json.get("refresh_token").asText() : null,
-          json.has("expires_in") ? json.get("expires_in").asLong() : 3600);
+      String accessToken = json.get("access_token").asText();
+      String refreshToken =
+          json.has("refresh_token") && !json.get("refresh_token").isNull()
+              ? json.get("refresh_token").asText()
+              : null;
+
+      long expiresIn = json.has("expires_in") ? json.get("expires_in").asLong() : 3600;
+
+      return new JiraTokenResponse(accessToken, refreshToken, expiresIn);
+
     } catch (Exception e) {
-      // Throw an application error if the OAuth response cannot be parsed correctly
       throw new RuntimeException("Failed to parse Jira OAuth response", e);
     }
   }
 
-  // Retrieve the Atlassian Cloud ID for Jira site accessible to the authenticated user
-  // The Cloud ID is required when making Jira REST API requests through api.atlassian.com
-
+  // retrieves the cloud ID for the connected Jira site
+  // the cloud ID is used when making Jira API requests
   public String getCloudID(String accessToken) {
-    // create HTTP headers for the request
-    HttpHeaders headers = new HttpHeaders();
+    JsonNode resource = getJiraResource(accessToken);
 
-    // add oauth access token using bearer authentication
+    if (!resource.has("id") || resource.get("id").isNull()) {
+      throw new RuntimeException("Jira cloud ID was not returned by Atlassian.");
+    }
+
+    return resource.get("id").asText();
+  }
+
+  // retrieves the browser URL for the connected Jira site
+  // this is used when creating links that users can open in Jira
+  public String getSiteUrl(String accessToken) {
+    JsonNode resource = getJiraResource(accessToken);
+
+    if (!resource.has("url") || resource.get("url").isNull()) {
+      throw new RuntimeException("Jira site URL was not returned by Atlassian.");
+    }
+
+    return resource.get("url").asText();
+  }
+
+  // gets the Jira site connected to the authenticated Atlassian account
+  private JsonNode getJiraResource(String accessToken) {
+
+    HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(accessToken);
 
-    // create an HTTP request containing only the headers
-    HttpEntity<Void> request = new HttpEntity<Void>(headers);
-
-    // request list of cloud resources available to the authenticated user
+    HttpEntity<Void> request = new HttpEntity<>(headers);
 
     ResponseEntity<String> response =
         restTemplate.exchange(RESOURCES_URL, HttpMethod.GET, request, String.class);
 
     try {
-      // parse the array
       JsonNode resources = objectMapper.readTree(response.getBody());
 
-      // ensure that there is at least one resources found
-
-      if (!resources.isArray() || resources.size() == 0) {
-        throw new RuntimeException("No Jira resources are availiable for this account.");
+      if (!resources.isArray() || resources.isEmpty()) {
+        throw new RuntimeException("No Jira resources are available for this account.");
       }
 
-      return resources.get(0).get("id").asText();
+      return resources.get(0);
+
     } catch (Exception e) {
-      throw new RuntimeException("Failed to retrieve Jira cloud ID", e);
+      throw new RuntimeException("Failed to retrieve Jira resource", e);
     }
   }
 
@@ -189,33 +205,47 @@ public class JiraOAuthService {
 
   // this is the refresh token support
   public JiraTokenResponse refreshAccessToken(String refreshToken) {
+
+    if (refreshToken == null || refreshToken.isBlank()) {
+      throw new RuntimeException("No Jira refresh token available. Jira must be reconnected.");
+    }
+
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
 
-    String credentials = clientId + ":" + clientSecret;
-    String encodedCredentials =
-        Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
-    headers.set("Authorization", "Basic " + encodedCredentials);
-
-    // making sure that the body is exactly the way Jira expects it to be
     String body =
         "{"
             + "\"grant_type\":\"refresh_token\","
+            + "\"client_id\":\""
+            + escapeJson(clientId)
+            + "\","
+            + "\"client_secret\":\""
+            + escapeJson(clientSecret)
+            + "\","
             + "\"refresh_token\":\""
             + escapeJson(refreshToken)
             + "\""
             + "}";
 
     HttpEntity<String> request = new HttpEntity<>(body, headers);
+
     ResponseEntity<String> response =
         restTemplate.exchange(TOKEN_URL, HttpMethod.POST, request, String.class);
 
     try {
       JsonNode json = objectMapper.readTree(response.getBody());
-      return new JiraTokenResponse(
-          json.get("access_token").asText(),
-          json.has("refresh_token") ? json.get("refresh_token").asText() : refreshToken,
-          json.has("expires_in") ? json.get("expires_in").asLong() : 3600);
+
+      String accessToken = json.get("access_token").asText();
+
+      String newRefreshToken =
+          json.has("refresh_token") && !json.get("refresh_token").isNull()
+              ? json.get("refresh_token").asText()
+              : refreshToken;
+
+      long expiresIn = json.has("expires_in") ? json.get("expires_in").asLong() : 3600;
+
+      return new JiraTokenResponse(accessToken, newRefreshToken, expiresIn);
+
     } catch (Exception e) {
       throw new RuntimeException("Failed to refresh Jira token", e);
     }

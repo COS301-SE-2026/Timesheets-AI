@@ -1,6 +1,7 @@
 package timesheets.dto.response;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,8 @@ public class ProjectDetailResponse {
   private String name;
   private String description;
   private String status;
+  private LocalDate startDate;
+  private LocalDate endDate;
   private BigDecimal budgetHours;
   private BigDecimal hourlyRate;
   private BigDecimal budgetCost;

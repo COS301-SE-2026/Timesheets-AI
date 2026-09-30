@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import timesheets.auth.GoogleOAuthService;
 import timesheets.auth.GoogleTokenResponse;
+import timesheets.auth.MicrosoftOAuthService;
+import timesheets.auth.MicrosoftTokenResponse;
 import timesheets.auth.OAuthState;
 import timesheets.auth.OAuthStateService;
 import timesheets.domain.IntegrationToken;
@@ -37,6 +39,7 @@ public class IntegrationController {
 
   private final OAuthStateService oauthStateService;
   private final GoogleOAuthService googleOAuthService;
+  private final MicrosoftOAuthService microsoftOAuthService;
   private final SecurityUtils securityUtils;
   private final IntegrationTokenRepository integrationTokenRepository;
   private final JiraOAuthService jiraOAuthService;
@@ -50,9 +53,16 @@ public class IntegrationController {
 
   @GetMapping("/google/calendar/connect")
   public ResponseEntity<String> connectGoogleCalender() {
+
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    // Use the email of the user currently signed into Timesheets AI
+    // so Google can target the same account when connecting Calendar.
+    String currentUserEmail = securityUtils.getCurrentEmail();
     String state = oauthStateService.generateState(workspaceMemberId, "GOOGLE_CALENDAR");
-    String authorizationUrl = googleOAuthService.buildAuthorizationUrl(state);
+
+    String authorizationUrl = googleOAuthService.buildAuthorizationUrl(state, currentUserEmail);
+
     return ResponseEntity.ok(authorizationUrl);
   }
 
@@ -218,6 +228,9 @@ public class IntegrationController {
     // get cloud id associated with the token
     String cloudId = jiraOAuthService.getCloudID(tokenResponse.getAccessToken());
 
+    // get the actual Jira site URL used for browser links
+    String siteUrl = jiraOAuthService.getSiteUrl(tokenResponse.getAccessToken());
+
     // calculate when the access token expires
     LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn());
 
@@ -236,6 +249,7 @@ public class IntegrationController {
     integrationToken.setWorkspaceMemberId(workspaceMemberId);
     integrationToken.setProvider("JIRA");
     integrationToken.setProviderResourceId(cloudId);
+    integrationToken.setProviderSiteUrl(siteUrl);
     integrationToken.setAccessToken(tokenResponse.getAccessToken());
     integrationToken.setExpiresAt(expiresAt);
 
@@ -270,18 +284,36 @@ public class IntegrationController {
     return ResponseEntity.ok(issue);
   }
 
-  // mirrors GET /api/calendar/status so the frontend can check the jira connection the same way
+  // returns the current Jira connection state for the signed-in workspace member
   public record IntegrationStatus(boolean connected, String provider) {}
 
   @GetMapping("/jira/status")
   public ResponseEntity<IntegrationStatus> getJiraStatus() {
+
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
-    // a stored token row means the user finished the oauth flow
-    boolean connected =
-        integrationTokenRepository
-            .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "JIRA")
-            .isPresent();
+    Optional<IntegrationToken> jiraToken =
+        integrationTokenRepository.findByWorkspaceMemberIdAndProvider(workspaceMemberId, "JIRA");
+
+    boolean connected = false;
+
+    if (jiraToken.isPresent()) {
+
+      IntegrationToken token = jiraToken.get();
+
+      /*
+      - Jira is only treated as connected when the OAuth connection has all the information needed by the integration
+      - providerResourceId is the Jira cloud ID used for API requests
+      - providerSiteUrl is the Jira site used for browser links
+      */
+      connected =
+          token.getAccessToken() != null
+              && !token.getAccessToken().isBlank()
+              && token.getProviderResourceId() != null
+              && !token.getProviderResourceId().isBlank()
+              && token.getProviderSiteUrl() != null
+              && !token.getProviderSiteUrl().isBlank();
+    }
 
     return ResponseEntity.ok(new IntegrationStatus(connected, connected ? "jira" : null));
   }
@@ -368,5 +400,69 @@ public class IntegrationController {
             .toList();
 
     return ResponseEntity.ok(new JiraTicketsBreakdownResponse(total, byStatus));
+  }
+
+  // this is the endpoint for teh microsoft calendar oauth
+  @GetMapping("/microsoft/calendar/connect")
+  public ResponseEntity<String> connectMicrosoftCalendar() {
+
+    UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
+
+    /*
+    - I want it to use the email of the user who is signed in
+    - microsoft should go to that account when the calendar is connected
+     */
+    String currentUserEmail = securityUtils.getCurrentEmail();
+
+    /*
+    - in order to protect the callback being used by another user, link the state value to an auth request
+    */
+    String state = oauthStateService.generateState(workspaceMemberId, "MICROSOFT_CALENDAR");
+    String authorizationUrl = microsoftOAuthService.buildAuthorizationUrl(state, currentUserEmail);
+
+    return ResponseEntity.ok(authorizationUrl);
+  }
+
+  // microsoft will go back to this endpoint after authorization
+  @GetMapping("/microsoft/calendar/callback")
+  public ResponseEntity<Void> microsoftCalendarCallback(
+      @RequestParam String code, @RequestParam String state) {
+
+    /*
+    - for security; making sure that the user who started the connection is linked to the state
+     */
+    OAuthState validatedState = oauthStateService.validateState(state);
+    UUID workspaceMemberId = validatedState.getWorkspaceMemberId();
+
+    // auth code is temporary so getting tokens instead
+    MicrosoftTokenResponse tokenResponse = microsoftOAuthService.exchangeCodeForToken(code);
+    LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn());
+
+    Optional<IntegrationToken> existingToken =
+        integrationTokenRepository.findByWorkspaceMemberIdAndProvider(
+            workspaceMemberId, "MICROSOFT_CALENDAR");
+
+    IntegrationToken integrationToken;
+
+    if (existingToken.isEmpty()) {
+      integrationToken = new IntegrationToken();
+    } else {
+      integrationToken = existingToken.get();
+    }
+
+    integrationToken.setWorkspaceMemberId(workspaceMemberId);
+    integrationToken.setProvider("MICROSOFT_CALENDAR");
+    integrationToken.setAccessToken(tokenResponse.getAccessToken());
+    integrationToken.setExpiresAt(expiresAt);
+
+    if (tokenResponse.getRefreshToken() != null) {
+      integrationToken.setRefreshToken(tokenResponse.getRefreshToken());
+    }
+
+    integrationTokenRepository.save(integrationToken);
+
+    return ResponseEntity.status(HttpStatus.FOUND)
+        .header(HttpHeaders.LOCATION, frontendUrl + "/calendar?connected=true")
+        .build();
   }
 }

@@ -381,6 +381,7 @@
 
 .entries-card__header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
@@ -413,7 +414,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -446,6 +447,7 @@
 
 .entries-toolbar__filters {
   display: flex;
+  margin-inline-start: auto;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
@@ -483,12 +485,13 @@
 
   th {
     padding: 10px 12px;
-    border-bottom: 1px solid #e5e7eb;
+    background: #eef5fd;
+    border-bottom: 2px solid var(--color-secondary);
     text-align: left;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.04em;
-    color: var(--color-text-muted);
+    color: var(--color-primary);
     white-space: nowrap;
   }
 
@@ -499,7 +502,7 @@
   }
 
   tbody tr:hover {
-    background: #f9fafb;
+    background: rgba(230, 241, 251, 0.35);
   }
 }
 

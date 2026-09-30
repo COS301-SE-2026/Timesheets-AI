@@ -1,5 +1,8 @@
 package timesheets.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -29,8 +32,12 @@ public class TimesheetController {
   private final TimeEntryService timeEntryService;
   private final SecurityUtils securityUtils;
 
-  // getting all the timesheets for a logged in user
-  // think viewing my own timesheets
+  @Operation(
+      summary = "Get my timesheets",
+      description = "Gets all timesheets for the current user.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timesheets retrieved successfully")
+  })
   @GetMapping("/me")
   public ResponseEntity<List<TimesheetResponse>> getMyTimesheets() {
 
@@ -44,8 +51,12 @@ public class TimesheetController {
     return ResponseEntity.ok(responses);
   }
 
-  // getting the timesheet by status
-  // think viewing my own timesheets
+  @Operation(
+      summary = "Get my timesheets by status",
+      description = "Gets the current user's timesheets filtered by status.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timesheets retrieved successfully")
+  })
   @GetMapping("/me/status/{status}")
   public ResponseEntity<List<TimesheetResponse>> getMyTimesheetsByStatus(
       @PathVariable String status) {
@@ -58,14 +69,24 @@ public class TimesheetController {
     return ResponseEntity.ok(responses);
   }
 
-  // getting a single timesheet, think my own or others
+  @Operation(summary = "Get timesheet", description = "Gets a specific timesheet by its ID.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timesheet retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Timesheet not found")
+  })
   @GetMapping("/{id}")
   public ResponseEntity<TimesheetResponse> getTimesheetById(@PathVariable UUID id) {
     Timesheet timesheet = timesheetService.getTimesheetById(id);
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
   }
 
-  // getting all the entries of a timesheet
+  @Operation(
+      summary = "Get timesheet entries",
+      description = "Gets all time entries for a timesheet.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Time entries retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Timesheet not found")
+  })
   @GetMapping("/{id}/entries")
   public ResponseEntity<List<TimeEntryResponse>> getTimesheetEntries(@PathVariable UUID id) {
     List<TimeEntryResponse> entries = timeEntryService.getEntriesByTimesheet(id);
@@ -73,7 +94,12 @@ public class TimesheetController {
     return ResponseEntity.ok(entries);
   }
 
-  // when a timesheet is approved
+  @Operation(summary = "Submit timesheet", description = "Submits a timesheet for review.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timesheet submitted successfully"),
+    @ApiResponse(responseCode = "404", description = "Timesheet not found"),
+    @ApiResponse(responseCode = "409", description = "Timesheet has already been submitted")
+  })
   @PostMapping("/{id}/submit")
   public ResponseEntity<TimesheetResponse> submitTimesheet(@PathVariable UUID id) {
     Timesheet timesheet = timesheetService.submitTimesheet(id);
@@ -81,7 +107,15 @@ public class TimesheetController {
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
   }
 
-  // when a timesheet gets approved
+  @Operation(summary = "Approve timesheet", description = "Approves a submitted timesheet.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timesheet approved successfully"),
+    @ApiResponse(
+        responseCode = "403",
+        description = "User does not have permission to approve timesheets"),
+    @ApiResponse(responseCode = "404", description = "Timesheet not found"),
+    @ApiResponse(responseCode = "409", description = "Timesheet cannot be approved")
+  })
   @PostMapping("/{id}/approve")
   public ResponseEntity<TimesheetResponse> approveTimesheet(@PathVariable UUID id) {
 
@@ -91,7 +125,15 @@ public class TimesheetController {
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
   }
 
-  // when a timesheet gets rejected
+  @Operation(summary = "Reject timesheet", description = "Rejects a submitted timesheet.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timesheet rejected successfully"),
+    @ApiResponse(
+        responseCode = "403",
+        description = "User does not have permission to reject timesheets"),
+    @ApiResponse(responseCode = "404", description = "Timesheet not found"),
+    @ApiResponse(responseCode = "409", description = "Timesheet cannot be rejected")
+  })
   @PostMapping("/{id}/reject")
   public ResponseEntity<TimesheetResponse> rejectTimesheet(
       @PathVariable UUID id, @Valid @RequestBody RejectRequest request) {
@@ -102,11 +144,15 @@ public class TimesheetController {
     return ResponseEntity.ok(TimesheetResponse.from(timesheet));
   }
 
-  /*
-  - managers and admins
-  - to get all the timesheets in a workspace, besides DRAFTS
-  - think viewing other peoples timesheets
-  */
+  @Operation(
+      summary = "Get workspace timesheets",
+      description = "Gets timesheets from the current workspace.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Workspace timesheets retrieved successfully"),
+    @ApiResponse(
+        responseCode = "403",
+        description = "User does not have permission to view workspace timesheets")
+  })
   @GetMapping("/workspace")
   public ResponseEntity<List<TimesheetResponse>> getWorkspaceTimesheets() {
     List<Timesheet> timesheets = timesheetService.getWorkspaceTimesheets();
@@ -125,6 +171,15 @@ public class TimesheetController {
   - the first-time submitted and the resubmitted both can be her
   - think viewing other peoples timesheets
    */
+  @Operation(
+      summary = "Get pending timesheets",
+      description = "Gets submitted timesheets waiting for review in the current workspace.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Pending timesheets retrieved successfully"),
+    @ApiResponse(
+        responseCode = "403",
+        description = "User does not have permission to view pending timesheets")
+  })
   @GetMapping("/workspace/pending")
   public ResponseEntity<List<TimesheetResponse>> getPendingWorkspaceTimesheets() {
 
@@ -138,6 +193,15 @@ public class TimesheetController {
 
   // viewing the timesheets by the status in that workspace
   // think viewing other peoples timesheets by the status
+  @Operation(
+      summary = "Get workspace timesheets by status",
+      description = "Gets workspace timesheets filtered by status.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timesheets retrieved successfully"),
+    @ApiResponse(
+        responseCode = "403",
+        description = "User does not have permission to view workspace timesheets")
+  })
   @GetMapping("/workspace/status/{status}")
   public ResponseEntity<List<TimesheetResponse>> getWorkspaceTimesheetsByStatus(
       @PathVariable String status) {
