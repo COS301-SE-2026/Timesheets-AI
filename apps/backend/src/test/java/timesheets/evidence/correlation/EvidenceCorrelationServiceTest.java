@@ -14,7 +14,8 @@
 
 //   private static final long MAX_SESSION_GAP_MINUTES = 30;
 
-//   public List<EvidenceGroup> correlate(UUID workspaceMemberId, List<EvidenceEvent> evidenceEvents) {
+//   public List<EvidenceGroup> correlate(UUID workspaceMemberId, List<EvidenceEvent>
+// evidenceEvents) {
 
 //     List<EvidenceGroup> groups = new ArrayList<EvidenceGroup>();
 
@@ -174,7 +175,8 @@
 //     group.getEvidenceEvents().add(event);
 
 //     if (event.getTimestamp() != null
-//         && (group.getStartTime() == null || event.getTimestamp().isBefore(group.getStartTime()))) {
+//         && (group.getStartTime() == null || event.getTimestamp().isBefore(group.getStartTime())))
+// {
 //       group.setStartTime(event.getTimestamp());
 //     }
 

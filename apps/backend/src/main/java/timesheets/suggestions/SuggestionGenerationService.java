@@ -153,52 +153,52 @@ public class SuggestionGenerationService {
   }
 
   private UUID findProjectId(List<EvidenceEvent> evidenceEvents) {
-        Map<UUID, Integer> projectCounts = new HashMap<>();
+    Map<UUID, Integer> projectCounts = new HashMap<>();
 
-        for (EvidenceEvent event : evidenceEvents) {
-            if (event != null && event.getProjectId() != null) {
-                projectCounts.merge(event.getProjectId(), 1, Integer::sum);
-            }
-        }
-
-        return findDominantId(projectCounts);
+    for (EvidenceEvent event : evidenceEvents) {
+      if (event != null && event.getProjectId() != null) {
+        projectCounts.merge(event.getProjectId(), 1, Integer::sum);
+      }
     }
+
+    return findDominantId(projectCounts);
+  }
 
   private UUID findTaskId(List<EvidenceEvent> evidenceEvents) {
-        Map<UUID, Integer> taskCounts = new HashMap<>();
+    Map<UUID, Integer> taskCounts = new HashMap<>();
 
-        for (EvidenceEvent event : evidenceEvents) {
-            if (event != null && event.getTaskId() != null) {
-                taskCounts.merge(event.getTaskId(), 1, Integer::sum);
-            }
-        }
-
-        return findDominantId(taskCounts);
+    for (EvidenceEvent event : evidenceEvents) {
+      if (event != null && event.getTaskId() != null) {
+        taskCounts.merge(event.getTaskId(), 1, Integer::sum);
+      }
     }
+
+    return findDominantId(taskCounts);
+  }
 
   private UUID findDominantId(Map<UUID, Integer> counts) {
-        if (counts.isEmpty()) {
-            return null;
-        }
-
-        UUID dominantId = null;
-        int highestCount = 0;
-        boolean tie = false;
-
-        for (Map.Entry<UUID, Integer> entry : counts.entrySet()) {
-            int count = entry.getValue();
-
-            if (count > highestCount) {
-                dominantId = entry.getKey();
-                highestCount = count;
-                tie = false; 
-            } else if (count == highestCount) {
-                tie = true;
-            }
-        }
-
-        return tie ? null : dominantId;
+    if (counts.isEmpty()) {
+      return null;
     }
+
+    UUID dominantId = null;
+    int highestCount = 0;
+    boolean tie = false;
+
+    for (Map.Entry<UUID, Integer> entry : counts.entrySet()) {
+      int count = entry.getValue();
+
+      if (count > highestCount) {
+        dominantId = entry.getKey();
+        highestCount = count;
+        tie = false;
+      } else if (count == highestCount) {
+        tie = true;
+      }
+    }
+
+    return tie ? null : dominantId;
+  }
 
   private String generateTitle(List<EvidenceEvent> evidenceEvents) {
 
@@ -243,72 +243,72 @@ public class SuggestionGenerationService {
   }
 
   private String findJiraIssueTitle(List<EvidenceEvent> evidenceEvents) {
-        for (EvidenceEvent event : evidenceEvents) {
-            if ("JIRA".equalsIgnoreCase(event.getSource())) {
-                String title = getMetadataString(event, "title");
-                if (isValidText(title)) {
-                    return title;
-                }
-            }
+    for (EvidenceEvent event : evidenceEvents) {
+      if ("JIRA".equalsIgnoreCase(event.getSource())) {
+        String title = getMetadataString(event, "title");
+        if (isValidText(title)) {
+          return title;
         }
-        return null;
+      }
     }
+    return null;
+  }
 
-    private String findCalendarTitle(List<EvidenceEvent> evidenceEvents) {
-        for (EvidenceEvent event : evidenceEvents) {
-            if ("CALENDAR".equalsIgnoreCase(event.getSource())) {
-                String title = getMetadataString(event, "title");
-                if (isValidText(title)) {
-                    return title;
-                }
-            }
+  private String findCalendarTitle(List<EvidenceEvent> evidenceEvents) {
+    for (EvidenceEvent event : evidenceEvents) {
+      if ("CALENDAR".equalsIgnoreCase(event.getSource())) {
+        String title = getMetadataString(event, "title");
+        if (isValidText(title)) {
+          return title;
         }
-        return null;
+      }
+    }
+    return null;
+  }
+
+  private String findCommitMessage(List<EvidenceEvent> evidenceEvents) {
+    for (EvidenceEvent event : evidenceEvents) {
+      if ("GITHUB".equalsIgnoreCase(event.getSource()) && isValidText(event.getDescription())) {
+        return event.getDescription();
+      }
+    }
+    return null;
+  }
+
+  private String generateDescription(List<EvidenceEvent> evidenceEvents) {
+    List<String> eventSummaries = new ArrayList<>();
+
+    for (EvidenceEvent event : evidenceEvents) {
+      if (event == null) {
+        continue;
+      }
+      if (isValidText(event.getDescription())) {
+        eventSummaries.add(event.getDescription());
+      }
     }
 
-    private String findCommitMessage(List<EvidenceEvent> evidenceEvents) {
-        for (EvidenceEvent event : evidenceEvents) {
-            if ("GITHUB".equalsIgnoreCase(event.getSource()) && isValidText(event.getDescription())) {
-                return event.getDescription();
-            }
-        }
-        return null;
+    if (eventSummaries.isEmpty()) {
+      return null;
     }
 
-    private String generateDescription(List<EvidenceEvent> evidenceEvents) {
-        List<String> eventSummaries = new ArrayList<>();
+    return String.join(" | ", eventSummaries);
+  }
 
-        for (EvidenceEvent event : evidenceEvents) {
-            if (event == null) {
-                continue;
-            }
-            if (isValidText(event.getDescription())) {
-                eventSummaries.add(event.getDescription());
-            }
-        }
+  private String generateExplanation(EvidenceGroup group) {
+    int evidenceCount = group.getEvidenceEvents().size();
+    return "This suggestion was generated from " + evidenceCount + " related evidence events.";
+  }
 
-        if (eventSummaries.isEmpty()) {
-            return null;
-        }
-
-        return String.join(" | ", eventSummaries);
+  private String getMetadataString(EvidenceEvent event, String key) {
+    if (event == null || event.getMetadata() == null) {
+      return null;
     }
 
-    private String generateExplanation(EvidenceGroup group) {
-        int evidenceCount = group.getEvidenceEvents().size();
-        return "This suggestion was generated from " + evidenceCount + " related evidence events.";
-    }
+    Object value = event.getMetadata().get(key);
+    return value != null ? value.toString() : null;
+  }
 
-    private String getMetadataString(EvidenceEvent event, String key) {
-        if (event == null || event.getMetadata() == null) {
-            return null;
-        }
-
-        Object value = event.getMetadata().get(key);
-        return value != null ? value.toString() : null;
-    }
-
-    private boolean isValidText(String value) {
-        return value != null && !value.trim().isEmpty();
-    }
+  private boolean isValidText(String value) {
+    return value != null && !value.trim().isEmpty();
+  }
 }
