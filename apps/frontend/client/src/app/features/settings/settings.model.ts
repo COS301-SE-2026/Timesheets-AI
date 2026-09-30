@@ -20,6 +20,7 @@ export interface IntegrationStatus{
     description: string;
     icon: string;
     connected: boolean;
+    enabled: boolean;
 }
 
 export interface AccountSecuritySettings{
