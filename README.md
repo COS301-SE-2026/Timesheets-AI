@@ -211,8 +211,7 @@
 | **Database** | PostgreSQL 15, Flyway migrations |
 | **AI and ML** | Python 3.11+, FastAPI, PyTorch, TensorFlow, Scikit-learn |
 | **Auth** | JWT (stateless), Spring Security |
-| **Caching** | Redis via AWS ElastiCache |
-| **Infrastructure** | AWS (EC2, RDS, Amplify, S3, Parameter Store) |
+| **Infrastructure** | AWS (EC2) |
 | **Containerisation** | Docker, Docker Compose |
 | **CI/CD** | GitHub Actions |
 | **Testing: Backend** | JUnit 5, Mockito, Spring Boot Test |
@@ -276,92 +275,200 @@
 
 
 ```
-Timesheest-AI/
-│
-├── apps/
-│   ├── backend/                  # Java 17 and Spring Boot 3.5
-│   │   ├── src/
-│   │   │   ├── main/
-│   │   │   │   ├── java/timesheets/
-│   │   │   │   │   ├── TimesheetsApplication.java
-│   │   │   │   │   ├── controller/
-│   │   │   │   │   ├── service/
-│   │   │   │   │   │   └── impl/
-│   │   │   │   │   ├── repository/
-│   │   │   │   │   ├── domain/
-│   │   │   │   │   ├── dto/
-│   │   │   │   │   │   ├── request/
-│   │   │   │   │   │   └── response/
-│   │   │   │   │   ├── mapper/
-│   │   │   │   │   ├── security/
-│   │   │   │   │   │   ├── filter/
-│   │   │   │   │   │   └── jwt/
-│   │   │   │   │   ├── config/
-│   │   │   │   │   ├── exception/
-│   │   │   │   │   ├── enums/
-│   │   │   │   │   └── util/
-│   │   │   │   └── resources/
-│   │   │   │       ├── application.yml
-│   │   │   │       └── db/
-│   │   │   │           └── migration/
-│   │   │   │               ├── V1__init_schema.sql
-│   │   │   │               └── V2__seed_data.sql
-│   │   │   └── test/
-│   │   │       └── java/timesheets/
-│   │   ├── pom.xml
-│   │   ├── Dockerfile
-│   │   └── checkstyle.xml
-│   │
-│   └── frontend/                 # Angular 17 and Material UI
-│       ├── client/
-│       │   ├── src/
-│       │   │   ├── app/
-│       │   │   ├── assets/
-│       │   │   └── environments/
-│       │   ├── angular.json
-│       │   ├── package.json
-│       │   └── yarn.lock
-│       └── Dockerfile
-│
-├── ai-service/                   # Python 3.11 and FastAPI
-│   ├── main.py
-│   ├── requirements.txt
-│   ├── pyproject.toml
+.
+├── ai-service
+│   ├── app
+│   │   ├── api
+│   │   │   ├── __init__.py
+│   │   │   ├── anomaly.py
+│   │   │   ├── burnout.py
+│   │   │   ├── dashboard.py
+│   │   │   ├── delivery_forecast.py
+│   │   │   ├── dev_trigger.py
+│   │   │   ├── health.py
+│   │   │   ├── manager_assistant.py
+│   │   │   ├── manager_dashboard.py
+│   │   │   ├── productivity.py
+│   │   │   ├── project_forecast.py
+│   │   │   ├── project_forecast_evidence.py
+│   │   │   ├── task_switching.py
+│   │   │   └── weekly_summary.py
+│   │   ├── jobs
+│   │   │   └── nightly_insights_job.py
+│   │   ├── models
+│   │   │   ├── __init__.py
+│   │   │   ├── ai_insight.py
+│   │   │   ├── project.py
+│   │   │   ├── project_member.py
+│   │   │   ├── task.py
+│   │   │   ├── time_entry.py
+│   │   │   ├── user.py
+│   │   │   ├── workspace.py
+│   │   │   └── workspace_member.py
+│   │   ├── schemas
+│   │   │   ├── __init__.py
+│   │   │   ├── anomaly.py
+│   │   │   ├── burnout.py
+│   │   │   ├── dashboard.py
+│   │   │   ├── delivery_forecast.py
+│   │   │   ├── manager_assistant.py
+│   │   │   ├── manager_dashboard.py
+│   │   │   ├── productivity.py
+│   │   │   ├── project_forecast.py
+│   │   │   ├── project_forecast_evidence.py
+│   │   │   ├── project_forecast_explanation.py
+│   │   │   ├── project_forecast_persistence.py
+│   │   │   ├── project_forecast_scenario.py
+│   │   │   ├── task_switching.py
+│   │   │   └── weekly_summary.py
+│   │   ├── services
+│   │   │   ├── __init__.py
+│   │   │   ├── anomaly.py
+│   │   │   ├── burnout.py
+│   │   │   ├── dashboard_aggregates.py
+│   │   │   ├── delivery_forecast.py
+│   │   │   ├── github_activity.py
+│   │   │   ├── manager_assistant.py
+│   │   │   ├── manager_dashboard.py
+│   │   │   ├── productivity.py
+│   │   │   ├── project_forecast.py
+│   │   │   ├── project_forecast_evidence.py
+│   │   │   ├── project_forecast_explanation.py
+│   │   │   ├── project_forecast_persistence.py
+│   │   │   ├── project_forecast_scenario.py
+│   │   │   ├── score_cards.py
+│   │   │   ├── task_switching.py
+│   │   │   └── weekly_summary.py
+│   │   ├── utils
+│   │   │   └── __init__.py
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   ├── main.py
+│   │   └── scheduler.py
+│   ├── tests
+│   │   ├── __init__.py
+│   │   ├── test_anomaly.py
+│   │   ├── test_burnout.py
+│   │   ├── test_delivery_forecast.py
+│   │   ├── test_health.py
+│   │   ├── test_nightly_insights_job.py
+│   │   ├── test_productivity.py
+│   │   ├── test_scheduler.py
+│   │   ├── test_task_switching.py
+│   │   └── test_weekly_summary.py
 │   ├── Dockerfile
-│   └── tests/
-│       └── test_health.py
-│
-├── infrastructure/               
-│
-├── docs/                         # All documentation
-│   ├── srs/
-│   ├── wireframes/
-│   ├── architecture/
-│   └── meeting-minutes/
-│
-├── assets/
-│   └── images/                  # Logos and team photos
-│
-├── .devcontainer/
-│   ├── devcontainer.json
-│   └── setup.sh
-│
-├── .github/
-│   └── workflows/
-│       ├── backend-ci.yml
-│       └── frontend-ci.yml
-│
+│   ├── conftest.py
+│   ├── main.py
+│   ├── pyproject.toml
+│   └── requirements.txt
+├── apps
+│   ├── backend
+│   │   ├── src
+│   │   │   ├── main
+│   │   │   └── test
+│   │   ├── Dockerfile
+│   │   ├── README.md
+│   │   ├── checkstyle.xml
+│   │   └── pom.xml
+│   └── frontend
+│       ├── client
+│       │   ├── public
+│       │   ├── src
+│       │   ├── README.md
+│       │   ├── angular.json
+│       │   ├── eslint.config.js
+│       │   ├── jest.config.js
+│       │   ├── package.json
+│       │   ├── proxy.conf.docker.json
+│       │   ├── proxy.conf.local.json
+│       │   ├── setup-jest.js
+│       │   ├── tsconfig.app.json
+│       │   ├── tsconfig.json
+│       │   └── tsconfig.spec.json
+│       ├── Dockerfile
+│       └── nginx.conf
+├── assets
+│   └── images
+│       ├── Momently-gif.gif
+│       ├── Wireframe #1.png
+│       ├── Wireframe #2.png
+│       ├── Wireframe #3.png
+│       ├── Wireframe #4.png
+│       ├── Wireframe #5.png
+│       ├── client-logo.png
+│       ├── dashboard-preview.png
+│       ├── logo-light.png
+│       ├── momently name.png
+│       ├── team-logo-light.png
+│       └── team-photo.jpeg
+├── brand-kit
+│   ├── assets
+│   │   ├── hourglass.png
+│   │   ├── logo-light.png
+│   │   └── momently name.png
+│   ├── index.html
+│   └── styles.css
+├── docs
+│   ├── Demo 1
+│   │   ├── API Service Contract.pdf
+│   │   ├── Architectural Specifications .pdf
+│   │   ├── Cybernauts Brand Kit.pdf
+│   │   ├── Design.md
+│   │   ├── Functional Requirements.pdf
+│   │   ├── Quality Requirements.md
+│   │   ├── Quality Requirements.pdf
+│   │   ├── Use Case.pdf
+│   │   ├── Use cases.md
+│   │   └── User stories and characteristics.pdf
+│   ├── Demo-3
+│   │   ├── Acceptance Criteria.pdf
+│   │   ├── Final Coding Standards Handbook.pdf
+│   │   ├── Mapping Quality Requirements to Architectural Decisions.pdf
+│   │   ├── Software Architecture Specifications.pdf
+│   │   ├── Testing Policy.pdf
+│   │   └── User Manual.pdf
+│   ├── demo-2
+│   │   ├── Acceptance-Criteria.pdf
+│   │   ├── Brand-Style-Guide.pdf
+│   │   ├── Coding-Standards-Handbook.pdf
+│   │   ├── SAS.pdf
+│   │   ├── SRS.pdf
+│   │   ├── Test-Case-Specification.pdf
+│   │   ├── User-Manual.pdf
+│   │   └── here.txt
+│   ├── demo-3
+│   │   ├── Acceptance Criteria.pdf
+│   │   ├── Mapping Quality Requirements to Architectural Decisions .pdf
+│   │   ├── NFR TESTING.pdf
+│   │   ├── Software Architecture Specifications.pdf
+│   │   ├── Software Requirements Specifications.pdf
+│   │   ├── Testing Policy.pdf
+│   │   ├── User Manual.pdf
+│   │   └── here.txt
+│   ├── demo-4
+│   │   └── here.txt
+│   └── openapi.json
+├── monitoring
+│   ├── grafana
+│   │   └── provisioning
+│   │       └── datasources
+│   └── prometheus
+│       └── prometheus.yml
+├── nginx
+│   ├── nginx.conf
+│   └── proxy.conf
+├── tests
 ├── CONTRIBUTING.md
-├── docker-compose.yml
 ├── LOGS.md
+├── README.md
+├── SETUP.md
+├── docker-compose.prod.yml
+├── docker-compose.yml
+├── package-lock.json
 ├── package.json
 ├── turbo.json
-├── yarn.lock
-├── .env.example
-├── .gitignore
-├── SETUP.md
-└── README.md
-
+└── yarn.lock
 ```
 
 ## Team Cybernauts
