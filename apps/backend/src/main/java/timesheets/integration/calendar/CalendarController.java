@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import timesheets.repository.IntegrationTokenRepository;
 import timesheets.repository.TimeEntryRepository;
 import timesheets.security.SecurityUtils;
 
@@ -25,7 +24,6 @@ import timesheets.security.SecurityUtils;
 public class CalendarController {
   private final CalendarService calendarService;
   private final SecurityUtils securityUtils;
-  private final IntegrationTokenRepository integrationTokenRepository;
   private final TimeEntryRepository timeEntryRepository;
 
   private static final double MINUTES_PER_HOUR = 60.0;
@@ -44,10 +42,9 @@ public class CalendarController {
   public ResponseEntity<CalendarStatus> getStatus() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
-    return integrationTokenRepository
-        .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "GOOGLE_CALENDAR")
-        .map(token -> ResponseEntity.ok(new CalendarStatus(true, "google", null)))
-        .orElseGet(() -> ResponseEntity.ok(new CalendarStatus(false, null, null)));
+    CalendarStatus status = calendarService.getStatus(workspaceMemberId);
+
+    return ResponseEntity.ok(status);
   }
 
   @GetMapping("/events")

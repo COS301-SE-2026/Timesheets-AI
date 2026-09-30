@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import timesheets.integration.calendar.CalendarAdapter;
 import timesheets.integration.calendar.CalendarEvent;
+import timesheets.integration.calendar.CalendarService;
 
 @Component
 @RequiredArgsConstructor
 public class CalendarEvidenceCollector implements EvidenceCollector {
-  private final CalendarAdapter calendarAdapter;
+  private final CalendarService calendarService;
 
   @Override
   public List<EvidenceEvent> collect(
@@ -22,7 +22,7 @@ public class CalendarEvidenceCollector implements EvidenceCollector {
 
     // Collect events
     List<CalendarEvent> calendarEvents =
-        calendarAdapter.getEvents(workspaceMemberId, startTime, endTime);
+        calendarService.getEvents(workspaceMemberId, startTime, endTime);
 
     List<EvidenceEvent> evidenceEvents = new ArrayList<>();
 
@@ -42,7 +42,6 @@ public class CalendarEvidenceCollector implements EvidenceCollector {
       metadata.put("startTime", calendarEvent.getStartTime());
       metadata.put("endTime", calendarEvent.getEndTime());
       metadata.put("participants", calendarEvent.getParticipants());
-      metadata.put("externalEventId", calendarEvent.getExternalEventId());
 
       evidenceEvent.setMetadata(metadata);
       evidenceEvents.add(evidenceEvent);

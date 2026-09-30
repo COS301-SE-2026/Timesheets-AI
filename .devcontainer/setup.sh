@@ -40,8 +40,8 @@ echo "  Redis ready → localhost:6379"
 
 # ── Root workspace (Turbo) ─────────────────────────────────────────────────
 echo "Installing root workspace dependencies (Turborepo)..."
-npm install -g yarn --silent 2>/dev/null || true
-yarn install --silent
+npm install -g yarn --ignore-scripts --silent 2>/dev/null || true
+yarn install --ignore-scripts --silent
 echo "  Turborepo ready"
 
 # ── Backend ────────────────────────────────────────────────────────────────
@@ -54,9 +54,9 @@ echo "Installing frontend dependencies..."
 # Angular app lives at apps/frontend/client/ (matches frontend-ci.yml)
 FRONTEND_DIR="$REPO_ROOT/apps/frontend/client"
 if [ -d "$FRONTEND_DIR" ]; then
-  npm install -g @angular/cli --silent 2>/dev/null || true
+  npm install -g @angular/cli --ignore-scripts --silent 2>/dev/null || true
   cd "$FRONTEND_DIR"
-  yarn install --silent 2>/dev/null && echo "  Frontend dependencies installed" || echo "  yarn install had warnings"
+  yarn install --ignore-scripts --silent 2>/dev/null && echo "  Frontend dependencies installed" || echo "  yarn install had warnings"
 else
   echo "  apps/frontend/client/ not found yet — skipping (scaffold it with: ng new client)"
 fi

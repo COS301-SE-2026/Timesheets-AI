@@ -61,7 +61,7 @@ jobs:
 
             - name: Install Dependencies 
               if: steps.filter.outputs.frontend == 'true' || steps.retry.outputs.frontend == 'true'
-              run: yarn install --frozen-lockfile 
+              run: yarn install --frozen-lockfile --ignore-scripts 
 
 #===================== PLAN stage ================================
 

@@ -43,7 +43,7 @@ public class GoogleOAuthService {
   */
 
   // this is url where the users will be sent to Google Permission screen
-  public String buildAuthorizationUrl(String state) {
+  public String buildAuthorizationUrl(String state, String loginHint) {
     return UriComponentsBuilder.fromHttpUrl(GOOGLE_AUTHORIZATION_URL)
         .queryParam("client_id", clientId)
         .queryParam("redirect_uri", redirectUri)
@@ -51,6 +51,7 @@ public class GoogleOAuthService {
         .queryParam("scope", "https://www.googleapis.com/auth/calendar.events")
         .queryParam("access_type", "offline")
         .queryParam("prompt", "consent")
+        .queryParam("login_hint", loginHint)
         .queryParam("state", state)
         .build()
         .encode()

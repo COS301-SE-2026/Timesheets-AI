@@ -69,6 +69,24 @@ describe('LogtimeComponent', () => {
     isLocked: false,
   };
 
+  const mockActiveTimer={
+    id: 'timer-1',
+    project:{
+      id: projectOneId,
+      name: 'Mobile App Development',
+    },
+    task:{
+      id: taskOneId,
+      title: 'Implement Login Screen',
+    },
+    startedAt: `${today()}T03:00:00`,
+    elapsedMinutes: 0,
+    elapsedSeconds: 0,
+    active: true,
+    isPaused: false,
+    pausedAt: null,
+  };
+
   function today(): string {
     return new Date().toISOString().slice(0, 10);
   }
@@ -85,6 +103,10 @@ describe('LogtimeComponent', () => {
 
     httpMock.expectOne(`/api/tasks/project/${projectOneId}`).flush(
       mockTasks.filter((t)=> t.projectId === projectOneId),);
+
+      httpMock.expectOne(`/api/tasks/project/${projectTwoId}`).flush(
+    mockTasks.filter((t) => t.projectId === projectTwoId),
+  );
   }
 
   beforeEach(async () => {
@@ -386,7 +408,17 @@ describe('LogtimeComponent', () => {
       projectId: projectTwoId,
       taskId: taskTwoId,
     });
-    startReq.flush({});
+    startReq.flush({
+      ...mockActiveTimer,
+      project:{
+        id: projectTwoId,
+        name: 'Backend API',
+      },
+      task:{
+        id: taskTwoId,
+        title: 'Create Timesheet API',
+      },
+    });
 
     jest.advanceTimersByTime(61_000);
 
@@ -471,11 +503,19 @@ describe('LogtimeComponent', () => {
     });
 
     component.startTimer();
-    httpMock.expectOne('/api/timers/start').flush({});
+    httpMock.expectOne('/api/timers/start').flush({
+      ...mockActiveTimer,
+    });
 
     jest.advanceTimersByTime(10_000);
     component.pauseTimer();
-    httpMock.expectOne('/api/timers/pause').flush({ elapsedSeconds: 10, isPaused: true });
+    httpMock.expectOne('/api/timers/pause').flush({ 
+      ...mockActiveTimer,
+      elapsedSeconds: 10,
+      elapsedMinutes: 0,
+      isPaused: true ,
+      pausedAt: `${today()}T03:00:10`,
+    });
 
     expect(component.isTimerPaused()).toBe(true);
     expect(component.elapsedSeconds()).toBe(10);
@@ -484,7 +524,13 @@ describe('LogtimeComponent', () => {
     expect(component.elapsedSeconds()).toBe(10); //frozen while paused
 
     component.resumeTimer();
-    httpMock.expectOne('/api/timers/resume').flush({ elapsedSeconds: 10, isPaused: false });
+    httpMock.expectOne('/api/timers/resume').flush({ 
+      ...mockActiveTimer,
+      elapsedSeconds: 10, 
+      isPaused: false,
+      elapsedMinutes: 0,
+      pausedAt: null,
+    });
     jest.advanceTimersByTime(5_000);
 
     expect(component.isTimerPaused()).toBe(false);
@@ -634,7 +680,7 @@ describe('LogtimeComponent', () => {
   it('should return fallback labels for unknown project and task ids', () => {
     expect(component.getProjectName('unknown')).toBe('Unknown project');
 
-    expect(component.getTaskTitle('unknown')).toBe('No task selected');
+    expect(component.getTaskTitle('unknown')).toBe('Unknown task');
   });
 
   // Timer started label
@@ -648,7 +694,13 @@ describe('LogtimeComponent', () => {
     });
 
     component.startTimer();
-    httpMock.expectOne('/api/timers/start').flush({});
+    httpMock.expectOne('/api/timers/start').flush({
+      ...mockActiveTimer,
+      task:{
+        id: taskTwoId,
+        title: 'Create Timesheet API',
+      },
+    });
     expect(component.timerStartedLabel()).toContain('Started at');
   });
 
@@ -710,7 +762,9 @@ describe('LogtimeComponent', () => {
     });
 
     component.startTimer();
-    httpMock.expectOne('/api/timers/start').flush({});
+    httpMock.expectOne('/api/timers/start').flush({
+      ...mockActiveTimer,
+    });
 
     expect(component.activeTimer()).toBeTruthy();
 

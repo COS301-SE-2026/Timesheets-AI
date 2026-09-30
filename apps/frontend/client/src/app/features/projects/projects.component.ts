@@ -23,8 +23,6 @@ import { Project } from './models/project.model';
 import { ProjectStatus } from './enums/project-status.enum';
 import { PROJECT_FILTERS } from './constants/project-filters.constant';
 import { CommonModule, NgClass } from '@angular/common';
-import { HeaderComponent } from '../../shared/components/header/header.component';
-import { StatsCardComponent } from '../../shared/components/stats-card/stats-card.component';
 import { ProgressBarComponent } from '../../shared/components/progress-bar/progress-bar.component';
 import { ProjectService } from '../../core/services/project.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -41,8 +39,6 @@ import {
   imports: [
     CommonModule,
     RouterModule,
-    HeaderComponent,
-    StatsCardComponent,
     ProgressBarComponent,
     NgClass
   ],
@@ -117,6 +113,15 @@ export class ProjectsComponent implements OnInit {
     return this.projects.length;
   }
 
+  protected get summaryCards() {
+    return [
+      { label: 'Total projects', description: 'All your assigned projects', value: this.totalProjects, icon: 'fa-folder-open', color: 'blue'},
+      { label: 'Active projects', description: 'Projects you contribute to', value: this.activeProjects, icon: 'fa-folder', color: 'green'},
+      { label: 'Completed projects', description: 'Projects delivered', value: this.completedProjects, icon: 'fa-circle-check', color: 'orange'},
+      { label: 'Your hours', description: 'Time across projects', value: this.myTotalHoursLoading ? '...' : this.myTotalHoursLabel, icon: 'fa-clock', color: 'purple'},
+    ]
+  }
+
   protected get activeProjects(): number {
     return this.projects.filter(
       (project) => project.status === ProjectStatus.ACTIVE,
@@ -142,24 +147,34 @@ export class ProjectsComponent implements OnInit {
     );
   }
 
-  protected filterProjects(selectedFilter: string): void {
-    this.selectedFilter = selectedFilter;
+  protected get visibleFilters(): string[] {
+    const user = this.authService.currentUser();
+    const isManager = user?.roles.some(role => 
+    ['MANAGER', 'ROLE_MANAGER', 'ADMIN', 'ROLE_ADMIN'].includes(role)) ?? false;
+    return isManager ? this.filters : this.filters.filter(f => f !== 'My projects');
+  }
 
-    if (selectedFilter === 'All') {
-      this.filteredProjects = [...this.projects];
+  protected filterProjects(selectedFilter: string): void {
+    if (selectedFilter === 'My projects' && !this.canSeeMyProjects) {
       return;
     }
+    this.selectedFilter = selectedFilter;
 
     this.filteredProjects = this.projects.filter(
-      (project) => project.status === selectedFilter,
+      (project) => (selectedFilter === 'All' ||
+        (selectedFilter === 'My projects' ? project.role !== null : project.status === selectedFilter )) &&
+        project.name.toLowerCase().includes(this.searchTerm.toLowerCase()),
     );
+  }
+
+  private get canSeeMyProjects(): boolean {
+    const user = this.authService.currentUser();
+    return user?.roles.some(role => ['MANAGER', 'ROLE_MANAGER', 'ADMIN', 'ROLE_ADMIN'].includes(role)) ?? false;
   }
 
   protected searchProjects(searchValue: string): void {
     this.searchTerm = searchValue;
-    this.filteredProjects = this.projects.filter((project) =>
-      project.name.toLowerCase().includes(searchValue.toLowerCase()),
-    );
+    this.filterProjects(this.selectedFilter);
   }
 
   protected getProjectInitials(name:string):string{

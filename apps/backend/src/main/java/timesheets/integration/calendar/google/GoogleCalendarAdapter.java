@@ -138,6 +138,8 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
       calendarEvent.setTitle(googleEvent.getSummary());
       calendarEvent.setExternalEventId(googleEvent.getId());
 
+      calendarEvent.setProvider(getProvider());
+
       List<String> participants = new ArrayList<>();
 
       if (googleEvent.getAttendees() != null) {

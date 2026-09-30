@@ -25,6 +25,8 @@ interface BackenCalendarEvent{
     startTime: string;
     endTime: string;
     externalEventId: string;
+    participants: string[];
+    provider: string;
 }
 @Injectable({
     providedIn: 'root'
@@ -33,8 +35,7 @@ interface BackenCalendarEvent{
 export class CalendarService{
     private readonly http=inject(HttpClient);
     private readonly apiUrl= '/api/calendar';
-    private readonly googleCalendarApiUrl= '/api/integrations/google/calendar';
-
+    private readonly integrationsApiUrl = '/api/integrations';
     // mocking data rn
     // private readonly mockOutlookEvents: AppEvent[]=[
     //     {
@@ -83,25 +84,20 @@ export class CalendarService{
 
     // ];
 
-    getEvents(
-        // provider: CalendarProvider,
-        startTime: string,
-        endTime: string
-    ): Observable<AppEvent[]>{
+    //the backend is now the one that determines which connected calendar provider is used
+    getEvents(startTime: string, endTime: string, ): Observable<AppEvent[]>{
         const params= new HttpParams()
             .set('startTime',startTime)
             .set('endTime', endTime);
 
-        return this.http.get<BackenCalendarEvent[]>(
-            `${this.apiUrl}/events`,
-            { params }
-        ).pipe(
-            map(events=> events.map(
-                event=> this.mapBackendEvent(event)
-            ))
-        );
-        // const selectedEvents= provider === 'outlook'? this.mockOutlookEvents: this.mockGoogleEvents;
-        // return of( selectedEvents).pipe(delay(200));
+        return this.http.get<BackenCalendarEvent[]>(`${this.apiUrl}/events`, { params })
+            .pipe(
+                map(events => {
+                    return events.map(
+                        event => this.mapBackendEvent(event)
+                    );
+                })
+            );
     }
 
     // getGoogleConnectionStatus(): Observable<CalendarStatus>{
@@ -116,10 +112,13 @@ export class CalendarService{
         );
     }
 
-    connectGoogleCalendar(): Observable<string>{
+    connectCalendar(provider: 'GOOGLE' | 'MICROSOFT'): Observable<string> {
+        const providerPath =
+            provider === 'MICROSOFT' ? 'microsoft' : 'google';
+
         return this.http.get(
-            `${this.googleCalendarApiUrl}/connect`,
-            { responseType: 'text'}
+            `${this.integrationsApiUrl}/${providerPath}/calendar/connect`,
+            { responseType: 'text' }
         );
     }
 
@@ -130,11 +129,11 @@ export class CalendarService{
     //     );
     // }
 
-    getEvent(externalEventId:string): Observable<AppEvent>{
+    getEvent(externalEventId: string): Observable<AppEvent> {
         return this.http.get<BackenCalendarEvent>(
             `${this.apiUrl}/events/${externalEventId}`
         ).pipe(
-            map(event=> this.mapBackendEvent(event))
+            map(event => this.mapBackendEvent(event))
         );
     }
 
@@ -147,11 +146,35 @@ export class CalendarService{
             title: event.title,
             start: event.startTime,
             end: event.endTime,
-
-            // BACKEND DOESNT PROVIDE THESE FIELDS
-            provider: 'google',
-            category
+            provider: this.mapProvider(event.provider),
+            participants: event.participants ?? [],
+            category,
+            categoryLabel: this.getCategoryLabel(category)
         };
+    }
+
+    private getCategoryLabel(category: AppEvent['category']): string {
+        const labels: Record<string, string> = {
+            meetings: 'Meeting',
+            work: 'Work',
+            calls: 'Call',
+            deadline: 'Deadline'
+        };
+
+        return category ? labels[category] || 'Event' : 'Event';
+    }
+
+    private mapProvider(provider: string): CalendarProvider {
+        switch (provider) {
+            case 'MICROSOFT_CALENDAR':
+                return 'microsoft';
+
+            case 'GOOGLE_CALENDAR':
+                return 'google';
+
+            default:
+                throw new Error(`Unsupported calendar provider: ${provider}`);
+        }
     }
 
     private getEventCategory(title: string): AppEvent['category']{

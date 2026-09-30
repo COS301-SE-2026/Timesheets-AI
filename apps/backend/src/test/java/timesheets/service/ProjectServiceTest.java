@@ -316,15 +316,15 @@ public class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("throw exception when non-admin tries to create project")
-    void throwExceptionWhenNonAdminCreatesProject() {
+    @DisplayName("throw exception when a developer tries to create project")
+    void throwExceptionWhenDeveloperCreatesProject() {
       CreateProjectRequest request = createValidCreateProjectRequest();
 
       when(securityUtils.isAdmin()).thenReturn(false);
 
       assertThatThrownBy(() -> projectService.createProject(request, testWorkspaceMemberId))
           .isInstanceOf(AccessDeniedException.class)
-          .hasMessage("Only Admins can create projects");
+          .hasMessage("Only Admins and Managers can create projects");
 
       verify(projectRepository, never()).save(any(Project.class));
     }
@@ -339,6 +339,7 @@ public class ProjectServiceTest {
       Project savedProject = createTestProject();
 
       when(securityUtils.isAdmin()).thenReturn(true);
+      when(securityUtils.isManager()).thenReturn(false);
       when(securityUtils.getCurrentWorkspaceId()).thenReturn(testWorkspaceId);
       when(workspaceMemberRepository.findById(testWorkspaceMemberId))
           .thenReturn(Optional.of(createTestWorkspaceMember()));

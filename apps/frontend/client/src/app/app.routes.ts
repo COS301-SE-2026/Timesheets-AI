@@ -9,6 +9,7 @@ import { LandingPageComponent } from './features/landing/landing-page/landing-pa
 import { authGuard } from './core/guards/auth.guard';
 import { workspaceGuard } from './core/guards/workspace.guard'; 
 import { teamGuard } from './core/guards/team.guard'
+import { insightsGaurd } from './core/guards/insights.guard';
 
 export const routes: Routes = [
   /* Default redirect */
@@ -71,6 +72,14 @@ export const routes: Routes = [
         .then(m => m.ProjectsComponent)
   },
 
+  {
+    path: 'projects/details',
+    canActivate: [authGuard, workspaceGuard],
+    loadComponent: () =>
+      import('./features/projects/project-details/project-details.component')
+        .then(m => m.ProjectDetailsComponent)
+  },
+
   /* Project Details Page */
   {
     path: 'projects/:id',
@@ -87,14 +96,6 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/my-tasks/my-tasks.component')
         .then(m => m.MyTasksComponent)
-  },
-
-  {
-    path: 'leave-requests',
-    canActivate: [authGuard, workspaceGuard],
-    loadComponent: () =>
-      import('./features/leave-requests/leave-requests.component')
-        .then(m => m.LeaveRequestsComponent)
   },
 
   // Team page
@@ -131,7 +132,7 @@ export const routes: Routes = [
 
   {
     path: 'insights',
-    canActivate: [authGuard, workspaceGuard],
+    canActivate: [authGuard, workspaceGuard, insightsGaurd],
     loadComponent: () =>
       import('./features/insights/insights.component').then(
         (m) => m.InsightsComponent,

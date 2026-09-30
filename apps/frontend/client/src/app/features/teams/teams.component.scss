@@ -83,13 +83,35 @@ h1 {
     justify-content: flex-end;
 }
 
+.workspace-role-control {
+    position: relative;
+}
+
+.workspace-role-control i {
+    position: absolute;
+    left: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-inverse);
+    pointer-events: none;
+}
+
 .workspace-add-controls select {
-    border: 1px solid var(--color-input-border);
+    appearance: none;
+    border: 0;
     border-radius: var(--radius-button);
-    color: var(--color-text-body);
+    background: var(--color-primary);
+    box-shadow: var(--elevation-1);
+    color: var(--color-text-inverse);
     font: inherit;
-    padding: var(--space-2);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-bold);
+    padding: var(--space-2) var(--space-3) var(--space-2) 2.5rem;
     cursor: pointer;
+}
+
+.workspace-add-controls select:hover {
+    background: var(--color-primary-hover);
 }
 
 // Stat cards styling
@@ -357,10 +379,6 @@ h1 {
     box-shadow: var(--elevation-3);
     min-width: 190px;
     padding: var(--space-1);
-    position: relative;
-    right: 0;
-    top: calc(100% + var(--space-1));
-    z-index: 3;
 }
 
 .action-menu button {
@@ -511,6 +529,7 @@ h1 {
     display: flex;
     gap: var(--space-3);
     justify-content: flex-end;
+    margin-top: var(--space-6);
 }
 
 .assignment-dialog input, .assignment-dialog textarea {
@@ -526,11 +545,44 @@ width: 100%;
     margin-top: var(--space-4)
 }
 
-.assignment-dialog select[multiple] {
-    min-height: 8rem;
+.developer-selector {
+    margin: var(--space-4) 0 0;
+    padding: var(--space-3);
+    min-width: 0;
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--radius-button);
+}
+
+.developer-options {
+    max-height: 14rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 4px;
+}
+
+.assignment-dialog .developer-options .developer-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
 }
 
 
+.assignment-dialog .developer-options input {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin: 0;
+    accent-color: var(--color-primary);
+}
+
+.developer-options:has(input:disabled) {
+    opacity: 0.6;
+    cursor: default;
+}
 
 .project-form-grid select {
     box-sizing: border-box;
@@ -631,4 +683,14 @@ width: 100%;
     justify-content: flex-start;
 }
 
+}
+
+.assignment-dialog label.developer-option {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+    margin: 0;
+    padding: 6px 8px;
+    cursor: pointer;
 }

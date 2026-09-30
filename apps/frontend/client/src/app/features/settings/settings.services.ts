@@ -6,8 +6,8 @@
 
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable, of, delay } from "rxjs";
-import { UserSettings, IntegrationStatus, ChangePasswordRequest, ChangePasswordResponse, MessageResponse, MfaSetupResponse } from "./settings.model";
+import { Observable, of, forkJoin, map, catchError, throwError } from "rxjs";
+import { UserSettings, ChangePasswordRequest, ChangePasswordResponse, MessageResponse, MfaSetupResponse } from "./settings.model";
 
 
 @Injectable({ providedIn: 'root'})
@@ -15,6 +15,8 @@ export class SettingsService{
     private readonly http= inject(HttpClient);
     private readonly apiUrl= 'api/settings';
     private readonly authUrl= 'api/auth';
+    private readonly accountUrl= 'api/account';
+
 
     private readonly mockSettings: UserSettings={
         security:{
@@ -23,11 +25,10 @@ export class SettingsService{
         integrations:[
             {
                 id: 'github',
-                name: 'Github',
+                name: 'GitHub',
                 description: 'Sync pull requests, commits and repositories.',
                 icon: 'fa-brands fa-github',
                 connected: true,
-                enabled: true,
             },
             {
                 id: 'jira',
@@ -35,15 +36,13 @@ export class SettingsService{
                 description: 'Import issues, track work and link time entries.',
                 icon: 'fa-brands fa-jira',
                 connected: true,
-                enabled: true,
             },
             {
-                id: 'google-calendar',
-                name: 'Google Calendar',
-                description: 'Sync your calendar events and avaiability.',
-                icon: 'fa-brands fa-google',
+                id: 'calendar',
+                name: 'Calendar',
+                description: 'Sync your calendar events and availability.',
+                icon: 'fa-solid fa-calendar-days',
                 connected: true,
-                enabled: true,
             },
         ],
         notifications:{
@@ -62,7 +61,64 @@ export class SettingsService{
     }
 
     getSettings(mfaEnabled: boolean): Observable<UserSettings>{
-        return of({...this.mockSettings, security:{mfaEnabled}}).pipe(delay(200));
+        return forkJoin({
+            github: this.isConnected('api/integrations/github/status'),
+            jira: this.isConnected('api/integrations/jira/status'),
+            calendar: this.isConnected('api/calendar/status'),
+        }).pipe(
+            map(({ github, jira, calendar})=>{
+                const connectionStatus: Record<string, boolean>={
+                    github,
+                    jira,
+                    calendar,
+                };
+                return{
+                    ...this.mockSettings,
+                    security: { mfaEnabled},
+                    integrations:this.mockSettings.integrations.map((i)=>({
+                        ...i,
+                        connected: connectionStatus[i.id]?? false,
+                    })),
+                };
+                
+            })
+        );
+    }
+
+    private isConnected(url: string): Observable<boolean>{
+        return this.http.get<{ connected: boolean }>(url).pipe(
+            map((res)=> res.connected), catchError(()=>of(false))
+        )
+    }
+
+    getConnectUrl(
+        integrationId: string,
+        calendarProvider: 'google' | 'microsoft' = 'google'
+    ): Observable<string>{
+        const urls: Record<string, string>={
+            github: 'api/integrations/github/connect',
+            jira: 'api/integrations/jira/connect',
+            calendar: 'api/integrations/google/calendar/connect',
+        };
+
+        if(integrationId=== 'calendar' && calendarProvider=== 'microsoft'){
+            urls['calendar']= 'api/integrations/microsoft/calendar/connect';
+        }
+
+        const url=urls[integrationId];
+        if(!url){
+            return throwError(()=> new Error(`Unknown integration: ${integrationId}`));
+        }
+
+        if(integrationId=== 'github'){
+            return this.http.get(url, {
+                responseType: 'text',
+                params:{
+                    returnPath: '/settings',
+                },
+            });
+        }
+        return this.http.get(url, { responseType: 'text'});
     }
 
     getMfaSetup(): Observable<MfaSetupResponse>{
@@ -85,21 +141,10 @@ export class SettingsService{
         );
     }
 
-    toggleIntegration(integrationId: string, enabled: boolean): Observable<IntegrationStatus>{
-        const integration=this.mockSettings.integrations.find(
-            (i)=> i.id=== integrationId
+    requestAccountDeletion(reason: string): Observable<MessageResponse>{
+        return this.http.post<MessageResponse>(
+            `${this.accountUrl}/deletion/request`,
+            { reason }
         );
-
-        if(integration) integration.enabled= enabled;
-
-        return of(integration as IntegrationStatus).pipe(delay(150));
-    }
-
-    requestIntegration(): Observable<void>{
-        return of(void 0).pipe(delay(150));
-    }
-
-    requestAccountDeletion(): Observable<void>{
-        return of(void 0).pipe(delay(150));
     }
 }

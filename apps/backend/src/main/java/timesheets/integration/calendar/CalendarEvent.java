@@ -16,4 +16,5 @@ public class CalendarEvent {
   private LocalDateTime endTime;
   private String externalEventId;
   private List<String> participants;
+  private String provider;
 }

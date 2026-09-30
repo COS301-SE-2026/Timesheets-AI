@@ -1,6 +1,11 @@
 package timesheets.controller;
 
 import exception.BadRequestException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +55,19 @@ public class AuthController {
   private final JwtService jwtService;
   private final MfaService mfaService;
 
+  @Operation(
+      summary = "Set up MFA",
+      description = "Generates MFA setup information for the authenticated user.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "MFA setup generated successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MfaSetupResponse.class))),
+    @ApiResponse(responseCode = "401", description = "User is not authenticated")
+  })
   @GetMapping("/mfa/setup")
   public ResponseEntity<MfaSetupResponse> setupMfa(Authentication authentication) {
     CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -59,6 +77,19 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
+  @Operation(
+      summary = "Verify MFA",
+      description = "Verifies the MFA code and enables MFA for the user.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "MFA enabled successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class))),
+    @ApiResponse(responseCode = "400", description = "Invalid MFA code")
+  })
   @PostMapping("/mfa/verify")
   public ResponseEntity<MessageResponse> verifyMfa(
       Authentication authentication, @Valid @RequestBody MfaVerifyRequest request) {
@@ -69,6 +100,17 @@ public class AuthController {
     return ResponseEntity.ok(new MessageResponse("MFA enabled successfully"));
   }
 
+  @Operation(summary = "Disable MFA", description = "Disables MFA for the authenticated user.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "MFA disabled successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class))),
+    @ApiResponse(responseCode = "400", description = "Invalid password")
+  })
   @PostMapping("/mfa/disable")
   public ResponseEntity<MessageResponse> disableMfa(
       Authentication authentication, @Valid @RequestBody MfaDisableRequest request) {
@@ -79,6 +121,19 @@ public class AuthController {
     return ResponseEntity.ok(new MessageResponse("MFA disabled successfully"));
   }
 
+  @Operation(
+      summary = "Verify MFA login",
+      description = "Verifies the MFA code and completes the login.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "MFA login verified successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = AuthResponse.class))),
+    @ApiResponse(responseCode = "400", description = "Invalid or expired MFA challenge")
+  })
   @PostMapping("/mfa/login/verify")
   public ResponseEntity<AuthResponse> verifyMfaLogin(
       @Valid @RequestBody MfaLoginVerifyRequest request) {
@@ -98,25 +153,75 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
+  @Operation(
+      summary = "Register user",
+      description = "Registers a new user account and sends an email verification link.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "201",
+        description = "User registered successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = RegisterResponse.class))),
+    @ApiResponse(responseCode = "400", description = "Invalid registration request")
+  })
   @PostMapping("/register")
   public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
     RegisterResponse response = authService.register(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  // a user will verify their email after registering
+  @Operation(
+      summary = "Verify email",
+      description = "Verifies the user's email using a verification token.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Email verified successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class))),
+    @ApiResponse(responseCode = "400", description = "Invalid or expired verification token")
+  })
   @PostMapping("/verify-email")
   public ResponseEntity<MessageResponse> verifyEmail(@RequestParam String token) {
     MessageResponse response = authService.verifyEmail(token);
     return ResponseEntity.ok(response);
   }
 
+  @Operation(
+      summary = "Log in",
+      description = "Authenticates a user using their email and password.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Login successful",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = AuthResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Invalid credentials")
+  })
   @PostMapping("/login")
   public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
     AuthResponse response = authService.login(request);
     return ResponseEntity.ok(response);
   }
 
+  @Operation(
+      summary = "Forgot password",
+      description = "Sends a password reset link if the account exists.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Password reset request processed",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class)))
+  })
   @PostMapping("/forgot-password")
   public ResponseEntity<MessageResponse> forgotPassword(
       @Valid @RequestBody PasswordRequest.Forgot request) {
@@ -124,6 +229,19 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
+  @Operation(
+      summary = "Reset password",
+      description = "Resets the user's password using a reset token.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Password reset successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class))),
+    @ApiResponse(responseCode = "400", description = "Invalid password reset request")
+  })
   @PostMapping("/reset-password")
   public ResponseEntity<MessageResponse> resetPassword(
       @Valid @RequestBody PasswordRequest.Reset request) {
@@ -131,6 +249,19 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
+  @Operation(
+      summary = "Change password",
+      description = "Changes the password of the authenticated user.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Password changed successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class))),
+    @ApiResponse(responseCode = "400", description = "Invalid password")
+  })
   @PostMapping("/change-password")
   public ResponseEntity<MessageResponse> changePassword(
       Authentication authentication, @Valid @RequestBody PasswordRequest.Change request) {
@@ -146,18 +277,49 @@ public class AuthController {
     return ResponseEntity.ok(response);
   }
 
+  @Operation(summary = "Log out", description = "Logs out the authenticated user.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Logout successful"),
+    @ApiResponse(responseCode = "401", description = "User is not authenticated")
+  })
   @PostMapping("/logout")
   public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorization) {
     authService.logout(authorization);
     return ResponseEntity.noContent().build();
   }
 
+  @Operation(
+      summary = "Google authentication",
+      description = "Authenticates a user using their Google account.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Google authentication successful",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = AuthResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Google authentication failed")
+  })
   @PostMapping("/google")
   public ResponseEntity<AuthResponse> googleAuth(@Valid @RequestBody GoogleAuthRequest request) {
     AuthResponse response = authService.googleAuth(request);
     return ResponseEntity.ok(response);
   }
 
+  @Operation(
+      summary = "Microsoft authentication",
+      description = "Authenticates a user using their Microsoft account.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Microsoft authentication successful",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = AuthResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Microsoft authentication failed")
+  })
   @PostMapping("/microsoft")
   public ResponseEntity<AuthResponse> microsoftAuth(
       @Valid @RequestBody MicrosoftAuthRequest request) {

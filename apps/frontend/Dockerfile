@@ -15,7 +15,7 @@ COPY package.json yarn.lock ./
 COPY apps/frontend/client/package.json apps/frontend/client/package.json
 
 # Install dependencies 
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --ignore-scripts
 
 # Copy angular application 
 COPY . .
@@ -39,7 +39,7 @@ COPY package.json yarn.lock ./
 COPY apps/frontend/client/package.json apps/frontend/client/package.json
 
 # Install dependencies 
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --ignore-scripts
 
 # Copy angular application 
 COPY . .

@@ -13,28 +13,8 @@ all the project that specific user is on.
 Related Requirements: N/A
 -->
 
-<!--
-HEADER
--->
-<app-header [title] ="'Projects'">
-  <div class="header-search">
-    <label for="project-search" class="visually-hid">
-      Search projects
-    </label>
-
-    <input
-      id="project-search"
-      class="project-search-input"
-      type="search"
-      placeholder="Search projects..."
-      [value]="searchTerm"
-      (input)="searchProjects($any($event.target).value)"
-      >
-
-  </div>
-</app-header>
-
 <div class="projects-page-container">
+  <h1 class="page-title">Projects</h1>
   <!--
   PAGE HEADING
   -->
@@ -56,48 +36,25 @@ HEADER
     STATS CARDS
     -->
     <section class="projects-statistics-grid">
-      <app-stats-card
-        label="Projects"
-        [value]="totalProjects.toString()"
-        description="Total assigned projects"
-        [progress]="100"
-        icon="fa-regular fa-folder-open"
-        iconClass="blue">
-      </app-stats-card>
-      <app-stats-card
-        label="Active"
-        [value]="activeProjects.toString()"
-        description="Currently active"
-        [progress]="75"
-        icon="fa-solid fa-check"
-        iconClass="green">
-      </app-stats-card>
-      <app-stats-card
-        label="Completed"
-        [value]="completedProjects.toString()"
-        description="Completed projects"
-        [progress]="100"
-        icon="fa-solid fa-flag-checkered"
-        iconClass="orange">
-      </app-stats-card>
-      <!--
-      Total hours logged across all YOUR projects summed from /api/projects/{id}
-      member entries matched by email, not the team total
-      -->
-      <app-stats-card
-        label="Your Hours"
-        [value]="myTotalHoursLoading ? '...': myTotalHoursLabel"
-        description="Your hours across all projects"
-        [progress]="100"
-        icon="fa-regular fa-clock"
-        iconClass="purple">
-      </app-stats-card>
+     @for (card of summaryCards; track card.label ){
+      <article class="project-summary-card" [ngClass]="card.color">
+        <div class="summary-heading">
+          <span class="summary-icon"><i class="fa-solid" [ngClass]="card.icon" aria-hidden="true"></i></span>
+          <div>
+            <h2>{{ card.label }}</h2>
+            <p>{{ card.description }}</p>
+          </div>
+        </div>
+        <strong class="summary-value">{{ card.value }}</strong>
+      </article>
+     }
     </section>
     <!--
     FILTER BUTTONS SECTION
     -->
     <section class="project-filter-row">
-      @for (filter of filters; track filter){
+      <div class="project-filters">
+      @for (filter of visibleFilters; track filter){
         <button
           class="project-filter-button"
           [class.selected-filter]="selectedFilter===filter"
@@ -105,6 +62,17 @@ HEADER
           {{filter}}
         </button>
       }
+      </div>
+      <div class="project-search">
+        <label for="project-search" class="visually-hid">Search projects</label>
+        <input
+        id="project-search"
+        class="project-search-input"
+        type="search"
+        placeholder="Search projects..."
+        [value]="searchTerm"
+        (input)="searchProjects($any($event.target).value)">
+      </div>
     </section>
     <!--
     PROJECTS :)
@@ -113,7 +81,8 @@ HEADER
       @for (project of filteredProjects; track project.id){
         <article 
           class="project-card"
-          [routerLink]="['/projects', project.id]"
+          routerLink="/projects/details"
+          [state]="{ projectId: project.id }"
         >
           <div class="project-card-header">
             <div class="project-title-row">
@@ -155,7 +124,7 @@ HEADER
                 [progress]="project.progressPercentageClamped!">
               </app-progress-bar>
               <span class="progress-value">
-                Progress: {{project.progressPercentageClamped}}%
+                Progress: {{project.progressPercentageClamped | number:'1.0-2'}}%
               </span>
             </div>
           } @else {

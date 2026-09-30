@@ -9,7 +9,6 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
-
 import { SidebarComponent } from './shared/components/sidebar/sidebar.component';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
@@ -21,7 +20,7 @@ import { FooterComponent } from './shared/components/footer/footer.component';
     RouterOutlet,
     SidebarComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
 ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'

@@ -1,0 +1,76 @@
+<!--
+Author: Cleopatra Kwenda
+Date: 2026-09-29
+Purpose: will display our desired wireframe of 
+the hovering timer.
+Related Requirements: N/A
+-->
+
+@if(timerService.activeTimer(); as timer){
+
+    @if(sidebarCollapsed){
+        <button
+            type="button"
+            class="floating-timer floating-timer--collapsed"
+            (click)="openTimer()"
+            aria-label="Timer running">
+            <span 
+                class="floating-timer__clock"
+                aria-hidden="true">
+                <span class="floating-timer__clock-hand floating-timer__clock-hand--hour"></span>
+                <span class="floating-timer__clock-hand floating-timer__clock-hand--minute"></span>
+            </span>
+
+            <span class="floating-timer__running-status">
+                <span 
+                    class="floating-timer__running-dot"
+                    aria-hidden="true">
+                </span>
+
+                <span class="floating-timer__small-label">
+                    TIMER
+                </span>
+            </span>
+
+        </button>
+    }@else{
+
+        <button
+            type="button"
+            class="floating-timer"
+            (click)="openTimer()"
+            aria-label="Open active timer">
+
+            <span class="floating-timer__content">
+                <span class="floating-timer__status">
+                    <span 
+                        class="floating-timer__indicator"
+                        aria-hidden="true">
+                    </span>
+                    
+                    <span class="floating-timer__label">
+                        TIMER RUNNING
+                    </span>
+                </span>
+
+                <strong class="floating-timer__time">
+                    {{ formatElapsed(timerService.elapsedSeconds()) }}
+                </strong>
+
+                <span class="floating-timer__details">
+                    {{ timer.project.name }}
+
+                    @if(timer.task){
+                        <span class="floating-timer__separator">·</span>
+                        {{ timer.task.title }}
+                    }
+                </span>
+            </span>
+
+            <span 
+                class="fa-solid fa-arrow-right floating-timer__arrow"
+                aria-hidden="true">
+            </span>
+        </button>
+    }
+}

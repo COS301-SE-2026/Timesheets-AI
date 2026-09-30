@@ -30,7 +30,7 @@ const STATUS_MAP: Record<ProjectResponse['status'], ProjectStatus> = {
   ARCHIVED: ProjectStatus.ARCHIVED,
 };
 
-const ROLE_MAP: Record<ProjectResponse['myRole'], ProjectRole> = {
+const ROLE_MAP: Record<NonNullable<ProjectResponse['myRole']>, ProjectRole> = {
   ADMIN: ProjectRole.ADMIN,
   MANAGER: ProjectRole.MANAGER,
   DEVELOPER: ProjectRole.DEVELOPER,
@@ -187,8 +187,8 @@ export function mapToProjectDetails(
 
     //still gonna do(Nyasha): backend detail endpoint doesn't return these yet
     myRole: ProjectRole.DEVELOPER,
-    startDate: '',
-    endDate: '',
+    startDate: detail.startDate || '',
+    endDate: detail.endDate || '',
 
     members: detail.members.map(mapToProjectMember),
   };

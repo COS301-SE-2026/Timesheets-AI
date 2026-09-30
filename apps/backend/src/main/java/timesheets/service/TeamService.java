@@ -5,6 +5,7 @@ import exception.ResourceNotFoundException;
 import exception.StateConflictException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -176,10 +177,14 @@ public class TeamService {
       throw new ResourceNotFoundException("Workspace not found");
     }
 
+    List<WorkspaceMember> memberships =
+        workspaceMemberRepository.findByWorkspaceIdAndIsActiveTrue(workspaceId);
+    Map<UUID, UUID> membershipIdsByUser =
+        memberships.stream()
+            .collect(Collectors.toMap(WorkspaceMember::getUserId, WorkspaceMember::getId));
+
     List<UUID> userIdsInWorkspace =
-        workspaceMemberRepository.findByWorkspaceIdAndIsActiveTrue(workspaceId).stream()
-            .map(WorkspaceMember::getUserId)
-            .collect(Collectors.toList());
+        memberships.stream().map(WorkspaceMember::getUserId).collect(Collectors.toList());
 
     List<User> usersInWorkspace = userRepository.findAllById(userIdsInWorkspace);
 
@@ -195,6 +200,7 @@ public class TeamService {
               user ->
                   AvailableUserResponse.builder()
                       .userId(user.getId())
+                      .workspaceMemberId(membershipIdsByUser.get(user.getId()))
                       .firstName(user.getFirstName())
                       .lastName(user.getLastName())
                       .email(user.getEmail())
@@ -215,6 +221,7 @@ public class TeamService {
               user ->
                   AvailableUserResponse.builder()
                       .userId(user.getId())
+                      .workspaceMemberId(membershipIdsByUser.get(user.getId()))
                       .firstName(user.getFirstName())
                       .lastName(user.getLastName())
                       .email(user.getEmail())

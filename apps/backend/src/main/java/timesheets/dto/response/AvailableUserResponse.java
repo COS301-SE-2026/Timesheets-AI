@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AvailableUserResponse {
   private UUID userId;
+  private UUID workspaceMemberId;
   private String firstName;
   private String lastName;
   private String email;

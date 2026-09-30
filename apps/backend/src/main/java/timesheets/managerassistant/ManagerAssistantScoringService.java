@@ -4,7 +4,7 @@ only runs when ManagerAssistantController is hit directly, which only happens wh
 queue, no auto trigger anywhere in this file, dont add one later without checking this comment first
 
 fully separate from timesheets.evidence (kguagelo's folder, shes using it for a different feature right now). only shared dependency is the base adapters
-(GitHubAdapter, CalendarAdapter, IssueTrackerAdapter), the oauth/fetch layer every integration already sits on, not her collector abstraction, so this
+(GitHubAdapter, CalendarService, IssueTrackerAdapter), the oauth/fetch layer every integration already sits on, not her collector abstraction, so this
 doesn't need to touch her files at all
 
 gemini never touches this class, only the one narrative sentence in ManagerAssistantNarrativeClient does, through ai-service. reasoning: a
@@ -38,9 +38,9 @@ import org.springframework.stereotype.Service;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
 import timesheets.dto.response.IssueResponse;
-import timesheets.integration.calendar.CalendarAdapter;
 import timesheets.integration.calendar.CalendarEvent;
 import timesheets.integration.calendar.CalendarNotConnectedException;
+import timesheets.integration.calendar.CalendarService;
 import timesheets.integration.github.GitCommitActivity;
 import timesheets.integration.github.GitHubAdapter;
 import timesheets.integration.github.GitHubService;
@@ -60,7 +60,7 @@ public class ManagerAssistantScoringService {
   private static final int LIKELY_REJECT_THRESHOLD = 45;
 
   private final GitHubAdapter gitHubAdapter;
-  private final CalendarAdapter calendarAdapter;
+  private final CalendarService CalendarService;
   private final IssueTrackerAdapter issueTrackerAdapter;
   private final TimeEntryRepository timeEntryRepository;
 
@@ -193,7 +193,7 @@ public class ManagerAssistantScoringService {
       UUID memberId, LocalDateTime start, LocalDateTime end) {
     List<CalendarEvent> events;
     try {
-      events = calendarAdapter.getEvents(memberId, start, end);
+      events = CalendarService.getEvents(memberId, start, end);
     } catch (CalendarNotConnectedException e) {
       return new ManagerAssistantEvidenceResult("CALENDAR", 0, 0.0, "calendar not connected");
     }

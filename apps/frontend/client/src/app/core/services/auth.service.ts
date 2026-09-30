@@ -5,6 +5,9 @@ import { Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AuthenticationResult, PublicClientApplication, } from '@azure/msal-browser';
 
+//the calendar page uses this to see which connection flow to choose
+export type AuthProvider = 'GOOGLE' | 'MICROSOFT' | 'PASSWORD';
+
 export interface RegisterRequest {
   firstName: string;
   lastName: string;
@@ -49,6 +52,7 @@ Patched: Zamokuhle Zwane, 25 July 2026
 login and googleAuth were only ever storing the token
 */
 const USER_KEY = 'auth_user';
+const AUTH_PROVIDER_KEY = 'auth_provider';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -131,7 +135,10 @@ export class AuthService {
 
   login(payload: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, payload).pipe(
-      tap((res) => this.persistSession(res)),
+      tap((res) => {
+        this.persistSession(res);
+        this.setAuthProvider('PASSWORD');
+      }),
       catchError(this.handleError),
     );
   }
@@ -139,7 +146,13 @@ export class AuthService {
   googleAuth(idToken: string): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.baseUrl}/google`, { idToken })
-      .pipe(tap((res) => this.persistSession(res)),catchError(this.handleError),);
+      .pipe(
+        tap((res) => {
+          this.persistSession(res);
+          this.setAuthProvider('GOOGLE');
+        }),
+        catchError(this.handleError),
+      );
   }
 
   async microsoftAuth(): Promise<AuthResponse> {
@@ -162,12 +175,31 @@ export class AuthService {
         .post<AuthResponse>(`${this.baseUrl}/microsoft`, {
           idToken: microsoftResult.idToken,
         })
-        .pipe(tap((res) => this.persistSession(res)), catchError(this.handleError),)
+        .pipe(
+          tap((res) => {
+            this.persistSession(res);
+            this.setAuthProvider('MICROSOFT');
+          }),
+          catchError(this.handleError),
+        )
         .subscribe({
           next: resolve,
           error: reject,
         });
     });
+  }
+
+  /*
+  - want the user to get the auth provider while logged in
+  - but since this is a temporary action, I don't want it to persist after the browser is closed
+  - hence I used session storage
+  */
+  private setAuthProvider(provider: AuthProvider): void {
+    sessionStorage.setItem(AUTH_PROVIDER_KEY, provider);
+  }
+
+  getAuthProvider(): AuthProvider | null {
+    return sessionStorage.getItem(AUTH_PROVIDER_KEY) as AuthProvider | null;
   }
 
   logout(): void {
@@ -181,6 +213,7 @@ export class AuthService {
     }
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    sessionStorage.removeItem(AUTH_PROVIDER_KEY);
     this.currentUser.set(null);
     this.router.navigate(['/login']);
   }

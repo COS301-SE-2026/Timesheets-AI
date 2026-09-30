@@ -414,7 +414,7 @@ describe('MyTasksComponent', () => {
  
       component.navigateToProject(projectId);
  
-      expect(navigateSpy).toHaveBeenCalledWith(['/projects', projectId]);
+      expect(navigateSpy).toHaveBeenCalledWith(['/projects/details'], {state: { projectId } } );
     });
   });
 

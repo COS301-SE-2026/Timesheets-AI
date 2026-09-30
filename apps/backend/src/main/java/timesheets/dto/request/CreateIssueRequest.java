@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 public class CreateIssueRequest {
-  @NotBlank(message = "Title is required")
-  private String title;
+  @NotBlank(message = "Summary is required")
+  private String summary;
 
   private String description;
 

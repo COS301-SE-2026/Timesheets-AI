@@ -28,7 +28,7 @@ Related Requirements: N/A
                         [class.connected]="isConnected()">
                     </span>
                     <span>
-                        {{ provider()=== 'outlook'? 'Outlook': 'Google Calendar' }}
+                        {{ provider()=== 'microsoft'? 'Outlook': 'Google Calendar' }}
                         {{ isConnected() ? 'connected' : 'not connected'}}
                     </span>
                     @if (lastSyncedLabel()){
@@ -47,7 +47,7 @@ Related Requirements: N/A
                         class="fa-solid fa-rotate"
                         [class.fa-spin]="isSyncing()">
                     </i>
-                    {{ isSyncing()? 'Syncing...': provider()=== 'outlook'? 'Sync Outlook now': 'Sync Google now' }}
+                    {{ isSyncing()? 'Syncing...': provider()=== 'microsoft'? 'Sync Outlook now': 'Sync Google now' }}
                 </button>
             }@else{
                 <!-- NO CALENDAR CONNECTED -->
@@ -155,7 +155,7 @@ Related Requirements: N/A
                     <span>
                         This is a read-only calendar
                         Events are imported from
-                        {{ provider() === 'outlook'? 'Outlook': 'Google Calendar'}}.
+                        {{ provider() === 'microsoft'? 'Outlook': 'Google Calendar'}}.
                         To make changes, use your calendar provider.
                     </span>         
                 }@else{
@@ -176,7 +176,7 @@ Related Requirements: N/A
 
         <dialog 
             class="event-details-card"
-            aria-modal="true">
+            aria-modal="true" open>
             <button 
                 class="close-button"
                 (click)="closeEventDetails()"
@@ -212,9 +212,23 @@ Related Requirements: N/A
                     <div class="info-item">
                         <i class="fa-regular fa-calendar"></i>
                         <span>
-                            {{ event.start | date:'EEE, d MMM yyyy'}}
+                            {{ event.start | date:'HH:mm'}}
+                            @if(event.end){
+                                - {{ event.end | date:'HH:mm'}}
+                            }
                         </span>
                     </div>
+
+                    @if (event.participants && event.participants.length > 0) {
+                        <div class="info-item align-start">
+                            <i class="fa-solid fa-users"></i>
+                            <div>
+                                @for (participant of event.participants; track participant) {
+                                    <div> {{ participant }}</div>
+                                }
+                            </div>
+                        </div>
+                    }
 
                     <!-- TIME -->
                     <div class="info-item">

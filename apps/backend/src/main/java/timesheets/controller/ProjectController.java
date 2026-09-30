@@ -1,5 +1,8 @@
 package timesheets.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +37,12 @@ public class ProjectController {
   private final SecurityUtils securityUtils;
   private final ProjectService projectService;
 
-  // this will get the projects - role based access implemented in my service file
+  @Operation(
+      summary = "Get projects",
+      description = "Gets the projects available to the current user.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Projects retrieved successfully")
+  })
   @GetMapping
   public ResponseEntity<List<ProjectResponse>> getProjects() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
@@ -48,7 +56,13 @@ public class ProjectController {
     return ResponseEntity.ok(projects);
   }
 
-  // this will get detailed info about a particular project
+  @Operation(
+      summary = "Get project details",
+      description = "Gets the details of a specific project.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Project retrieved successfully"),
+    @ApiResponse(responseCode = "404", description = "Project not found")
+  })
   @GetMapping("/{projectId}")
   public ResponseEntity<ProjectDetailResponse> getProjectDetail(@PathVariable UUID projectId) {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
@@ -63,6 +77,15 @@ public class ProjectController {
     return ResponseEntity.ok(response);
   }
 
+  @Operation(
+      summary = "Create project",
+      description = "Creates a new project in the current workspace.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Project created successfully"),
+    @ApiResponse(
+        responseCode = "403",
+        description = "User does not have permission to create projects")
+  })
   @PostMapping
   public ResponseEntity<ProjectResponse> createProject(
       @Valid @RequestBody CreateProjectRequest request) {
@@ -80,10 +103,16 @@ public class ProjectController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  // this will be used to update a project
+  @Operation(
+      summary = "Update project",
+      description = "Updates the details of an existing project.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Project updated successfully"),
+    @ApiResponse(responseCode = "404", description = "Project not found")
+  })
   @PatchMapping("/{projectId}")
   public ResponseEntity<ProjectResponse> patchProject(
-      @PathVariable UUID projectId, @RequestBody UpdateProjectRequest request) {
+      @PathVariable UUID projectId, @Valid @RequestBody UpdateProjectRequest request) {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
@@ -91,7 +120,13 @@ public class ProjectController {
     return ResponseEntity.ok(response);
   }
 
-  // this should archive a project
+  @Operation(summary = "Archive project", description = "Archives an existing project.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Project archived successfully"),
+    @ApiResponse(
+        responseCode = "403",
+        description = "User does not have permission to archive projects")
+  })
   @PatchMapping("/{projectId}/archive")
   public ResponseEntity<Void> archiveProject(@PathVariable UUID projectId) {
 
@@ -102,7 +137,13 @@ public class ProjectController {
     return ResponseEntity.ok().build();
   }
 
-  // to delete a project
+  @Operation(summary = "Delete project", description = "Deletes an existing project.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Project deleted successfully"),
+    @ApiResponse(
+        responseCode = "403",
+        description = "User does not have permission to delete projects")
+  })
   @DeleteMapping("/{projectId}")
   public ResponseEntity<Void> deleteProject(@PathVariable UUID projectId) {
 
@@ -113,7 +154,13 @@ public class ProjectController {
     return ResponseEntity.noContent().build();
   }
 
-  // this will be to assign a workspace member to a project
+  @Operation(
+      summary = "Assign project member",
+      description = "Assigns a workspace member to a project.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "201", description = "Member assigned successfully"),
+    @ApiResponse(responseCode = "404", description = "Project or member not found")
+  })
   @PostMapping("/{projectId}/members")
   public ResponseEntity<ProjectMemberResponse> assignMemberToProject(
       @PathVariable UUID projectId, @Valid @RequestBody AssignProjectMemberRequest request) {
@@ -125,7 +172,11 @@ public class ProjectController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  // this will delete a member from the project
+  @Operation(summary = "Remove project member", description = "Removes a member from a project.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Member removed successfully"),
+    @ApiResponse(responseCode = "404", description = "Project or member not found")
+  })
   @DeleteMapping("/{projectId}/members/{workspaceMemberId}")
   public ResponseEntity<Void> removeMemberFromProject(
       @PathVariable UUID projectId, @PathVariable UUID workspaceMemberId) {
@@ -135,7 +186,13 @@ public class ProjectController {
     return ResponseEntity.noContent().build();
   }
 
-  // get most recent forecast
+  @Operation(
+      summary = "Get project forecast",
+      description = "Gets the latest saved forecast for a project.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Project forecast retrieved successfully"),
+    @ApiResponse(responseCode = "403", description = "User does not have access to the project")
+  })
   @GetMapping("/{projectId}/forecast")
   public ResponseEntity<SavedProjectForecastResponse> getProjectForecast(
       @PathVariable UUID projectId) {
@@ -147,7 +204,13 @@ public class ProjectController {
     return ResponseEntity.ok(response);
   }
 
-  // recalculates the forcast
+  @Operation(
+      summary = "Sync project forecast",
+      description = "Recalculates and updates the project forecast.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Project forecast updated successfully"),
+    @ApiResponse(responseCode = "403", description = "User does not have access to the project")
+  })
   @PostMapping("/{projectId}/forecast/sync")
   public ResponseEntity<ProjectForecastResponse> syncProjectForecast(
       @PathVariable UUID projectId, @RequestHeader("Authorization") String authorization) {

@@ -5,6 +5,9 @@ regardless of who its about. Absolutely cant do per-project pass because this is
 This is threshold based, its not a trained model
 Author: Zamokuhle Zwane
 Date: 23/08/2026
+Patch: risk_level was text-only before (HIGH/MEDIUM/LOW), which meant any consumer that needed an actual number (the manager dashboard's flagged
+burnout card, for one) had no real score to read off AIInsight.score, it was always NULL. Added risk_score so score actually gets persisted now instead
+of downstream code having to fake-guess a number off the reason string.
 """
 
 import uuid
@@ -19,6 +22,8 @@ from app.models.workspace_member import WorkspaceMember
 
 LONG_DAY_HOURS = 10.0  # two hours longer than the typical work day
 CONSECUTIVE_LONG_DAYS_THRESHOLD = 3  # this can be changed to maybe 6 days
+RISK_SCORE_BASELINE = 20.0
+RISK_SCORE_PER_STREAK_DAY = 25.0
 
 
 def calculate_burnout_risk(
@@ -52,17 +57,19 @@ def calculate_burnout_risk(
         else:
             long_day_streak = 0
 
+    risk_score = min(100.0, RISK_SCORE_BASELINE + (max_streak * RISK_SCORE_PER_STREAK_DAY))
+
     if max_streak >= CONSECUTIVE_LONG_DAYS_THRESHOLD:
         risk_level = "HIGH"
-        reason = f"Sustain {LONG_DAY_HOURS}h+ days for {max_streak} days staight"
+        reason = f"Sustained {LONG_DAY_HOURS}h+ days for {max_streak} days straight"
     elif max_streak >= 1:
         risk_level = "MEDIUM"
-        reason = f"At least one {LONG_DAY_HOURS: 0f}h+ day logged this period"
+        reason = f"At least one {LONG_DAY_HOURS:.0f}h+ day logged this period"
     else:
         risk_level = "LOW"
         reason = "No sustained long-hour days detected"
 
-    return {"risk_level": risk_level, "reason": reason}
+    return {"risk_level": risk_level, "risk_score": round(risk_score, 1), "reason": reason}
 
 
 def save_burnout_insight(db: Session, workspace_member_id: uuid.UUID, result: dict) -> AIInsight:
@@ -73,6 +80,7 @@ def save_burnout_insight(db: Session, workspace_member_id: uuid.UUID, result: di
         workspace_id=member.workspace_id if member else None,
         insight_type="BURNOUT",
         scope="TEAM",
+        score=result["risk_score"],
         description=result["reason"],
         recommendation=(
             "Check in before assigning further overtime."

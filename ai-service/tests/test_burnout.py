@@ -58,12 +58,11 @@ def should_return_high_risk_when_three_consecutive_long_days_logged():
 
 def should_call_db_correctly_when_saving_burnout_insight():
     # arrange
-    result = {"risk_level": "HIGH", "reason": "blah blah"}
+    result = {"risk_level": "HIGH", "risk_score": 0.9, "reason": "blah blah"}
     db = MagicMock()
 
     # act
     insight = save_burnout_insight(db, MEMBER_ID, result)
-
     # assert
     db.add.assert_called_once()
     db.commit.assert_called_once()
