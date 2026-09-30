@@ -84,5 +84,11 @@ class OAuthStateServiceTest {
 
       assertThatThrownBy(() -> service.validateState(foreign)).isInstanceOf(JwtException.class);
     }
+
+    @Test
+    @DisplayName("should reject garbage")
+    void rejectsGarbage() {
+      assertThatThrownBy(() -> service.validateState("not-a-jwt")).isInstanceOf(JwtException.class);
+    }
   }
 }
