@@ -91,7 +91,9 @@ export class NotificationsPageComponent implements OnInit {
         if (!notification.isRead) {
             this.markAsRead(notification);
         }
-
+		if (this.notificationService.openNotificationTarget(notification)) {
+            return;
+        }
         const route = this.notificationService.getNotificationRoute( notification.type, );
 
 		if (route) {
