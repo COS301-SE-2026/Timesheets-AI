@@ -78,6 +78,7 @@
   }
 }
 
+
 .header-pill--date {
   position: relative;
   cursor: pointer;
@@ -1293,4 +1294,58 @@
   gap: 10px;
   padding: 18px 32px;
   border-top: 1px solid #e5e7eb;
+}
+
+.suggestion-evidence-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.suggestion-carousel {
+  width: 100%;
+}
+
+.suggestion-carousel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.suggestion-carousel__header h2 {
+  margin: 0;
+}
+
+.suggestion-carousel__navigation {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.suggestion-carousel__dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.suggestion-carousel__dots button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.suggestion-carousel__dots button.active {
+  width: 20px;
+  border-radius: 4px;
 }

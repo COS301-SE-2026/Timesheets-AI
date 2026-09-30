@@ -430,316 +430,268 @@
     </section>
   }
 
-    
-<!-- Suggestion works panel for suggested works -->
-@if (activePanel() === "suggestions") {
-  <section class="entry-panel" aria-labelledby="suggestions-panel-title">
-    <article class="card entry-panel_card">
+<div class="suggestions-panel">
 
-      <header class="card_header">
-        <div>
-          <h2 id="suggestions-panel-title">Suggested Work</h2>
-          <p>We found work that may be missing from your timesheet.</p>
-        </div>
+  @if (suggestionsLoading()) {
+    <div class="suggestions-state">
+      <p>Looking for suggested work...</p>
+    </div>
+  }
 
-        <button
-          type="button"
-          class="icon-btn"
-          aria-label="Close"
-          (click)="closePanel()">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M6 6l12 12M18 6 6 18"></path>
-          </svg>
-        </button>
-      </header>
+  @else if (suggestions().length === 0) {
+    <div class="suggestions-state">
+      <h3>No suggested work found</h3>
+      <p>We could not find any additional work for this period.</p>
+    </div>
+  }
 
-      <div class="suggestions-panel">
+  @else {
+    @if (getCurrentSuggestion(); as suggestion) {
+      <section class="suggestion-carousel">
 
-        @if (suggestionsLoading()) {
-          <div class="suggestions-state">
-            <p>Looking for suggested work...</p>
-          </div>
-        }
-
-        @else if (suggestions().length === 0) {
-          <div class="suggestions-state">
-            <h3>No suggested work found</h3>
-            <p>
-              We could not find any additional work for this period.
-            </p>
-          </div>
-        }
-
-        @else {
-          <div class="suggestions-list">
-
-            @for (suggestion of suggestions(); track suggestion.id) {
-
-              <article class="suggestion-card">
-
-                <header class="suggestion-card-header">
-
-                  <div class="suggestion-card-header-main-one">
-
-
-                    <h3 class="suggestion-card-title">
-                      {{ suggestion.title }}
-                    </h3>
-
-                    <div class="suggestion-card-date">
-                      <span>{{ formatDate(suggestion.startTime) }}</span>
-                    </div>
-
-                    <div class="suggestion-card-summary">
-
-                      <span class="suggestion-source-summary">
-                        {{ getSourceSummary(suggestion) }}
-                      </span>
-
-                      @if (
-                        suggestion.durationMinutes !== null
-                        && suggestion.durationMinutes > 0
-                      ) {
-                        <span class="suggestion-duration-summary">
-                          {{ suggestion.durationMinutes }} min
-                        </span>
-                      }
-
-                    </div>
-
-                  </div>
-
-                  <div class="suggestion-card-status">
-                    <span class="suggestion-pending-badge">
-                      Pending
-                    </span>
-                  </div>
-
-                </header>
-
-
-                <div class="suggestion-card-fields">
-
-                   <!-- Project -->
-                  <label class="field">
-                    <span class="field-label">Project</span>
-
-                    <select
-                      [value]="suggestion.projectId || ''"
-                      (change)="assignSuggestionProject(suggestion, $event)">
-
-                      <option value="">Select project</option>
-
-                      @for (project of projects(); track project.id) {
-                        <option [value]="project.id">
-                          {{ project.name }}
-                        </option>
-                      }
-
-                    </select>
-                  </label>
-                  
-                
-                  <!-- Task -->
-                  <label class="field">
-                    <span class="field-label">Task</span>
-
-                    <select
-                      [value]="suggestion.taskId || ''"
-                      (change)="assignSuggestionTask(suggestion, $event)">
-
-                      <option value="">No task selected</option>
-
-                      @for (
-                        task of getSuggestionTasks(suggestion.id);
-                        track task.id
-                      ) {
-                        <option [value]="task.id">
-                          {{ task.title }}
-                        </option>
-                      }
-
-                      <option value="CREATE NEW TASK">
-                        + Create new task
-                      </option>
-
-                    </select>
-                  </label>
-
-
-                  <!-- Create new task -->
-                  @if (suggestionCreatingTask() === suggestion.id) {
-
-                    <div class="suggestion-new-task">
-
-                      <label class="field">
-                        <span class="field-label">
-                          New task
-                        </span>
-
-                        <input
-                          type="text"
-                          [value]="newSuggestionTaskTitle()"
-                          (input)="newSuggestionTaskTitle.set($any($event.target).value)"
-                          placeholder="Enter task title" />
-                      </label>
-
-                      <div class="suggestion-new-task-actions">
-
-                        <button
-                          type="button"
-                          class="btn btn--ghost"
-                          (click)="cancelCreateSuggestionTask()">
-                          Cancel
-                        </button>
-
-                        <button
-                          type="button"
-                          class="btn btn--primary"
-                          [disabled]="!newSuggestionTaskTitle().trim()"
-                          (click)="createSuggestionTask(suggestion)">
-                          Create task
-                        </button>
-
-                      </div>
-
-                    </div>
-                  }
-
-                   <!-- Duration -->
-                  <label class="field">
-                    <span class="field-label">Duration</span>
-                    <p class="suggestion-duration-help">
-                        Duration could not be determined from the available
-                        evidence. Please enter how long you worked.
-                      </p>
-                      
-                    @if (
-                      suggestion.durationMinutes === null
-                    ) {
-
-                      <div class="suggestion-duration-input">
-
-                        <input
-                          type="number"
-                          min="1"
-                          step="1"
-                          placeholder="Enter duration"
-                          [value]="''"
-                          (change)="updateSuggestionDuration(suggestion, $event)"
-                        />
-
-                        <span>minutes</span>
-
-                      </div>
-
-                    } @else {
-
-                      <div class="suggestion-duration-display">
-                        {{ suggestion.durationMinutes }} minutes
-                      </div>
-
-                    }
-                  </label>
-
-                  <!-- Description -->
-                  <label class="field">
-                    <span class="field-label">Description</span>
-
-                    <textarea
-                      [value]="suggestion.description || ''"
-                      (input)="updateSuggestionDescription(suggestion, $event)"
-                      rows="4"
-                      placeholder="Add a description of this work...">
-                    </textarea>
-                  </label>
-
-                </div>
-
-
-                <footer class="suggestion-card-actions">
-
-                  <button
-                    type="button"
-                    class="btn btn--secondary"
-                    (click)="seeSuggestionEvidence(suggestion)">
-                    See Evidence
-                  </button>
-
-                  <button
-                    type="button"
-                    class="btn btn--ghost"
-                    (click)="confirmRejectSuggestion(suggestion)">
-                    Reject
-                  </button>
-
-                  <button
-                    type="button"
-                    class="btn btn--primary"
-                    [disabled]="
-                      !suggestion.projectId ||
-                      suggestion.durationMinutes === null ||
-                      suggestion.durationMinutes <= 0
-                    "
-                    (click)="approveSuggestion(suggestion)">
-                    Approve &amp; Add
-                  </button>
-
-                </footer>
-
-              </article>
-            }
-
+        <header class="suggestion-carousel__header">
+          <div>
+            <h2>Recommended Suggestion</h2>
+            <span>
+              {{ currentSuggestionIndex() + 1 }} / {{ suggestions().length }}
+            </span>
           </div>
 
+          <div class="suggestion-carousel__navigation">
+            <button
+              type="button"
+              class="btn btn--ghost"
+              (click)="previousSuggestion()"
+              [disabled]="suggestions().length <= 1">
+              ←
+            </button>
+            <button
+              type="button"
+              class="btn btn--ghost"
+              (click)="nextSuggestion()"
+              [disabled]="suggestions().length <= 1">
+              →
+            </button>
+          </div>
+        </header>
 
-          @if (suggestionPendingReject()) {
+        <!-- SINGLE SUGGESTION CARD for slideshow -->
+        <article class="suggestion-card">
 
-            <div class="suggestion-confirmation">
+          <header class="suggestion-card-header">
+            <div class="suggestion-card-header-main-one">
+              <h3 class="suggestion-card-title">
+                {{ suggestion.title }}
+              </h3>
 
-              <div class="suggestion-confirm">
-
-                <h3>Reject suggestion?</h3>
-
-                <p>
-                  Are you sure that you want to reject
-                  <strong>
-                    {{ suggestionPendingReject()?.title }}
-                  </strong>?
-                </p>
-
-                <div class="suggestion-confirm-actions">
-
-                  <button
-                    type="button"
-                    class="btn btn--ghost"
-                    (click)="cancelRejectSuggestion()">
-                    Cancel
-                  </button>
-
-                  <button
-                    type="button"
-                    class="btn btn--primary"
-                    (click)="confirmReject()">
-                    Reject
-                  </button>
-
-                </div>
-
+              <div class="suggestion-card-date">
+                <span>{{ formatDate(suggestion.startTime) }}</span>
               </div>
 
+              <div class="suggestion-card-summary">
+                <span class="suggestion-source-summary">
+                  {{ getSourceSummary(suggestion) }}
+                </span>
+
+                @if (getSuggestionDurationSeconds(suggestion) > 0) {
+                  <span class="suggestion-duration-summary">
+                    {{ formatDuration(getSuggestionDurationSeconds(suggestion)) }}
+                  </span>
+                }
+              </div>
             </div>
+
+            <div class="suggestion-card-status">
+              <span class="suggestion-pending-badge">Pending</span>
+            </div>
+          </header>
+
+          <div class="suggestion-card-fields">
+
+            <!-- Project -->
+            <label class="field">
+              <span class="field-label">Project</span>
+              <select
+                [value]="suggestion.projectId || ''"
+                (change)="assignSuggestionProject(suggestion, $event)"
+              >
+                <option value="">Select project</option>
+                @for (project of projects(); track project.id) {
+                  <option [value]="project.id">{{ project.name }}</option>
+                }
+              </select>
+            </label>
+
+            <!-- Task -->
+            <label class="field">
+              <span class="field-label">Task</span>
+              <select
+                [value]="suggestion.taskId || ''"
+                (change)="assignSuggestionTask(suggestion, $event)"
+              >
+                <option value="">No task selected</option>
+                @for (task of getSuggestionTasks(suggestion.id); track task.id) {
+                  <option [value]="task.id">{{ task.title }}</option>
+                }
+                <option value="CREATE NEW TASK">+ Create new task</option>
+              </select>
+            </label>
+
+            <!-- Create new task -->
+            @if (suggestionCreatingTask() === suggestion.id) {
+              <div class="suggestion-new-task">
+                <label class="field">
+                  <span class="field-label">New task</span>
+                  <input
+                    type="text"
+                    [value]="newSuggestionTaskTitle()"
+                    (input)="newSuggestionTaskTitle.set($any($event.target).value)"
+                    placeholder="Enter task title"
+                  />
+                </label>
+
+                <div class="suggestion-new-task-actions">
+                  <button
+                    type="button"
+                    class="btn btn--ghost"
+                    (click)="cancelCreateSuggestionTask()"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn--primary"
+                    [disabled]="!newSuggestionTaskTitle().trim()"
+                    (click)="createSuggestionTask(suggestion)"
+                  >
+                    Create task
+                  </button>
+                </div>
+              </div>
+            }
+
+            <!-- Time Row -->
+            <div class="suggestion-time-row">
+              <label class="field">
+                <span class="field-label">Start Time</span>
+                <input
+                  type="time"
+                  [value]="getSuggestionStartTime(suggestion)"
+                  (change)="updateSuggestionTime(suggestion, $event, 'startTime')"
+                />
+              </label>
+
+              <label class="field">
+                <span class="field-label">End Time</span>
+                <input
+                  type="time"
+                  [value]="getSuggestionEndTime(suggestion)"
+                  (change)="updateSuggestionTime(suggestion, $event, 'endTime')"
+                />
+                @if (isSuggestionEndTimeInvalid(suggestion)) {
+                  <span class="field-error">End time must be after start time.</span>
+                }
+              </label>
+
+              <label class="field">
+                <span class="field-label">Duration</span>
+                <input
+                  type="text"
+                  readonly
+                  [value]="formatDuration(getSuggestionDurationSeconds(suggestion))"
+                />
+              </label>
+            </div>
+
+            <!-- Description -->
+            <label class="field">
+              <span class="field-label">Description</span>
+              <textarea
+                [value]="suggestion.description || ''"
+                (input)="updateSuggestionDescription(suggestion, $event)"
+                rows="4"
+                placeholder="Add a description of this work..."
+              ></textarea>
+            </label>
+
+          </div>
+
+          <footer class="suggestion-card-actions">
+            <button
+              type="button"
+              class="btn btn--secondary"
+              (click)="seeSuggestionEvidence(suggestion)"
+            >
+              See Evidence
+            </button>
+
+            <button
+              type="button"
+              class="btn btn--ghost"
+              (click)="confirmRejectSuggestion(suggestion)"
+            >
+              Reject
+            </button>
+
+            <button
+              type="button"
+              class="btn btn--primary"
+              [disabled]="!suggestion.projectId || isSuggestionEndTimeInvalid(suggestion)"
+              (click)="approveSuggestion(suggestion)"
+            >
+              Approve &amp; Add
+            </button>
+          </footer>
+
+        </article>
+
+        <!-- Carousel Indicators -->
+        <div class="suggestion-carousel__dots">
+          @for (item of suggestions(); track item.id; let i = $index) {
+            <button
+              type="button"
+              [class.active]="i === currentSuggestionIndex()"
+              (click)="currentSuggestionIndex.set(i)"
+              [attr.aria-label]="'Show suggestion ' + (i + 1)">
+            </button>
           }
+        </div>
 
-        }
+      </section>
 
-      </div>
+      <!-- Reject confirmation -->
+      @if (suggestionPendingReject()) {
+        <div class="suggestion-confirmation">
+          <div class="suggestion-confirm">
+            <h3>Reject suggestion?</h3>
+            <p>
+              Are you sure that you want to reject
+              <strong>{{ suggestionPendingReject()?.title }}</strong>?
+            </p>
 
-    </article>
-  </section>
-}
+            <div class="suggestion-confirm-actions">
+              <button
+                type="button"
+                class="btn btn--ghost"
+                (click)="cancelRejectSuggestion()"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="btn btn--primary"
+                (click)="confirmReject()"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  }
 
-
+</div>
 
      <!-- See the Evidence Modal -->
 @if (suggestionEvidence(); as evidence) {
