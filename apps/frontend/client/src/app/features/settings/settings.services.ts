@@ -29,7 +29,6 @@ export class SettingsService{
                 description: 'Sync pull requests, commits and repositories.',
                 icon: 'fa-brands fa-github',
                 connected: true,
-                enabled: true,
             },
             {
                 id: 'jira',
@@ -37,15 +36,13 @@ export class SettingsService{
                 description: 'Import issues, track work and link time entries.',
                 icon: 'fa-brands fa-jira',
                 connected: true,
-                enabled: true,
             },
             {
-                id: 'google-calendar',
-                name: 'Google Calendar',
+                id: 'calendar',
+                name: 'Calendar',
                 description: 'Sync your calendar events and avaiability.',
-                icon: 'fa-brands fa-google',
+                icon: 'fa-brands fa-calendar',
                 connected: true,
-                enabled: true,
             },
         ],
         notifications:{
