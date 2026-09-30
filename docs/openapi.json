@@ -153,6 +153,8 @@
         "tags": [
           "timesheet-controller"
         ],
+        "summary": "Submit timesheet",
+        "description": "Submits a timesheet for review.",
         "operationId": "submitTimesheet",
         "parameters": [
           {
@@ -167,7 +169,27 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Timesheet submitted successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimesheetResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Timesheet not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimesheetResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Timesheet has already been submitted",
             "content": {
               "*/*": {
                 "schema": {
@@ -184,6 +206,8 @@
         "tags": [
           "timesheet-controller"
         ],
+        "summary": "Reject timesheet",
+        "description": "Rejects a submitted timesheet.",
         "operationId": "rejectTimesheet",
         "parameters": [
           {
@@ -208,7 +232,37 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Timesheet rejected successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimesheetResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have permission to reject timesheets",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimesheetResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Timesheet not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimesheetResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Timesheet cannot be rejected",
             "content": {
               "*/*": {
                 "schema": {
@@ -256,6 +310,8 @@
         "tags": [
           "timesheet-controller"
         ],
+        "summary": "Approve timesheet",
+        "description": "Approves a submitted timesheet.",
         "operationId": "approveTimesheet",
         "parameters": [
           {
@@ -270,7 +326,37 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Timesheet approved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimesheetResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have permission to approve timesheets",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimesheetResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Timesheet not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimesheetResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Timesheet cannot be approved",
             "content": {
               "*/*": {
                 "schema": {
@@ -437,6 +523,8 @@
         "tags": [
           "task-controller"
         ],
+        "summary": "Create task",
+        "description": "Creates a new task for a project.",
         "operationId": "createTask",
         "requestBody": {
           "content": {
@@ -449,8 +537,48 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "Task created successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid task request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have permission to create the task",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Task cannot be created for the project",
             "content": {
               "*/*": {
                 "schema": {
@@ -1424,6 +1552,8 @@
         "tags": [
           "task-controller"
         ],
+        "summary": "Get task",
+        "description": "Gets the details of a specific task.",
         "operationId": "getTaskById",
         "parameters": [
           {
@@ -1438,7 +1568,27 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Task retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have access to the task",
             "content": {
               "*/*": {
                 "schema": {
@@ -1453,6 +1603,8 @@
         "tags": [
           "task-controller"
         ],
+        "summary": "Update task",
+        "description": "Updates the editable details of an existing task.",
         "operationId": "updateTask",
         "parameters": [
           {
@@ -1477,7 +1629,37 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Task updated successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid task update request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have permission to update the task",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -1789,6 +1971,8 @@
         "tags": [
           "timesheet-controller"
         ],
+        "summary": "Get timesheet",
+        "description": "Gets a specific timesheet by its ID.",
         "operationId": "getTimesheetById",
         "parameters": [
           {
@@ -1803,7 +1987,17 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Timesheet retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimesheetResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Timesheet not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -1820,6 +2014,8 @@
         "tags": [
           "timesheet-controller"
         ],
+        "summary": "Get timesheet entries",
+        "description": "Gets all time entries for a timesheet.",
         "operationId": "getTimesheetEntries",
         "parameters": [
           {
@@ -1834,7 +2030,20 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Time entries retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimeEntryResponse"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Timesheet not found",
             "content": {
               "*/*": {
                 "schema": {
@@ -1854,10 +2063,25 @@
         "tags": [
           "timesheet-controller"
         ],
+        "summary": "Get workspace timesheets",
+        "description": "Gets timesheets from the current workspace.",
         "operationId": "getWorkspaceTimesheets",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Workspace timesheets retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimesheetResponse"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have permission to view workspace timesheets",
             "content": {
               "*/*": {
                 "schema": {
@@ -1877,6 +2101,8 @@
         "tags": [
           "timesheet-controller"
         ],
+        "summary": "Get workspace timesheets by status",
+        "description": "Gets workspace timesheets filtered by status.",
         "operationId": "getWorkspaceTimesheetsByStatus",
         "parameters": [
           {
@@ -1890,7 +2116,20 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Timesheets retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimesheetResponse"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have permission to view workspace timesheets",
             "content": {
               "*/*": {
                 "schema": {
@@ -1910,10 +2149,25 @@
         "tags": [
           "timesheet-controller"
         ],
+        "summary": "Get pending timesheets",
+        "description": "Gets submitted timesheets waiting for review in the current workspace.",
         "operationId": "getPendingWorkspaceTimesheets",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Pending timesheets retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimesheetResponse"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have permission to view pending timesheets",
             "content": {
               "*/*": {
                 "schema": {
@@ -1933,10 +2187,12 @@
         "tags": [
           "timesheet-controller"
         ],
+        "summary": "Get my timesheets",
+        "description": "Gets all timesheets for the current user.",
         "operationId": "getMyTimesheets",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Timesheets retrieved successfully",
             "content": {
               "*/*": {
                 "schema": {
@@ -1956,6 +2212,8 @@
         "tags": [
           "timesheet-controller"
         ],
+        "summary": "Get my timesheets by status",
+        "description": "Gets the current user's timesheets filtered by status.",
         "operationId": "getMyTimesheetsByStatus",
         "parameters": [
           {
@@ -1969,7 +2227,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Timesheets retrieved successfully",
             "content": {
               "*/*": {
                 "schema": {
@@ -2055,10 +2313,25 @@
         "tags": [
           "task-controller"
         ],
+        "summary": "Get team tasks",
+        "description": "Gets all active tasks for the current team.",
         "operationId": "getTeamTasks",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Team tasks retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskResponse"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have permission to view team tasks",
             "content": {
               "*/*": {
                 "schema": {
@@ -2078,6 +2351,8 @@
         "tags": [
           "task-controller"
         ],
+        "summary": "Get project tasks",
+        "description": "Gets all active tasks for a specific project.",
         "operationId": "getTasksForProject",
         "parameters": [
           {
@@ -2092,7 +2367,20 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Tasks retrieved successfully",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskResponse"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User does not have access to the project",
             "content": {
               "*/*": {
                 "schema": {
@@ -2112,10 +2400,12 @@
         "tags": [
           "task-controller"
         ],
+        "summary": "Get my tasks",
+        "description": "Gets all active tasks assigned to the current user.",
         "operationId": "getMyTasks",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Tasks retrieved successfully",
             "content": {
               "*/*": {
                 "schema": {
