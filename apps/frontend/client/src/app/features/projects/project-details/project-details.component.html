@@ -204,6 +204,15 @@ Wrapped in loading error guard since now content now comes from GET /api/project
 
         </button>
 
+        <button
+            class="tab-button"
+            [class.active]="activeTab() === 'community'"
+            (click)="setActiveTab('community')">
+
+            Community
+
+        </button>
+
         @if (canViewForecast()) {
             <button class="tab-button" [class.active]="activeTab() === 'forecast'" (click)="setActiveTab('forecast')">
                 Forecast
@@ -543,6 +552,17 @@ Wrapped in loading error guard since now content now comes from GET /api/project
         </article>
 
     </section>
+    }
+
+    <!--
+    COMMUNITY TAB
+    -->
+    @if (activeTab() === 'community') {
+        <app-project-community
+            [projectId]="projectId()"
+            [projectName]="project().name"
+            [members]="project().members"
+            [highlightMessageId]="highlightMessageId()" />
     }
 
     @if (activeTab() === 'forecast' && canViewForecast()) {
