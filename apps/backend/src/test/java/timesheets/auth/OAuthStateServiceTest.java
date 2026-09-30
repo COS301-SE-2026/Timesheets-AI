@@ -1,8 +1,8 @@
 package timesheets.auth;
 
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -34,5 +34,13 @@ class OAuthStateServiceTest {
       assertThat(state.split("\\.")).hasSize(3);
     }
 
+    @Test
+    @DisplayName("should produce different states for different members")
+    void differsPerMember() {
+      String a = service.generateState(UUID.randomUUID(), "GITHUB", "/settings");
+      String b = service.generateState(UUID.randomUUID(), "GITHUB", "/settings");
+
+      assertThat(a).isNotEqualTo(b);
+    }
   }
 }
