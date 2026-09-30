@@ -4,7 +4,7 @@ import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/sl
 import { MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from './settings.services';
-import { UserSettings, UserRole } from './settings.model';
+import { UserSettings, UserRole, IntegrationStatus } from './settings.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
@@ -49,6 +49,7 @@ export class SettingsComponent implements OnInit{
     ()=> this.role()=== 'DEVELOPER'
   );
 
+
   ngOnInit(): void{
     const user= this.authService.currentUser();
 
@@ -75,27 +76,30 @@ export class SettingsComponent implements OnInit{
     });
   }
 
-  // browseIntegrations(): void{
-  //   if(!this.canAddIntegrations()){
-  //     return;
-  //   }
+  connectIntegration(integration: IntegrationStatus): void{
+    this.syncingIntegration.set(integration.id);
+  
+    this.settingsService.getConnectUrl(integration.id, this.calendarProvider()).subscribe({
+      next:(url)=>{
+        window.location.href=url;
+      },
+      error:(error: unknown)=>{
+        console.error(`Failed to connect ${integration.name}:`, error);
+        this.syncingIntegration.set(null);
+      },
+    });
+  }
 
-  //   const dialogRef= this.dialog.open(
-  //     IntegrationBrowserDialogComponent,{
-  //       width: '700px',
-  //       maxWidth: '120vw',
-  //       disableClose: true
-  //     }
-  //   );
+  private calendarProvider(): 'google' | 'microsoft'{
+    const signedInWith= this.authService.getAuthProvider();
 
-  //   dialogRef.afterClosed().subscribe((integration)=> {
-  //     if(!integration){
-  //       return;
-  //     }
+    if(signedInWith=== 'MICROSOFT')return 'microsoft';
+    if(signedInWith=== 'GOOGLE')return 'google';
 
-  //     console.log('Integration selected:', integration);
-  //   });
-  // }
+    const email= this.authService.currentUser()?.email?? '';
+    return /@(outlook|hotmail|live)\./i.test(email)? 'microsoft': 'google';
+
+  }
 
   changePassword():void{
     // i need the password change flow that our app uses
@@ -181,6 +185,7 @@ export class SettingsComponent implements OnInit{
   isSyncing(integrationId: string): boolean{
     return this.syncingIntegration()=== integrationId;
   }
+
 
   requestAccountDeletion():void{
     const dialogRef= this.dialog.open(

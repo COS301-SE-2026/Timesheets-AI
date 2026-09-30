@@ -105,14 +105,28 @@ Realated Requirement: N/A
                         </div>
 
                         <div class="integration-control">
-                            @if(integration.connected){
-                                <span class="status-dot connected">
+                                <span class="status-dot"
+                                    [class.connected]="integration.connected">
                                 </span>
                                 <span class="status-text">
-                                    Connected
+                                    {{ integration.connected? 'Connected': 'Not connected' }}
                                 </span>
-                            }
 
+                            <button 
+                                class="connect-button"
+                                type="button"
+                                [disabled]="isSyncing(integration.id)"
+                                (click)="connectIntegration(integration)">
+                                <i class="fa-solid fa-link"></i>
+                                
+                                @if(isSyncing(integration.id)){
+                                    Connecting...
+                                }@else if(integration.connected){
+                                    Reconnect
+                                }@else{
+                                    Connect
+                                }
+                            </button>
 
                         </div>
                     </div>
