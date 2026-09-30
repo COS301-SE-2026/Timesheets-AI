@@ -481,13 +481,14 @@
 
                   <div class="suggestion-card-header-main-one">
 
-                    <div class="suggestion-card-date">
-                      <span>{{ formatDate(suggestion.startTime) }}</span>
-                    </div>
 
                     <h3 class="suggestion-card-title">
                       {{ suggestion.title }}
                     </h3>
+
+                    <div class="suggestion-card-date">
+                      <span>{{ formatDate(suggestion.startTime) }}</span>
+                    </div>
 
                     <div class="suggestion-card-summary">
 
@@ -519,45 +520,7 @@
 
                 <div class="suggestion-card-fields">
 
-                  <!-- Duration -->
-                  <label class="field">
-                    <span class="field-label">Duration</span>
-
-                    @if (
-                      suggestion.durationMinutes === null
-                    ) {
-
-                      <div class="suggestion-duration-input">
-
-                        <input
-                          type="number"
-                          min="1"
-                          step="1"
-                          placeholder="Enter duration"
-                          [value]="''"
-                          (change)="updateSuggestionDuration(suggestion, $event)"
-                        />
-
-                        <span>minutes</span>
-
-                      </div>
-
-                      <p class="suggestion-duration-help">
-                        Duration could not be determined from the available
-                        evidence. Please enter how long you worked.
-                      </p>
-
-                    } @else {
-
-                      <div class="suggestion-duration-display">
-                        {{ suggestion.durationMinutes }} minutes
-                      </div>
-
-                    }
-                  </label>
-
-
-                  <!-- Project -->
+                   <!-- Project -->
                   <label class="field">
                     <span class="field-label">Project</span>
 
@@ -575,8 +538,8 @@
 
                     </select>
                   </label>
-
-
+                  
+                
                   <!-- Task -->
                   <label class="field">
                     <span class="field-label">Task</span>
@@ -643,6 +606,41 @@
                     </div>
                   }
 
+                   <!-- Duration -->
+                  <label class="field">
+                    <span class="field-label">Duration</span>
+                    <p class="suggestion-duration-help">
+                        Duration could not be determined from the available
+                        evidence. Please enter how long you worked.
+                      </p>
+                      
+                    @if (
+                      suggestion.durationMinutes === null
+                    ) {
+
+                      <div class="suggestion-duration-input">
+
+                        <input
+                          type="number"
+                          min="1"
+                          step="1"
+                          placeholder="Enter duration"
+                          [value]="''"
+                          (change)="updateSuggestionDuration(suggestion, $event)"
+                        />
+
+                        <span>minutes</span>
+
+                      </div>
+
+                    } @else {
+
+                      <div class="suggestion-duration-display">
+                        {{ suggestion.durationMinutes }} minutes
+                      </div>
+
+                    }
+                  </label>
 
                   <!-- Description -->
                   <label class="field">
@@ -960,7 +958,7 @@
 
 }
 
-            <footer class="suggestion-evidence-footer">
+            <!-- <footer class="suggestion-evidence-footer">
 
               <button
                 type="button"
@@ -981,7 +979,7 @@
         </div>
       }
     </section>
-   }
+   } -->
 
 
   <!-- Entries list section -->
