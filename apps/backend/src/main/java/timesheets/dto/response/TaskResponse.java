@@ -19,6 +19,7 @@ public class TaskResponse {
   private UUID projectId;
   private String projectName;
   private String jiraTicketKey;
+  private String jiraUrl;
   private UUID parentTaskId;
   private String title;
   private String description;
@@ -55,11 +56,13 @@ public class TaskResponse {
         .build();
   }
 
-  public static TaskResponse fromWithDetails(Task task, String projectName, String assignedToName) {
+  public static TaskResponse fromWithDetails(
+      Task task, String projectName, String assignedToName, String jiraUrl) {
     TaskResponse response = from(task);
 
     response.setProjectName(projectName);
     response.setAssignedToName(assignedToName);
+    response.setJiraUrl(jiraUrl);
 
     return response;
   }
