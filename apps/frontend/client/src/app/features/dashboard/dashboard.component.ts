@@ -350,7 +350,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private entryMinutes(entry: TimeEntryResponse): number {
     const start = +new Date(entry.startTime),
     end = +new Date(entry.endTime);
-    return Number.isFinite(start) && Number.isFinite(end) && end >= start ? Math.round((end - start) / 60000) : entry.durationMinutes;
+    return Number.isFinite(start) && Number.isFinite(end) && end >= start ? Math.round((end - start) / 60000) : entry.durationMinutes ?? 0;
   }
 
   private startOfDay(d: Date): Date {
