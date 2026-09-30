@@ -197,26 +197,51 @@ public class JiraAdapter implements IssueTrackerAdapter {
   @Override
   public List<IssueResponse> getIssues(
       UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
-    List<IssueResponse> issues = getIssues(workspaceMemberId);
-    List<IssueResponse> filteredIssues = new ArrayList<IssueResponse>();
 
-    for (IssueResponse issue : issues) {
+    return getLinkedIssues(workspaceMemberId, startTime, endTime);
+  }
 
-      LocalDateTime createdAt = parseJiraTimestamp(issue.getCreatedAt());
-      LocalDateTime updatedAt = parseJiraTimestamp(issue.getUpdatedAt());
+  /*
+  - using this for the project service since for this context it does not depend on the currently connected user
+  - also if there is a Jira issue that failed to be retrieved it should not stop everything else from being retrieved
+  NOTE:
+  - I am keeping tasks for the project scope
+  - the evidence is linked to the time frame
+   */
+  public List<IssueResponse> getLinkedIssues(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
-      boolean createdInRange =
-          createdAt != null && !createdAt.isBefore(startTime) && !createdAt.isAfter(endTime);
+    List<Task> linkedTasks = taskRepository.findByJiraTicketKeyIsNotNullAndIsDeletedFalse();
+    List<IssueResponse> issues = new ArrayList<>();
 
-      boolean updatedInRange =
-          updatedAt != null && !updatedAt.isBefore(startTime) && !updatedAt.isAfter(endTime);
+    for (Task task : linkedTasks) {
+      try {
+        IssueResponse issue = getIssue(workspaceMemberId, task.getJiraTicketKey());
+        // the linked account should be used to get the Jira issues
 
-      if (createdInRange || updatedInRange) {
-        filteredIssues.add(issue);
+        LocalDateTime createdAt = parseJiraTimestamp(issue.getCreatedAt());
+        LocalDateTime updatedAt = parseJiraTimestamp(issue.getUpdatedAt());
+
+        boolean createdInRange =
+            createdAt != null && !createdAt.isBefore(startTime) && !createdAt.isAfter(endTime);
+
+        boolean updatedInRange =
+            updatedAt != null && !updatedAt.isBefore(startTime) && !updatedAt.isAfter(endTime);
+
+        /*
+        - I only want issues that were active in the range that we are testing and checking
+         */
+        if (createdInRange || updatedInRange) {
+          issues.add(issue);
+        }
+
+      } catch (Exception e) {
+        log.warn(
+            "Could not retrieve linked Jira issue {}: {}", task.getJiraTicketKey(), e.getMessage());
       }
     }
 
-    return filteredIssues;
+    return issues;
   }
 
   @Override
@@ -477,6 +502,9 @@ public class JiraAdapter implements IssueTrackerAdapter {
       dto.setAssigneeEmail(getString(assignee, "emailAddress"));
       dto.setAssigneeDisplayName(getString(assignee, "displayName"));
     }
+
+    // link the Jira issue back to its local Timesheets task
+    taskRepository.findByJiraTicketKey(key).ifPresent(task -> dto.setLocalTaskId(task.getId()));
 
     return dto;
   }
