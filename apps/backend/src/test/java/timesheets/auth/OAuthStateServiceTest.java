@@ -74,5 +74,15 @@ class OAuthStateServiceTest {
 
       assertThatThrownBy(() -> service.validateState(tampered)).isInstanceOf(JwtException.class);
     }
+
+    @Test
+    @DisplayName("should reject a state signed with another secret")
+    void rejectsOtherSecret() {
+      OAuthStateService other = new OAuthStateService();
+      ReflectionTestUtils.setField(other, "secret", "another-secret-key-that-is-32-bytes-long!!");
+      String foreign = other.generateState(UUID.randomUUID(), "GITHUB");
+
+      assertThatThrownBy(() -> service.validateState(foreign)).isInstanceOf(JwtException.class);
+    }
   }
 }
