@@ -112,9 +112,6 @@ export class SuggestionsComponent implements OnInit {
     approveSuggestion(suggestion: SuggestedWorkSession): void {
     this.suggestionsService.approve(suggestion.id).subscribe({
         next: (response) => {
-        console.log('APPROVE: backend success');
-        console.log('APPROVE: response =', response);
-
         this.suggestions = this.suggestions.filter(
             (item) => item.id !== suggestion.id
         );
