@@ -75,6 +75,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       metadata.put("createdAt", issue.getCreatedAt());
       metadata.put("updatedAt", issue.getUpdatedAt());
       metadata.put("dueDate", issue.getDueDate());
+      metadata.put("title", issue.getTitle());
 
       evidenceEvent.setMetadata(metadata);
       evidenceEvents.add(evidenceEvent);
