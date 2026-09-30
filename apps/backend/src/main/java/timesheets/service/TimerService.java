@@ -5,6 +5,9 @@ import exception.BadRequestException;
 import exception.ConflictException;
 import exception.ResourceNotFoundException;
 import exception.StateConflictException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -48,6 +51,16 @@ public class TimerService {
 
   // this will start a new timer, and in our system only one timer is allowed across the entire
   // workspace
+  @Operation(
+      summary = "Start timer",
+      description = "Starts a new timer for a project and optional task.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timer started successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid timer request"),
+    @ApiResponse(responseCode = "403", description = "User does not have access to the project"),
+    @ApiResponse(responseCode = "404", description = "Project not found"),
+    @ApiResponse(responseCode = "409", description = "User already has an active timer")
+  })
   @Transactional
   public TimerSession startTimer(StartTimerRequest request) {
 
@@ -133,6 +146,11 @@ public class TimerService {
   this should pause the current running timer
   - I added the timer pause and stuff such that the timer can be resumed later
    */
+  @Operation(summary = "Pause timer", description = "Pauses the currently active timer.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timer paused successfully"),
+    @ApiResponse(responseCode = "409", description = "Timer cannot be paused")
+  })
   @Transactional
   public TimerSession pauseTimer() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
@@ -173,7 +191,11 @@ public class TimerService {
     return timerSessionRepository.save(activeTimer);
   }
 
-  // resumes a timer
+  @Operation(summary = "Resume timer", description = "Resumes the currently paused timer.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timer resumed successfully"),
+    @ApiResponse(responseCode = "409", description = "Timer cannot be resumed")
+  })
   @Transactional
   public TimerSession resumeTimer() {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
@@ -209,7 +231,13 @@ public class TimerService {
     return timerSessionRepository.save(activeTimer);
   }
 
-  // this should be if a timer is stopped and a draft timer entry is created
+  @Operation(
+      summary = "Stop timer",
+      description = "Stops the active timer and creates a time entry.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Timer stopped successfully"),
+    @ApiResponse(responseCode = "409", description = "No active timer found")
+  })
   @Transactional
   public TimeEntry stopTimer() {
 
@@ -271,6 +299,11 @@ public class TimerService {
   }
 
   // ! helper function
+  @Operation(summary = "Get active timer", description = "Gets the currently active timer.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Active timer retrieved successfully"),
+    @ApiResponse(responseCode = "204", description = "No active timer found")
+  })
   public TimerSession getActiveTimer() {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
@@ -291,6 +324,13 @@ public class TimerService {
   }
 
   // ! we want our users to be able to discard a timer without without it creating a time entry
+  @Operation(
+      summary = "Discard timer",
+      description = "Discards the active timer without creating a time entry.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Timer discarded successfully"),
+    @ApiResponse(responseCode = "404", description = "No active timer found")
+  })
   @Transactional
   public void discardTimer() {
 

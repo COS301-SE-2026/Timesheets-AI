@@ -121,37 +121,52 @@ public class JiraOAuthService {
     }
   }
 
-  // Retrieve the Atlassian Cloud ID for Jira site accessible to the authenticated user
-  // The Cloud ID is required when making Jira REST API requests through api.atlassian.com
-
+  // retrieves the cloud ID for the connected Jira site
+  // the cloud ID is used when making Jira API requests
   public String getCloudID(String accessToken) {
-    // create HTTP headers for the request
-    HttpHeaders headers = new HttpHeaders();
+    JsonNode resource = getJiraResource(accessToken);
 
-    // add oauth access token using bearer authentication
+    if (!resource.has("id") || resource.get("id").isNull()) {
+      throw new RuntimeException("Jira cloud ID was not returned by Atlassian.");
+    }
+
+    return resource.get("id").asText();
+  }
+
+  // retrieves the browser URL for the connected Jira site
+  // this is used when creating links that users can open in Jira
+  public String getSiteUrl(String accessToken) {
+    JsonNode resource = getJiraResource(accessToken);
+
+    if (!resource.has("url") || resource.get("url").isNull()) {
+      throw new RuntimeException("Jira site URL was not returned by Atlassian.");
+    }
+
+    return resource.get("url").asText();
+  }
+
+  // gets the Jira site connected to the authenticated Atlassian account
+  private JsonNode getJiraResource(String accessToken) {
+
+    HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(accessToken);
 
-    // create an HTTP request containing only the headers
-    HttpEntity<Void> request = new HttpEntity<Void>(headers);
-
-    // request list of cloud resources available to the authenticated user
+    HttpEntity<Void> request = new HttpEntity<>(headers);
 
     ResponseEntity<String> response =
         restTemplate.exchange(RESOURCES_URL, HttpMethod.GET, request, String.class);
 
     try {
-      // parse the array
       JsonNode resources = objectMapper.readTree(response.getBody());
 
-      // ensure that there is at least one resources found
-
-      if (!resources.isArray() || resources.size() == 0) {
-        throw new RuntimeException("No Jira resources are availiable for this account.");
+      if (!resources.isArray() || resources.isEmpty()) {
+        throw new RuntimeException("No Jira resources are available for this account.");
       }
 
-      return resources.get(0).get("id").asText();
+      return resources.get(0);
+
     } catch (Exception e) {
-      throw new RuntimeException("Failed to retrieve Jira cloud ID", e);
+      throw new RuntimeException("Failed to retrieve Jira resource", e);
     }
   }
 
