@@ -11,6 +11,7 @@
 
 export const PROJECT_FILTERS: string[] = [
   'All',
+  'My projects',
   'Active',
   'On Hold',
   'Completed',

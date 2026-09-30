@@ -3,17 +3,25 @@
 // Purpose: Settings page styling matched to the approved
 //  the wireframe
 
-$page-bg: #f7f8fb;
+$page-bg: #f8fafc;
 $card-bg: #ffffff;
-$card-border: #e7e9f0;
-$text-title: #0f172a;
-$text-body: #334155;
-$text-muted: #6b7280;
+$card-border: #e5eaf2;
+$text-title: #172033;
+$text-body: #475569;
+$text-muted: #7b879b;
 $primary: #2563eb;
-$primary-light: #eaf1fe;
+$primary-light: #eaf2ff;
+$primary-dark: #1d4ed8;
+
 $green: #16a34a;
+$green-light: #eaf8ef;
 $red: #dc2626;
 $red-bg: #fdecec;
+$red-light: #fff0f0;
+$purple: #7c3aed;
+$purple-light: #f1ebff;
+$orange: #ea580c;
+$orange-light: #fff4e8;
 
 // SETTINGS ARE
 .settings-page{
@@ -23,74 +31,89 @@ $red-bg: #fdecec;
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 24px 32px 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    margin-bottom: 18px;
+    padding: 34px 42px 48px;
     box-sizing: border-box;
 }
 
 // HEADEING AREA
 .settings-header{
-    margin-bottom: 10px;
+    margin-bottom: 28px;
 
     h1{
         margin: 0;
-        font-size: 26px;
+        font-size: 32px;
         font-weight: 700;
+        letter-spacing: -0.5px;
         color: $text-title;
+        line-height: 1.2;
     }
 
     p{
-        margin: 5px 0 0;
-        font-size: 14px;
+        margin: 8px 0 0;
+        font-size: 15px;
+        line-height: 1.5;
         color: $text-muted;
     }
 }
 
 // SETTINGS CARDS
 .settings-card{
+    width: 100%;
     background: $card-bg;
     border: 1px solid $card-border;
     border-radius: 14px;
 
     display: grid;
-    grid-template-columns: 68px 260px minmax(0, 1fr);
+    grid-template-columns: 76px 270px minmax(0, 1fr);
     column-gap: 16px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02),
+                0 8px 24px rgba(15, 23, 42, 0.025);
+    margin-bottom: 18px;
+    background: $card-bg;
+    border: 1px solid $card-border;
     overflow: hidden;
 
     // CARDS ICONS
     .card-icon{
+        transition: border-color 0.2s ease,
+                    box-shadow 0.2s ease;
+
+        &:hover{
+            border-color: #dce3ee;
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.03),
+                0 10px 28px rgba(15, 23, 42, 0.035);
+        }
+
         grid-column: 1;
         grid-row: 1;
         width: 48px;
         height: 48px;
-        margin-top: 14px;
-        border-radius: 14px;
+        margin:  20px 0 0 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 19px;
+        border-radius: 14px;
         flex-shrink: 0;
 
         &.security{
-            background: #e6f0fe;
-            color: #1e40af;
+            background: $primary-light;
+            color: $primary;
         }
 
         &.integrations{
-            background: #efeafe;
-            color: #7c3aed;
+            background: $purple-light;
+            color: $purple;
         }
 
         &.notifications{
-            background: #fef3e0;
-            color: #b45309;
+            background: $orange-light;
+            color: $orange;
         }
 
         &.danger{
-            background: $red-bg;
+            background: $red-light;
             color: $red;
         }
 
@@ -101,17 +124,21 @@ $red-bg: #fdecec;
         grid-column: 2;
         grid-row: 1;
 
-        padding: 16px 20px 16px 0;
+        padding: 22px 20px 22px 4px;
 
         h2{
             margin: 0;
-            font-size: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-size: 17px;
             font-weight: 700;
             color: $text-title;
+            line-height: 1.35;
         }
 
         p{
-            margin: 6px 0 0;
+            margin: 7px 0 0;
             font-size: 14px;
             color: $text-muted;
             line-height: 1.5;
@@ -127,7 +154,7 @@ $red-bg: #fdecec;
         flex-direction: column;
         justify-content: center;
         border-left: 1px solid $card-border;
-        padding: 0 20px 0 24px;
+        padding: 10px 24px 10px 28px;
     }
 }
 
@@ -136,12 +163,13 @@ $red-bg: #fdecec;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
-    min-height: 64px;
-    padding: 10px 0;
+    gap: 24px;
+    min-height: 66px;
+    padding: 12px 0;
+    box-sizing: border-box;
 
     &:not(:last-child){
-        border-bottom: 1px solid #f0f1f4;
+        border-bottom: 1px solid #eef1f5;
     }
 }
 
@@ -153,14 +181,13 @@ $red-bg: #fdecec;
         display: block;
         font-size: 14px;
         font-weight: 600;
-
         color: $text-title;
     }
 
     p{
-        margin: 3px 0 0;
+        margin: 4px 0 0;
         font-size: 13px;
-        line-height: 1.4;
+        line-height: 1.45;
         color: $text-muted;
     }
 }
@@ -169,60 +196,72 @@ $red-bg: #fdecec;
 .setting-control{
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     flex-shrink: 0;
 }
 
 // PASSWORD
 .password-dots{
     letter-spacing: 3px;
-    color: $text-muted;
-    font-size: 15px;
+    color: #8994a7;
+    font-size: 14px;
 }
 
 // TOGGLE LABEL
 .toggle-label{
     font-size: 13px;
     color: $text-muted;
-    min-width: 55px;
+    min-width: 58px;
     font-weight: 500;
 }
 
 // SECONDARY BUTTONS
 .secondary-button{
-    padding: 8px 28px;
+    min-width: 104px;
+    padding: 9px 20px;
 
-    border: 1px solid $card-border;
+    border: 1px solid #dfe5ee;
     background: #ffffff;
 
-    border-radius: 8px;
+    border-radius: 9px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    color: $text-title;
-    transition: background 0.2s ease, border-color 0.2s ease;
 
     &:hover{
+        transition: 
+                    background 0.2s ease,
+                    border-color 0.2s ease,
+                    box-shadow 0.2s ease;
         background: #f8fafc;
-        border-color: #d7dae3;
+        border-color: #cfd7e3;
+        box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
+    }
+
+    &:active{
+        background: #f1f5f9;
     }
 }
 
 // DELETION AREA BUTTON
 .danger-button{
-    padding: 9px 18px;
-    border: 1px solid #f3b4b4;
+    min-width: 142px;
+    padding: 10px 18px;
+    border: 1px solid #f3b8b8;
     background: #ffffff;
 
     color: $red;
-    border-radius: 8px;
+    border-radius: 9px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease;
-
+    
     &:hover{
-        background: $red-bg;
+        transition: 
+                    background 0.2s ease,
+                    border-color 0.2s ease;
+        background: $red-light;
+        border-color: #ef9b9b;
     }
 }
 
