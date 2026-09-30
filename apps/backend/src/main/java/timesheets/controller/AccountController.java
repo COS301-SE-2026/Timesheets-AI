@@ -1,5 +1,8 @@
 package timesheets.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +22,18 @@ public class AccountController {
 
   private final AccountService accountService;
 
-  // user requests for account deletion
+  @Operation(
+      summary = "Request account deletion",
+      description = "Submits an account deletion request for the authenticated user.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "202",
+        description = "Account deletion request submitted successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid account deletion request"),
+    @ApiResponse(responseCode = "401", description = "User is not authenticated"),
+    @ApiResponse(responseCode = "404", description = "User not found"),
+    @ApiResponse(responseCode = "409", description = "Account deletion request cannot be processed")
+  })
   @PostMapping("/deletion/request")
   public ResponseEntity<MessageResponse> requestDeletion(
       @Valid @RequestBody AccountDeletionRequest.Request request) {

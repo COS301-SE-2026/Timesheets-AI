@@ -23,6 +23,7 @@ import timesheets.dto.request.UpdateTaskRequest;
 import timesheets.dto.response.IssueResponse;
 import timesheets.dto.response.TaskResponse;
 import timesheets.integration.issue.JiraAdapter;
+import timesheets.repository.IntegrationTokenRepository;
 import timesheets.repository.ProjectMemberRepository;
 import timesheets.repository.ProjectRepository;
 import timesheets.repository.TaskRepository;
@@ -42,6 +43,7 @@ public class TaskService {
   private final WorkspaceMemberRepository workspaceMemberRepository;
   private final UserRepository userRepository;
   private final JiraAdapter jiraAdapter;
+  private final IntegrationTokenRepository integrationTokenRepository;
 
   // this gets all the active tasks of a project - only if the user has access to
   // that project
@@ -64,7 +66,8 @@ public class TaskService {
         .map(
             task -> {
               String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
-              return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+              String jiraUrl = getJiraUrl(task, workspaceMemberId);
+              return TaskResponse.fromWithDetails(task, projectName, assignedToName, jiraUrl);
             })
         .collect(Collectors.toList());
   }
@@ -88,7 +91,9 @@ public class TaskService {
 
     String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
 
-    return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+    String jiraUrl = getJiraUrl(task, workspaceMemberId);
+
+    return TaskResponse.fromWithDetails(task, projectName, assignedToName, jiraUrl);
   }
 
   // this gets the task by the id - internal entity
@@ -119,7 +124,8 @@ public class TaskService {
 
               String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
 
-              return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+              String jiraUrl = getJiraUrl(task, workspaceMemberId);
+              return TaskResponse.fromWithDetails(task, projectName, assignedToName, jiraUrl);
             })
         .collect(Collectors.toList());
   }
@@ -270,8 +276,9 @@ public class TaskService {
 
     String projectName = project.getName();
     String assignedToName = getAssignedToName(savedTask.getAssignedWorkspaceMemberId());
+    String jiraUrl = getJiraUrl(savedTask, workspaceMemberId);
 
-    return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName);
+    return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName, jiraUrl);
   }
 
   // updates the editable fields of an existing task
@@ -361,8 +368,9 @@ public class TaskService {
             .map(Project::getName)
             .orElse("Unknown Project");
     String assignedToName = getAssignedToName(savedTask.getAssignedWorkspaceMemberId());
+    String jiraUrl = getJiraUrl(savedTask, workspaceMemberId);
 
-    return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName);
+    return TaskResponse.fromWithDetails(savedTask, projectName, assignedToName, jiraUrl);
   }
 
   @Transactional(readOnly = true)
@@ -395,10 +403,30 @@ public class TaskService {
                       .orElse("Unknown Project");
 
               String assignedToName = getAssignedToName(task.getAssignedWorkspaceMemberId());
+              String jiraUrl = getJiraUrl(task, workspaceMemberId);
 
-              return TaskResponse.fromWithDetails(task, projectName, assignedToName);
+              return TaskResponse.fromWithDetails(task, projectName, assignedToName, jiraUrl);
             })
         .collect(Collectors.toList());
+  }
+
+  /*
+  - creates the browser link for a Jira ticket
+  - the Jira site URL belongs to the connected Jira account
+  - if Jira is not connected or the task has no Jira ticket, there is no link
+  */
+  private String getJiraUrl(Task task, UUID workspaceMemberId) {
+
+    if (task.getJiraTicketKey() == null || task.getJiraTicketKey().isBlank()) {
+      return null;
+    }
+
+    return integrationTokenRepository
+        .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "JIRA")
+        .map(token -> token.getProviderSiteUrl())
+        .filter(siteUrl -> siteUrl != null && !siteUrl.isBlank())
+        .map(siteUrl -> siteUrl.replaceAll("/+$", "") + "/browse/" + task.getJiraTicketKey())
+        .orElse(null);
   }
 
   // ! helper functions
