@@ -43,4 +43,17 @@ class OAuthStateServiceTest {
       assertThat(a).isNotEqualTo(b);
     }
   }
+
+  @Nested
+  @DisplayName("validateState")
+  class ValidateStateTests {
+
+    @Test
+    @DisplayName("should accept a state it generated")
+    void acceptsOwnState() {
+      String state = service.generateState(UUID.randomUUID(), "JIRA", "/settings");
+
+      assertThat(service.validateState(state)).isNotNull();
+    }
+  }
 }
