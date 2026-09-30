@@ -43,8 +43,8 @@ import timesheets.evidence.EvidenceEvent;
 @Service
 public class EvidenceCorrelationService {
   // this is for temporal correlation - max time
-  private static final long MAX_SESSION_GAP_MINUTES = 120;
-  private static final double MIN_CORRELATION_THRESHOLD = 0.40;
+  private static final long MAX_SESSION_GAP_MINUTES = 240;
+  private static final double MIN_CORRELATION_THRESHOLD = 0.30;
 
   // create a lists of evidene events for a specific member into clustered evidence groups
   public List<EvidenceGroup> correlate(UUID workspaceMemberId, List<EvidenceEvent> evidenceEvents) {

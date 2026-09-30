@@ -57,7 +57,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       }
 
       evidenceEvent.setTimestamp(timestamp);
-      evidenceEvent.setDescription(issue.getTitle());
+      // evidenceEvent.setDescription(issue.getTitle());
       evidenceEvent.setTaskId(issue.getLocalTaskId());
       evidenceEvent.setProjectId(issue.getLocalProjectId());
 
