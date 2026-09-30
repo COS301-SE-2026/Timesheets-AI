@@ -228,6 +228,9 @@ public class IntegrationController {
     // get cloud id associated with the token
     String cloudId = jiraOAuthService.getCloudID(tokenResponse.getAccessToken());
 
+    // get the actual Jira site URL used for browser links
+    String siteUrl = jiraOAuthService.getSiteUrl(tokenResponse.getAccessToken());
+
     // calculate when the access token expires
     LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn());
 
@@ -246,6 +249,7 @@ public class IntegrationController {
     integrationToken.setWorkspaceMemberId(workspaceMemberId);
     integrationToken.setProvider("JIRA");
     integrationToken.setProviderResourceId(cloudId);
+    integrationToken.setProviderSiteUrl(siteUrl);
     integrationToken.setAccessToken(tokenResponse.getAccessToken());
     integrationToken.setExpiresAt(expiresAt);
 
@@ -280,18 +284,36 @@ public class IntegrationController {
     return ResponseEntity.ok(issue);
   }
 
-  // mirrors GET /api/calendar/status so the frontend can check the jira connection the same way
+  // returns the current Jira connection state for the signed-in workspace member
   public record IntegrationStatus(boolean connected, String provider) {}
 
   @GetMapping("/jira/status")
   public ResponseEntity<IntegrationStatus> getJiraStatus() {
+
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
-    // a stored token row means the user finished the oauth flow
-    boolean connected =
-        integrationTokenRepository
-            .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "JIRA")
-            .isPresent();
+    Optional<IntegrationToken> jiraToken =
+        integrationTokenRepository.findByWorkspaceMemberIdAndProvider(workspaceMemberId, "JIRA");
+
+    boolean connected = false;
+
+    if (jiraToken.isPresent()) {
+
+      IntegrationToken token = jiraToken.get();
+
+      /*
+      - Jira is only treated as connected when the OAuth connection has all the information needed by the integration
+      - providerResourceId is the Jira cloud ID used for API requests
+      - providerSiteUrl is the Jira site used for browser links
+      */
+      connected =
+          token.getAccessToken() != null
+              && !token.getAccessToken().isBlank()
+              && token.getProviderResourceId() != null
+              && !token.getProviderResourceId().isBlank()
+              && token.getProviderSiteUrl() != null
+              && !token.getProviderSiteUrl().isBlank();
+    }
 
     return ResponseEntity.ok(new IntegrationStatus(connected, connected ? "jira" : null));
   }
