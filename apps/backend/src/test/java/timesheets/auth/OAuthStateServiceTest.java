@@ -55,5 +55,13 @@ class OAuthStateServiceTest {
 
       assertThat(service.validateState(state)).isNotNull();
     }
+
+    @Test
+    @DisplayName("should accept a state without a return path")
+    void acceptsStateWithoutReturnPath() {
+      String state = service.generateState(UUID.randomUUID(), "JIRA");
+
+      assertThat(service.validateState(state)).isNotNull();
+    }
   }
 }
