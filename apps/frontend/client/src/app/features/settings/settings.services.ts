@@ -6,8 +6,8 @@
 
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable, of, delay, forkJoin, map, catchError, throwError } from "rxjs";
-import { UserSettings, IntegrationStatus, ChangePasswordRequest, ChangePasswordResponse, MessageResponse, MfaSetupResponse } from "./settings.model";
+import { Observable, of, forkJoin, map, catchError, throwError } from "rxjs";
+import { UserSettings, ChangePasswordRequest, ChangePasswordResponse, MessageResponse, MfaSetupResponse } from "./settings.model";
 
 
 @Injectable({ providedIn: 'root'})
@@ -25,7 +25,7 @@ export class SettingsService{
         integrations:[
             {
                 id: 'github',
-                name: 'Github',
+                name: 'GitHub',
                 description: 'Sync pull requests, commits and repositories.',
                 icon: 'fa-brands fa-github',
                 connected: true,
@@ -40,8 +40,8 @@ export class SettingsService{
             {
                 id: 'calendar',
                 name: 'Calendar',
-                description: 'Sync your calendar events and avaiability.',
-                icon: 'fa-brands fa-calendar',
+                description: 'Sync your calendar events and availability.',
+                icon: 'fa-brands fa-calendar-days',
                 connected: true,
             },
         ],
@@ -66,17 +66,22 @@ export class SettingsService{
             jira: this.isConnected('api/integration/jira/status'),
             calendar: this.isConnected('api/calendar/status'),
         }).pipe(
-            map(({ github, jira, calendar})=>({
-                ...this.mockSettings,
-                security: { mfaEnabled},
-                integrations:this.mockSettings.integrations.map((i)=>({
-                    ...i,
-                    connected:
-                        i.id=== 'github'? github: i.id=== 'jira'? jira: calendar,
-                })
-                ),
+            map(({ github, jira, calendar})=>{
+                const connectionStatus: Record<string, boolean>={
+                    github,
+                    jira,
+                    calendar,
+                };
+                return{
+                    ...this.mockSettings,
+                    security: { mfaEnabled},
+                    integrations:this.mockSettings.integrations.map((i)=>({
+                        ...i,
+                        connected: connectionStatus[i.id]?? false,
+                    })),
+                };
+                
             })
-            )
         );
     }
 
@@ -84,6 +89,36 @@ export class SettingsService{
         return this.http.get<{ connected: boolean }>(url).pipe(
             map((res)=> res.connected), catchError(()=>of(false))
         )
+    }
+
+    getConnectUrl(
+        integrationId: string,
+        calendarProvider: 'google' | 'microsoft' = 'google'
+    ): Observable<string>{
+        const urls: Record<string, string>={
+            github: 'api/integration/github/connect',
+            jira: 'api/integration/jira/connect',
+            calendar: 'api/integrations/google/calendar/connect',
+        };
+
+        if(integrationId=== 'calendar' && calendarProvider=== 'microsoft'){
+            urls['calendar']= 'api/integrations/microsoft/calendar/connect';
+        }
+
+        const url=urls[integrationId];
+        if(!url){
+            return throwError(()=> new Error(`Unknown integration: ${integrationId}`));
+        }
+
+        if(integrationId=== 'github'){
+            return this.http.get(url, {
+                responseType: 'text',
+                params:{
+                    returnPath: '/settings',
+                },
+            });
+        }
+        return this.http.get(url, { responseType: 'text'});
     }
 
     getMfaSetup(): Observable<MfaSetupResponse>{
