@@ -834,6 +834,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Verify email",
+        "description": "Verifies the user's email using a verification token.",
         "operationId": "verifyEmail",
         "parameters": [
           {
@@ -847,7 +849,17 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Email verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired verification token",
             "content": {
               "*/*": {
                 "schema": {
@@ -864,6 +876,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Reset password",
+        "description": "Resets the user's password using a reset token.",
         "operationId": "resetPassword",
         "requestBody": {
           "content": {
@@ -877,7 +891,17 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Password reset successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid password reset request",
             "content": {
               "*/*": {
                 "schema": {
@@ -894,6 +918,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Register user",
+        "description": "Registers a new user account and sends an email verification link.",
         "operationId": "register",
         "requestBody": {
           "content": {
@@ -906,8 +932,18 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK",
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid registration request",
             "content": {
               "*/*": {
                 "schema": {
@@ -924,6 +960,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Microsoft authentication",
+        "description": "Authenticates a user using their Microsoft account.",
         "operationId": "microsoftAuth",
         "requestBody": {
           "content": {
@@ -937,7 +975,17 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Microsoft authentication successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Microsoft authentication failed",
             "content": {
               "*/*": {
                 "schema": {
@@ -954,6 +1002,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Verify MFA",
+        "description": "Verifies the MFA code and enables MFA for the user.",
         "operationId": "verifyMfa",
         "requestBody": {
           "content": {
@@ -967,7 +1017,17 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "MFA enabled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid MFA code",
             "content": {
               "*/*": {
                 "schema": {
@@ -984,6 +1044,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Verify MFA login",
+        "description": "Verifies the MFA code and completes the login.",
         "operationId": "verifyMfaLogin",
         "requestBody": {
           "content": {
@@ -997,7 +1059,17 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "MFA login verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired MFA challenge",
             "content": {
               "*/*": {
                 "schema": {
@@ -1014,6 +1086,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Disable MFA",
+        "description": "Disables MFA for the authenticated user.",
         "operationId": "disableMfa",
         "requestBody": {
           "content": {
@@ -1027,7 +1101,17 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "MFA disabled successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid password",
             "content": {
               "*/*": {
                 "schema": {
@@ -1044,6 +1128,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Log out",
+        "description": "Logs out the authenticated user.",
         "operationId": "logout",
         "parameters": [
           {
@@ -1056,8 +1142,11 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "204": {
+            "description": "Logout successful"
+          },
+          "401": {
+            "description": "User is not authenticated"
           }
         }
       }
@@ -1067,6 +1156,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Log in",
+        "description": "Authenticates a user using their email and password.",
         "operationId": "login",
         "requestBody": {
           "content": {
@@ -1080,7 +1171,17 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
             "content": {
               "*/*": {
                 "schema": {
@@ -1097,6 +1198,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Google authentication",
+        "description": "Authenticates a user using their Google account.",
         "operationId": "googleAuth",
         "requestBody": {
           "content": {
@@ -1110,7 +1213,17 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Google authentication successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Google authentication failed",
             "content": {
               "*/*": {
                 "schema": {
@@ -1127,6 +1240,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Forgot password",
+        "description": "Sends a password reset link if the account exists.",
         "operationId": "forgotPassword",
         "requestBody": {
           "content": {
@@ -1140,9 +1255,9 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Password reset request processed",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponse"
                 }
@@ -1157,6 +1272,8 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Change password",
+        "description": "Changes the password of the authenticated user.",
         "operationId": "changePassword",
         "requestBody": {
           "content": {
@@ -1170,7 +1287,17 @@
         },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Password changed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid password",
             "content": {
               "*/*": {
                 "schema": {
@@ -2891,10 +3018,22 @@
         "tags": [
           "auth-controller"
         ],
+        "summary": "Set up MFA",
+        "description": "Generates MFA setup information for the authenticated user.",
         "operationId": "setupMfa",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "MFA setup generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MfaSetupResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User is not authenticated",
             "content": {
               "*/*": {
                 "schema": {
