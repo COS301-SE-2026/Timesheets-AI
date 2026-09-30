@@ -326,7 +326,7 @@ public class InsightsService {
                 });
 
     ticket.setProjectId(projectId);
-    ticket.setSummary(issue.getTitle());
+    ticket.setSummary(issue.getSummary());
     ticket.setJiraStatus(issue.getStatus());
     ticket.setIssueType(issue.getIssueType());
     ticket.setLastSynced(LocalDateTime.now());
