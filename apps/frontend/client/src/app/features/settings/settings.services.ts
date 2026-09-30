@@ -6,7 +6,7 @@
 
 import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable, of, delay } from "rxjs";
+import { Observable, of, delay, forkJoin, map, catchError, throwError } from "rxjs";
 import { UserSettings, IntegrationStatus, ChangePasswordRequest, ChangePasswordResponse, MessageResponse, MfaSetupResponse } from "./settings.model";
 
 
@@ -64,7 +64,29 @@ export class SettingsService{
     }
 
     getSettings(mfaEnabled: boolean): Observable<UserSettings>{
-        return of({...this.mockSettings, security:{mfaEnabled}}).pipe(delay(200));
+        return forkJoin({
+            github: this.isConnected('api/integration/github/status'),
+            jira: this.isConnected('api/integration/jira/status'),
+            calendar: this.isConnected('api/calendar/status'),
+        }).pipe(
+            map(({ github, jira, calendar})=>({
+                ...this.mockSettings,
+                security: { mfaEnabled},
+                integrations:this.mockSettings.integrations.map((i)=>({
+                    ...i,
+                    connected:
+                        i.id=== 'github'? github: i.id=== 'jira'? jira: calendar,
+                })
+                ),
+            })
+            )
+        );
+    }
+
+    private isConnected(url: string): Observable<boolean>{
+        return this.http.get<{ connected: boolean }>(url).pipe(
+            map((res)=> res.connected), catchError(()=>of(false))
+        )
     }
 
     getMfaSetup(): Observable<MfaSetupResponse>{
@@ -85,20 +107,6 @@ export class SettingsService{
             `${this.authUrl}/mfa/disable`,
             { password }
         );
-    }
-
-    toggleIntegration(integrationId: string, enabled: boolean): Observable<IntegrationStatus>{
-        const integration=this.mockSettings.integrations.find(
-            (i)=> i.id=== integrationId
-        );
-
-        if(integration) integration.enabled= enabled;
-
-        return of(integration as IntegrationStatus).pipe(delay(150));
-    }
-
-    requestIntegration(): Observable<void>{
-        return of(void 0).pipe(delay(150));
     }
 
     requestAccountDeletion(reason: string): Observable<MessageResponse>{
