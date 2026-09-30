@@ -108,6 +108,44 @@
             "description": "OK"
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "time-entry-controller"
+        ],
+        "operationId": "patchTimeEntry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimeEntryPatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeEntryResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/timesheets/{id}/submit": {
@@ -175,6 +213,37 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/TimesheetResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/timesheets/{id}/manager-assistant-review": {
+      "post": {
+        "tags": [
+          "manager-assistant-controller"
+        ],
+        "operationId": "generateReview",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManagerAssistantReview"
                 }
               }
             }
@@ -333,6 +402,36 @@
         }
       }
     },
+    "/api/teams/members": {
+      "post": {
+        "tags": [
+          "team-controller"
+        ],
+        "operationId": "assignUserToWorkspace",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignWorkspaceMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceMemberResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/tasks": {
       "post": {
         "tags": [
@@ -407,6 +506,86 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectId}/members": {
+      "post": {
+        "tags": [
+          "project-controller"
+        ],
+        "operationId": "assignMemberToProject",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignProjectMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectMemberResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectId}/forecast/sync": {
+      "post": {
+        "tags": [
+          "project-controller"
+        ],
+        "operationId": "syncProjectForecast",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectForecastResponse"
                 }
               }
             }
@@ -598,6 +777,58 @@
         }
       }
     },
+    "/api/integrations/github/sync": {
+      "post": {
+        "tags": [
+          "git-hub-integration-controller"
+        ],
+        "operationId": "sync",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/insights/generate": {
+      "post": {
+        "tags": [
+          "insights-controller"
+        ],
+        "operationId": "generateInsights",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateInsightsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/verify-email": {
       "post": {
         "tags": [
@@ -614,6 +845,36 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "resetPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Reset"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -651,6 +912,126 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/microsoft": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "microsoftAuth",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MicrosoftAuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/mfa/verify": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "verifyMfa",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/mfa/login/verify": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "verifyMfaLogin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaLoginVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/mfa/disable": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "disableMfa",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaDisableRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
                 }
               }
             }
@@ -741,6 +1122,343 @@
         }
       }
     },
+    "/api/auth/forgot-password": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "forgotPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Forgot"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/change-password": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "changePassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Change"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/deletion/request": {
+      "post": {
+        "tags": [
+          "account-controller"
+        ],
+        "summary": "Request account deletion",
+        "description": "Submits an account deletion request for the authenticated user. The request is sent for administrative review before the account is deleted.",
+        "operationId": "requestDeletion",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Account deletion request submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "Account deletion request submitted successfully. An admin will review your request."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid account deletion request",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "401": {
+            "description": "Authentication is required to request account deletion",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{taskId}": {
+      "get": {
+        "tags": [
+          "task-controller"
+        ],
+        "operationId": "getTaskById",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "task-controller"
+        ],
+        "operationId": "updateTask",
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTask"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectId}": {
+      "get": {
+        "tags": [
+          "project-controller"
+        ],
+        "operationId": "getProjectDetail",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "project-controller"
+        ],
+        "operationId": "deleteProject",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "project-controller"
+        ],
+        "operationId": "patchProject",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProjectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{projectId}/archive": {
+      "patch": {
+        "tags": [
+          "project-controller"
+        ],
+        "operationId": "archiveProject",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/notifications/{notificationId}/read": {
+      "patch": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "markAsRead",
+        "parameters": [
+          {
+            "name": "notificationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/read-all": {
+      "patch": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "markAllAsRead",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/leave-requests/{id}": {
       "get": {
         "tags": [
@@ -811,6 +1529,37 @@
         }
       }
     },
+    "/api/insights/{id}/resolve": {
+      "patch": {
+        "tags": [
+          "insights-controller"
+        ],
+        "operationId": "resolveInsight",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolveInsightResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/timesheets/{id}": {
       "get": {
         "tags": [
@@ -868,6 +1617,85 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/TimeEntryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/timesheets/workspace": {
+      "get": {
+        "tags": [
+          "timesheet-controller"
+        ],
+        "operationId": "getWorkspaceTimesheets",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimesheetResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/timesheets/workspace/status/{status}": {
+      "get": {
+        "tags": [
+          "timesheet-controller"
+        ],
+        "operationId": "getWorkspaceTimesheetsByStatus",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimesheetResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/timesheets/workspace/pending": {
+      "get": {
+        "tags": [
+          "timesheet-controller"
+        ],
+        "operationId": "getPendingWorkspaceTimesheets",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimesheetResponse"
                   }
                 }
               }
@@ -975,30 +1803,45 @@
         }
       }
     },
-    "/api/tasks/{taskId}": {
+    "/api/teams/members/available": {
       "get": {
         "tags": [
-          "task-controller"
+          "team-controller"
         ],
-        "operationId": "getTaskById",
-        "parameters": [
-          {
-            "name": "taskId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
+        "operationId": "getAvailableUsers",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/TaskResponse"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AvailableUserResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/team-tasks": {
+      "get": {
+        "tags": [
+          "task-controller"
+        ],
+        "operationId": "getTeamTasks",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaskResponse"
+                  }
                 }
               }
             }
@@ -1103,12 +1946,12 @@
         }
       }
     },
-    "/api/projects/{projectId}": {
+    "/api/projects/{projectId}/forecast": {
       "get": {
         "tags": [
           "project-controller"
         ],
-        "operationId": "getProjectDetail",
+        "operationId": "getProjectForecast",
         "parameters": [
           {
             "name": "projectId",
@@ -1126,7 +1969,123 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProjectDetailResponse"
+                  "$ref": "#/components/schemas/SavedProjectForecastResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/project-forecast/{projectId}/evidence": {
+      "get": {
+        "tags": [
+          "project-forecast-evidence-controller"
+        ],
+        "operationId": "getProjectEvidence",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "startTime",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectForecastEvidenceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications": {
+      "get": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "getMyNotifications",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/unread": {
+      "get": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "getMyUnreadNotifications",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/unread/count": {
+      "get": {
+        "tags": [
+          "notification-controller"
+        ],
+        "operationId": "getMyUnreadCount",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
                 }
               }
             }
@@ -1200,6 +2159,437 @@
         }
       }
     },
+    "/api/integrations/microsoft/calendar/connect": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "connectMicrosoftCalendar",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/microsoft/calendar/callback": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "microsoftCalendarCallback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integrations/jira/vs-logged": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "getJiraVsLogged",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JiraVsLoggedRow"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/jira/tickets-breakdown": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "getJiraTicketsBreakdown",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/JiraTicketsBreakdownResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/jira/status": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "getJiraStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/jira/issues": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "getJiraIssues",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IssueResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/jira/issues/{issueKey}": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "getJiraIssue",
+        "parameters": [
+          {
+            "name": "issueKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssueResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/jira/connect": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "connectJira",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/jira/callback": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "jiraCallback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/google/calendar/connect": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "connectGoogleCalender",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/google/calendar/callback": {
+      "get": {
+        "tags": [
+          "integration-controller"
+        ],
+        "operationId": "googleCalendarCallBack",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integrations/github/status": {
+      "get": {
+        "tags": [
+          "git-hub-integration-controller"
+        ],
+        "operationId": "getStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntegrationStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/github/connect": {
+      "get": {
+        "tags": [
+          "git-hub-integration-controller"
+        ],
+        "operationId": "connect",
+        "parameters": [
+          {
+            "name": "returnPath",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/github/commits": {
+      "get": {
+        "tags": [
+          "git-hub-integration-controller"
+        ],
+        "operationId": "getCommits",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GitCommitActivity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/integrations/github/callback": {
+      "get": {
+        "tags": [
+          "git-hub-integration-controller"
+        ],
+        "operationId": "callback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/insights/weekly-summary/team": {
+      "get": {
+        "tags": [
+          "insights-controller"
+        ],
+        "operationId": "getTeamWeeklySummary",
+        "parameters": [
+          {
+            "name": "weekStart",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklySummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/insights/summary": {
       "get": {
         "tags": [
@@ -1240,12 +2630,345 @@
         }
       }
     },
+    "/api/insights/my-projects": {
+      "get": {
+        "tags": [
+          "insights-controller"
+        ],
+        "operationId": "getMyProjects",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DeveloperProjectResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/insights/me": {
+      "get": {
+        "tags": [
+          "insights-controller"
+        ],
+        "operationId": "getCurrentMember",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentMemberResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/insights/manager-dashboard": {
+      "get": {
+        "tags": [
+          "insights-controller"
+        ],
+        "operationId": "getManagerDashboard",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "8w"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManagerDashboardResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/insights/ai": {
+      "get": {
+        "tags": [
+          "insights-controller"
+        ],
+        "operationId": "getAiDashboard",
+        "parameters": [
+          {
+            "name": "includeResolved",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "8w"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiDashboardResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/calendar/vs-tracked": {
+      "get": {
+        "tags": [
+          "calendar-controller"
+        ],
+        "operationId": "getVsTracked",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarVsTrackedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/calendar/status": {
+      "get": {
+        "tags": [
+          "calendar-controller"
+        ],
+        "operationId": "getStatus_1",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/calendar/events": {
+      "get": {
+        "tags": [
+          "calendar-controller"
+        ],
+        "operationId": "getEvents",
+        "parameters": [
+          {
+            "name": "startTime",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "endTime",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CalendarEvent"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/calendar/events/{externalEventId}": {
+      "get": {
+        "tags": [
+          "calendar-controller"
+        ],
+        "operationId": "getEvent",
+        "parameters": [
+          {
+            "name": "externalEventId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarEvent"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/mfa/setup": {
+      "get": {
+        "tags": [
+          "auth-controller"
+        ],
+        "operationId": "setupMfa",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MfaSetupResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/timers/discard": {
       "delete": {
         "tags": [
           "timer-controller"
         ],
         "operationId": "discardTimer",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/teams/members/{workspaceMemberId}": {
+      "delete": {
+        "tags": [
+          "team-controller"
+        ],
+        "operationId": "removeUserFromWorkspace",
+        "parameters": [
+          {
+            "name": "workspaceMemberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/projects/{projectId}/members/{workspaceMemberId}": {
+      "delete": {
+        "tags": [
+          "project-controller"
+        ],
+        "operationId": "removeMemberFromProject",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "workspaceMemberId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -1406,12 +3129,63 @@
         "type": "object",
         "properties": {
           "reason": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
           "reason"
         ]
+      },
+      "ManagerAssistantEvidenceResult": {
+        "type": "object",
+        "properties": {
+          "sourceName": {
+            "type": "string"
+          },
+          "matchCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      },
+      "ManagerAssistantReview": {
+        "type": "object",
+        "properties": {
+          "timesheetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "confidenceScorePercent": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "verdict": {
+            "type": "string"
+          },
+          "evidenceSources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ManagerAssistantEvidenceResult"
+            }
+          },
+          "narrative": {
+            "type": "string"
+          },
+          "hasConflict": {
+            "type": "boolean"
+          },
+          "hasMissingEvidence": {
+            "type": "boolean"
+          }
+        }
       },
       "CreatedTimeEntryResponse": {
         "type": "object",
@@ -1431,10 +3205,10 @@
             "format": "date"
           },
           "startTime": {
-            "$ref": "#/components/schemas/LocalTime"
+            "type": "string"
           },
           "endTime": {
-            "$ref": "#/components/schemas/LocalTime"
+            "type": "string"
           },
           "durationMinutes": {
             "type": "integer",
@@ -1442,27 +3216,6 @@
           },
           "status": {
             "type": "string"
-          }
-        }
-      },
-      "LocalTime": {
-        "type": "object",
-        "properties": {
-          "hour": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "minute": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "second": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "nano": {
-            "type": "integer",
-            "format": "int32"
           }
         }
       },
@@ -1563,11 +3316,101 @@
           }
         }
       },
+      "AssignWorkspaceMemberRequest": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MANAGER",
+              "DEVELOPER"
+            ]
+          }
+        },
+        "required": [
+          "role",
+          "userId"
+        ]
+      },
+      "WorkspaceMemberResponse": {
+        "type": "object",
+        "properties": {
+          "workspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN",
+              "MANAGER",
+              "DEVELOPER"
+            ]
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateIssueRequest": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "projectKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "issueType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "priority": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "assigneeEmail": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "issueType",
+          "projectKey",
+          "summary"
+        ]
+      },
       "CreateTaskRequest": {
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string"
@@ -1601,6 +3444,12 @@
           "priority": {
             "type": "string",
             "pattern": "LOW|MEDIUM|HIGH|CRITICAL"
+          },
+          "createJiraIssue": {
+            "type": "boolean"
+          },
+          "jiraDetails": {
+            "$ref": "#/components/schemas/CreateIssueRequest"
           }
         },
         "required": [
@@ -1683,7 +3532,8 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": {
             "type": "string"
@@ -1766,6 +3616,269 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "AssignProjectMemberRequest": {
+        "type": "object",
+        "properties": {
+          "workspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isProjectManager": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "workspaceMemberId"
+        ]
+      },
+      "ProjectMemberResponse": {
+        "type": "object",
+        "properties": {
+          "projectMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isProjectManager": {
+            "type": "boolean"
+          },
+          "joinedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AiExplanation": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string"
+          },
+          "riskExplanation": {
+            "type": "string"
+          },
+          "contributingFactors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Recommendation"
+            }
+          }
+        }
+      },
+      "Budget": {
+        "type": "object",
+        "properties": {
+          "budgetHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "usedHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "remainingBudgetHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "forecastTotalHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "forecastOverrunHours": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Confidence": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "string"
+          },
+          "evidenceAvailable": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "evidenceTotal": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "availableEvidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "missingEvidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "taskEstimateCoveragePercentage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ProjectForecastResponse": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "budget": {
+            "$ref": "#/components/schemas/Budget"
+          },
+          "schedule": {
+            "$ref": "#/components/schemas/Schedule"
+          },
+          "tasks": {
+            "$ref": "#/components/schemas/Tasks"
+          },
+          "velocity": {
+            "$ref": "#/components/schemas/Velocity"
+          },
+          "risk": {
+            "$ref": "#/components/schemas/Risk"
+          },
+          "confidence": {
+            "$ref": "#/components/schemas/Confidence"
+          },
+          "externalEvidence": {
+            "type": "object",
+            "additionalProperties": {}
+          },
+          "aiExplanation": {
+            "$ref": "#/components/schemas/AiExplanation"
+          }
+        }
+      },
+      "Recommendation": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "Risk": {
+        "type": "object",
+        "properties": {
+          "budget": {
+            "type": "string"
+          },
+          "schedule": {
+            "type": "string"
+          },
+          "taskProgress": {
+            "type": "string"
+          },
+          "overall": {
+            "type": "string"
+          }
+        }
+      },
+      "Schedule": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "plannedEndDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "forecastEndDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "delayDays": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "timelineProgressPercentage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Tasks": {
+        "type": "object",
+        "properties": {
+          "totalTasks": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedTasks": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "remainingTasks": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completionPercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "estimatedRemainingHours": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Velocity": {
+        "type": "object",
+        "properties": {
+          "recentHoursPerWeek": {
+            "type": "number",
+            "format": "double"
+          },
+          "lookbackDays": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "hoursInPeriod": {
+            "type": "number",
+            "format": "double"
+          },
+          "hasSufficientData": {
+            "type": "boolean"
           }
         }
       },
@@ -1865,7 +3978,8 @@
         "type": "object",
         "properties": {
           "reason": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
@@ -1876,15 +3990,37 @@
         "type": "object",
         "properties": {
           "reason": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
           "reason"
         ]
       },
-      "Approve": {
-        "type": "object"
+      "Approve": {},
+      "GenerateInsightsResponse": {
+        "type": "object",
+        "properties": {
+          "github": {
+            "$ref": "#/components/schemas/SyncResult"
+          },
+          "jira": {
+            "$ref": "#/components/schemas/SyncResult"
+          }
+        }
+      },
+      "SyncResult": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "lastSyncedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       },
       "MessageResponse": {
         "type": "object",
@@ -1897,18 +4033,40 @@
           }
         }
       },
+      "Reset": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 1
+          },
+          "newPassword": {
+            "type": "string",
+            "maxLength": 2147483647,
+            "minLength": 8,
+            "pattern": "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,20}$"
+          }
+        },
+        "required": [
+          "newPassword",
+          "token"
+        ]
+      },
       "RegisterRequest": {
         "type": "object",
         "properties": {
           "firstName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "lastName": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "email": {
             "type": "string",
-            "pattern": "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@(momentum\\.co\\.za|momentum\\.com)$"
+            "minLength": 1,
+            "pattern": "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@(momentum\\.co\\.za|momentum\\.com|gmail\\.com|cs\\.up\\.ac\\.za|outlook\\.com)$"
           },
           "password": {
             "type": "string",
@@ -1951,19 +4109,16 @@
           }
         }
       },
-      "AuthRequest": {
+      "MicrosoftAuthRequest": {
         "type": "object",
         "properties": {
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
+          "idToken": {
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
-          "email",
-          "password"
+          "idToken"
         ]
       },
       "AuthResponse": {
@@ -2016,16 +4171,260 @@
           }
         }
       },
+      "MfaVerifyRequest": {
+        "type": "object",
+        "properties": {
+          "totpCode": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "totpCode"
+        ]
+      },
+      "MfaLoginVerifyRequest": {
+        "type": "object",
+        "properties": {
+          "challengeToken": {
+            "type": "string",
+            "minLength": 1
+          },
+          "totpCode": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "challengeToken",
+          "totpCode"
+        ]
+      },
+      "MfaDisableRequest": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "AuthRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
       "GoogleAuthRequest": {
         "type": "object",
         "properties": {
           "idToken": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
           "idToken"
         ]
+      },
+      "Forgot": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "Change": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "minLength": 1
+          },
+          "newPassword": {
+            "type": "string",
+            "maxLength": 2147483647,
+            "minLength": 8,
+            "pattern": "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,20}$"
+          },
+          "confirmPassword": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "confirmPassword",
+          "currentPassword",
+          "newPassword"
+        ]
+      },
+      "Request": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "TimeEntryPatchRequest": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "taskId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "durationSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "entryType": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "isBillable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateTask": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "pattern": "TODO|IN_PROGRESS|DONE|BLOCKED"
+          },
+          "priority": {
+            "type": "string",
+            "pattern": "LOW|MEDIUM|HIGH|CRITICAL"
+          },
+          "estimatedHours": {
+            "type": "number"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "assignedWorkspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "UpdateProjectRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "pattern": "ACTIVE|ON_HOLD|COMPLETED|ARCHIVED"
+          },
+          "budgetHours": {
+            "type": "number"
+          },
+          "hourlyRate": {
+            "type": "number"
+          },
+          "budgetCost": {
+            "type": "number"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "managerIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "NotificationResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "entityType": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isRead": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
       },
       "Update": {
         "type": "object",
@@ -2050,6 +4449,51 @@
           },
           "attachments": {
             "type": "string"
+          }
+        }
+      },
+      "ResolveInsightResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "resolved": {
+            "type": "boolean"
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolvedByWorkspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "AvailableUserResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "workspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isInWorkspace": {
+            "type": "boolean"
           }
         }
       },
@@ -2177,6 +4621,9 @@
               "DEVELOPER"
             ]
           },
+          "isProjectManager": {
+            "type": "boolean"
+          },
           "hoursLogged": {
             "type": "number"
           },
@@ -2201,6 +4648,14 @@
           },
           "status": {
             "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date"
           },
           "budgetHours": {
             "type": "number"
@@ -2233,6 +4688,250 @@
           "updatedAt": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "SavedProjectForecastResponse": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "lastSyncedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "forecast": {
+            "$ref": "#/components/schemas/ProjectForecastResponse"
+          }
+        }
+      },
+      "ActivityCount": {
+        "type": "object",
+        "properties": {
+          "activityType": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ExternalEvidenceSummary": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "activityCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "latestActivity": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "activities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivityCount"
+            }
+          }
+        }
+      },
+      "ProjectForecastEvidenceResponse": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "github": {
+            "$ref": "#/components/schemas/ExternalEvidenceSummary"
+          },
+          "jira": {
+            "$ref": "#/components/schemas/ExternalEvidenceSummary"
+          }
+        }
+      },
+      "JiraVsLoggedRow": {
+        "type": "object",
+        "properties": {
+          "ticket": {
+            "type": "string"
+          },
+          "estimateHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "loggedHours": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "JiraStatusCount": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "JiraTicketsBreakdownResponse": {
+        "type": "object",
+        "properties": {
+          "totalTickets": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "byStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JiraStatusCount"
+            }
+          }
+        }
+      },
+      "IntegrationStatus": {
+        "type": "object",
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          },
+          "provider": {
+            "type": "string"
+          }
+        }
+      },
+      "IssueResponse": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "issueType": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "assigneeEmail": {
+            "type": "string"
+          },
+          "assigneeDisplayName": {
+            "type": "string"
+          },
+          "projectKey": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string"
+          },
+          "localTaskId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "GitCommitActivity": {
+        "type": "object",
+        "properties": {
+          "workspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "commitHash": {
+            "type": "string"
+          },
+          "repositoryName": {
+            "type": "string"
+          },
+          "repositoryUrl": {
+            "type": "string"
+          },
+          "commitMessage": {
+            "type": "string"
+          },
+          "commitTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "linesAdded": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "linesRemoved": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "authorEmail": {
+            "type": "string"
+          },
+          "githubAuthorLogin": {
+            "type": "string"
+          },
+          "changedFiles": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "WeeklySummaryResponse": {
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectType": {
+            "type": "string"
+          },
+          "weekStart": {
+            "type": "string",
+            "format": "date"
+          },
+          "narrative": {
+            "type": "string"
+          },
+          "insightId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
@@ -2322,6 +5021,680 @@
             "format": "double"
           },
           "status": {
+            "type": "string"
+          }
+        }
+      },
+      "DeveloperProjectResponse": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "hoursLogged": {
+            "type": "number",
+            "format": "double"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CurrentMemberResponse": {
+        "type": "object",
+        "properties": {
+          "workspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "FlaggedBurnoutMember": {
+        "type": "object",
+        "properties": {
+          "workspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "riskScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "statusBand": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "insightId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memberName": {
+            "type": "string"
+          },
+          "memberRole": {
+            "type": "string"
+          }
+        }
+      },
+      "GithubActivityByMember": {
+        "type": "object",
+        "properties": {
+          "workspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memberName": {
+            "type": "string"
+          },
+          "hoursLogged": {
+            "type": "number",
+            "format": "double"
+          },
+          "commitCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "JiraTicketBreakdown": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "byType": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JiraTypeCount"
+            }
+          }
+        }
+      },
+      "JiraTypeCount": {
+        "type": "object",
+        "properties": {
+          "issueType": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ManagedProject": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectName": {
+            "type": "string"
+          }
+        }
+      },
+      "ManagerDashboardResponse": {
+        "type": "object",
+        "properties": {
+          "projectCompletionForecast": {
+            "$ref": "#/components/schemas/ProjectCompletionForecast"
+          },
+          "teamLoggedHours": {
+            "$ref": "#/components/schemas/TeamLoggedHours"
+          },
+          "flaggedBurnoutMembers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FlaggedBurnoutMember"
+            }
+          },
+          "taskOverview": {
+            "$ref": "#/components/schemas/TaskOverview"
+          },
+          "velocity": {
+            "$ref": "#/components/schemas/Velocity"
+          },
+          "projectHealth": {
+            "$ref": "#/components/schemas/ProjectHealth"
+          },
+          "githubActivityByMember": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GithubActivityByMember"
+            }
+          },
+          "jiraTicketBreakdown": {
+            "$ref": "#/components/schemas/JiraTicketBreakdown"
+          },
+          "managedProjects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ManagedProject"
+            }
+          },
+          "scopedProjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "period": {
+            "type": "string"
+          }
+        }
+      },
+      "ProjectCompletionForecast": {
+        "type": "object",
+        "properties": {
+          "weeklyProgress": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WeeklyProgressPoint"
+            }
+          },
+          "currentProgressPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "forecastCompletionDate": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "ProjectHealth": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "statusLabel": {
+            "type": "string"
+          },
+          "onTrackPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "atRiskPercent": {
+            "type": "number",
+            "format": "double"
+          },
+          "behindPercent": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "TaskOverview": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "todo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inProgress": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "done": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "blocked": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "narrative": {
+            "type": "string"
+          }
+        }
+      },
+      "TeamLoggedHours": {
+        "type": "object",
+        "properties": {
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamLoggedHoursMember"
+            }
+          }
+        }
+      },
+      "TeamLoggedHoursMember": {
+        "type": "object",
+        "properties": {
+          "memberName": {
+            "type": "string"
+          },
+          "hours": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "WeeklyProgressPoint": {
+        "type": "object",
+        "properties": {
+          "weekLabel": {
+            "type": "string"
+          },
+          "percent": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "AiDashboardResponse": {
+        "type": "object",
+        "properties": {
+          "workspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "insights": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Insight"
+            }
+          },
+          "github": {
+            "$ref": "#/components/schemas/GithubActivity"
+          },
+          "period": {
+            "type": "string"
+          },
+          "productivityTrend": {
+            "$ref": "#/components/schemas/ProductivityTrend"
+          },
+          "timeAllocation": {
+            "$ref": "#/components/schemas/TimeAllocation"
+          },
+          "estimateVsActual": {
+            "$ref": "#/components/schemas/EstimateVsActual"
+          },
+          "scoreCards": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScoreCard"
+            }
+          },
+          "timeSplitByTask": {
+            "$ref": "#/components/schemas/TimeSplitByTask"
+          },
+          "taskSwitchingByDay": {
+            "$ref": "#/components/schemas/TaskSwitchingByDay"
+          }
+        }
+      },
+      "EstimateVsActual": {
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EstimateVsActualCategory"
+            }
+          }
+        }
+      },
+      "EstimateVsActualCategory": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "estimatedHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "actualHours": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "GithubActivity": {
+        "type": "object",
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          },
+          "hoursLogged": {
+            "type": "number",
+            "format": "double"
+          },
+          "commitCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "commitsPerHour": {
+            "type": "number",
+            "format": "double"
+          },
+          "additions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "deletions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "activeRepositories": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "activeDays": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "alignment": {
+            "type": "string"
+          },
+          "alignmentScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "explanation": {
+            "type": "string"
+          }
+        }
+      },
+      "Insight": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "insightType": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number",
+            "format": "double"
+          },
+          "confidence": {
+            "type": "number",
+            "format": "double"
+          },
+          "description": {
+            "type": "string"
+          },
+          "recommendation": {
+            "type": "string"
+          },
+          "narrative": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "workspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "memberName": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolved": {
+            "type": "boolean"
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolvedByWorkspaceMemberId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "ProductivityTrend": {
+        "type": "object",
+        "properties": {
+          "points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductivityTrendPoint"
+            }
+          },
+          "is_synthetic": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProductivityTrendPoint": {
+        "type": "object",
+        "properties": {
+          "weekLabel": {
+            "type": "string"
+          },
+          "userScore": {
+            "type": "number",
+            "format": "double"
+          },
+          "teamAverage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ScoreCard": {
+        "type": "object",
+        "properties": {
+          "insightType": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number",
+            "format": "double"
+          },
+          "status": {
+            "type": "string"
+          },
+          "deltaVsPrevious": {
+            "type": "number",
+            "format": "double"
+          },
+          "recommendation": {
+            "type": "string"
+          },
+          "sparkline": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            }
+          }
+        }
+      },
+      "TaskSwitchingByDay": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskSwitchingByDayItem"
+            }
+          }
+        }
+      },
+      "TaskSwitchingByDayItem": {
+        "type": "object",
+        "properties": {
+          "dayLabel": {
+            "type": "string"
+          },
+          "switches": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TimeAllocation": {
+        "type": "object",
+        "properties": {
+          "totalHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimeAllocationCategory"
+            }
+          }
+        }
+      },
+      "TimeAllocationCategory": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "hours": {
+            "type": "number",
+            "format": "double"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "TimeSplitByTask": {
+        "type": "object",
+        "properties": {
+          "totalHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimeSplitByTaskItem"
+            }
+          }
+        }
+      },
+      "TimeSplitByTaskItem": {
+        "type": "object",
+        "properties": {
+          "taskTitle": {
+            "type": "string"
+          },
+          "hours": {
+            "type": "number",
+            "format": "double"
+          },
+          "percentage": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "CalendarVsTrackedResponse": {
+        "type": "object",
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          },
+          "calendarHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "trackedHours": {
+            "type": "number",
+            "format": "double"
+          },
+          "unmatchedHours": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "CalendarStatus": {
+        "type": "object",
+        "properties": {
+          "connected": {
+            "type": "boolean"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "lastSyncedAt": {
+            "type": "string"
+          }
+        }
+      },
+      "CalendarEvent": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "externalEventId": {
+            "type": "string"
+          },
+          "participants": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "provider": {
+            "type": "string"
+          }
+        }
+      },
+      "MfaSetupResponse": {
+        "type": "object",
+        "properties": {
+          "secretKey": {
+            "type": "string"
+          },
+          "qrCodeUrl": {
+            "type": "string"
+          },
+          "message": {
             "type": "string"
           }
         }
