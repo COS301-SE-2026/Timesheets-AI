@@ -76,5 +76,23 @@ class TotpUtilsTest {
 
       assertThat(totpUtils.verifyCode(secret, "abc123")).isFalse();
     }
+
+    @Test
+    @DisplayName("should reject an empty code")
+    void rejectsEmptyCode() {
+      String secret = totpUtils.generateSecret();
+
+      assertThat(totpUtils.verifyCode(secret, "")).isFalse();
+    }
+
+    @Test
+    @DisplayName("should reject a code generated from a different secret")
+    void rejectsCodeFromOtherSecret() {
+      String secret = totpUtils.generateSecret();
+      String otherSecret = totpUtils.generateSecret();
+      int otherCode = new GoogleAuthenticator().getTotpPassword(otherSecret);
+
+      assertThat(totpUtils.verifyCode(secret, String.valueOf(otherCode))).isFalse();
+    }
   }
 }
