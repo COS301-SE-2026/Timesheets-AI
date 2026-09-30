@@ -4,7 +4,7 @@ import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/sl
 import { MatSelectModule} from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from './settings.services';
-import { UserSettings, UserRole } from './settings.model';
+import { UserSettings, UserRole, IntegrationStatus } from './settings.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ChangePasswordDialogComponent } from './change-password-dialog/change-password-dialog.component';
