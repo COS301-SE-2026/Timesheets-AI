@@ -18,6 +18,7 @@ export interface TaskResponse {
   projectId: string;
   projectName: string | null;
   jiraTicketKey: string | null;
+  jiraUrl: string | null;
   parentTaskId: string | null;
   title: string;
   description: string | null;
