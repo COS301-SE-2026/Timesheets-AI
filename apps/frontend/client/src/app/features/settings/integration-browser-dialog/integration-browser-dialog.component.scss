@@ -1,0 +1,99 @@
+// Author: Cleopatra Kwenda
+// Date: 2026-09-22
+// Purpose: a pop-up for browse
+// integration disabling
+
+.dialog-description{
+    margin: 0 0 20px;
+    color: #6b7a99;
+    line-height: 1.5;
+}
+
+.integration-list{
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.integration-grid{
+    display: grid;
+    grid-template-columns: 300px 300px;
+    gap: 12px;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.integration-option{
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+    width: 300px;
+    min-width: 0;
+    gap: 10px;
+    min-height: 96;
+    box-shadow: 0 2px 6px rgba(15, 76, 145, 0.08);
+}
+
+.integration-icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 14px;
+    border-radius: 8px;
+    background: #e5e7eb;
+    color: #1f2937;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+}
+
+.integration-info{
+    flex: 1;
+    min-width: 0;
+
+    h3{
+        margin: 0 0 4px;
+        font-size: 14px;
+        color: #1f2937;
+    }
+
+    p{
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.4;
+        color: #6b7280;
+    }
+}
+
+.add-button{
+    --mdc-outlined-text-field-outline-color: #bfd4f4;
+    --mdc-outlined-text-field-hover-outline-color: #0f4c91;
+    --mdc-outlined-text-field-focus-outline-color: #0f4c91;
+    --mdc-outlined-text-field-label-text-color: #6b7a99;
+    --mdc-outlined-text-field-focus-label-text-color: #0f4c91;
+    flex-shrink: 0;
+}
+
+@media(max-width: 650px){
+    .integration-grid{
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .integration-option{
+        width: 100%;
+    }
+}
+
+button[mat-flat-button]{
+    --mdc-filled-button-container-color: #0f4c91;
+    --mdc-filled-button-label-text-color: #ffffff;
+}
+
+button[mat-button]{
+    color: #0f4c91;
+}
