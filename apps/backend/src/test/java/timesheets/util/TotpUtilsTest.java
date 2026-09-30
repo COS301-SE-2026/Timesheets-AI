@@ -2,6 +2,7 @@ package timesheets.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.warrenstrange.googleauth.GoogleAuthenticator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -52,6 +53,28 @@ class TotpUtilsTest {
       assertThat(url).contains("data=otpauth%3A%2F%2Ftotp%2F");
       assertThat(url).contains("secret%3D" + secret);
       assertThat(url).contains("issuer%3DTimesheets");
+    }
+
+    @Nested
+    @DisplayName("verifyCode")
+    class VerifyCodeTests {
+
+      @Test
+      @DisplayName("should accept a currently valid code")
+      void acceptsValidCode() {
+        String secret = totpUtils.generateSecret();
+        int validCode = new GoogleAuthenticator().getTotpPassword(secret);
+
+        assertThat(totpUtils.verifyCode(secret, String.valueOf(validCode))).isTrue();
+      }
+    }
+
+    @Test
+    @DisplayName("should reject a code that is not numeric")
+    void rejectsNonNumericCode() {
+      String secret = totpUtils.generateSecret();
+
+      assertThat(totpUtils.verifyCode(secret, "abc123")).isFalse();
     }
   }
 }
