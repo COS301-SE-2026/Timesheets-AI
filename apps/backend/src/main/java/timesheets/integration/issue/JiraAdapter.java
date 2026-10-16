@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -17,48 +18,44 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import timesheets.domain.IntegrationToken;
+import timesheets.domain.Project;
 import timesheets.domain.Task;
+import timesheets.domain.WorkspaceMember;
 import timesheets.dto.request.CreateIssueRequest;
 import timesheets.dto.response.CommentResponse;
 import timesheets.dto.response.IssueResponse;
 import timesheets.dto.response.StatusChangeResponse;
 import timesheets.dto.response.WorklogResponse;
 import timesheets.repository.IntegrationTokenRepository;
+import timesheets.repository.ProjectRepository;
 import timesheets.repository.TaskRepository;
+import timesheets.repository.WorkspaceMemberRepository;
 
-/*
-this class talks to Jira's API on behalf of your application
-it will take the Jira OAuth token stored in the db, call Jira and convert Jira's response
-into your application's IssueDto objects
-
-ObjectMapper converts the JSON string into a tree of JsonNode objects
-
-*/
 @Service
 @Slf4j
 public class JiraAdapter implements IssueTrackerAdapter {
 
-  // used to communicate with Jira
   private final RestTemplate restTemplate;
-
-  // used to parse the response
   private final ObjectMapper objectMapper;
-
-  // used to find the OAuth token beloning to the member
   private final IntegrationTokenRepository integrationTokenRepository;
-
   private final TaskRepository taskRepository;
   private final JiraOAuthService jiraOAuthService;
+  private final ProjectRepository projectRepository;
+  private final WorkspaceMemberRepository workspaceMemberRepository;
 
   public JiraAdapter(
       IntegrationTokenRepository integrationTokenRepository,
       TaskRepository taskRepository,
-      JiraOAuthService jiraOAuthService) {
+      JiraOAuthService jiraOAuthService,
+      ProjectRepository projectRepository,
+      WorkspaceMemberRepository workspaceMemberRepository) {
     this.restTemplate = new RestTemplate();
     this.objectMapper = new ObjectMapper();
     this.integrationTokenRepository = integrationTokenRepository;
     this.taskRepository = taskRepository;
     this.jiraOAuthService = jiraOAuthService;
+    this.projectRepository = projectRepository;
+    this.workspaceMemberRepository = workspaceMemberRepository;
   }
 
   @Override
@@ -66,7 +63,6 @@ public class JiraAdapter implements IssueTrackerAdapter {
     return "JIRA";
   }
 
-  // get all Jira issues associated with the member
   @Override
   public List<IssueResponse> getIssues(UUID workspaceMemberId) {
     // find the Jira integration token  for this workspace member
@@ -81,39 +77,59 @@ public class JiraAdapter implements IssueTrackerAdapter {
             + "&maxResults=50"
             + "&fields=summary,status,issuetype,description,priority,project,assignee,created,updated,duedate";
 
-    // add OAuth access token
-    HttpHeaders headers = new HttpHeaders();
-    headers.setBearerAuth(integrationToken.getAccessToken());
-
-    HttpEntity<Void> request = new HttpEntity<Void>(headers);
-
-    ResponseEntity<String> response =
-        restTemplate.exchange(url, HttpMethod.GET, request, String.class);
-
-    // the parsing occurs here
+    HttpHeaders headers = createAuthHeaders(integrationToken.getAccessToken());
+    HttpEntity<Void> request = new HttpEntity<>(headers);
 
     try {
+      ResponseEntity<String> response =
+          restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
       JsonNode root = objectMapper.readTree(response.getBody());
       JsonNode issues = root.get("issues");
 
       List<IssueResponse> result = new ArrayList<IssueResponse>();
 
-      // issues must be a array to avoid unexpected JSON
       if (issues != null && issues.isArray()) {
         for (JsonNode issue : issues) {
-          result.add(parseJiraIssue(issue));
+          result.add(parseJiraIssue(issue, workspaceMemberId));
         }
       }
-
       return result;
     } catch (Exception e) {
+      e.printStackTrace();
       throw new RuntimeException("Failed to parse Jira issues", e);
     }
   }
 
   @Override
+  public List<IssueResponse> getIssues(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+
+    List<IssueResponse> issues = getIssues(workspaceMemberId);
+    List<IssueResponse> filteredIssues = new ArrayList<>();
+
+    for (IssueResponse issue : issues) {
+      LocalDateTime createdAt = parseJiraTimestamp(issue.getCreatedAt());
+      LocalDateTime updatedAt = parseJiraTimestamp(issue.getUpdatedAt());
+
+      boolean createdInRange =
+          createdAt != null && !createdAt.isBefore(startTime) && !createdAt.isAfter(endTime);
+
+      boolean updatedInRange =
+          updatedAt != null && !updatedAt.isBefore(startTime) && !updatedAt.isAfter(endTime);
+
+      if (createdInRange || updatedInRange) {
+        filteredIssues.add(issue);
+      }
+    }
+    return filteredIssues;
+  }
+
+  @Override
   public IssueResponse getIssue(UUID workspaceMemberId, String issueKey) {
+
     IntegrationToken token = getValidToken(workspaceMemberId);
+
     String cloudId = token.getProviderResourceId();
 
     String url = "https://api.atlassian.com/ex/jira/" + cloudId + "/rest/api/3/issue/" + issueKey;
@@ -126,15 +142,17 @@ public class JiraAdapter implements IssueTrackerAdapter {
           restTemplate.exchange(url, HttpMethod.GET, request, String.class);
 
       JsonNode issue = objectMapper.readTree(response.getBody());
-      return parseJiraIssue(issue);
+
+      return parseJiraIssue(issue, workspaceMemberId);
+
     } catch (Exception e) {
+      e.printStackTrace();
       throw new RuntimeException("Failed to fetch Jira issue: " + issueKey, e);
     }
   }
 
   @Override
   public IssueResponse createIssue(UUID workspaceMemberId, CreateIssueRequest request) {
-
     IntegrationToken token = getValidToken(workspaceMemberId);
     String cloudId = token.getProviderResourceId();
 
@@ -148,34 +166,15 @@ public class JiraAdapter implements IssueTrackerAdapter {
     HttpEntity<String> httpRequest = new HttpEntity<>(payload, headers);
 
     try {
-      log.info("Creating Jira issue in project: {}", request.getProjectKey());
-      log.debug("Jira create issue payload: {}", payload);
-
       ResponseEntity<String> response =
           restTemplate.exchange(url, HttpMethod.POST, httpRequest, String.class);
 
-      log.info("Jira issue creation successful. Status: {}", response.getStatusCode());
-
       JsonNode result = objectMapper.readTree(response.getBody());
-
       String issueKey = result.get("key").asText();
-
-      log.info("Created Jira issue: {}", issueKey);
 
       return getIssue(workspaceMemberId, issueKey);
 
-    } catch (org.springframework.web.client.HttpStatusCodeException e) {
-
-      log.error(
-          "Jira API returned error {}: {}", e.getStatusCode(), e.getResponseBodyAsString(), e);
-
-      throw new RuntimeException(
-          "Jira API error " + e.getStatusCode() + ": " + e.getResponseBodyAsString(), e);
-
     } catch (Exception e) {
-
-      log.error("Failed to create Jira issue", e);
-
       throw new RuntimeException("Failed to create Jira issue", e);
     }
   }
@@ -188,7 +187,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
             .orElseThrow(() -> new RuntimeException("Task not found: " + taskId));
 
     task.setJiraTicketKey(issueKey);
-    task.setUpdatedAt(java.time.LocalDateTime.now());
+    task.setUpdatedAt(LocalDateTime.now());
     taskRepository.save(task);
 
     log.info("Linked task {} to Jira issue: {}", taskId, issueKey);
@@ -249,11 +248,9 @@ public class JiraAdapter implements IssueTrackerAdapter {
       UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
     List<IssueResponse> issues = getIssues(workspaceMemberId);
-
-    List<WorklogResponse> worklogs = new ArrayList<WorklogResponse>();
+    List<WorklogResponse> worklogs = new ArrayList<>();
 
     IntegrationToken token = getValidToken(workspaceMemberId);
-
     String cloudId = token.getProviderResourceId();
 
     for (IssueResponse issue : issues) {
@@ -264,12 +261,11 @@ public class JiraAdapter implements IssueTrackerAdapter {
               + issue.getKey()
               + "/worklog";
 
-      HttpEntity<Void> request = new HttpEntity<Void>(createAuthHeaders(token.getAccessToken()));
-
-      ResponseEntity<String> response =
-          restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+      HttpEntity<Void> request = new HttpEntity<>(createAuthHeaders(token.getAccessToken()));
 
       try {
+        ResponseEntity<String> response =
+            restTemplate.exchange(url, HttpMethod.GET, request, String.class);
         JsonNode root = objectMapper.readTree(response.getBody());
 
         JsonNode worklogNodes = root.get("worklogs");
@@ -280,7 +276,6 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
         for (JsonNode worklogNode : worklogNodes) {
           String started = getString(worklogNode, "started");
-
           LocalDateTime startedAt = parseJiraTimestamp(started);
 
           if (startedAt == null) {
@@ -308,14 +303,12 @@ public class JiraAdapter implements IssueTrackerAdapter {
             worklog.setAuthorDisplayName(getString(author, "displayName"));
             worklog.setAuthorEmail(getString(author, "emailAddress"));
           }
-
           worklogs.add(worklog);
         }
       } catch (Exception e) {
-        log.error("Failed to parse Jira worklogs for the issue:" + issue.getKey(), e);
+        log.error("Failed to parse Jira worklogs for the issue: " + issue.getKey(), e);
       }
     }
-
     return worklogs;
   }
 
@@ -323,7 +316,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
   public List<CommentResponse> getComments(
       UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
     List<IssueResponse> issues = getIssues(workspaceMemberId);
-    List<CommentResponse> comments = new ArrayList<CommentResponse>();
+    List<CommentResponse> comments = new ArrayList<>();
     IntegrationToken token = getValidToken(workspaceMemberId);
     String cloudId = token.getProviderResourceId();
 
@@ -335,12 +328,11 @@ public class JiraAdapter implements IssueTrackerAdapter {
               + issue.getKey()
               + "/comment";
 
-      HttpEntity<Void> request = new HttpEntity<Void>(createAuthHeaders(token.getAccessToken()));
-
-      ResponseEntity<String> response =
-          restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+      HttpEntity<Void> request = new HttpEntity<>(createAuthHeaders(token.getAccessToken()));
 
       try {
+        ResponseEntity<String> response =
+            restTemplate.exchange(url, HttpMethod.GET, request, String.class);
         JsonNode root = objectMapper.readTree(response.getBody());
         JsonNode commentNodes = root.get("comments");
 
@@ -350,7 +342,6 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
         for (JsonNode commentNode : commentNodes) {
           String created = getString(commentNode, "created");
-
           LocalDateTime createdAt = parseJiraTimestamp(created);
 
           if (createdAt == null) {
@@ -364,14 +355,12 @@ public class JiraAdapter implements IssueTrackerAdapter {
           }
 
           CommentResponse comment = new CommentResponse();
-
           comment.setIssueKey(issue.getKey());
           comment.setCommentId(getString(commentNode, "id"));
           comment.setUpdatedAt(parseJiraTimestamp(getString(commentNode, "updated")));
           comment.setBody(getString(commentNode, "body"));
 
           JsonNode author = commentNode.get("author");
-
           if (author != null && !author.isNull()) {
             comment.setAuthorDisplayName(getString(author, "displayName"));
             comment.setAuthorEmail(getString(author, "emailAddress"));
@@ -380,7 +369,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
           comments.add(comment);
         }
       } catch (Exception e) {
-        log.error("Failed to parse the comments for this issue" + issue.getKey(), e);
+        log.error("Failed to parse the comments for this issue " + issue.getKey(), e);
       }
     }
 
@@ -391,8 +380,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
   public List<StatusChangeResponse> getStatusChanges(
       UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
     List<IssueResponse> issues = getIssues(workspaceMemberId);
-
-    List<StatusChangeResponse> statusChanges = new ArrayList<StatusChangeResponse>();
+    List<StatusChangeResponse> statusChanges = new ArrayList<>();
     IntegrationToken token = getValidToken(workspaceMemberId);
     String cloudId = token.getProviderResourceId();
 
@@ -406,7 +394,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
               + "?startAt=0"
               + "&maxResults=100";
 
-      HttpEntity<Void> request = new HttpEntity<Void>(createAuthHeaders(token.getAccessToken()));
+      HttpEntity<Void> request = new HttpEntity<>(createAuthHeaders(token.getAccessToken()));
 
       try {
         ResponseEntity<String> response =
@@ -432,7 +420,6 @@ public class JiraAdapter implements IssueTrackerAdapter {
           }
 
           JsonNode items = history.get("items");
-
           if (items == null || !items.isArray()) {
             continue;
           }
@@ -446,17 +433,12 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
             StatusChangeResponse statusChange = new StatusChangeResponse();
             statusChange.setIssueKey(issue.getKey());
-
             statusChange.setChangeLogId(getString(history, "id"));
-
             statusChange.setChangedAt(changedAt);
-
             statusChange.setFromStatus(getString(item, "fromString"));
-
             statusChange.setToStatus(getString(item, "toString"));
 
             JsonNode author = history.get("author");
-
             if (author != null && !author.isNull()) {
               statusChange.setAuthorDisplayName(getString(author, "displayName"));
               statusChange.setAuthorEmail(getString(author, "emailAddress"));
@@ -473,14 +455,14 @@ public class JiraAdapter implements IssueTrackerAdapter {
     return statusChanges;
   }
 
-  // ! helper functions
+  // Helper functions
   private HttpHeaders createAuthHeaders(String accessToken) {
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(accessToken);
     return headers;
   }
 
-  private IssueResponse parseJiraIssue(JsonNode issue) {
+  private IssueResponse parseJiraIssue(JsonNode issue, UUID workspaceMemberId) {
     String key = issue.get("key").asText();
     JsonNode fields = issue.get("fields");
 
@@ -493,6 +475,19 @@ public class JiraAdapter implements IssueTrackerAdapter {
     dto.setPriority(getNestedString(fields, "priority", "name"));
     dto.setProjectKey(getNestedString(fields, "project", "key"));
     dto.setProjectName(getNestedString(fields, "project", "name"));
+
+    WorkspaceMember workspaceMember =
+        workspaceMemberRepository
+            .findById(workspaceMemberId)
+            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+    UUID workspaceId = workspaceMember.getWorkspaceId();
+
+    Optional<Project> localProject =
+        projectRepository.findByWorkspaceIdAndJiraProjectKey(workspaceId, dto.getProjectKey());
+
+    if (localProject.isPresent()) {
+      dto.setLocalProjectId(localProject.get().getId());
+    }
     dto.setCreatedAt(getString(fields, "created"));
     dto.setUpdatedAt(getString(fields, "updated"));
     dto.setDueDate(getString(fields, "duedate"));
@@ -503,6 +498,12 @@ public class JiraAdapter implements IssueTrackerAdapter {
       dto.setAssigneeDisplayName(getString(assignee, "displayName"));
     }
 
+    Optional<Task> localTask = taskRepository.findByJiraTicketKey(key);
+
+    if (localTask.isPresent()) {
+      dto.setLocalTaskId(localTask.get().getId());
+      dto.setLocalProjectId(localTask.get().getProjectId());
+    }
     // link the Jira issue back to its local Timesheets task
     taskRepository.findByJiraTicketKey(key).ifPresent(task -> dto.setLocalTaskId(task.getId()));
 
@@ -510,27 +511,18 @@ public class JiraAdapter implements IssueTrackerAdapter {
   }
 
   private LocalDateTime parseJiraTimestamp(String timestamp) {
-
     if (timestamp == null || timestamp.isBlank()) {
       return null;
     }
 
     try {
-
-      return java.time.OffsetDateTime.parse(timestamp).toLocalDateTime();
-
+      return OffsetDateTime.parse(timestamp).toLocalDateTime();
     } catch (Exception e) {
-
       try {
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-
         return OffsetDateTime.parse(timestamp, formatter).toLocalDateTime();
-
       } catch (Exception secondException) {
-
-        log.warn("Could not parse Jira timestamp", timestamp);
-
+        log.warn("Could not parse Jira timestamp: {}", timestamp);
         return null;
       }
     }
@@ -603,14 +595,12 @@ public class JiraAdapter implements IssueTrackerAdapter {
         .replace("\r", "\\r");
   }
 
-  // ! this method has been failing so I need to look at it again
   private IntegrationToken getValidToken(UUID workspaceMemberId) {
     IntegrationToken token =
         integrationTokenRepository
             .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "JIRA")
             .orElseThrow(() -> new RuntimeException("Jira is not connected for this user"));
 
-    // this will check if the token has expired or expires in 5 mins
     if (token.getExpiresAt() != null
         && token.getExpiresAt().minusMinutes(5).isBefore(LocalDateTime.now())) {
 
@@ -620,7 +610,6 @@ public class JiraAdapter implements IssueTrackerAdapter {
         JiraOAuthService.JiraTokenResponse newToken =
             jiraOAuthService.refreshAccessToken(token.getRefreshToken());
 
-        // wanting to update the token in the DB so that we always have the most recent updated
         token.setAccessToken(newToken.getAccessToken());
         token.setExpiresAt(LocalDateTime.now().plusSeconds(newToken.getExpiresIn()));
 

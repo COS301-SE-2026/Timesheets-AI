@@ -25,6 +25,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, computed, inject, OnDestroy, signal, effect } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
+
 import {
   TimerService,
   ActiveTimerResponse,
@@ -34,11 +36,15 @@ import {
   TimeEntryService,
   TimeEntryRequest as TimeEntryApiRequest,
 } from '../../../../core/services/time-entry.service';
+import { SuggestedWorkSession } from '../../../suggestions/models/suggested.model';
+import { SuggestionService } from '../../../suggestions/suggestion.service';
+import { sign } from 'node:crypto';
+import { error } from 'node:console';
 //type definitions and interface
 
 type ViewOption = 'Day' | 'Week' | 'Month';
 type StatusOption = 'All' | TimeEntryStatus;
-type PanelType = 'manual' | 'timer' | null;
+type PanelType = 'manual' | 'timer' | 'suggestions' | null;
 type TimeEntryStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
 
 //was: type EntryType = 'manual' | 'timer' | 'import' | 'api';
@@ -138,7 +144,7 @@ interface TaskApiResponse {
 
 @Component({
   selector: 'app-logtime',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, DecimalPipe],
   templateUrl: './logtime.component.html',
   styleUrl: './logtime.component.scss',
 })
@@ -152,6 +158,8 @@ export class LogtimeComponent implements OnDestroy {
   private readonly apiBaseUrl = '/api';
   private readonly timerService = inject(TimerService);
   private readonly timeEntryService = inject(TimeEntryService);
+  private readonly suggestionService = inject(SuggestionService);
+
   private readonly route = inject(ActivatedRoute);
   private  pendingTaskId: string | null = null;
 
@@ -188,10 +196,14 @@ export class LogtimeComponent implements OnDestroy {
   readonly newTaskTitleError = signal(false);
   readonly isTimerPaused = signal(false);
   readonly pausedElapsedSeconds = signal(0);
-  readonly filterFrom = signal(this.today());
-  readonly filterTo = signal(this.today());
+  // readonly filterFrom = signal(this.today());
+  // readonly filterTo = signal(this.today());
+  // this is to make it 7 days (week) and not cuurent day 
+  readonly filterFrom = signal(this.todayStartOfWeek());
+  readonly filterTo = signal(this.todayEndOfWeek());
   readonly durationPreviewSeconds = signal(3600);
-
+  readonly suggestionPendingReject = signal<SuggestedWorkSession | null>(null);
+  readonly currentSuggestionIndex = signal(0);
   /*  
   tracks the current period's timesheet, submit now happens at this level not per entry, since status/submittedAt/approvedAt/isLocked all live on
   the timesheets table per backend schema, not on time_entries
@@ -214,6 +226,12 @@ export class LogtimeComponent implements OnDestroy {
   loadTasks, loadEntries, loadCurrentTimesheet, saveEntry, startTimer, stopTimer, deleteEntry, submitTimesheet), so this now assumes a live backend connection is always available.
   */
   readonly entries = signal<TimeEntry[]>([]);
+
+  readonly suggestions = signal<SuggestedWorkSession[]>([]);
+  readonly suggestionsLoading = signal(false);
+  // to store the suggestion id 
+  readonly suggestionCreatingTask = signal<string | null>(null);
+  readonly newSuggestionTaskTitle = signal('');
 
   //Reactive from groups
 
@@ -347,6 +365,31 @@ export class LogtimeComponent implements OnDestroy {
     );
   }); 
 
+  // to get 7 days (week)
+  private todayStartOfWeek(): string {
+  const date = new Date();
+  const day = date.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+
+  date.setDate(date.getDate() + diff);
+
+  return this.formatDateForInput(date);
+}
+
+  private todayEndOfWeek(): string {
+    const date = new Date();
+    const day = date.getDay();
+    const diff = day === 0 ? 0 : 7 - day;
+
+    date.setDate(date.getDate() + diff);
+
+    return this.formatDateForInput(date);
+  }
+
+  private formatDateForInput(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
   //Native asynchronous timer allocation reference tracking context
   private timerIntervalId: ReturnType<typeof setInterval> | null = null;
 
@@ -427,6 +470,7 @@ export class LogtimeComponent implements OnDestroy {
 
   private onDateRangeChange(): void {
     this.loadCurrentTimesheet();
+    this.loadSuggestions();
   }
 
   //Returns true if the template end time is at or before the input start time bounds
@@ -455,6 +499,16 @@ export class LogtimeComponent implements OnDestroy {
 
   dismissToast(): void {
     this.toastMessage.set('');
+  }
+
+  // need to make the UI bit better - need to show error messages more nicely and clearly
+  // helper method to avoid repetition
+  showToast(message: string): void {
+    this.toastMessage.set(message);
+
+    setTimeout(() => {
+      this.toastMessage.set(''); 
+    }, 3000);
   }
 
   openManualPanel(): void {
@@ -494,9 +548,62 @@ export class LogtimeComponent implements OnDestroy {
     this.activePanel.set('timer');
   }
 
+  //suggestions panel
+  openSuggestionsPanel() : void {
+    if (!this.canEditEntries()){
+      this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+      return;
+    }
+
+    this.activePanel.set('suggestions');
+    this.loadSuggestions();
+  }
+
   closePanel(): void {
     this.activePanel.set(null);
   }
+
+    getCurrentSuggestion(): SuggestedWorkSession | null {
+  const suggestions = this.suggestions();
+
+  if (suggestions.length === 0) {
+    return null;
+  }
+
+  return suggestions[this.currentSuggestionIndex()];
+}
+
+previousSuggestion(): void {
+  const suggestions = this.suggestions();
+
+  if (suggestions.length === 0) {
+    return;
+  }
+
+  const currentIndex = this.currentSuggestionIndex();
+
+  this.currentSuggestionIndex.set(
+    currentIndex === 0
+      ? suggestions.length - 1
+      : currentIndex - 1
+  );
+}
+
+nextSuggestion(): void {
+  const suggestions = this.suggestions();
+
+  if (suggestions.length === 0) {
+    return;
+  }
+
+  const currentIndex = this.currentSuggestionIndex();
+
+  this.currentSuggestionIndex.set(
+    currentIndex === suggestions.length - 1
+      ? 0
+      : currentIndex + 1
+  );
+}
 
   /*
    Persists log form values into the records array.
@@ -897,7 +1004,6 @@ export class LogtimeComponent implements OnDestroy {
       : '';
   }
 
-  // Converts numerical raw seconds parameters into visual presentation standard "HH:MM:SS" formats
   formatElapsed(totalSeconds: number): string {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -908,7 +1014,6 @@ export class LogtimeComponent implements OnDestroy {
       .join(':');
   }
 
-  // Custom visual modifier turning simple dynamic counts into compressed time descriptors
   formatDuration(totalSeconds = 0): string {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -925,7 +1030,6 @@ export class LogtimeComponent implements OnDestroy {
     this.selectedStatus.set(status);
   }
 
-  // Resolves contextual CSS formatting handles depending on workflow state settings
   entryDotClass(entry: TimeEntry): string {
     return `status-dot status-dot--${(entry.status ?? 'draft').toLowerCase()}`;
   }
@@ -949,8 +1053,6 @@ export class LogtimeComponent implements OnDestroy {
       (taskId ? this.taskTitles()[taskId] ?? 'Unknown task' : 'No task selected')
     );
   }
-
-  //populates editing controls with targets extraction contexts to alter parameters
 
   editEntry(entry: TimeEntry): void {
     if (!this.canEditEntries()) {
@@ -977,6 +1079,10 @@ export class LogtimeComponent implements OnDestroy {
     this.openMenuEntryId.set(
       this.openMenuEntryId() === entryId ? null : entryId,
     );
+  }
+
+  getSourceSummary(suggestion: SuggestedWorkSession): string {
+    return suggestion?.explanation || 'Automated Suggestion';
   }
 
   /*
@@ -1056,8 +1162,6 @@ export class LogtimeComponent implements OnDestroy {
           ),
       });
   }
-
-  // data sanitization methods
 
   private resetEntryForm(): void {
     this.resetNewTaskState();
@@ -1149,7 +1253,6 @@ export class LogtimeComponent implements OnDestroy {
     return this.timeToMinutes(endTime) - this.timeToMinutes(startTime);
   }
 
-  // Checks overlap conditions by comparing raw mathematical minute counters
   private timesOverlap(
     startA: string,
     endA: string,
@@ -1162,7 +1265,6 @@ export class LogtimeComponent implements OnDestroy {
     );
   }
 
-  // Parses textual time records into flat integer values relative to midnight
   private timeToMinutes(time: string): number {
     const timeValue = this.timeFromDateTime(time);
     const [safeHours, safeMinutes] = timeValue.split(':').map(Number);
@@ -1269,6 +1371,433 @@ export class LogtimeComponent implements OnDestroy {
       });
   }
 
+  
+  private loadSuggestions(): void {
+    this.suggestionsLoading.set(true);
+
+    // fetch or create suggestions 24 hours range 
+    this.suggestionService.generateSuggestions(this.workspaceMemberId, `${this.filterFrom()}T00:00:00`,
+  `${this.filterTo()}T23:59:59`).subscribe({
+    next: (suggestions) => {
+      this.suggestions.set(suggestions);
+      this.suggestionsLoading.set(false);
+    },
+    error: (error) => {
+      this.suggestionsLoading.set(false);
+    }
+  });
+  }
+
+  rejectSuggestion(suggestion: SuggestedWorkSession): void {
+  this.suggestionService.reject(suggestion.id).subscribe({
+    next: () => {
+      this.suggestions.set(
+        this.suggestions().filter(
+          (item) => item.id !== suggestion.id
+        )
+      );
+
+      // display a friendly message
+      this.showToast('Suggestion rejected.') 
+    },
+    error: (error) => {
+      this.showToast('We could not reject this suggestion. Please try again.')
+    }
+  });
+}
+
+getSuggestionStartTime(suggestion: SuggestedWorkSession): string {
+  return this.timeFromDateTime(suggestion.startTime);
+}
+
+getSuggestionEndTime(suggestion: SuggestedWorkSession): string {
+  return this.timeFromDateTime(suggestion.endTime);
+}
+
+getSuggestionDurationSeconds(
+  suggestion: SuggestedWorkSession
+): number {
+
+  if (!suggestion.startTime || !suggestion.endTime) {
+    return 0;
+  }
+
+  const startTime = this.timeFromDateTime(suggestion.startTime);
+  const endTime = this.timeFromDateTime(suggestion.endTime);
+
+  const startMinutes = this.timeToMinutes(startTime);
+  const endMinutes = this.timeToMinutes(endTime);
+
+  const durationMinutes = endMinutes - startMinutes;
+
+  if (durationMinutes <= 0) {
+    return 0;
+  }
+
+  return durationMinutes * 60;
+}
+
+getSuggestionDurationMinutes(
+  suggestion: SuggestedWorkSession
+): number {
+  return Math.floor(
+    this.getSuggestionDurationSeconds(suggestion) / 60
+  );
+}
+
+isSuggestionEndTimeInvalid(
+  suggestion: SuggestedWorkSession
+): boolean {
+  if (!suggestion.startTime || !suggestion.endTime) {
+    return true;
+  }
+
+  const startTime = this.timeFromDateTime(suggestion.startTime);
+  const endTime = this.timeFromDateTime(suggestion.endTime);
+
+  return this.calculateDuration(startTime, endTime) <= 0;
+}
+
+updateSuggestionTime(
+  suggestion: SuggestedWorkSession,
+  event: Event,
+  field: 'startTime' | 'endTime'
+): void {
+  const input = event.target as HTMLInputElement;
+  const time = input.value;
+
+  if (!time) {
+    return;
+  }
+
+  const date = this.dateFromDateTime(suggestion.startTime);
+
+  const startTime =
+    field === 'startTime'
+      ? time
+      : this.timeFromDateTime(suggestion.startTime);
+
+  const endTime =
+    field === 'endTime'
+      ? time
+      : this.timeFromDateTime(suggestion.endTime);
+
+  const duration = this.calculateDuration(
+    startTime,
+    endTime
+  );
+
+  if (duration <= 0) {
+    this.showToast(
+      field === 'startTime'
+        ? 'Start time must be before end time.'
+        : 'End time must be after start time.'
+    );
+    return;
+  }
+
+  this.suggestionService.edit(suggestion.id, {
+    title: suggestion.title,
+    projectId: suggestion.projectId || undefined,
+    taskId: suggestion.taskId || undefined,
+    startTime: this.toDateTimeValue(date, startTime),
+    endTime: this.toDateTimeValue(date, endTime),
+    description: suggestion.description || undefined
+  }).subscribe({
+    next: (updatedSuggestion) => {
+      this.suggestions.set(
+        this.suggestions().map((item) =>
+          item.id === updatedSuggestion.id
+            ? updatedSuggestion
+            : item
+        )
+      );
+    },
+    error: (error) => {
+      this.showToast(
+        error.error?.message ?? 'Unable to update the time.'
+      );
+    }
+  });
+}
+
+// this is when the user reject suggestion, we should alert them of this action 
+confirmRejectSuggestion(suggestion: SuggestedWorkSession): void {
+  this.suggestionPendingReject.set(suggestion);
+}
+
+cancelRejectSuggestion(): void {
+  this.suggestionPendingReject.set(null);
+}
+
+confirmReject(): void {
+  const suggestion = this.suggestionPendingReject();
+
+  if (!suggestion){
+    return;
+  }
+
+  this.suggestionPendingReject.set(null);
+  this.rejectSuggestion(suggestion);
+}
+
+approveSuggestion(suggestion: SuggestedWorkSession): void {
+
+  if (!suggestion.projectId) {
+    this.showToast('Please select a project before approving.');
+    return;
+  }
+
+  if (this.isSuggestionEndTimeInvalid(suggestion)) {
+    this.showToast('End time must be after start time.');
+    return;
+  }
+
+  const durationSeconds =
+    this.getSuggestionDurationSeconds(suggestion);
+
+  if (durationSeconds <= 0) {
+    this.showToast('Please enter a valid start and end time.');
+    return;
+  }
+
+  this.suggestionService.approve(suggestion.id).subscribe({
+    next: () => {
+      this.suggestions.set(
+        this.suggestions().filter(
+          (item) => item.id !== suggestion.id
+        )
+      );
+
+      this.loadEntries();
+
+      this.showToast('Suggested work added to your timesheet.');
+    },
+    error: (error) => {
+      this.showToast(
+        error.error?.message ??
+        'Failed to add suggested work to your timesheet.'
+      );
+    }
+  });
+}
+
+  assignSuggestionProject(
+  suggestion: SuggestedWorkSession,
+  event: Event
+): void {
+  const select = event.target as HTMLSelectElement;
+  const projectId = select.value;
+
+  if (!projectId) {
+    return;
+  }
+
+  this.suggestionService.edit(suggestion.id, {
+    title: suggestion.title,
+    projectId: projectId,
+    taskId: suggestion.taskId || undefined,
+    startTime: suggestion.startTime,
+    endTime: suggestion.endTime,
+    description: suggestion.description || undefined
+  }).subscribe({
+    next: (updatedSuggestion) => {
+      const updatedSuggestions = this.suggestions().map((item) =>
+        item.id === updatedSuggestion.id
+          ? updatedSuggestion
+          : item
+      );
+
+      this.suggestions.set(updatedSuggestions);
+      // load the tasks here 
+      this.loadSuggestionTasks(updatedSuggestion.id, projectId);
+    },
+    error: (error) => {
+      console.error('Failed to assign project:', error);
+    }
+  });
+}
+
+
+assignSuggestionTask(suggestion: SuggestedWorkSession, event: Event): void {
+  const select = event.target as HTMLSelectElement;
+  const taskId = select.value;
+
+  if (taskId === 'CREATE NEW TASK'){
+    this.suggestionCreatingTask.set(suggestion.id);
+    this.newSuggestionTaskTitle.set('');
+
+    select.value = suggestion.taskId || '';
+    return;
+  }
+
+  this.suggestionService.edit(suggestion.id, {
+    title: suggestion.title,
+    projectId: suggestion.projectId || undefined,
+    taskId: taskId || undefined,
+    startTime: suggestion.startTime,
+    endTime: suggestion.endTime,
+    description: suggestion.description || undefined
+  }).subscribe({
+    next: (updatedSuggestion) => {
+      const updatedSuggestions = this.suggestions().map((item) =>
+        item.id === updatedSuggestion.id
+        ? updatedSuggestion
+        : item
+      );
+
+      this.suggestions.set(updatedSuggestions);
+    },
+    error: (error) => {
+      this.toastMessage.set(error.eror?.message ?? 'Unable to assign the task.');
+    }
+  });
+}
+
+createSuggestionTask(suggestion: SuggestedWorkSession): void {
+  const title = this.newSuggestionTaskTitle().trim();
+  const projectId = suggestion.projectId;
+
+  if (!projectId){
+    this.showToast('Please select a project before creating a task.');
+    return;
+  }
+
+  if (!title){
+    this.showToast('Please enter a task title.');
+    return;
+  }
+
+  const request = {
+    title: title,
+    projectId: projectId
+  };
+
+  this.http.post<TaskApiResponse>(`${this.apiBaseUrl}/tasks`, request, this.requestOptions()).subscribe({
+    next: (createdTask) => {
+      // add new task to this suggestion's task list
+      const currentTasks = this.suggestionTasks.get(suggestion.id) || [];
+
+        currentTasks.push({
+          id: createdTask.id,
+          projectId: createdTask.projectId,
+          title: createdTask.title
+        });
+      
+        this.suggestionTasks.set(
+          suggestion.id, currentTasks
+        )
+
+        this.suggestionService.edit(suggestion.id, {
+          title: suggestion.title,
+          projectId: projectId,
+          taskId: createdTask.id,
+          startTime: suggestion.startTime,
+          endTime: suggestion.endTime,
+          description: suggestion.description || undefined
+        }).subscribe({
+          next: (updatedSuggestion) => {
+            const updatedSuggestions = this.suggestions().map((item) =>
+              item.id === updatedSuggestion.id
+              ? updatedSuggestion
+              : item
+            );
+
+            this.suggestions.set(updatedSuggestions);
+            this.suggestionCreatingTask.set(null);
+            this.newSuggestionTaskTitle.set('');
+            this.showToast('Task created and assigned to the suggestion.');
+          },
+          error: (error) => {
+            this.showToast('The task was created but we could not assign it to the suggestion.');
+          }
+        });
+    },
+    error: (error) => {
+      this.showToast(error.error?.message ?? 'We could not create the task. Please try again.');
+    }
+  });
+}
+
+cancelCreateSuggestionTask(): void {
+  this.suggestionCreatingTask.set(null);
+  this.newSuggestionTaskTitle.set('');
+}
+
+
+updateSuggestionDescription(
+  suggestion: SuggestedWorkSession,
+  event: Event
+): void {
+  const textarea = event.target as HTMLTextAreaElement;
+  const description = textarea.value;
+
+  this.suggestionService.edit(suggestion.id, {
+    title: suggestion.title,
+    projectId: suggestion.projectId || undefined,
+    taskId: suggestion.taskId || undefined,
+    startTime: suggestion.startTime,
+    endTime: suggestion.endTime,
+    description: description || undefined
+  }).subscribe({
+    next: (updatedSuggestion) => {
+      const updatedSuggestions = this.suggestions().map((item) =>
+        item.id === updatedSuggestion.id
+          ? updatedSuggestion
+          : item
+      );
+
+      this.suggestions.set(updatedSuggestions);
+    },
+    error: (error) => {
+      this.showToast(error.error?.message ?? 'Unable to update the description.');
+    }
+  });
+}
+  
+
+suggestionEvidence = signal<SuggestedWorkSession | null>(null);
+
+seeSuggestionEvidence(suggestion: SuggestedWorkSession): void {
+  this.suggestionEvidence.set(suggestion);
+}
+
+closeSuggestionEvidence(): void {
+  this.suggestionEvidence.set(null);
+}
+
+// this is for fetching all the tasks to display in the suggestion panel 
+// goal here is connect the suggestion's selected project to this existing task 
+  private suggestionTasks = new Map<string, Task[]>;
+  private loadSuggestionTasks(suggestionId: string, projectId: string): void{
+    if (!projectId){
+      this.suggestionTasks.set(suggestionId, []);
+      return;
+    }
+
+    this.http.get<TaskApiResponse[]>(
+      `${this.apiBaseUrl}/tasks/project/${projectId}`,
+      this.requestOptions()
+    ).subscribe({
+      next: (tasks) => {
+        this.suggestionTasks.set(
+          suggestionId,
+          tasks.map((task) => ({
+            id: task.id,
+            projectId: task.projectId,
+            title: task.title
+          }))
+        );
+      },
+      error: (error) => {
+        this.showToast('We could not the tasks for this project.');
+      }
+    });
+  }
+
+  getSuggestionTasks(suggestionId: string): Task[]{
+    return this.suggestionTasks.get(suggestionId) || [];
+  }
   /*
   I decided to deviate from the previous use of the api/tasks/my-tasks GET
   because i think the system to should load every task on the project
@@ -1449,5 +1978,20 @@ export class LogtimeComponent implements OnDestroy {
       durationSeconds: entry.durationMinutes, 
       durationMinutes: Math.round(entry.durationMinutes / 60),
     };
+  }
+
+  formatDate(date: string | Date): string {
+    if (!date) return '';
+
+    return new Date(date).toLocaleDateString();
+  }
+
+  formatTime(date: string | Date): string {
+    if (!date) return '';
+
+    return new Date(date).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   }
 }

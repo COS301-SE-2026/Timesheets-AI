@@ -24,7 +24,7 @@ export interface TimeEntryResponse {
     taskId: string;
     startTime: string;
     endTime: string;
-    durationMinutes: number;
+    durationMinutes: number | null;
     entryType: 'MANUAL' | 'TIMER'; //matches the CHECK constraint, was entryTime
     description: string;
     isDeleted: boolean;
