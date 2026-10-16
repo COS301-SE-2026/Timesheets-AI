@@ -1318,7 +1318,7 @@ $border-colour: #f1f5f9;
         }
 
         .hero-title{
-            font-size: clamp(2.8rem, 5vw, 5rem);
+            font-size: clamp(2.2rem, 4.2vw, 4.2rem);
             line-height: 1.1;
         }
 
@@ -1344,6 +1344,60 @@ $border-colour: #f1f5f9;
         }
     }
 }
+
+/* HERO TITLE TYPING ANIMATION */
+.hero-title {
+    .typing-line {
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        width: 0;
+        animation: typing 1.2s steps(30, end) forwards;
+    }
+
+    .typing-line--second {
+        animation-delay: 1.2s;
+    }
+
+    .typing-highlight {
+        display: inline-block;
+        overflow: hidden;
+        white-space: nowrap;
+        width: 0;
+        vertical-align: bottom;
+        animation: typing-highlight 1.2s steps(30, end) forwards;
+        animation-delay: 2.4s;
+    }
+}
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes typing-highlight {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-title .typing-line,
+    .hero-title .typing-highlight {
+        animation: none;
+        width: auto;
+        overflow: visible;
+        white-space: normal;
+    }
+}
+    
 
 .help-cards-section{
     margin-top: 4rem;
