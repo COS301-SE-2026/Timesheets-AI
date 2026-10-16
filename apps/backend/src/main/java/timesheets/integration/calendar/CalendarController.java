@@ -51,9 +51,28 @@ public class CalendarController {
   public ResponseEntity<List<CalendarEvent>> getEvents(
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+
+    if (!startTime.isBefore(endTime)) {
+      return ResponseEntity.badRequest().build();
+    }
+
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    List<CalendarEvent> events = calendarService.getEvents(workspaceMemberId, startTime, endTime);
-    return ResponseEntity.ok(events);
+
+    // it is okay for accounts to be not connected to Google or Microsoft
+    /*
+     Connected users still retrieve their Google or Microsoft Calendar events
+     Disconnected users receive an empty list instead of an unhandled exceptopns
+
+     I need to check and fix the frontend to make it can distinguish between unconnected Calendar from a connected Calendar with no events
+    */
+
+    try {
+      List<CalendarEvent> events = calendarService.getEvents(workspaceMemberId, startTime, endTime);
+      return ResponseEntity.ok(events);
+
+    } catch (CalendarNotConnectedException e) {
+      return ResponseEntity.ok(List.of());
+    }
   }
 
   @GetMapping("/events/{externalEventId}")
