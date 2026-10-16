@@ -43,7 +43,6 @@ describe('LandingPageComponent', () => {
     expect(logos).toHaveLength(4);
   });
 
-  // ---------- NEW: marquee ----------
   it('should render the capability marquee with pills', () => {
     const compiled = fixture.nativeElement;
     const pills = compiled.querySelectorAll('.marquee-pill');
@@ -52,7 +51,6 @@ describe('LandingPageComponent', () => {
     expect(compiled.querySelectorAll('.marquee-group')).toHaveLength(2);
   });
 
-  // ---------- NEW: forecast section ----------
   it('should render the project forecast section', () => {
     const compiled = fixture.nativeElement;
 
@@ -67,34 +65,29 @@ describe('LandingPageComponent', () => {
     expect(points).toHaveLength(3);
   });
 
-  // ---------- NEW: mission / vision ----------
   it('should render mission and vision cards', () => {
     const compiled = fixture.nativeElement;
     const cards = compiled.querySelectorAll('.mission-card');
     expect(cards).toHaveLength(2);
   });
 
-  // ---------- NEW: impact stats ----------
   it('should render impact stats', () => {
     const compiled = fixture.nativeElement;
     const stats = compiled.querySelectorAll('.stats-section .stat-item');
     expect(stats).toHaveLength(4);
   });
 
-  // ---------- NEW: landing FAQ ----------
   it('should render the landing FAQ with platform questions', () => {
     const compiled = fixture.nativeElement;
     const items = compiled.querySelectorAll('.landing-faq .faq-item');
     expect(items.length).toBeGreaterThanOrEqual(5);
   });
 
-  // ---------- NEW: closing CTA ----------
   it('should render the closing call-to-action section', () => {
     const compiled = fixture.nativeElement;
     expect(compiled.querySelector('.cta-section')).toBeTruthy();
   });
 
-  // ---------- NEW: section navigation ----------
   it('should render in-page section navigation with anchor links', () => {
     const compiled = fixture.nativeElement;
     const links = compiled.querySelectorAll('.nav-links a');
@@ -107,13 +100,11 @@ describe('LandingPageComponent', () => {
     expect(hrefs).toContain('#faq');
   });
 
-  // ---------- NEW: footer ----------
   it('should render the site footer', () => {
     const compiled = fixture.nativeElement;
     expect(compiled.querySelector('.site-footer')).toBeTruthy();
   });
 
-  // ---------- tab switching still works ----------
   it('should switch to help view and back to home view', () => {
     const compiled = fixture.nativeElement;
 
