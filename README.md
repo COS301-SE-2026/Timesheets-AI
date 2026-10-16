@@ -19,17 +19,30 @@
   Created by <strong>Team Cybernauts</strong> &nbsp;·&nbsp; University of Pretoria &nbsp;·&nbsp; COS 301 Capstone 2026
 </p>
 
-<p align="center">
-  <img src="./assets/images/team-logo-light.png#gh-light-mode-only" width="100" alt="Cybernauts"/>
-  <img src="./assets/images/team-logo-light.png#gh-dark-mode-only" width="100" alt="Cybernauts"/>
-  &nbsp;&nbsp;&nbsp;
-  <img src="./assets/images/client-logo.png" width="100" alt="Momentum Life"/>
-</p>
+---
 
+<div align="center">
+
+<p align="center"><strong>Quick Links</strong></p>
+
+[![About](https://img.shields.io/badge/ABOUT-0F4C91?style=for-the-badge)](#about-momently)
+[![Documentation](https://img.shields.io/badge/DOCUMENTATION-E07830?style=for-the-badge)](#documentation)
+[![Dashboard](https://img.shields.io/badge/PROJECT_DASHBOARD-0F4C91?style=for-the-badge)](#project-dashboard)
+[![Features](https://img.shields.io/badge/FEATURES-E07830?style=for-the-badge)](#features)
+[![Getting Started](https://img.shields.io/badge/GETTING_STARTED-0F4C91?style=for-the-badge)](#getting-started)
+[![Commands](https://img.shields.io/badge/COMMAND_REFERENCE-E07830?style=for-the-badge)](#command-reference)
+[![Tech Stack](https://img.shields.io/badge/TECH_STACK-0F4C91?style=for-the-badge)](#technology-stack)
+[![Team](https://img.shields.io/badge/TEAM_CYBERNAUTS-E07830?style=for-the-badge)](#team-cybernauts)
+[![Important Links](https://img.shields.io/badge/IMPORTANT_LINKS-0F4C91?style=for-the-badge)](#important-links)
+[![Contact](https://img.shields.io/badge/CONTACT-E07830?style=for-the-badge)](#contact)
+
+</div>
 
 ---
 
-## About Momently
+<a id="about-momently"></a>
+<p align="center"><strong>About Momently</strong></p>
+
 
 **Momently** is a web-based time-tracking and productivity insights platform built for Momentum Life's IT department. Where existing tools track hours, Momently understands them - surfacing AI-driven insights into where effort goes, flagging anomalies, integrating with Jira and GitHub, and giving managers the visibility they need to lead high-performing teams.
 
@@ -39,7 +52,12 @@
   </a>
 </p>
 
-## Documentation
+---
+
+<a id="documentation"></a>
+<details>
+<summary><strong>Documentation</strong></summary>
+
 
 <details open>
 <summary><strong>Demo 4 Documentation</strong></summary>
@@ -47,18 +65,18 @@
 
 | Document | Link |
 |---|---|
-| Software Requirements Specification | [View PDF](./docs/demo-4/Software%20Requirements%20Specifications.pdf) |
-| Software Architecture Specification | [View PDF](./docs/demo-4/Software%20Architecture%20Specifications.pdf) |
-| API Service Contract | [View PDF](./docs/demo-4/API%20Service%20Contract.pdf) |
-| Mapping Quality Requirements to Architectural Decisions | [View PDF](./docs/demo-4/Mapping%20Quality%20Requirements%20to%20Architectural%20Decisions.pdf) |
-| Acceptance Criteria | [View PDF](./docs/demo-4/Acceptance%20Criteria%20%281%29.pdf) |
-| Coding Standards Handbook | [View PDF](./docs/demo-4/Final%20Coding%20Standards%20Handbook%20%281%29.pdf) |
-| Testing Policy | [View PDF](./docs/demo-4/Testing%20Policy.pdf) |
-| NFR Testing | [View PDF](./docs/demo-4/NFR%20TESTING.pdf) |
-| User Manual | [View PDF](./docs/demo-4/User_Manual_updated%20%282%29.pdf) |
-| Project Forecast (Wow Factor) | [View PDF](./docs/demo-4/Project%20forecast%20wow%20factor%20explained.pdf) |
-| Domain Model | [View Diagram](./docs/demo-4/Domain%20model.drawio.png) |
-| Deployment Diagram | [View Diagram](./docs/demo-4/Deployment%20diagram.png) |
+| Software Requirements Specification | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Software%20Requirements%20Specifications.pdf) |
+| Software Architecture Specification | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Software%20Architecture%20Specifications.pdf) |
+| API Service Contract | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/API%20Service%20Contract.pdf) |
+| Mapping Quality Requirements to Architectural Decisions | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Mapping%20Quality%20Requirements%20to%20Architectural%20Decisions.pdf) |
+| Acceptance Criteria | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Acceptance%20Criteria%20%281%29.pdf) |
+| Coding Standards Handbook | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Final%20Coding%20Standards%20Handbook%20%281%29.pdf) |
+| Testing Policy | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Testing%20Policy.pdf) |
+| NFR Testing | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/NFR%20TESTING.pdf) |
+| User Manual | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/User_Manual_updated%20%282%29.pdf) |
+| Project Forecast (Wow Factor) | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Project%20forecast%20wow%20factor%20explained.pdf) |
+| Domain Model | [![View Diagram](https://img.shields.io/badge/OPEN_DIAGRAM-E07830?style=flat-square&logo=diagramsnet&logoColor=white)](./docs/demo-4/Domain%20model.drawio.png) |
+| Deployment Diagram | [![View Diagram](https://img.shields.io/badge/OPEN_DIAGRAM-E07830?style=flat-square&logo=diagramsnet&logoColor=white)](./docs/demo-4/Deployment%20diagram.png) |
 
 </details>
 
@@ -69,16 +87,18 @@
 
 | Document | Link |
 |---|---|
-| System Requirements Specification | [View PDF](./docs/demo-4) |
-| System Architecture Specification | [View PDF](./docs/demo-4) |
-| Coding Standards Handbook | [View PDF](./docs/demo-4) |
-| Testing Policy | [View PDF](./docs/demo-4) |
-| User Manual | [View PDF](./docs/demo-4) |
-| Brand Style Guide | [View PDF](./docs/demo-4) |
-| Wireframes | [View Figma ](https://www.figma.com/design/Ras0nDzb87hQtSOP5NZPZK/Wireframe-1?node-id=126-1521&t=H2hiPy2OuQYZ0KTM-1) |
-| Demo 3 Video | [View Video](https://drive.google.com/drive/folders/1gpO3XaNUE5g1n7dqh99ziZ2QS6ZSBFLI?usp=drive_link) |
-| Brand Style Site | [View Site](https://momently-brand-style.netlify.app/) |
-| NFR TESTING | [View PDF](./docs/demo-4/NFR-TESTING.pdf) |
+| System Requirements Specification | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4) |
+| System Architecture Specification | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4) |
+| Coding Standards Handbook | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4) |
+| Testing Policy | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4) |
+| User Manual | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4) |
+| Brand Style Guide | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4) |
+| Wireframes | [![View Figma](https://img.shields.io/badge/OPEN_FIGMA-0F4C91?style=flat-square&logo=figma&logoColor=white)](https://www.figma.com/design/Ras0nDzb87hQtSOP5NZPZK/Wireframe-1?node-id=126-1521&t=H2hiPy2OuQYZ0KTM-1) |
+| Demo 3 Video | [![View Video](https://img.shields.io/badge/WATCH_VIDEO-E07830?style=flat-square&logo=youtube&logoColor=white)](https://drive.google.com/drive/folders/1gpO3XaNUE5g1n7dqh99ziZ2QS6ZSBFLI?usp=drive_link) |
+| Brand Style Site | [![View Site](https://img.shields.io/badge/VISIT_SITE-0F4C91?style=flat-square&logo=googlechrome&logoColor=white)](https://momently-brand-style.netlify.app/) |
+| NFR TESTING | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/NFR-TESTING.pdf) |
+
+</details>
 
 <details open>
 <summary><strong>Demo 2 Documentation</strong></summary>
@@ -111,7 +131,14 @@
 </div>
 </details>
 
-## Project Dashboard
+---
+
+</details>
+
+<a id="project-dashboard"></a>
+<details>
+<summary><strong>Project Dashboard</strong></summary>
+
 
 
 ### Build and Quality
@@ -170,8 +197,14 @@
 </p>
 </p>
 
+---
 
-## Important Links
+</details>
+
+<a id="important-links"></a>
+<details>
+<summary><strong>Important Links</strong></summary>
+
 
 | Link | Description |
 |------|-------------|
@@ -184,10 +217,12 @@
 | [Architecture](./docs/architecture/) | Domain model and ERD |
 | [Demo 1 video](./docs/) | Video recording for demo one |
 
+</details>
 
+<a id="technology-stack"></a>
+<details>
+<summary><strong>Technology Stack</strong></summary>
 
-
-## <img src="https://img.icons8.com/?size=100&id=hSm5FhlnhnlL&format=png&color=000000" width="22"> Technology Stack
 
 ### Core Stack
 
@@ -271,8 +306,14 @@
   <img src="https://img.shields.io/badge/Yarn-Package_Manager-2C8EBB?style=for-the-badge&logo=yarn&logoColor=white" alt="Yarn"/>
 </p>
 
+---
 
-## Repository Structure
+</details>
+
+<a id="repository-structure"></a>
+<details>
+<summary><strong>Repository Structure</strong></summary>
+
 
 
 ```
@@ -472,7 +513,14 @@
 └── yarn.lock
 ```
 
-## Team Cybernauts
+---
+
+</details>
+
+<a id="team-cybernauts"></a>
+<details>
+<summary><strong>Team Cybernauts</strong></summary>
+
 
 <p align="center">
   <img src="./assets/images/team-photo.jpeg" width="580" alt="Team Cybernauts" style="border-radius:12px"/>
@@ -506,8 +554,14 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 | **Kgaugelo Matsena** | AWS infrastructure, CI/CD pipelines, Docker, cloud deployment, external integrations |
 | **Cleopatra Kwenda** | Testing strategy, E2E testing with Cypress, QA, documentation, system reliability |
 
+---
 
-## Features
+</details>
+
+<a id="features"></a>
+<details>
+<summary><strong>Features</strong></summary>
+
 
 <table>
 <tr>
@@ -536,7 +590,14 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 </tr>
 </table>
 
-## Getting Started
+---
+
+</details>
+
+<a id="getting-started"></a>
+<details>
+<summary><strong>Getting Started</strong></summary>
+
 
 ### Prerequisites
 
@@ -640,7 +701,14 @@ Use this if you are on a low-spec machine, on Windows without WSL, or want to ge
 3. Wait approximately 3 minutes for the environment to set up automatically
 4. Run Option A or B inside the Codespaces terminal
 
-## Command Reference
+---
+
+</details>
+
+<a id="command-reference"></a>
+<details>
+<summary><strong>Command Reference</strong></summary>
+
 
 <p> Run all commands from the repo root. Full reference in [`SETUP.md`](./SETUP.md).</p>
 
@@ -727,9 +795,12 @@ curl -s -X POST http://localhost:8080/api/auth/login \
 
 > Full setup guide and command reference: [`SETUP.md`](./SETUP.md)
 
+</details>
 
+<a id="documentation"></a>
+<details>
+<summary><strong>Documentation</strong></summary>
 
-## Documentation
 
 | Document | Location |
 |----------|----------|
@@ -743,14 +814,12 @@ curl -s -X POST http://localhost:8080/api/auth/login \
 
 See the full [Git and Code Standards](./docs/) guide for commit conventions, branch rules, and the PR checklist.
 
+---
 
-## Contact
+</details>
 
-<p align="left">
-  <a href="mailto:cybernauts301@gmail.com">
-    <img src="https://img.shields.io/badge/cybernauts301%40gmail.com-0F4C91?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"/>
-  </a>
-</p>
+<a id="contact"></a>
+<p align="center"><strong>Contact Info</strong></p>
 
 
 <p align="center">
@@ -768,4 +837,11 @@ See the full [Git and Code Standards](./docs/) guide for commit conventions, bra
 <p align="center">
   <strong>Momently</strong> &nbsp;·&nbsp; <em>Every moment counts.</em><br/>
   <sub>Team Cybernauts &nbsp;·&nbsp; COS 301 &nbsp;·&nbsp; University of Pretoria &nbsp;·&nbsp; 2026</sub>
+</p>
+
+<p align="center"> </p>
+
+<p align="center"><a href="mailto:cybernauts301@gmail.com">
+    <img src="https://img.shields.io/badge/cybernauts301%40gmail.com-0F4C91?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"/>
+  </a>
 </p>
