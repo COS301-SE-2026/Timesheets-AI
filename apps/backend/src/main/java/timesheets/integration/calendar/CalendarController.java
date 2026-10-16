@@ -59,9 +59,9 @@ public class CalendarController {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
 
-    // it is okay for accounts to be not connected to Google or Microsoft
     /*
-     Connected users still retrieve their Google or Microsoft Calendar events
+    Calendar integrations are optional
+     Connected users retrieve their Google or Microsoft Calendar events
      Disconnected users receive an empty list instead of an unhandled exceptopns
 
      I need to check and fix the frontend to make it can distinguish between unconnected Calendar from a connected Calendar with no events
@@ -87,6 +87,7 @@ public class CalendarController {
     }
   }
 
+  // Devs should track time without connecting to Google or Microsoft calendar
   @GetMapping("/vs-tracked")
   public ResponseEntity<CalendarVsTrackedResponse> getVsTracked(
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
@@ -99,38 +100,43 @@ public class CalendarController {
 
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
     LocalDateTime start = from.atStartOfDay();
-    LocalDateTime end = to.atTime(23, 59, 59);
+    LocalDateTime end = to.plusDays(1).atStartOfDay();
 
-    List<CalendarEvent> events;
-    try {
-      events = calendarService.getEvents(workspaceMemberId, start, end);
-    } catch (CalendarNotConnectedException e) {
-      // normal state, user just has not connected yet
-      return ResponseEntity.ok(new CalendarVsTrackedResponse(false, 0, 0, 0));
-    } catch (RuntimeException e) {
-      // real failure, log it so it does not hide behind "not connected"
-      log.error("calendar vs-tracked failed for member {}", workspaceMemberId, e);
-      return ResponseEntity.ok(new CalendarVsTrackedResponse(false, 0, 0, 0));
-    }
+    // end time is to include midnight so e.g. 2026-10-16T00:00:00 to 2026-10-17T00:00:00
 
-    double calendarHours =
-        events.stream()
-            .filter(e -> e.getStartTime() != null && e.getEndTime() != null)
-            .mapToDouble(
-                e ->
-                    Duration.between(e.getStartTime(), e.getEndTime()).toMinutes()
-                        / MINUTES_PER_HOUR)
-            .sum();
-
+    // calculate tracked hours before fetching Calendar event sbecause a developer can track time
+    // without connecting Google or Microsoft Calendar
     double trackedHours =
         timeEntryRepository
-            .findByWorkspaceMemberIdAndStartTimeBetween(workspaceMemberId, start, end)
+            .findByWorkspaceMemberIdAndStartTimeGreaterThanEqualAndStartTimeLessThan(
+                workspaceMemberId, start, end)
             .stream()
             .filter(t -> !Boolean.TRUE.equals(t.getIsDeleted()))
             .mapToDouble(
                 t ->
                     (t.getDurationSeconds() != null ? t.getDurationSeconds() : 0)
                         / SECONDS_PER_HOUR)
+            .sum();
+
+    List<CalendarEvent> events;
+    try {
+      events = calendarService.getEvents(workspaceMemberId, start, end);
+    } catch (CalendarNotConnectedException e) {
+      // normal state, user just has not connected yet
+      // prevented the system from reporting zero tracked hours if the user is not connected
+      return ResponseEntity.ok(new CalendarVsTrackedResponse(false, 0, round2(trackedHours), 0));
+    }
+
+    // max - protection against negative Calendar durations
+    double calendarHours =
+        events.stream()
+            .filter(e -> e.getStartTime() != null && e.getEndTime() != null)
+            .mapToDouble(
+                e ->
+                    Math.max(
+                        0,
+                        Duration.between(e.getStartTime(), e.getEndTime()).toMinutes()
+                            / MINUTES_PER_HOUR))
             .sum();
 
     double unmatchedHours = Math.max(calendarHours - trackedHours, 0);
