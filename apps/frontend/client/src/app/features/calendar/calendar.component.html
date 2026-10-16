@@ -51,13 +51,31 @@ Related Requirements: N/A
                 </button>
             }@else{
                 <!-- NO CALENDAR CONNECTED -->
-                <button 
+                <!-- <button 
                     class="sync-button"
                     (click)="connectCalendar()"
                     [disabled]="isSyncing()">
                     <i class="fa-solid fa-calendar-plus"></i>
                     Connect calendar
+                </button> -->
+
+                <!-- include Google or Microsoft calendars -->
+
+                <div class="calendar-connect-actions">
+                    <button 
+                        class="sync-button"
+                        (click)="connectCalendar('GOOGLE')">
+                        <i class="fa-brands fa-google fa-google-styling"></i>
+                        Connect Google Calendar
                 </button>
+
+                <button 
+                        class="sync-button"
+                        (click)="connectCalendar('MICROSOFT')">
+                        <i class="fa-brands fa-microsoft fa-outlook-styling"></i>
+                        Connect Outlook
+                </button>
+                </div>
             }
         </div>
     </header>
@@ -121,6 +139,16 @@ Related Requirements: N/A
 
         <!-- CALENDAR AREA -->
         <div class="calendar-container">
+
+            @if (!isConnected()){
+                <div class="calendar-empty-state">
+                    <i class="fa-regular fa-calendar"></i>
+                    <p>
+                        No Calendar connected.
+                        Connect Google Calendar or Outlook to view your events.
+                    </p>
+                </div>
+            }
             <full-calendar
                 #calendar
                 [options]="calendarOptions">
