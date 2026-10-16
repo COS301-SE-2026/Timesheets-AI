@@ -128,15 +128,24 @@ public class CalendarController {
     }
 
     // max - protection against negative Calendar durations
+
+    /*
+
+     Calendar event starts at 11pm on 10 Oct and it ends at 2am on 11 Oct
+     The event was for 3 hhours
+     but 1 hour is for 10th and rest to 11th
+    */
     double calendarHours =
         events.stream()
             .filter(e -> e.getStartTime() != null && e.getEndTime() != null)
             .mapToDouble(
-                e ->
-                    Math.max(
-                        0,
-                        Duration.between(e.getStartTime(), e.getEndTime()).toMinutes()
-                            / MINUTES_PER_HOUR))
+                e -> {
+                  LocalDateTime eventStart =
+                      e.getStartTime().isBefore(start) ? start : e.getStartTime();
+                  LocalDateTime eventEnd = e.getEndTime().isAfter(end) ? end : e.getStartTime();
+                  return Math.max(
+                      0, Duration.between(eventStart, eventEnd).toSeconds() / SECONDS_PER_HOUR);
+                })
             .sum();
 
     double unmatchedHours = Math.max(calendarHours - trackedHours, 0);
