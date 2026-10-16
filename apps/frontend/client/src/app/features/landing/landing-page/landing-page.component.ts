@@ -1,7 +1,7 @@
 /*
 Author: Cleopatra Kwenda
 Date: 2026-07-30
-Purpose: contains all the necessary data that the website requires.
+Purpose: Contains the data and interactions required by the landing page.
 Related Requirement: N/A
 */
 
@@ -10,7 +10,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HourglassComponent } from '../../../shared/components/hourglass/hourglass.component';
 
-
 @Component({
   selector: 'app-landing-page',
   standalone: true,
@@ -18,143 +17,156 @@ import { HourglassComponent } from '../../../shared/components/hourglass/hourgla
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.scss'
 })
-
 export class LandingPageComponent {
-
   protected readonly brandLogo = '/assets/momently.png';
   activeTab: 'home' | 'help' = 'home';
 
+  // Keep these names only if the corresponding approved brand assets are available.
   clientLogos = [
-    { name: 'momentum METROPOLITAN' },
-    { name: ' Gaurdrisk ' },
-    { name: 'momentum health' },
+    { name: 'Momentum Metropolitan' },
+    { name: 'Guardrisk' },
+    { name: 'Momentum Health' },
     { name: 'ER24' },
-    { name: 'momentum investments' },
+    { name: 'Momentum Investments' },
   ];
 
   features = [
     {
-      title: 'Effortless Tracking',
-      description: 'Track time in real-time or log it later-quick, simple, and flexible.',
+      title: 'Effortless Time Tracking',
+      description: 'Track time with a timer or add a manual entry when you need to record work afterwards.',
       bgColor: '#eff6ff',
       iconColor: '#2563eb',
       icon: 'fa-solid fa-clock'
     },
     {
-      title: 'Seamless Integrations',
-      description: 'Connect with Jira, GitHub, Outlook Calendar and more tools you already use.',
+      title: 'Connected Workflows',
+      description: 'Bring work context together with integrations such as Jira, GitHub and calendar data where connected.',
       bgColor: '#f0fdf4',
       iconColor: '#16a34a',
       icon: 'fa-solid fa-puzzle-piece'
     },
     {
       title: 'AI-Powered Insights',
-      description: 'Get intelligent analytics and predictive insights that help you work smarter.',
+      description: 'Use AI-assisted analysis to understand time entries, work patterns and potential delivery risks.',
       bgColor: '#fff7ed',
       iconColor: '#ea580c',
       icon: 'fa-solid fa-chart-line'
     },
     {
-      title: 'Accurate & Trusted Data',
-      description: 'AI detects anomalies and ensures your time data is accurate and reliable.',
+      title: 'Timesheet Review',
+      description: 'Give managers context to review submitted timesheets and investigate entries that may need attention.',
       bgColor: '#faf5ff',
       iconColor: '#9333ea',
       icon: 'fa-solid fa-shield-halved'
     },
   ];
 
-  // Capability tags that scroll across the marquee
+  // Capability tags that scroll across the marquee.
   featureTags = [
-    { label: 'Real-time tracking',   color: '#2563eb', icon: 'fa-solid fa-clock' },
-    { label: 'Jira & GitHub sync',   color: '#16a34a', icon: 'fa-solid fa-puzzle-piece' },
-    { label: 'AI-powered insights',  color: '#ea580c', icon: 'fa-solid fa-chart-line' },
-    { label: 'Predictive forecasts', color: '#9333ea', icon: 'fa-solid fa-telescope' },
-    { label: 'Anomaly detection',    color: '#0d9488', icon: 'fa-solid fa-shield-halved' },
-    { label: 'Outlook Calendar',     color: '#2563eb', icon: 'fa-solid fa-calendar-days' },
-    { label: 'Team capacity',        color: '#ea580c', icon: 'fa-solid fa-users' },
-    { label: 'One-click timesheets', color: '#16a34a', icon: 'fa-solid fa-paper-plane' },
+    { label: 'Timer and manual entries', color: '#2563eb', icon: 'fa-solid fa-clock' },
+    { label: 'Jira and GitHub context', color: '#16a34a', icon: 'fa-solid fa-puzzle-piece' },
+    { label: 'AI-assisted insights', color: '#ea580c', icon: 'fa-solid fa-chart-line' },
+    { label: 'Project delivery forecasts', color: '#9333ea', icon: 'fa-solid fa-telescope' },
+    { label: 'Timesheet review signals', color: '#0d9488', icon: 'fa-solid fa-shield-halved' },
+    { label: 'Calendar context', color: '#2563eb', icon: 'fa-solid fa-calendar-days' },
+    { label: 'Team effort visibility', color: '#ea580c', icon: 'fa-solid fa-users' },
+    { label: 'Manager approvals', color: '#16a34a', icon: 'fa-solid fa-clipboard-check' },
   ];
 
-  // Project forecast section — supporting points
+  // Project forecast section — supporting points.
   forecastPoints = [
     {
-      title: 'Confidence, not guesswork',
-      description: 'Every sprint gets a live on-time confidence score based on actual logged hours.',
+      title: 'Plan with better context',
+      description: 'Use logged time and remaining work to understand the current state of a project.',
       icon: 'fa-solid fa-gauge-high'
     },
     {
-      title: 'Slip detected early',
-      description: 'Momently flags at-risk tickets days before they become a delivery problem.',
+      title: 'Identify potential delivery risks',
+      description: 'Surface work that may need attention before it affects delivery.',
       icon: 'fa-solid fa-triangle-exclamation'
     },
     {
-      title: 'Act on AI suggestions',
-      description: 'Reassignment and scope recommendations show exactly what would move the date.',
+      title: 'Turn insights into action',
+      description: 'Use AI-generated guidance to support planning and workload discussions.',
       icon: 'fa-solid fa-wand-magic-sparkles'
     },
   ];
 
-  // Project forecast section — sprint effort distribution
+  // Illustrative values used only to style the landing-page forecast preview.
   forecastBars = [
-    { label: 'Backend',  value: 82 },
+    { label: 'Backend', value: 82 },
     { label: 'Frontend', value: 64 },
-    { label: 'QA',       value: 91 },
-    { label: 'Design',   value: 45 },
+    { label: 'QA', value: 91 },
+    { label: 'Design', value: 45 },
   ];
 
-  // Impact stats band
+  // Describe product capabilities instead of publishing unsupported performance claims.
   impactStats = [
-    { value: '18%',   label: 'more focus time per sprint' },
-    { value: '3d',    label: 'average slip caught early' },
-    { value: '5 min', label: 'to onboard your team' },
-    { value: '100%',  label: 'of logged hours accounted for' },
+    { value: 'Timer + manual', label: 'ways to record work' },
+    { value: 'Jira + GitHub', label: 'connected development context' },
+    { value: 'AI-assisted', label: 'timesheet review insights' },
+    { value: 'Project-level', label: 'delivery forecasting' },
   ];
 
-  // Platform-level FAQs shown on the landing page
+  // Platform-level FAQs shown on the landing page.
   landingFaqs = [
     {
       question: 'What exactly is Momently?',
-      answer: 'Momently is an AI-driven time analytics platform built for software development teams. It tracks time against projects and tasks, then turns that data into insight — forecasts, anomaly alerts, and capacity views that help teams deliver more predictably.'
+      answer: 'Momently is a time-tracking and time-analytics platform for software development teams. It brings together time entries, project and task context, timesheet review, and AI-assisted insights to help teams understand effort and delivery.'
     },
     {
       question: 'Who is Momently built for?',
-      answer: 'Development teams, engineering managers and delivery leads who want visibility into where their hours actually go. If your team already lives in Jira, GitHub or Outlook Calendar, Momently slots in without changing how they work.'
+      answer: 'Momently is designed for developers who record time against projects and tasks, and managers who review submitted timesheets and need better visibility into team effort and project progress.'
     },
     {
       question: 'How is Momently different from a basic timer?',
-      answer: 'A timer tells you how long something took. Momently tells you what that means — how confident you should be in a delivery date, which tickets are quietly slipping, and where your team\'s capacity is really being spent.'
+      answer: 'A timer records duration. Momently also connects time entries with project and task context, supports manager timesheet review, and provides AI-assisted insights and project delivery forecasting.'
     },
     {
-      question: 'Do I need to install anything?',
-      answer: 'No. Momently runs in the browser and connects to the tools your team already uses. Most teams are logging time within five minutes of creating a workspace.'
+      question: 'Can I record time if I forgot to start the timer?',
+      answer: 'Yes. Alongside timer-based tracking, users can add manual time entries to record work after it has happened.'
     },
     {
-      question: 'Is my data safe?',
-      answer: 'Yes. Your time data belongs to you and your workspace. We do not sell it, share it with third parties, or use it to train models outside your own workspace analytics.'
+      question: 'How does timesheet review work?',
+      answer: 'Developers can submit their timesheets for review. Managers can examine submitted entries and use available AI-generated signals as supporting context before approving a timesheet or requesting changes.'
     },
     {
-      question: 'How much does it cost?',
-      answer: 'Momently is free to start — create a workspace, invite your team and see your first forecast without entering payment details. Paid plans for larger teams are available when you need them.'
+      question: 'What do the AI insights and project forecast do?',
+      answer: 'AI insights help identify patterns or entries that may need attention. Project forecasting uses available project and time-tracking information to help teams assess delivery progress and potential risks. These insights support decisions rather than replacing human judgement.'
+    },
+    {
+      question: 'Which tools can Momently connect to?',
+      answer: 'Momently has integration workflows for tools such as Jira and GitHub, with calendar context also part of the product. The information available depends on which integrations are configured and connected.'
+    },
+    {
+      question: 'Is the landing-page forecast live data?',
+      answer: 'No. The forecast and timesheet review panels on this landing page are illustrative previews, not live workspace data or guaranteed outcomes.'
     },
   ];
 
-  toggleTab(): void {
-    this.activeTab = this.activeTab === 'home' ? 'help' : 'home';
+  setActiveTab(tab: 'home' | 'help'): void {
+    this.activeTab = tab;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   goHome(): void {
     this.activeTab = 'home';
-  }
-
-  setActiveTab(tab: 'home' | 'help'): void {
-    this.activeTab = tab;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   downloadManual(): void {
-    window.open('https://drive.google.com/file/d/18TvwQfwzIs9q5z6C6n2ud_Ffpb0jL1fa/view?usp=drive_link', '_blank', 'noopener, noreferrer');
+    window.open(
+      'https://drive.google.com/file/d/18TvwQfwzIs9q5z6C6n2ud_Ffpb0jL1fa/view?usp=drive_link',
+      '_blank',
+      'noopener,noreferrer'
+    );
   }
 
   watchDemo(): void {
-    window.open('https://youtu.be/NED-IekCKc8?si=0AQHgPD3XTn4RCeM', '_blank', 'noopener, noreferrer');
+    window.open(
+      'https://youtu.be/NED-IekCKc8?si=0AQHgPD3XTn4RCeM',
+      '_blank',
+      'noopener,noreferrer'
+    );
   }
 }

@@ -68,9 +68,10 @@ $border-colour: #f1f5f9;
     justify-content: space-between;
     gap: 1.5rem;
     padding: 1rem 0;
-    position: sticky;
-    top: 0;
-    z-index: 50;
+    // Keep the header in normal document flow; section links should not pin
+    // the navbar over the page content while scrolling.
+    position: relative;
+    z-index: 5;
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -1709,5 +1710,379 @@ $border-colour: #f1f5f9;
             padding: 0 1.1rem 1.1rem;
             font-size: 0.875rem;
         }
+    }
+}
+
+/* ============================================================
+   LANDING PAGE CONTENT UPDATES
+   ============================================================ */
+
+/* Anchor targets remain visible and are not hidden beneath the header. */
+#features,
+#forecast,
+#timesheet-review,
+#mission,
+#faq {
+    scroll-margin-top: 1.5rem;
+}
+
+.trust-description {
+    max-width: 760px;
+    margin: -1.25rem auto 2.5rem;
+    color: $text-muted;
+    font-size: 0.98rem;
+    line-height: 1.7;
+}
+
+/* Two clickable cards give both product highlights equal visibility. */
+.wow-section {
+    margin: 0 0 7rem;
+}
+
+.wow-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+
+    @media (max-width: 720px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.wow-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 300px;
+    padding: 2rem;
+    border: 1px solid $border-colour;
+    border-radius: 24px;
+    color: inherit;
+    text-decoration: none;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.06);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+
+    &:hover,
+    &:focus-visible {
+        transform: translateY(-5px);
+        box-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
+        outline: none;
+    }
+
+    h3 {
+        margin: 0.65rem 0;
+        color: $text-dark;
+        font-size: 1.45rem;
+        line-height: 1.25;
+    }
+
+    p {
+        margin: 0 0 1.5rem;
+        color: $text-muted;
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
+
+    &--forecast {
+        background: linear-gradient(135deg, #f0f6ff 0%, #ffffff 75%);
+        border-color: #dbeafe;
+
+        &:hover,
+        &:focus-visible {
+            border-color: #93c5fd;
+        }
+
+        .wow-card-icon,
+        .wow-card-link {
+            color: $primary-blue;
+        }
+    }
+
+    &--review {
+        background: linear-gradient(135deg, #fff5ed 0%, #ffffff 75%);
+        border-color: #ffedd5;
+
+        &:hover,
+        &:focus-visible {
+            border-color: #fdba74;
+        }
+
+        .wow-card-icon,
+        .wow-card-link {
+            color: $primary-orange;
+        }
+    }
+}
+
+.wow-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+    font-size: 1.35rem;
+}
+
+.wow-card-kicker {
+    margin-top: 1.35rem;
+    color: $text-muted;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+}
+
+.wow-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: auto;
+    font-size: 0.9rem;
+    font-weight: 750;
+}
+
+/* AI-assisted timesheet review highlight. */
+.review-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    margin: 0 0 7rem;
+    padding: 4rem;
+    border: 1px solid #ffedd5;
+    border-radius: 32px;
+    background: linear-gradient(135deg, #fffaf5 0%, #ffffff 52%, #f4f8ff 100%);
+
+    @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+        padding: 2.5rem;
+    }
+
+    @media (max-width: 640px) {
+        padding: 1.5rem;
+        border-radius: 22px;
+    }
+}
+
+.review-copy {
+    h2 {
+        margin: 0 0 1.25rem;
+        color: $text-dark;
+        font-family: $font-special-gothic;
+        font-size: clamp(2rem, 3.6vw, 3.15rem);
+        line-height: 1.1;
+        letter-spacing: -0.015em;
+
+        .highlight { color: $primary-orange; }
+    }
+
+    > p {
+        margin: 0 0 1.5rem;
+        color: $text-muted;
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    .review-badge {
+        color: $primary-orange;
+        background: #fff0e4;
+    }
+}
+
+.review-points {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0 0 2rem;
+    padding: 0;
+    list-style: none;
+
+    li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        color: $text-muted;
+        font-size: 0.92rem;
+        line-height: 1.6;
+
+        > i {
+            margin-top: 0.2rem;
+            color: #0f9488;
+            flex-shrink: 0;
+        }
+
+        strong { color: $text-dark; }
+    }
+}
+
+.review-panel {
+    min-width: 0;
+    padding: 1.75rem;
+    border: 1px solid #e8edf5;
+    border-radius: 24px;
+    background: white;
+    box-shadow: 0 28px 60px rgba(15, 23, 42, 0.12);
+
+    @media (max-width: 640px) {
+        padding: 1.1rem;
+    }
+}
+
+.review-panel-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .panel-eyebrow {
+        display: block;
+        margin-bottom: 0.35rem;
+        color: $text-muted;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+    }
+
+    h3 {
+        margin: 0;
+        color: $text-dark;
+        font-size: 1.3rem;
+    }
+}
+
+.review-status {
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    background: #fff7ed;
+    color: #c2410c;
+    font-size: 0.72rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.review-person {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem 0;
+    border-top: 1px solid #eef2f7;
+    border-bottom: 1px solid #eef2f7;
+
+    .review-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        border-radius: 13px;
+        background: #eff6ff;
+        color: $primary-blue;
+        font-weight: 800;
+    }
+
+    div { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+    strong { color: $text-dark; font-size: 0.9rem; }
+    span:not(.review-avatar) { color: $text-muted; font-size: 0.76rem; }
+}
+
+.review-hours {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+
+    > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+        padding: 0.9rem;
+        border-radius: 13px;
+        background: #f8fafc;
+    }
+
+    span { color: $text-muted; font-size: 0.75rem; }
+    strong { color: $text-dark; font-size: 0.9rem; }
+}
+
+.review-insight {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 1rem;
+    border: 1px solid #ffedd5;
+    border-radius: 14px;
+    background: #fff7ed;
+
+    > i { margin-top: 0.15rem; color: $primary-orange; }
+    strong { color: #9a3412; font-size: 0.88rem; }
+    p { margin: 0.35rem 0 0; color: #7c2d12; font-size: 0.8rem; line-height: 1.55; }
+}
+
+.review-entry {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.9rem;
+    border: 1px solid #e8edf5;
+    border-radius: 13px;
+
+    .review-entry-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 11px;
+        background: #eff6ff;
+        color: $primary-blue;
+    }
+
+    div { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+    strong { color: $text-dark; font-size: 0.82rem; }
+    div span { color: $text-muted; font-size: 0.7rem; line-height: 1.4; }
+
+    .review-check {
+        margin-left: auto;
+        color: #0f766e;
+        font-size: 0.72rem;
+        font-weight: 800;
+    }
+}
+
+.review-disclaimer {
+    margin: 1rem 0 0;
+    color: #94a3b8;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* Product capability labels are longer than the old numerical claims. */
+.stats-section .stat-item strong {
+    font-family: inherit;
+    font-size: clamp(1.05rem, 1.7vw, 1.55rem);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .marquee-track,
+    .floating-chip,
+    .ring-value,
+    .bar-fill {
+        animation: none !important;
+    }
+    .wow-card,
+    .features-card,
+    .mission-card {
+        transition: none;
     }
 }

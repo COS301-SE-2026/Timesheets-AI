@@ -99,7 +99,7 @@ html { scroll-behavior: smooth; }
 
                 <div class="hero-actions">
                     <a routerLink="/signup" class="btn-primary">
-                        Start tracking free
+                        Explore Momently
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
 
@@ -110,9 +110,9 @@ html { scroll-behavior: smooth; }
                 </div>
 
                 <ul class="hero-proof">
-                    <li><i class="fa-solid fa-circle-check"></i> No credit card needed</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Set up in under 5 minutes</li>
-                    <li><i class="fa-solid fa-circle-check"></i> Your data stays yours</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Timer and manual time entry</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Built around your team’s workflow</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Insights from your logged time</li>
                 </ul>
             </div>
 
@@ -130,16 +130,16 @@ html { scroll-behavior: smooth; }
                 <div class="floating-chip chip-top">
                     <i class="fa-solid fa-bolt"></i>
                     <div>
-                        <strong>+18%</strong>
-                        <span>focus time this sprint</span>
+                        <strong>AI</strong>
+                        <span>time and delivery insights</span>
                     </div>
                 </div>
 
                 <div class="floating-chip chip-bottom">
                     <i class="fa-solid fa-chart-line"></i>
                     <div>
-                        <strong>92%</strong>
-                        <span>on-time confidence</span>
+                        <strong>Review</strong>
+                        <span>manager timesheet workflow</span>
                     </div>
                 </div>
             </div>
@@ -220,6 +220,22 @@ html { scroll-behavior: smooth; }
         </section>
 
         <!-- ============================= -->
+        <!-- PRODUCT WOW FACTORS           -->
+        <!-- ============================= -->
+        <section class="wow-section" aria-labelledby="wow-heading">
+            <div class="section-heading">
+                <div class="badge-tag">
+                    <i class="fa-solid fa-sparkles"></i> SEE MOMENTLY IN ACTION
+                </div>
+                <h2 id="wow-heading">
+                    More than a timer.
+                    <span class="highlight">Insights you can act on.</span>
+                </h2>
+                <p>Explore the two standout capabilities: understand delivery risk and review time entries with AI assistance.</p>
+            </div>
+        </section>
+
+        <!-- ============================= -->
         <!-- PROJECT FORECAST (WOW FACTOR) -->
         <!-- ============================= -->
         <section class="forecast-section" id="forecast">
@@ -264,10 +280,10 @@ html { scroll-behavior: smooth; }
 
                 <div class="panel-top">
                     <div>
-                        <span class="panel-eyebrow">Sprint 14 · Checkout revamp</span>
+                        <span class="panel-eyebrow">Illustrative project view</span>
                         <h3>Delivery forecast</h3>
                     </div>
-                    <span class="live-pill"><span class="live-dot"></span> Live</span>
+                    <span class="live-pill">Forecast preview</span>
                 </div>
 
                 <div class="panel-body">
@@ -276,18 +292,18 @@ html { scroll-behavior: smooth; }
                         <div class="ring-wrap">
                             <svg class="ring" viewBox="0 0 120 120"
                                  role="img"
-                                 aria-label="87 percent on-time confidence">
+                                 aria-label="Illustrative forecast confidence">
                                 <circle class="ring-track" cx="60" cy="60" r="52"></circle>
                                 <circle class="ring-value" cx="60" cy="60" r="52"></circle>
                             </svg>
                             <div class="ring-label">
-                                <strong>87<span>%</span></strong>
-                                <span>on-time</span>
+                                <strong>AI</strong>
+                                <span>forecast</span>
                             </div>
                         </div>
 
                         <p class="confidence-note">
-                            Confidence this sprint ships on <strong>Fri 14 Aug</strong>
+                            A forecast based on available task and time-entry data
                         </p>
                     </div>
 
@@ -308,17 +324,67 @@ html { scroll-behavior: smooth; }
                 <div class="ai-callout">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                     <p>
-                        <strong>AI insight:</strong> two of your five open tickets carry
-                        60% of the remaining effort. Reassigning one would pull the
-                        delivery date forward by roughly 3 days.
+                        <strong>AI insight preview:</strong> use logged effort and remaining work
+                        to identify delivery risks and investigate where attention may be needed.
                     </p>
                 </div>
 
                 <div class="panel-footer">
-                    <div class="panel-stat"><strong>142h</strong><span>logged this sprint</span></div>
-                    <div class="panel-stat"><strong>-3d</strong><span>predicted slip</span></div>
-                    <div class="panel-stat"><strong>6</strong><span>open tickets</span></div>
+                    <div class="panel-stat"><strong>Logged time</strong><span>Effort recorded against work</span></div>
+                    <div class="panel-stat"><strong>Open work</strong><span>Remaining tasks in view</span></div>
+                    <div class="panel-stat"><strong>AI insights</strong><span>Signals to help assess delivery</span></div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ============================= -->
+        <!-- AI TIMESHEET REVIEW WOW FACTOR -->
+        <!-- ============================= -->
+        <section class="review-section" id="timesheet-review">
+            <div class="review-copy">
+                <div class="badge-tag review-badge">
+                    <i class="fa-solid fa-clipboard-check"></i> AI-ASSISTED TIMESHEET REVIEW
+                </div>
+                <h2>Review time with <span class="highlight">more context.</span></h2>
+                <p>
+                    Momently helps managers examine submitted timesheets alongside time-entry
+                    details and AI-generated signals. It supports the review process; managers
+                    remain responsible for approval decisions.
+                </p>
+                <ul class="review-points">
+                    <li><i class="fa-solid fa-check-circle"></i><span><strong>Spot entries to investigate</strong> — surface unusual or potentially inconsistent time patterns.</span></li>
+                    <li><i class="fa-solid fa-check-circle"></i><span><strong>Keep the human in the loop</strong> — use AI insights as supporting information, not an automatic verdict.</span></li>
+                    <li><i class="fa-solid fa-check-circle"></i><span><strong>Support manager review</strong> — make it easier to assess submitted time before approving or requesting changes.</span></li>
+                </ul>
+                <a routerLink="/login" class="btn-primary">Explore the app <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="review-panel" aria-label="Illustrative AI-assisted timesheet review interface">
+                <div class="review-panel-top">
+                    <div>
+                        <span class="panel-eyebrow">MANAGER WORKFLOW</span>
+                        <h3>Timesheet review</h3>
+                    </div>
+                    <span class="review-status">Submitted</span>
+                </div>
+                <div class="review-person">
+                    <span class="review-avatar">JD</span>
+                    <div><strong>Developer timesheet</strong><span>Weekly submission · Example view</span></div>
+                </div>
+                <div class="review-hours">
+                    <div><span>Total logged</span><strong>Time entries</strong></div>
+                    <div><span>Review status</span><strong>Needs review</strong></div>
+                </div>
+                <div class="review-insight">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <div><strong>AI review signal</strong><p>An entry may differ from the surrounding task or activity pattern. Check its details before deciding.</p></div>
+                </div>
+                <div class="review-entry">
+                    <span class="review-entry-icon"><i class="fa-solid fa-clock"></i></span>
+                    <div><strong>Time entry details</strong><span>Project · Task · Duration · Description</span></div>
+                    <span class="review-check">Review</span>
+                </div>
+                <p class="review-disclaimer">Illustrative example — not live user data or a real review result.</p>
             </div>
         </section>
 
@@ -327,7 +393,12 @@ html { scroll-behavior: smooth; }
         <!-- ============================= -->
         <section class="logos-section">
             <p class="trust-text">
-                Trusted by development teams that value every moment
+                Built for development teams that value every moment
+            </p>
+
+            <p class="trust-description">
+                Bring time entries, project activity, integrations and AI-assisted analysis together
+                so developers and managers can make better-informed decisions.
             </p>
 
             <div class="logos-container">
@@ -424,13 +495,12 @@ html { scroll-behavior: smooth; }
                 <span class="highlight">Start counting yours.</span>
             </h2>
             <p>
-                Spin up a workspace, invite your team, and see your first forecast in
-                under five minutes. No credit card, no setup calls, no spreadsheets.
+                Track work against projects and tasks, review timesheets, and use AI-assisted insights to understand delivery risks and team effort.
             </p>
 
             <div class="cta-actions">
                 <a routerLink="/signup" class="btn-primary">
-                    Create free account
+                    Get started
                     <i class="fa-solid fa-arrow-right"></i>
                 </a>
                 <button type="button" class="btn-secondary" (click)="watchDemo()">
