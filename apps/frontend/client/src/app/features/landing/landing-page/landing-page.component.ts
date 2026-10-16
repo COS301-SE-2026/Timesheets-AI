@@ -86,8 +86,9 @@ export class LandingPageComponent {
   }
 
   downloadManual():void{
-    window.open('/docs/demo-2/User-Manual.pdf', '_blank');
+    window.open('https://drive.google.com/file/d/18TvwQfwzIs9q5z6C6n2ud_Ffpb0jL1fa/view?usp=drive_link', '_blank', 'noopener, noreferrer');
   }
+  
 
   watchDemo(): void{
         window.open('https://youtu.be/NED-IekCKc8?si=0AQHgPD3XTn4RCeM', '_blank', 'noopener, noreferrer');
