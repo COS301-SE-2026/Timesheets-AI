@@ -8,6 +8,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -78,9 +79,12 @@ public class CalendarController {
   @GetMapping("/events/{externalEventId}")
   public ResponseEntity<CalendarEvent> getEvent(@PathVariable String externalEventId) {
     UUID workspaceMemberId = securityUtils.getDefaultWorkspaceMemberId();
-    CalendarEvent event = calendarService.getEvent(workspaceMemberId, externalEventId);
-
-    return ResponseEntity.ok(event);
+    try {
+      CalendarEvent event = calendarService.getEvent(workspaceMemberId, externalEventId);
+      return ResponseEntity.ok(event);
+    } catch (CalendarNotConnectedException e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    }
   }
 
   @GetMapping("/vs-tracked")
