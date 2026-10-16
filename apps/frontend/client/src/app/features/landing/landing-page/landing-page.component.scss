@@ -37,9 +37,7 @@ $border-colour: #f1f5f9;
     font-style: normal;
 }
 
-// ============================================================
 // SHARED BADGE / PILL
-// ============================================================
 .badge-tag{
     display: inline-flex;
     align-items: center;
@@ -59,9 +57,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // HEADER / NAVBAR
-// ============================================================
 .navbar{
     display: flex;
     align-items: center;
@@ -120,9 +116,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // AUTH BUTTONS (LOGIN / SIGNUP / GHOST)
-// ============================================================
 .auth-buttons{
     display: flex;
     align-items: center;
@@ -196,9 +190,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // HERO SECTION
-// ============================================================
 .hero-section{
     display: grid;
     grid-template-columns: 1.05fr 1.4fr;
@@ -389,9 +381,7 @@ $border-colour: #f1f5f9;
     50%{ transform: translateY(-10px); }
 }
 
-// ============================================================
 // PRIMARY / SECONDARY CTA BUTTONS
-// ============================================================
 .btn-primary{
     display: inline-flex;
     align-items: center;
@@ -449,9 +439,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // MOVING CAPABILITY MARQUEE
-// ============================================================
 .marquee-section{
     margin: 0 -2rem 6rem;
     padding: 1.75rem 0;
@@ -539,9 +527,7 @@ $border-colour: #f1f5f9;
     to{ transform: translateX(-50%); }
 }
 
-// ============================================================
 // SECTION HEADING (REUSABLE)
-// ============================================================
 .section-heading{
     max-width: 720px;
     margin: 0 auto 3rem;
@@ -569,9 +555,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // FEATURES GRID AREA
-// ============================================================
 .features-section{
     margin-bottom: 6rem;
 
@@ -592,7 +576,7 @@ $border-colour: #f1f5f9;
             background: $bg-light;
             border-radius: 18px;
             padding: 1.85rem;
-            border: 1px solid $border-colour;
+            border: 1px solid #e2e8f0;
             box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
             transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 
@@ -635,9 +619,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // PROJECT FORECAST — WOW FACTOR SECTION
-// ============================================================
 .forecast-section{
     display: grid;
     grid-template-columns: 1fr 1.15fr;
@@ -1044,14 +1026,12 @@ $border-colour: #f1f5f9;
     to{ transform: scaleX(1); }
 }
 
-// ============================================================
 // NAMES AND LOGO AREA
-// ============================================================
-.logos-section{
+.logos-section {
     text-align: center;
     margin-bottom: 6rem;
 
-    .trust-text{
+    .trust-text {
         font-size: 0.9rem;
         color: $text-muted;
         font-weight: 600;
@@ -1060,30 +1040,32 @@ $border-colour: #f1f5f9;
         text-transform: uppercase;
     }
 
-    .logos-container{
+    .logos-container {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         flex-wrap: wrap;
-        gap: 2rem;
+        gap: 5.5rem;
         opacity: 0.6;
         filter: grayscale(100%);
 
-        img{
-            height: 90px;
+        img {
+            height: 170px;
             width: auto;
+            max-width: 200px;
+            object-fit: contain;
             opacity: 0.7;
             filter: grayscale(100%);
             transition: 0.3s ease;
         }
 
-        img:hover{
+        img:hover {
             opacity: 1;
             filter: none;
             transform: scale(1.05);
         }
 
-        .logo-item{
+        .logo-item {
             font-size: 1.1rem;
             font-weight: 700;
             color: $text-muted;
@@ -1092,9 +1074,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // MISSION & VISION
-// ============================================================
 .mission-section{
     margin-bottom: 6rem;
 }
@@ -1109,32 +1089,22 @@ $border-colour: #f1f5f9;
     }
 }
 
-.mission-card{
+.mission-card {
     position: relative;
     background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
-    border: 1px solid $border-colour;
+    border: 1px solid #e2e8f0;
     border-radius: 24px;
     padding: 2.5rem;
     box-shadow: 0 20px 45px rgba(15, 23, 42, 0.06);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     overflow: hidden;
 
-    &::before{
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, $primary-blue, #60a5fa);
-    }
-
-    &:hover{
+    &:hover {
         transform: translateY(-6px);
         box-shadow: 0 28px 55px rgba(15, 23, 42, 0.10);
     }
 
-    .mission-tag{
+    .mission-tag {
         display: inline-block;
         font-size: 0.72rem;
         font-weight: 800;
@@ -1144,7 +1114,7 @@ $border-colour: #f1f5f9;
         margin-bottom: 1.25rem;
     }
 
-    h3{
+    h3 {
         font-size: 1.4rem;
         font-weight: 700;
         line-height: 1.3;
@@ -1153,14 +1123,14 @@ $border-colour: #f1f5f9;
         letter-spacing: -0.015em;
     }
 
-    p{
+    p {
         font-size: 0.95rem;
         line-height: 1.75;
         color: $text-muted;
         margin: 0 0 1.5rem 0;
     }
 
-    .mission-short{
+    .mission-short {
         font-family: $font-special-gothic;
         font-size: 1rem;
         font-weight: 400;
@@ -1171,20 +1141,16 @@ $border-colour: #f1f5f9;
         margin: 0;
     }
 
-    &--alt{
-        &::before{
-            background: linear-gradient(90deg, $primary-orange, #fb923c);
-        }
+    &--alt {
+         border-color: #e2e8f0;
 
-        .mission-tag{
+        .mission-tag {
             color: $primary-orange;
         }
     }
 }
 
-// ============================================================
 // IMPACT STATS
-// ============================================================
 .stats-section{
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1235,9 +1201,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // CLOSING CTA
-// ============================================================
 .cta-section{
     text-align: center;
     max-width: 780px;
@@ -1297,9 +1261,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // HELP CARDS ACTION BUTTONS (kept from original)
-// ============================================================
 .btn-card-action{
     display: inline-flex;
     align-items: center;
@@ -1339,9 +1301,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // HELP PAGE MENU
-// ============================================================
 .help-view-wrapper{
     margin-top: 4rem;
 
@@ -1480,9 +1440,7 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // FAQ SECTION (shared, plus landing variant)
-// ============================================================
 .faq-section{
     max-width: 1000px;
     margin: 6rem auto;
@@ -1612,60 +1570,71 @@ $border-colour: #f1f5f9;
     }
 }
 
-// ============================================================
 // FOOTER
-// ============================================================
-.site-footer{
+
+.site-footer {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
-    padding: 3rem 1rem 1rem;
-    border-top: 1px solid $border-colour;
+    padding: 3rem 1.5rem 1.5rem;
     margin-top: 4rem;
 
-    .footer-brand{
+    // Stronger divider separates the footer from the page.
+    border-top: 2px solid #cbd5e1;
+
+
+    .footer-brand {
         font-family: $font-special-gothic;
-        font-size: 1.35rem;
+        font-size: 1.5rem;
         font-weight: 400;
-        color: $text-dark;
+        color: #1e293b;
         letter-spacing: -0.01em;
 
-        .brand-name__accent{
+        .brand-name__accent {
             color: $primary-orange;
         }
     }
 
-    .footer-links{
+    .footer-links {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         gap: 1.75rem;
 
-        a{
-            color: $text-muted;
-            font-size: 0.88rem;
+        a {
+            color: #475569;
+            font-size: 0.9rem;
             font-weight: 600;
             text-decoration: none;
             transition: color 0.2s ease;
 
-            &:hover{
+            &:hover {
                 color: $primary-blue;
             }
         }
+
+        a:not(:last-child)::after {
+            content: "•";
+            margin-left: 0.75rem;
+            color: #9ca3af;
+        }
     }
 
-    .footer-copy{
+    .footer-copy {
         margin: 0;
+        padding-top: 1.25rem;
+        width: 100%;
+        border-top: 1px solid #e2e8f0;
+        text-align: center;
         font-size: 0.8rem;
-        color: #94a3b8;
+        color: #64748b;
         letter-spacing: 0.02em;
     }
 }
 
-// ============================================================
+
 // RESPONSIVE TWEAKS
-// ============================================================
 @media (max-width: 900px){
     .hero-section{
         grid-template-columns: 1fr;
@@ -1853,7 +1822,14 @@ $border-colour: #f1f5f9;
     padding: 4rem;
     border: 1px solid #ffedd5;
     border-radius: 32px;
-    background: linear-gradient(135deg, #fffaf5 0%, #ffffff 52%, #f4f8ff 100%);
+    background: linear-gradient(
+    135deg,
+    #ffeddc 0%,
+    #fff1e5 35%,
+    #fff7f0 65%,
+    #fffaf5 85%,
+    #f4f8ff 100%
+);
 
     @media (max-width: 1024px) {
         grid-template-columns: 1fr;
@@ -1887,8 +1863,9 @@ $border-colour: #f1f5f9;
     }
 
     .review-badge {
+        background: white;
         color: $primary-orange;
-        background: #fff0e4;
+        box-shadow: 0 8px 20px rgba(234, 88, 12, 0.10);
     }
 }
 

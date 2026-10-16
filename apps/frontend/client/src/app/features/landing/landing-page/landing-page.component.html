@@ -13,10 +13,10 @@ html { scroll-behavior: smooth; }
 
 <div class="landing-container">
 
-    <!-- HEADER AREA -->
+    <!-- HEADER AREA-->
     <header class="navbar">
 
-        <!-- LOGO AREA -->
+        <!-- LOGO AREA-->
         <a
             class="brand brand--hero"
             (click)="goHome()"
@@ -39,7 +39,7 @@ html { scroll-behavior: smooth; }
             </span>
         </a>
 
-        <!-- SECTION NAV (home view only) -->
+        <!-- SECTION NAV (home view only)-->
         @if (activeTab === 'home') {
             <nav class="nav-links" aria-label="Section navigation">
                 <a href="#features">Features</a>
@@ -49,7 +49,7 @@ html { scroll-behavior: smooth; }
             </nav>
         }
 
-        <!-- AUTH BUTTONS AND BRAND STYLE BUTTON -->
+        <!-- AUTH BUTTONS AND BRAND STYLE BUTTON-->
         <div class="auth-buttons">
             <a href="https://momently-brand-style.netlify.app/" class="btn-ghost">
                 Brand Style Guide
@@ -75,9 +75,9 @@ html { scroll-behavior: smooth; }
 
     @if (activeTab === 'home') {
 
-        <!-- ============================= -->
-        <!-- HERO SECTION                  -->
-        <!-- ============================= -->
+        
+        <!-- HERO SECTION-->
+        
         <section class="hero-section">
             <div class="hero-content">
                 <div class="badge-tag">
@@ -116,7 +116,7 @@ html { scroll-behavior: smooth; }
                 </ul>
             </div>
 
-            <!-- SCREENSHOT OF OUR PRETTIEST PAGE -->
+            <!-- SCREENSHOT OF OUR PRETTIEST PAGE-->
             <div class="hero-preview">
                 <div class="hero-glow"></div>
 
@@ -145,9 +145,9 @@ html { scroll-behavior: smooth; }
             </div>
         </section>
 
-        <!-- ============================= -->
-        <!-- MOVING CAPABILITY MARQUEE     -->
-        <!-- ============================= -->
+        
+        <!-- MOVING CAPABILITY MARQUEE-->
+        
         <section class="marquee-section" aria-label="Momently capabilities">
             <div class="marquee">
                 <div class="marquee-track">
@@ -176,9 +176,9 @@ html { scroll-behavior: smooth; }
             </div>
         </section>
 
-        <!-- ============================= -->
-        <!-- FEATURES GRID AREA            -->
-        <!-- ============================= -->
+        
+        <!-- FEATURES GRID AREA-->
+        
         <section class="features-section" id="features">
 
             <div class="section-heading">
@@ -219,13 +219,13 @@ html { scroll-behavior: smooth; }
             </div>
         </section>
 
-        <!-- ============================= -->
-        <!-- PRODUCT WOW FACTORS           -->
-        <!-- ============================= -->
+        
+        <!-- PRODUCT WOW FACTORS     -->
+        
         <section class="wow-section" aria-labelledby="wow-heading">
             <div class="section-heading">
                 <div class="badge-tag">
-                    <i class="fa-solid fa-sparkles"></i> SEE MOMENTLY IN ACTION
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> SEE MOMENTLY IN ACTION
                 </div>
                 <h2 id="wow-heading">
                     More than a timer.
@@ -235,14 +235,14 @@ html { scroll-behavior: smooth; }
             </div>
         </section>
 
-        <!-- ============================= -->
-        <!-- PROJECT FORECAST (WOW FACTOR) -->
-        <!-- ============================= -->
+        
+        <!-- PROJECT FORECAST (WOW FACTOR)-->
+        
         <section class="forecast-section" id="forecast">
 
             <div class="forecast-copy">
                 <div class="badge-tag forecast-badge">
-                    <i class="fa-solid fa-telescope"></i> PROJECT FORECAST
+                    <i class="fa-solid fa-chart-line"></i> PROJECT FORECAST
                 </div>
 
                 <h2>
@@ -275,7 +275,7 @@ html { scroll-behavior: smooth; }
                 </a>
             </div>
 
-            <!-- FORECAST DASHBOARD MOCK -->
+            <!-- FORECAST DASHBOARD MOCK-->
             <div class="forecast-panel">
 
                 <div class="panel-top">
@@ -337,9 +337,9 @@ html { scroll-behavior: smooth; }
             </div>
         </section>
 
-        <!-- ============================= -->
-        <!-- AI TIMESHEET REVIEW WOW FACTOR -->
-        <!-- ============================= -->
+        
+        <!-- AI TIMESHEET REVIEW WOW FACTOR-->
+        
         <section class="review-section" id="timesheet-review">
             <div class="review-copy">
                 <div class="badge-tag review-badge">
@@ -388,9 +388,9 @@ html { scroll-behavior: smooth; }
             </div>
         </section>
 
-        <!-- ============================= -->
-        <!-- MISSION & VISION              -->
-        <!-- ============================= -->
+        
+        <!-- MISSION & VISION-->
+        
         <section class="mission-section" id="mission">
 
             <div class="section-heading">
@@ -441,9 +441,9 @@ html { scroll-behavior: smooth; }
             </div>
         </section>
 
-        <!-- ============================= -->
-        <!-- IMPACT STATS                  -->
-        <!-- ============================= -->
+        
+        <!-- IMPACT STATS-->
+        
         <section class="stats-section">
             @for (stat of impactStats; track stat.label) {
                 <div class="stat-item">
@@ -453,9 +453,9 @@ html { scroll-behavior: smooth; }
             }
         </section>
 
-        <!-- ============================= -->
-        <!-- PLATFORM FAQ                  -->
-        <!-- ============================= -->
+        
+        <!-- PLATFORM FAQ-->
+        
         <section class="faq-section landing-faq" id="faq">
             <div class="faq-header">
                 <div class="badge-tag">
@@ -490,16 +490,33 @@ html { scroll-behavior: smooth; }
 
             <div class="faq-footer">
                 <p>Still curious about something?</p>
-                <a href="mailto:cybernauts301@gmail.com" class="btn-secondary">
-                    <i class="fa-solid fa-envelope"></i>
-                    Talk to the team
+
+                <a
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=cybernauts301@gmail.com&su=Momently%20Support%20Enquiry"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn-secondary">
+
+                    <i class="fa-brands fa-google"></i>
+                    Talk to us via Gmail
                 </a>
-            </div>
+
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    (click)="setActiveTab('help')">
+
+                    <i class="fa-solid fa-circle-question"></i>
+                    Help Menu
+                </button>
+
+                
+</div>
         </section>
 
-        <!-- ============================= -->
-        <!-- CLOSING CALL TO ACTION        -->
-        <!-- ============================= -->
+        
+        <!-- CLOSING CALL TO ACTION  -->
+        
         <section class="cta-section">
             <h2>
                 Every moment counts.
@@ -521,17 +538,12 @@ html { scroll-behavior: smooth; }
             </div>
         </section>
 
-        <!-- ============================= -->
-        <!-- CLIENT NAMES AND LOGOS        -->
-        <!-- ============================= -->
+        
+        <!-- CLIENT NAMES AND LOGOS  -->
+        
         <section class="logos-section">
             <p class="trust-text">
                 Built for development teams that value every moment
-            </p>
-
-            <p class="trust-description">
-                Bring time entries, project activity, integrations and AI-assisted analysis together
-                so developers and managers can make better-informed decisions.
             </p>
 
             <div class="logos-container">
@@ -554,9 +566,9 @@ html { scroll-behavior: smooth; }
             </div>
         </section>
 
-        <!-- ============================= -->
-        <!-- FOOTER                        -->
-        <!-- ============================= -->
+        
+        <!-- FOOTER      -->
+
         <footer class="site-footer">
             <span class="footer-brand">
                 <span class="brand-name__accent">m</span>omently
@@ -568,6 +580,7 @@ html { scroll-behavior: smooth; }
                 <a href="#mission">Mission</a>
                 <a href="#faq">FAQ</a>
                 <a href="https://momently-brand-style.netlify.app/">Brand Style Guide</a>
+                <a href="https://github.com/COS301-SE-2026/Timesheets-AI">GitHub Repository</a>
             </nav>
 
             <p class="footer-copy">
@@ -576,13 +589,13 @@ html { scroll-behavior: smooth; }
         </footer>
     }
 
-    <!-- ============================= -->
-    <!-- HELP VIEW PAGE                -->
-    <!-- ============================= -->
+    
+    <!-- HELP VIEW PAGE-->
+    
     @if (activeTab === 'help') {
         <div class="help-view-wrapper">
 
-            <!-- HELP HERO SECTION -->
+            <!-- HELP HERO SECTION-->
             <section class="hero-section">
                 <div class="hero-content">
                     <div class="badge-tag help-badge">
@@ -604,13 +617,13 @@ html { scroll-behavior: smooth; }
                     </p>
                 </div>
 
-                <!-- HOURGLASS COMPONENT -->
+                <!-- HOURGLASS COMPONENT-->
                 <div class="hero-preview">
                     <app-hourglass></app-hourglass>
                 </div>
             </section>
 
-            <!-- HELP CARDS AREA -->
+            <!-- HELP CARDS AREA-->
             <section class="features-section help-cards-section">
                 <div class="features-grid help-grid">
                     <div class="features-card help-card">
@@ -655,7 +668,7 @@ html { scroll-behavior: smooth; }
                 </div>
             </section>
 
-            <!-- FAQ SECTION -->
+            <!-- FAQ SECTION-->
             <section class="faq-section">
                 <div class="faq-header">
                     <h2>
@@ -726,7 +739,7 @@ html { scroll-behavior: smooth; }
                             <i class="fa-solid fa-chevron-down"></i>
                         </summary>
                         <div class="faq-answer">
-                            Watch the tutorial video, download the user manual or contact the workspace administrator (cybernauts301&#64;gmail.com) if you need further assistance.
+                            Watch the tutorial video, download the user manual or contact the developers (cybernauts301&#64;gmail.com) if you need further assistance.
                         </div>
                     </details>
                 </div>
