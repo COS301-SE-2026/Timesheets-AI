@@ -271,6 +271,17 @@ export class CalendarComponent implements OnInit{
     this.selectedEvent.set(null);
   }
 
+
+  // to prevent XSS injection because we are fetching external parties text so zero trust!!!
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+  }
+
   private renderEventContent(arg: any){
     if(arg.view.type=== 'dayGridMonth'){
       const category= arg.event.extendedProps['category'] || 'meetings';
@@ -281,13 +292,13 @@ export class CalendarComponent implements OnInit{
             <span class="event-dot ${category}">
             </span>
             <span class="event-title">
-              ${arg.event.title}
+              ${this.escapeHtml(arg.event.title)}
             </span>
 
             ${
               arg.timeText ? `
                 <span class="event-time">
-                  ${arg.timeText}
+                  ${this.escapeHtml(arg.timeText)}
                 </span>
               `: ''
             }
