@@ -25,6 +25,9 @@ public interface TimeEntryRepository extends JpaRepository<TimeEntry, UUID> {
   List<TimeEntry> findByWorkspaceMemberIdAndStartTimeBetween(
       UUID workspaceMemberId, LocalDateTime start, LocalDateTime end);
 
+  List<TimeEntry> findByWorkspaceMemberIdAndStartTimeGreaterThanEqualAndStartTimeLessThan(
+      UUID workspaceMemberId, LocalDateTime start, LocalDateTime end);
+
   // this is a custom query to get time entries for a user within a date range, we have to join with
   // the workspace_members table to filter by user_id
   // we use nativeQuery = true because we're writing raw SQL instead of JPQL, and we have to use the
