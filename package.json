@@ -24,7 +24,7 @@
     "frontend:lint": "cd apps/frontend/client && yarn lint",
     "frontend:coverage": "cd apps/frontend/client && yarn test:coverage",
     "frontend:e2e": "cd apps/frontend/client && yarn e2e",
-    "ai:dev": "cd ai-service && uvicorn main:app --reload --port 8000",
+    "ai:dev": "cd ai-service && uvicorn app.main:app --reload --port 8000",
     "ai:test": "cd ai-service && pytest",
     "ai:coverage": "cd ai-service && pytest --cov=. --cov-report=html",
     "ai:lint": "cd ai-service && ruff check .",

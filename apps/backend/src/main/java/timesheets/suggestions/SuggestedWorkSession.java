@@ -1,0 +1,81 @@
+package timesheets.suggestions;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import lombok.Data;
+import timesheets.domain.SuggestedWorkSessionEntity;
+import timesheets.evidence.EvidenceEvent;
+
+@Data
+public class SuggestedWorkSession {
+  private UUID id;
+  private UUID workspaceMemberId;
+  private LocalDateTime startTime;
+  private LocalDateTime endTime;
+  private String title;
+  private UUID projectId;
+  private UUID taskId;
+  private List<EvidenceEvent> evidenceEvents = new ArrayList<EvidenceEvent>();
+  private double confidenceScore;
+  private Integer durationMinutes;
+  private Integer durationSeconds;
+  private String entryType;
+  private String explanation;
+  private SuggestionStatus status;
+  private String description;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
+
+  public SuggestedWorkSessionEntity toEntity() {
+
+    return SuggestedWorkSessionEntity.builder()
+        .id(id)
+        .workspaceMemberId(workspaceMemberId)
+        .startTime(startTime)
+        .endTime(endTime)
+        .title(title)
+        .projectId(projectId)
+        .taskId(taskId)
+        .evidenceEvents(evidenceEvents)
+        .confidenceScore(confidenceScore)
+        .durationSeconds(durationSeconds)
+        .entryType(entryType)
+        .durationMinutes(durationMinutes)
+        .description(description)
+        .explanation(explanation)
+        .status(status != null ? status.name() : null)
+        .createdAt(createdAt)
+        .updatedAt(updatedAt)
+        .build();
+  }
+
+  public static SuggestedWorkSession fromEntity(SuggestedWorkSessionEntity entity) {
+
+    SuggestedWorkSession suggestion = new SuggestedWorkSession();
+
+    suggestion.setId(entity.getId());
+    suggestion.setWorkspaceMemberId(entity.getWorkspaceMemberId());
+    suggestion.setStartTime(entity.getStartTime());
+    suggestion.setEndTime(entity.getEndTime());
+    suggestion.setTitle(entity.getTitle());
+    suggestion.setProjectId(entity.getProjectId());
+    suggestion.setTaskId(entity.getTaskId());
+    suggestion.setEvidenceEvents(entity.getEvidenceEvents());
+    suggestion.setConfidenceScore(entity.getConfidenceScore());
+    suggestion.setDurationMinutes(entity.getDurationMinutes());
+    suggestion.setDurationSeconds(entity.getDurationSeconds());
+    suggestion.setEntryType(entity.getEntryType());
+    suggestion.setDescription(entity.getDescription());
+    suggestion.setExplanation(entity.getExplanation());
+    suggestion.setCreatedAt(entity.getCreatedAt());
+    suggestion.setUpdatedAt(entity.getUpdatedAt());
+
+    if (entity.getStatus() != null) {
+      suggestion.setStatus(SuggestionStatus.valueOf(entity.getStatus()));
+    }
+
+    return suggestion;
+  }
+}

@@ -8,17 +8,22 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import timesheets.domain.WorkspaceMember;
 import timesheets.dto.response.CommentResponse;
 import timesheets.dto.response.IssueResponse;
 import timesheets.dto.response.StatusChangeResponse;
 import timesheets.dto.response.WorklogResponse;
 import timesheets.integration.issue.IssueTrackerAdapter;
+import timesheets.repository.ProjectRepository;
+import timesheets.repository.WorkspaceMemberRepository;
 
 @Component
 @RequiredArgsConstructor
 public class JiraEvidenceCollector implements EvidenceCollector {
 
   private final IssueTrackerAdapter issueTrackerAdapter;
+  private final WorkspaceMemberRepository workspaceMemberRepository;
+  private final ProjectRepository projectRepository;
 
   @Override
   public List<EvidenceEvent> collect(
@@ -26,17 +31,34 @@ public class JiraEvidenceCollector implements EvidenceCollector {
 
     List<IssueResponse> issues =
         issueTrackerAdapter.getIssues(workspaceMemberId, startTime, endTime);
+
     List<EvidenceEvent> evidenceEvents = new ArrayList<EvidenceEvent>();
 
+    WorkspaceMember workspaceMember =
+        workspaceMemberRepository
+            .findById(workspaceMemberId)
+            .orElseThrow(() -> new RuntimeException("Workspace member not found"));
+    UUID workspaceId = workspaceMember.getWorkspaceId();
     for (IssueResponse issue : issues) {
+
       EvidenceEvent evidenceEvent = new EvidenceEvent();
       evidenceEvent.setId(UUID.randomUUID());
       evidenceEvent.setSource("JIRA");
       evidenceEvent.setWorkspaceMemberId(workspaceMemberId);
       evidenceEvent.setActivityType("ISSUE");
 
-      LocalDateTime timestamp = parseTimestamp(issue.getCreatedAt());
+      // LocalDateTime timestamp = parseTimestamp(issue.getCreatedAt());
+      // evidenceEvent.setTimestamp(timestamp);
+
+      LocalDateTime timestamp = parseTimestamp(issue.getUpdatedAt());
+
+      if (timestamp == null) {
+        timestamp = parseTimestamp(issue.getCreatedAt());
+      }
+
       evidenceEvent.setTimestamp(timestamp);
+      evidenceEvent.setTaskId(issue.getLocalTaskId());
+      evidenceEvent.setProjectId(issue.getLocalProjectId());
       evidenceEvent.setDescription(issue.getSummary());
 
       Map<String, Object> metadata = new HashMap<String, Object>();
@@ -53,7 +75,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       metadata.put("createdAt", issue.getCreatedAt());
       metadata.put("updatedAt", issue.getUpdatedAt());
       metadata.put("dueDate", issue.getDueDate());
-      metadata.put("localTaskId", issue.getLocalTaskId());
+      metadata.put("title", issue.getSummary());
 
       evidenceEvent.setMetadata(metadata);
       evidenceEvents.add(evidenceEvent);
@@ -164,6 +186,10 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       evidenceEvent.setTimestamp(worklog.getStartedAt());
       evidenceEvent.setActivityType("WORKLOG");
       evidenceEvent.setDescription(worklog.getDescription());
+
+      if (worklog.getStartedAt() != null && worklog.getTimeSpentSeconds() > 0) {
+        evidenceEvent.setEndTime(worklog.getStartedAt().plusSeconds(worklog.getTimeSpentSeconds()));
+      }
 
       Map<String, Object> metadata = new HashMap<String, Object>();
       metadata.put("issueKey", worklog.getIssueKey());
