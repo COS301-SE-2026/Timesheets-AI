@@ -57,7 +57,6 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       }
 
       evidenceEvent.setTimestamp(timestamp);
-      // evidenceEvent.setDescription(issue.getTitle());
       evidenceEvent.setTaskId(issue.getLocalTaskId());
       evidenceEvent.setProjectId(issue.getLocalProjectId());
       evidenceEvent.setDescription(issue.getSummary());
@@ -76,7 +75,7 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       metadata.put("createdAt", issue.getCreatedAt());
       metadata.put("updatedAt", issue.getUpdatedAt());
       metadata.put("dueDate", issue.getDueDate());
-      metadata.put("title", issue.getTitle());
+      metadata.put("title", issue.getSummary());
 
       evidenceEvent.setMetadata(metadata);
       evidenceEvents.add(evidenceEvent);
