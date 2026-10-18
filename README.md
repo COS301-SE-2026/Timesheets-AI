@@ -27,7 +27,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/last-commit/COS301-SE-2026/Timesheets-AI/main?style=for-the-badge&color=E07830&label=last%20commit" alt="Last Commit"/>
+  <a href="https://github.com/COS301-SE-2026/Timesheets-AI/commits/main">
+  <img src="https://img.shields.io/github/last-commit/COS301-SE-2026/Timesheets-AI/main?style=for-the-badge&logo=git&logoColor=white&color=E07830" alt="Last Commit"/>
+</a>
   <img src="https://img.shields.io/github/issues/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830&label=open%20issues" alt="Open Issues"/>
   <img src="https://img.shields.io/github/issues-closed/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=1A65BF&label=closed%20issues" alt="Closed Issues"/>
 </p>
