@@ -1543,6 +1543,8 @@ confirmReject(): void {
 
 approveSuggestion(suggestion: SuggestedWorkSession): void {
 
+  this.conflictMessage.set('');
+
   if (!suggestion.projectId) {
     this.showToast('Please select a project before approving.');
     return;
@@ -1574,10 +1576,11 @@ approveSuggestion(suggestion: SuggestedWorkSession): void {
       this.showToast('Suggested work added to your timesheet.');
     },
     error: (error) => {
-      this.showToast(
-        error.error?.message ??
-        'Failed to add suggested work to your timesheet.'
-      );
+      if (error.status === 409){
+        this.conflictMessage.set( error.error?.message || 'This suggestion overlaps with an existing time entry. Please adjust the time before approving.');
+      } else {
+        this.conflictMessage.set(error.error?.message || 'Failed to add suggested work to your timesheet.');
+      }
     }
   });
 }
