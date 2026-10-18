@@ -74,7 +74,6 @@
 </p>
 
 
-
 <p align="center">
   <img src="./assets/images/section-divider.svg"
        width="100%"
@@ -669,12 +668,13 @@ Use this if you are on a low-spec machine, on Windows without WSL, or want to ge
 ├── turbo.json
 └── yarn.lock
 ```
+</details>
 
 <p align="center">
-  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
+  <img src="./assets/images/section-divider.svg"
+       width="100%"
+       alt="Section divider"/>
 </p>
-
-</details>
 
 <a id="team-cybernauts"></a>
 <p align="left">
