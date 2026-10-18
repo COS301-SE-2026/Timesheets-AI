@@ -34,7 +34,9 @@
   <img src="https://img.shields.io/github/issues-closed/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=1A65BF&label=closed%20issues" alt="Closed Issues"/>
 </p>
 
----
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
+</p>
 
 <div align="center">
 <p align="center"><strong>Quick Links</strong></p>
@@ -49,7 +51,9 @@
 </p>
 </div>
 
----
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
+</p>
 
 
 <a id="about-momently"></a>
@@ -745,7 +749,9 @@ We are a team of five women in Computer Science at the University of Pretoria. W
   <img src="https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&amp;metric=vulnerabilities" alt="Vulnerabilities" />
 </p>
 
----
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
+</p>
 
 <a id="contact"></a>
 
