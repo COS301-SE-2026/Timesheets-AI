@@ -42,23 +42,20 @@
 ---
 
 <div align="center">
-
 <p align="center"><strong>Quick Links</strong></p>
 
-[![About](https://img.shields.io/badge/About-0F4C91?style=flat-square)](#about-momently)&nbsp;&nbsp;
-[![Documentation](https://img.shields.io/badge/Documentation-E07830?style=flat-square)](#documentation)&nbsp;&nbsp;
-[![Dashboard](https://img.shields.io/badge/Project_Dashboard-0F4C91?style=flat-square)](#project-dashboard)&nbsp;&nbsp;
-[![Features](https://img.shields.io/badge/Features-E07830?style=flat-square)](#features)&nbsp;&nbsp;
-[![Getting Started](https://img.shields.io/badge/Getting_Started-0F4C91?style=flat-square)](#getting-started)&nbsp;&nbsp;
-[![Commands](https://img.shields.io/badge/Command_Reference-E07830?style=flat-square)](#command-reference)&nbsp;&nbsp;
-[![Tech Stack](https://img.shields.io/badge/Tech_Stack-0F4C91?style=flat-square)](#technology-stack)&nbsp;&nbsp;
-[![Team](https://img.shields.io/badge/Team_Cybernauts-E07830?style=flat-square)](#team-cybernauts)&nbsp;&nbsp;
-[![Important Links](https://img.shields.io/badge/Important_Links-0F4C91?style=flat-square)](#important-links)&nbsp;&nbsp;
-[![Contact](https://img.shields.io/badge/Contact-E07830?style=flat-square)](#contact)
-
+<p align="center">
+  <a href="#about-momently"><img src="https://img.shields.io/badge/About-0F4C91?style=flat-square" alt="About"></a>&nbsp;&nbsp;
+  <a href="#documentation"><img src="https://img.shields.io/badge/Documentation-E07830?style=flat-square" alt="Documentation"></a>&nbsp;&nbsp;
+  <a href="#technology-stack"><img src="https://img.shields.io/badge/Technology_Stack-0F4C91?style=flat-square" alt="Technology Stack"></a>&nbsp;&nbsp;
+  <a href="#getting-started"><img src="https://img.shields.io/badge/Getting_Started-E07830?style=flat-square" alt="Getting Started"></a>&nbsp;&nbsp;
+  <a href="#team-cybernauts"><img src="https://img.shields.io/badge/Meet_the_Team-0F4C91?style=flat-square" alt="Meet the Team"></a>&nbsp;&nbsp;
+  <a href="#contact"><img src="https://img.shields.io/badge/Contact_Info-E07830?style=flat-square" alt="Contact Info"></a>
+</p>
 </div>
 
 ---
+
 
 <a id="about-momently"></a>
 <p align="center"><strong>About Momently</strong></p>
@@ -701,119 +698,29 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 <details>
 <summary><strong>More about us...</strong></summary>
 
-### <img src="https://img.icons8.com/?size=100&id=vthqLC9ZovO9&format=png&color=000000" width="18"> Members
+<div align="center">
 
-| Name | Role | GitHub | LinkedIn |
-|---|---|:---:|:---:|
-| **Zamokuhle Zwane** | Team Lead · AI/ML Specialist | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/zamokuhle-zwane) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/zamokuhle-zwane) |
-| **Nyashadzashe Makwabarara** | Backend Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/nyasha-makwabarara) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/nyashadzashe-makwabarara) |
-| **Lerato Sibanda** | Frontend Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/lerato-sibanda) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/lerato-sibanda) |
-| **Kgaugelo Matsena** | DevOps Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/kgaugelo-matsena) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/kgaugelo-matsena) |
-| **Cleopatra Kwenda** | Integration and QA Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/cleopatra-kwenda) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/cleopatra-kwenda) |
+### Members
 
+<div align="center">
+
+| <a href="https://github.com/zamokuhle-zwane"><img src="assets/images/members-headshots/zamokuhle.jpeg" width="120" height="120" alt="Zamokuhle" style="object-fit: cover; border-radius: 12px;"></a> | <a href="https://github.com/kgaugelo-matsena"><img src="assets/images/members-headshots/kgaugelo.png" width="120" height="120" alt="Kgaugelo" style="object-fit: cover; border-radius: 12px;"></a> | <a href="https://github.com/cleopatra-kwenda"><img src="assets/images/members-headshots/cleopatra.jpeg" width="120" height="120" alt="Cleopatra" style="object-fit: cover; border-radius: 12px;"></a> | <a href="https://github.com/nyasha-makwabarara"><img src="assets/images/members-headshots/nyashadzashe.jpeg" width="120" height="120" alt="Nyashadzashe" style="object-fit: cover; border-radius: 12px;"></a> | <a href="https://github.com/lerato-sibanda"><img src="assets/images/members-headshots/lerato.jpeg" width="120" height="120" alt="Lerato" style="object-fit: cover; border-radius: 12px;"></a> |
+|:---:|:---:|:---:|:---:|:---:|
+| **[Zamokuhle Zwane](https://github.com/zamokuhle-zwane)** | **[Kgaugelo Matsena](https://github.com/kgaugelo-matsena)** | **[Cleopatra Kwenda](https://github.com/cleopatra-kwenda)** | **[Nyashadzashe Makwabarara](https://github.com/nyasha-makwabarara)** | **[Lerato Sibanda](https://github.com/lerato-sibanda)** |
+| Team Lead · AI/ML Specialist | DevOps Engineer | Integration & QA Engineer | Backend Engineer | Frontend Engineer |
+| [![GitHub](https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white)](https://github.com/zamokuhle-zwane) [![LinkedIn](https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/zamokuhle-zwane) | [![GitHub](https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white)](https://github.com/kgaugelo-matsena) [![LinkedIn](https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/kgaugelo-matsena) | [![GitHub](https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white)](https://github.com/cleopatra-kwenda) [![LinkedIn](https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/cleopatra-kwenda) | [![GitHub](https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white)](https://github.com/nyasha-makwabarara) [![LinkedIn](https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/nyashadzashe-makwabarara) | [![GitHub](https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white)](https://github.com/lerato-sibanda) [![LinkedIn](https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/lerato-sibanda) |
+
+</div>
 
 ### Role Breakdown
 
 | Name | Responsibilities |
 |------|-----------------|
 | **Zamokuhle Zwane** | Team leadership, AI/ML model development, anomaly detection, backend support |
-| **Nyashadzashe Makwabarara** | REST API development, JPA entities, Spring Security, database design, audit logging |
-| **Lerato Sibanda** | Angular component design, UI/UX, frontend testing, API integration, responsive layouts |
 | **Kgaugelo Matsena** | AWS infrastructure, CI/CD pipelines, Docker, cloud deployment, external integrations |
 | **Cleopatra Kwenda** | Testing strategy, E2E testing with Cypress, QA, documentation, system reliability |
-
----
-
-<div align="center">
-
-<table>
-  <tr>
-    <td align="center" width="20%">
-      <a href="https://github.com/zamokuhle-zwane">
-        <img src="https://github.com/zamokuhle-zwane.png?size=120" width="100" alt="Zamokuhle Zwane">
-      </a>
-      <br><br>
-      <strong>Zamokuhle Zwane</strong>
-      <br>
-      <sub>Team Lead · AI/ML Specialist</sub>
-      <br><br>
-      <a href="https://github.com/zamokuhle-zwane">
-        <img src="https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white" alt="GitHub">
-      </a>
-      <a href="https://linkedin.com/in/zamokuhle-zwane">
-        <img src="https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn">
-      </a>
-    </td>
-
-    <td align="center" width="20%">
-      <a href="https://github.com/nyasha-makwabarara">
-        <img src="https://github.com/nyasha-makwabarara.png?size=120" width="100" alt="Nyashadzashe Makwabarara">
-      </a>
-      <br><br>
-      <strong>Nyashadzashe Makwabarara</strong>
-      <br>
-      <sub>Backend Engineer</sub>
-      <br><br>
-      <a href="https://github.com/nyasha-makwabarara">
-        <img src="https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white" alt="GitHub">
-      </a>
-      <a href="https://linkedin.com/in/nyashadzashe-makwabarara">
-        <img src="https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn">
-      </a>
-    </td>
-
-    <td align="center" width="20%">
-      <a href="https://github.com/lerato-sibanda">
-        <img src="https://github.com/lerato-sibanda.png?size=120" width="100" alt="Lerato Sibanda">
-      </a>
-      <br><br>
-      <strong>Lerato Sibanda</strong>
-      <br>
-      <sub>Frontend Engineer</sub>
-      <br><br>
-      <a href="https://github.com/lerato-sibanda">
-        <img src="https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white" alt="GitHub">
-      </a>
-      <a href="https://linkedin.com/in/lerato-sibanda">
-        <img src="https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn">
-      </a>
-    </td>
-
-    <td align="center" width="20%">
-      <a href="https://github.com/kgaugelo-matsena">
-        <img src="https://github.com/kgaugelo-matsena.png?size=120" width="100" alt="Kgaugelo Matsena">
-      </a>
-      <br><br>
-      <strong>Kgaugelo Matsena</strong>
-      <br>
-      <sub>DevOps Engineer</sub>
-      <br><br>
-      <a href="https://github.com/kgaugelo-matsena">
-        <img src="https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white" alt="GitHub">
-      </a>
-      <a href="https://linkedin.com/in/kgaugelo-matsena">
-        <img src="https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn">
-      </a>
-    </td>
-
-    <td align="center" width="20%">
-      <a href="https://github.com/cleopatra-kwenda">
-        <img src="https://github.com/cleopatra-kwenda.png?size=120" width="100" alt="Cleopatra Kwenda">
-      </a>
-      <br><br>
-      <strong>Cleopatra Kwenda</strong>
-      <br>
-      <sub>Integration &amp; QA Engineer</sub>
-      <br><br>
-      <a href="https://github.com/cleopatra-kwenda">
-        <img src="https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white" alt="GitHub">
-      </a>
-      <a href="https://linkedin.com/in/cleopatra-kwenda">
-        <img src="https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn">
-      </a>
-    </td>
-  </tr>
-</table>
+| **Nyashadzashe Makwabarara** | REST API development, JPA entities, Spring Security, database design, audit logging |
+| **Lerato Sibanda** | Angular component design, UI/UX, frontend testing, API integration, responsive layouts |
 
 </div>
 
@@ -843,7 +750,8 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 ---
 
 <a id="contact"></a>
-<p align="center"><strong>Contact Info</strong></p>
+
+### Contact Information
 
 
 <p align="center">
