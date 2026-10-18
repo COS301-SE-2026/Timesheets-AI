@@ -19,6 +19,16 @@
   Created by <strong>Team Cybernauts</strong> &nbsp;·&nbsp; University of Pretoria &nbsp;·&nbsp; COS 301 Capstone 2026
 </p>
 
+
+<p align="center">
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/backend-ci.yml?branch=dev&label=BACKEND%20BUILD&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="Backend Build"/>
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/frontend-ci.yml?branch=dev&label=FRONTEND%20BUILD&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="Frontend Build"/>
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/ai-ci.yml?branch=dev&label=AI%20SERVICES&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="AI Services"/>
+</p>
+
+
+
+
 ---
 
 <div align="center">
@@ -52,36 +62,47 @@
   </a>
 </p>
 
----
+<p align="center">
+  <img src="./assets/images/section-divider.svg"
+       width="100%"
+       alt="Section divider"/>
+</p>
 
 <a id="documentation"></a>
-<details>
-<summary><strong>Documentation</strong></summary>
+
+<p align="center">
+  <img src="./assets/images/headers/documentation.svg"
+       width="600"
+       alt="Documentation"/>
+</p>
+
 
 
 <details open>
 <summary><strong>Demo 4 Documentation</strong></summary>
 <br>
 
-| Document | Link |
-|---|---|
-| Software Requirements Specification | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Software%20Requirements%20Specifications.pdf) |
-| Software Architecture Specification | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Software%20Architecture%20Specifications.pdf) |
-| API Service Contract | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/API%20Service%20Contract.pdf) |
-| Mapping Quality Requirements to Architectural Decisions | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Mapping%20Quality%20Requirements%20to%20Architectural%20Decisions.pdf) |
-| Acceptance Criteria | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Acceptance%20Criteria%20%281%29.pdf) |
-| Coding Standards Handbook | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Final%20Coding%20Standards%20Handbook%20%281%29.pdf) |
-| Testing Policy | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Testing%20Policy.pdf) |
-| NFR Testing | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/NFR%20TESTING.pdf) |
-| User Manual | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/User_Manual_updated%20%282%29.pdf) |
-| Project Forecast (Wow Factor) | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Project%20forecast%20wow%20factor%20explained.pdf) |
-| Domain Model | [![View Diagram](https://img.shields.io/badge/OPEN_DIAGRAM-E07830?style=flat-square&logo=diagramsnet&logoColor=white)](./docs/demo-4/Domain%20model.drawio.png) |
-| Deployment Diagram | [![View Diagram](https://img.shields.io/badge/OPEN_DIAGRAM-E07830?style=flat-square&logo=diagramsnet&logoColor=white)](./docs/demo-4/Deployment%20diagram.png) |
+<div align="center">
 
+[![Software Requirements Specification](https://img.shields.io/badge/Software_Requirements_Specification-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Software%20Requirements%20Specifications.pdf)
+[![Software Architecture Specification](https://img.shields.io/badge/Software_Architecture_Specification-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Software%20Architecture%20Specifications.pdf)
+[![API Service Contract](https://img.shields.io/badge/API_Service_Contract-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/API%20Service%20Contract.pdf)
+[![Mapping Quality Requirements](https://img.shields.io/badge/Quality_Requirements_Mapping-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Mapping%20Quality%20Requirements%20to%20Architectural%20Decisions.pdf)
+[![Acceptance Criteria](https://img.shields.io/badge/Acceptance_Criteria-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Acceptance%20Criteria%20%281%29.pdf)
+[![Coding Standards Handbook](https://img.shields.io/badge/Coding_Standards-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Final%20Coding%20Standards%20Handbook%20%281%29.pdf)
+[![Testing Policy](https://img.shields.io/badge/Testing_Policy-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Testing%20Policy.pdf)
+[![NFR Testing](https://img.shields.io/badge/NFR_Testing-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/NFR%20TESTING.pdf)
+[![User Manual](https://img.shields.io/badge/User_Manual-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/User_Manual_updated%20%282%29.pdf)
+[![Project Forecast](https://img.shields.io/badge/Project_Forecast-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Project%20forecast%20wow%20factor%20explained.pdf)
+[![Domain Model](https://img.shields.io/badge/Domain_Model-View_Diagram-0F4C91?style=for-the-badge&logo=diagramsnet&logoColor=white)](./docs/demo-4/Domain%20model.drawio.png)
+[![Deployment Diagram](https://img.shields.io/badge/Deployment_Diagram-View_Diagram-E07830?style=for-the-badge&logo=diagramsnet&logoColor=white)](./docs/demo-4/Deployment%20diagram.png)
+
+</div>
 </details>
 
 
-<details open>
+
+<details>
 <summary><strong>Demo 3 Documentation</strong></summary>
 <br>
 
@@ -100,7 +121,7 @@
 
 </details>
 
-<details open>
+<details>
 <summary><strong>Demo 2 Documentation</strong></summary>
 <br>
 
@@ -131,9 +152,13 @@
 </div>
 </details>
 
----
-
 </details>
+
+<p align="center">
+  <img src="./assets/images/section-divider.svg"
+       width="100%"
+       alt="Section divider"/>
+</p>
 
 <a id="project-dashboard"></a>
 <details>
@@ -143,16 +168,14 @@
 
 ### Build and Quality
 
-<p align="left">
-  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/backend-ci.yml?branch=dev&label=backend%20build&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="Backend Build"/>
-  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/frontend-ci.yml?branch=dev&label=frontend%20build&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="Frontend Build"/>
+<p align="center">
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/backend-ci.yml?branch=dev&label=BACKEND%20TESTS&style=for-the-badge&logo=junit5&logoColor=white&color=1A65BF" alt="Backend Tests"/>
+
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/frontend-ci.yml?branch=dev&label=FRONTEND%20TESTS&style=for-the-badge&logo=jest&logoColor=white&color=1A65BF" alt="Frontend Tests"/>
+
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/ai-ci.yml?branch=dev&label=AI%20TESTS&style=for-the-badge&logo=pytest&logoColor=white&color=1A65BF" alt="AI Tests"/>
 </p>
 
-<p align="left">
-  <img src="https://img.shields.io/badge/linting-clean-1A65BF?style=for-the-badge&logo=eslint&logoColor=white" alt="Linting"/>
-  <img src="https://img.shields.io/badge/tests-passing-1A65BF?style=for-the-badge&logo=jest&logoColor=white" alt="Tests"/>
-  
-</p>
 <p>
   <img src ="https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg" alt="Contributors"/>
 </p>
@@ -197,7 +220,11 @@
 </p>
 </p>
 
----
+<p align="center">
+  <img src="./assets/images/section-divider.svg"
+       width="100%"
+       alt="Section divider"/>
+</p>
 
 </details>
 
@@ -306,7 +333,11 @@
   <img src="https://img.shields.io/badge/Yarn-Package_Manager-2C8EBB?style=for-the-badge&logo=yarn&logoColor=white" alt="Yarn"/>
 </p>
 
----
+<p align="center">
+  <img src="./assets/images/section-divider.svg"
+       width="100%"
+       alt="Section divider"/>
+</p>
 
 </details>
 
@@ -513,7 +544,11 @@
 └── yarn.lock
 ```
 
----
+<p align="center">
+  <img src="./assets/images/section-divider.svg"
+       width="100%"
+       alt="Section divider"/>
+</p>
 
 </details>
 

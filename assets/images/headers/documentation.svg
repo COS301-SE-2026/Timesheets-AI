@@ -1,0 +1,52 @@
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="600"
+     height="80"
+     viewBox="0 0 600 80"
+     fill="none">
+
+  <!-- Open book icon -->
+  <g stroke="#E07830"
+     stroke-width="2.5"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+    <path d="M18 17
+             C27 14 37 16 43 21
+             V53
+             C35 48 26 47 18 51 Z"/>
+
+    <path d="M43 21
+             C50 16 60 14 69 17
+             V51
+             C61 47 51 48 43 53 Z"/>
+
+    <path d="M43 21 V53"/>
+
+    <path d="M25 25 C30 24 35 26 38 28"/>
+    <path d="M25 32 C30 31 35 33 38 35"/>
+    <path d="M49 28 C53 26 58 24 63 25"/>
+    <path d="M49 35 C53 33 58 31 63 32"/>
+  </g>
+
+  <!-- Section title -->
+  <text x="88"
+        y="45"
+        fill="#0F4C91"
+        font-family="'Special Gothic Expanded One', sans-serif"
+        font-size="32"
+        font-weight="700">
+    DOCUMENTATION
+  </text>
+
+  <!-- Orange accent line -->
+  <path d="M88 61 H570"
+        stroke="#E07830"
+        stroke-width="2"
+        stroke-linecap="round"/>
+
+  <!-- Navy diamond accent -->
+  <path d="M570 57 L574 61 L570 65 L566 61 Z"
+        fill="#0F4C91"/>
+
+</svg>
