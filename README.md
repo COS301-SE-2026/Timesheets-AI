@@ -471,15 +471,6 @@ Use this if you are on a low-spec machine, on Windows without WSL, or want to ge
 
 </details>
 
-<p align="center">
-  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
-</p>
-
-
-
-
-
-
 
 <a id="repository-structure"></a>
 <details>
@@ -685,16 +676,15 @@ Use this if you are on a low-spec machine, on Windows without WSL, or want to ge
 ```
 
 <p align="center">
-  <img src="./assets/images/section-divider.svg"
-       width="100%"
-       alt="Section divider"/>
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
 </p>
 
 </details>
 
 <a id="team-cybernauts"></a>
-<details>
-<summary><strong>Team Cybernauts</strong></summary>
+<p align="left">
+  <img src="./assets/images/headers/meet-the-team.svg" width="600" alt="getting started"/>
+</p>
 
 
 <p align="center">
@@ -707,6 +697,9 @@ Use this if you are on a low-spec machine, on Windows without WSL, or want to ge
 
 We are a team of five women in Computer Science at the University of Pretoria. We bring technical depth, collaborative energy, and a shared commitment to building software that makes a real difference. Roles are clearly defined but we work across the whole stack - no one gets stuck, no one gets left behind.
 
+
+<details>
+<summary><strong>More about us...</strong></summary>
 
 ### <img src="https://img.icons8.com/?size=100&id=vthqLC9ZovO9&format=png&color=000000" width="18"> Members
 
@@ -731,50 +724,105 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 
 ---
 
-</details>
-
-<a id="features"></a>
-<details>
-<summary><strong>Features</strong></summary>
-
+<div align="center">
 
 <table>
-<tr>
-  <td><strong>Smart time tracking</strong> - start/stop timer or manual entry, linked to projects and tasks</td>
-</tr>
-<tr>
-  <td><strong>AI-powered productivity insights</strong> - understand where effort goes, not just how many hours were logged</td>
-</tr>
-<tr>
-  <td><strong>Anomaly detection</strong> - flags unusual time patterns before they become a problem</td>
-</tr>
-<tr>
-  <td><strong>Timesheet approval workflow</strong> - submit, approve, reject with full audit trail</td>
-</tr>
-<tr>
-  <td><strong>Leave management</strong> - annual leave, sick leave, and public holidays feeding into AI insights</td>
-</tr>
-<tr>
-  <td><strong>Project-scoped roles</strong> - a user can be a Developer on one project and a Manager on another</td>
-</tr>
-<tr>
-  <td><strong>Jira and GitHub integration</strong> - compare logged time against external task data</td>
-</tr>
-<tr>
-  <td><strong>Responsive design</strong> - optimised for desktop and mobile screens with light and dark themes</td>
-</tr>
+  <tr>
+    <td align="center" width="20%">
+      <a href="https://github.com/zamokuhle-zwane">
+        <img src="https://github.com/zamokuhle-zwane.png?size=120" width="100" alt="Zamokuhle Zwane">
+      </a>
+      <br><br>
+      <strong>Zamokuhle Zwane</strong>
+      <br>
+      <sub>Team Lead · AI/ML Specialist</sub>
+      <br><br>
+      <a href="https://github.com/zamokuhle-zwane">
+        <img src="https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white" alt="GitHub">
+      </a>
+      <a href="https://linkedin.com/in/zamokuhle-zwane">
+        <img src="https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn">
+      </a>
+    </td>
+
+    <td align="center" width="20%">
+      <a href="https://github.com/nyasha-makwabarara">
+        <img src="https://github.com/nyasha-makwabarara.png?size=120" width="100" alt="Nyashadzashe Makwabarara">
+      </a>
+      <br><br>
+      <strong>Nyashadzashe Makwabarara</strong>
+      <br>
+      <sub>Backend Engineer</sub>
+      <br><br>
+      <a href="https://github.com/nyasha-makwabarara">
+        <img src="https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white" alt="GitHub">
+      </a>
+      <a href="https://linkedin.com/in/nyashadzashe-makwabarara">
+        <img src="https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn">
+      </a>
+    </td>
+
+    <td align="center" width="20%">
+      <a href="https://github.com/lerato-sibanda">
+        <img src="https://github.com/lerato-sibanda.png?size=120" width="100" alt="Lerato Sibanda">
+      </a>
+      <br><br>
+      <strong>Lerato Sibanda</strong>
+      <br>
+      <sub>Frontend Engineer</sub>
+      <br><br>
+      <a href="https://github.com/lerato-sibanda">
+        <img src="https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white" alt="GitHub">
+      </a>
+      <a href="https://linkedin.com/in/lerato-sibanda">
+        <img src="https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn">
+      </a>
+    </td>
+
+    <td align="center" width="20%">
+      <a href="https://github.com/kgaugelo-matsena">
+        <img src="https://github.com/kgaugelo-matsena.png?size=120" width="100" alt="Kgaugelo Matsena">
+      </a>
+      <br><br>
+      <strong>Kgaugelo Matsena</strong>
+      <br>
+      <sub>DevOps Engineer</sub>
+      <br><br>
+      <a href="https://github.com/kgaugelo-matsena">
+        <img src="https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white" alt="GitHub">
+      </a>
+      <a href="https://linkedin.com/in/kgaugelo-matsena">
+        <img src="https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn">
+      </a>
+    </td>
+
+    <td align="center" width="20%">
+      <a href="https://github.com/cleopatra-kwenda">
+        <img src="https://github.com/cleopatra-kwenda.png?size=120" width="100" alt="Cleopatra Kwenda">
+      </a>
+      <br><br>
+      <strong>Cleopatra Kwenda</strong>
+      <br>
+      <sub>Integration &amp; QA Engineer</sub>
+      <br><br>
+      <a href="https://github.com/cleopatra-kwenda">
+        <img src="https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white" alt="GitHub">
+      </a>
+      <a href="https://linkedin.com/in/cleopatra-kwenda">
+        <img src="https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn">
+      </a>
+    </td>
+  </tr>
 </table>
 
----
+</div>
 
 </details>
 
-</details>
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
+</p>
 
-
-
-
---- 
 
 <p align="center">
   <img src="https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg" alt="SonarCloud" />
@@ -817,7 +865,4 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 
 <p align="center"> </p>
 
-<p align="center"><a href="mailto:cybernauts301@gmail.com">
-    <img src="https://img.shields.io/badge/cybernauts301%40gmail.com-0F4C91?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"/>
-  </a>
-</p>
+
