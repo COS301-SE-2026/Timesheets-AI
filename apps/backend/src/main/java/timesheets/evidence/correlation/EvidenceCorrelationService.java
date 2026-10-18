@@ -43,7 +43,7 @@ import timesheets.evidence.EvidenceEvent;
 @Service
 public class EvidenceCorrelationService {
   // this is for temporal correlation - max time
-  private static final long MAX_SESSION_GAP_MINUTES = 240;
+  private static final long MAX_SESSION_GAP_MINUTES = 45;
   private static final double MIN_CORRELATION_THRESHOLD = 0.30;
 
   // create a lists of evidene events for a specific member into clustered evidence groups
@@ -137,10 +137,11 @@ public class EvidenceCorrelationService {
       return 0.0;
     }
 
+    // adjust temporalScore for testing
     double temporalScore;
 
     if (gapMinutes <= 0) {
-      temporalScore = 1.0;
+      temporalScore = 0.5;
     } else {
       temporalScore = 1.0 - ((double) gapMinutes / MAX_SESSION_GAP_MINUTES);
     }
