@@ -155,10 +155,139 @@
 </details>
 
 <p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
+</p>
+
+
+<a id="technology-stack"></a>
+
+### Tech Stack
+
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=angular,ts,java,spring,python,fastapi,pytorch,postgres,redis&perline=9"
+         alt="Core application stack"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=docker,aws,git,github,githubactions,jest,cypress,vscode,idea&perline=9"
+         alt="Infrastructure, testing and development tools"/>
+  </a>
+</p>
+
+
+<details>
+<summary><strong>View Detailed Tech Stack</strong></summary>
+<br>
+
+<!-- Frontend -->
+<p align="left"><strong>Frontend</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Angular-17%2B-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular 17+"/>
+  <img src="https://img.shields.io/badge/Angular_Material-UI-0081CB?style=for-the-badge&logo=materialdesign&logoColor=white" alt="Angular Material"/>
+  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
+</p>
+
+<!-- Backend -->
+<p align="left"><strong>Backend</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 17+"/>
+  <img src="https://img.shields.io/badge/Spring_Boot-3.5%2B-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot 3.5+"/>
+  <img src="https://img.shields.io/badge/Maven-Build-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white" alt="Maven"/>
+</p>
+
+<!-- Database and Caching -->
+<p align="left"><strong>Database and Caching</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/PostgreSQL-Database-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
+  <img src="https://img.shields.io/badge/Redis-Cache-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis"/>
+</p>
+
+<!-- Authentication -->
+<p align="left"><strong>Authentication and Security</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Spring_Security-Authentication-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Spring Security"/>
+  <img src="https://img.shields.io/badge/JWT-Token_Authentication-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT"/>
+</p>
+
+<!-- AI and Machine Learning -->
+<p align="left"><strong>AI and Machine Learning</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.11+"/>
+  <img src="https://img.shields.io/badge/FastAPI-Python_Microservices-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
+  <img src="https://img.shields.io/badge/PyTorch-Machine_Learning-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch"/>
+</p>
+
+<!-- Containerization and Hosting -->
+<p align="left"><strong>Containerization and Hosting</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+  <img src="https://img.shields.io/badge/Docker_Compose-Multi--Container-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Compose"/>
+  <img src="https://img.shields.io/badge/AWS-EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="AWS EC2"/>
+</p>
+
+<!-- Testing -->
+<p align="left"><strong>Testing and Quality Assurance</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/JUnit_5-Backend_Tests-25A162?style=for-the-badge&logo=junit5&logoColor=white" alt="JUnit 5"/>
+  <img src="https://img.shields.io/badge/Mockito-Mocking-25A162?style=for-the-badge" alt="Mockito"/>
+  <img src="https://img.shields.io/badge/Spring_Boot_Test-Integration_Testing-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot Test"/>
+  <img src="https://img.shields.io/badge/Cypress-E2E_Tests-17202C?style=for-the-badge&logo=cypress&logoColor=white" alt="Cypress"/>
+  <img src="https://img.shields.io/badge/PyTest-AI_Tests-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white" alt="PyTest"/>
+</p>
+
+<!-- API Communication and Documentation -->
+<p align="left"><strong>API Communication and Documentation</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/RESTful_APIs-Communication-02569B?style=for-the-badge" alt="RESTful APIs"/>
+  <img src="https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger and OpenAPI"/>
+</p>
+
+<!-- External Integrations -->
+<p align="left"><strong>External Integrations</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Spring_WebClient-HTTP_Integration-6DB33F?style=for-the-badge&logo=spring&logoColor=white" alt="Spring WebClient"/>
+</p>
+
+<!-- CI/CD and Version Control -->
+<p align="left"><strong>CI/CD and Version Control</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Git-Version_Control-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Git"/>
+  <img src="https://img.shields.io/badge/GitHub-Repository_Hosting-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+  <img src="https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions"/>
+</p>
+
+<!-- Monitoring -->
+<p align="left"><strong>Monitoring and Observability</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" alt="Prometheus"/>
+  <img src="https://img.shields.io/badge/Grafana-Dashboards-F46800?style=for-the-badge&logo=grafana&logoColor=white" alt="Grafana"/>
+</p>
+
+<!-- Development Methodology -->
+<p align="left"><strong>Development Methodology</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Scrum-Agile_Development-6B4FBB?style=for-the-badge" alt="Scrum"/>
+  <img src="https://img.shields.io/badge/GitHub_Projects-Project_Management-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Projects"/>
+</p>
+
+<p align="center">
   <img src="./assets/images/section-divider.svg"
        width="100%"
        alt="Section divider"/>
 </p>
+
+</details>
+
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
+</p>
+
+
+
+
 
 <a id="project-dashboard"></a>
 <details>
@@ -246,100 +375,7 @@
 
 </details>
 
-<a id="technology-stack"></a>
-<details>
-<summary><strong>Technology Stack</strong></summary>
 
-
-### Core Stack
-
-<p align="center">
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=angular,java,spring,python,postgres,docker,aws,github&perline=8" alt="Core stack"/>
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=ts,jest,githubactions,redis,vscode,idea&perline=8" alt="Supporting stack"/>
-  </a>
-</p>
-
-### Stack Breakdown
-
-| Area | Technology |
-|------|------------|
-| **Frontend** | Angular 17+, Angular Material UI, TypeScript |
-| **Backend** | Java 17+, Spring Boot 3.5+, Spring Security |
-| **Database** | PostgreSQL 15, Flyway migrations |
-| **AI and ML** | Python 3.11+, FastAPI, PyTorch, TensorFlow, Scikit-learn |
-| **Auth** | JWT (stateless), Spring Security |
-| **Infrastructure** | AWS (EC2) |
-| **Containerisation** | Docker, Docker Compose |
-| **CI/CD** | GitHub Actions |
-| **Testing: Backend** | JUnit 5, Mockito, Spring Boot Test |
-| **Testing: Frontend** | Jest, Cypress (E2E) |
-| **Testing: AI** | PyTest |
-| **Monitoring** | Prometheus, Grafana, UptimeRobot |
-| **API Docs** | Swagger / OpenAPI |
-| **Version Control** | Git, GitHub |
-
-### Technology Badges
-
-<p align="left">
-  <img src="https://img.shields.io/badge/Angular-17+-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular"/>
-  <img src="https://img.shields.io/badge/Material_UI-Angular-0081CB?style=for-the-badge&logo=mui&logoColor=white" alt="Material UI"/>
-  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
-</p>
-
-<p align="left">
-  <img src="https://img.shields.io/badge/Java-17+-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java"/>
-  <img src="https://img.shields.io/badge/Spring_Boot-3.5+-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot"/>
-  <img src="https://img.shields.io/badge/Spring_Security-JWT-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Spring Security"/>
-  <img src="https://img.shields.io/badge/Maven-Build-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white" alt="Maven"/>
-</p>
-
-<p align="left">
-  <img src="https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
-  <img src="https://img.shields.io/badge/Flyway-Migrations-CC0200?style=for-the-badge&logo=flyway&logoColor=white" alt="Flyway"/>
-  <img src="https://img.shields.io/badge/Redis-Cache-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis"/>
-</p>
-
-<p align="left">
-  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
-  <img src="https://img.shields.io/badge/FastAPI-AI_Service-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
-  <img src="https://img.shields.io/badge/PyTorch-ML-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch"/>
-  <img src="https://img.shields.io/badge/TensorFlow-ML-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow"/>
-</p>
-
-<p align="left">
-  <img src="https://img.shields.io/badge/AWS-EC2%20%7C%20RDS%20%7C%20Amplify-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="AWS"/>
-  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
-  <img src="https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions"/>
-</p>
-
-<p align="left">
-  <img src="https://img.shields.io/badge/JUnit_5-Backend_Tests-25A162?style=for-the-badge&logo=java&logoColor=white" alt="JUnit"/>
-  <img src="https://img.shields.io/badge/Mockito-Mocking-25A162?style=for-the-badge&logo=java&logoColor=white" alt="Mockito"/>
-  <img src="https://img.shields.io/badge/Jest-Unit_Tests-C21325?style=for-the-badge&logo=jest&logoColor=white" alt="Jest"/>
-  <img src="https://img.shields.io/badge/Cypress-E2E_Tests-17202C?style=for-the-badge&logo=cypress&logoColor=white" alt="Cypress"/>
-  <img src="https://img.shields.io/badge/PyTest-AI_Tests-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white" alt="PyTest"/>
-</p>
-
-<p align="left">
-  <img src="https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger"/>
-  <img src="https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" alt="Prometheus"/>
-  <img src="https://img.shields.io/badge/Grafana-Dashboards-F46800?style=for-the-badge&logo=grafana&logoColor=white" alt="Grafana"/>
-  <img src="https://img.shields.io/badge/Yarn-Package_Manager-2C8EBB?style=for-the-badge&logo=yarn&logoColor=white" alt="Yarn"/>
-</p>
-
-<p align="center">
-  <img src="./assets/images/section-divider.svg"
-       width="100%"
-       alt="Section divider"/>
-</p>
-
-</details>
 
 <a id="repository-structure"></a>
 <details>
