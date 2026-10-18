@@ -48,16 +48,18 @@ export class AppComponent {
 
 
     private updateLayout(url: string) : void {
-      const isLandingPage = url ==='/';
+      // Remove query parameters and URL fragments.
+      const path = url.split('?')[0].split('#')[0];
 
-      const isFullscreenPage = 
+      const isLandingPage = path === '/' || path === '';
+
+      const isFullscreenPage =
         isLandingPage ||
-        this.hideLayoutRoutes.some(r => url.startsWith(r));
+        this.hideLayoutRoutes.some(route => path.startsWith(route));
 
       this.showSidebar = !isFullscreenPage;
       this.showHeader = !isFullscreenPage;
       this.showFooter = !isFullscreenPage;
       this.isFullscreenPage = isFullscreenPage;
-
   }
 }
