@@ -765,6 +765,10 @@ We are a team of five women in Computer Science at the University of Pretoria. W
   <sub>Team Cybernauts &nbsp;·&nbsp; COS 301 &nbsp;·&nbsp; University of Pretoria &nbsp;·&nbsp; 2026</sub>
 </p>
 
-<p align="center"> </p>
+
+
+<p align="center">
+  <a href="mailto:cybernauts301@gmail.com"><img src="https://img.shields.io/badge/cybernauts301@gmail.com-0F4C91?style=for-the-badge&logo=gmail&logoColor=white" alt="Email Cybernauts"></a> 
+</p>
 
 
