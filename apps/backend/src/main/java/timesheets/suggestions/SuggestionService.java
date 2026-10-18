@@ -153,4 +153,12 @@ public class SuggestionService {
 
     return save(suggestion);
   }
+
+  public boolean suggestionExists(SuggestedWorkSession suggestion) {
+    return suggestionRepository.existsByWorkspaceMemberIdAndStartTimeAndEndTimeAndTitle(
+        suggestion.getWorkspaceMemberId(),
+        suggestion.getStartTime(),
+        suggestion.getEndTime(),
+        suggestion.getTitle());
+  }
 }

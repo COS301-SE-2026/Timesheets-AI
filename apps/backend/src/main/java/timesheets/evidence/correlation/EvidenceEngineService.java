@@ -34,6 +34,10 @@ public class EvidenceEngineService {
     List<SuggestedWorkSession> savedSuggestions = new ArrayList<SuggestedWorkSession>();
 
     for (SuggestedWorkSession suggestion : suggestions) {
+
+      if (suggestionService.suggestionExists(suggestion)) {
+        continue;
+      }
       savedSuggestions.add(suggestionService.save(suggestion));
     }
 
