@@ -193,12 +193,12 @@ public class JiraAdapter implements IssueTrackerAdapter {
     log.info("Linked task {} to Jira issue: {}", taskId, issueKey);
   }
 
-  @Override
-  public List<IssueResponse> getIssues(
-      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+  // @Override
+  // public List<IssueResponse> getIssues(
+  //     UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
-    return getLinkedIssues(workspaceMemberId, startTime, endTime);
-  }
+  //   return getLinkedIssues(workspaceMemberId, startTime, endTime);
+  // }
 
   /*
   - using this for the project service since for this context it does not depend on the currently connected user
