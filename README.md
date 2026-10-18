@@ -27,17 +27,10 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/github/last-commit/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830&label=Repository%20Activity" alt="Repository Activity"/>
   <img src="https://img.shields.io/github/last-commit/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830&label=last%20commit" alt="Last Commit"/>
-</p>
-
-<p align="center">
   <img src="https://img.shields.io/github/issues/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830&label=open%20issues" alt="Open Issues"/>
   <img src="https://img.shields.io/github/issues-closed/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=1A65BF&label=closed%20issues" alt="Closed Issues"/>
 </p>
-
-
-
 
 ---
 
@@ -303,7 +296,8 @@
 </p>
 
 
-### Prerequisites
+<h3 align="center">Prerequisites</h3>
+<div align = center>
 
 | Tool | Check | Installation |
 |---|---|---|
@@ -314,6 +308,8 @@
 | [![Angular CLI](https://img.shields.io/badge/Angular_CLI-17%2B-DD0031?style=flat-square&logo=angular&logoColor=white)](https://angular.dev/tools/cli) | `ng version` | `npm install -g @angular/cli` |
 | [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/) | `python3 --version` | [Python](https://www.python.org/) |
 | [![Docker](https://img.shields.io/badge/Docker-24%2B-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/) | `docker -v` | [Docker](https://www.docker.com/) |
+
+</div>
 
 <details>
 <summary><strong>First time setup</strong></summary>
@@ -751,9 +747,7 @@ We are a team of five women in Computer Science at the University of Pretoria. W
 
 <a id="contact"></a>
 
-### Contact Information
-
-
+<h3 align="center">Contact Information</h3>
 <p align="center">
   <img src="./assets/images/logo-light.png#gh-light-mode-only" width="120" alt="Momently"/>
   <img src="./assets/images/logo-light.png#gh-dark-mode-only" width="120" alt="Momently"/>
