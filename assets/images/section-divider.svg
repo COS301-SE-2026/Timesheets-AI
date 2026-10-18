@@ -1,22 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="24" viewBox="0 0 1200 24">
 
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="24" viewBox="0 0 1200 24">
-  <path d="M12 12 H500 L512 4 L524 20 L536 12 H1160"
-        fill="none" stroke="#E07830" stroke-width="2"/>
+  <!-- Base line -->
+  <path d="M12 12 H1188"
+        fill="none"
+        stroke="#0F4C91"
+        stroke-width="1.5"/>
 
-  <path d="M1160 12 L1170 4 L1180 12 L1170 20 Z"
-        fill="#0F4C91"/>
+  <!-- Moving orange segment -->
+  <path d="M12 12 H250"
+        fill="none"
+        stroke="#E07830"
+        stroke-width="3.5"
+        stroke-linecap="round">
+    <animateTransform
+      attributeName="transform"
+      type="translate"
+      values="0 0; 938 0; 0 0"
+      dur="30s"
+      repeatCount="indefinite"/>
+  </path>
 
-  <circle cx="12" cy="12" r="5" fill="#E07830"/>
-
-  <!-- Animated blue circle -->
-  <circle cx="40" cy="12" r="4" fill="#0F4C91">
-    <animate
-      attributeName="cx"
-      values="40;1160;40"
-      dur="40s"
-      repeatCount="indefinite"
-    />
-  </circle>
-
-  <circle cx="1188" cy="12" r="5" fill="#E07830"/>
 </svg>
