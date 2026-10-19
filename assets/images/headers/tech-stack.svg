@@ -1,0 +1,50 @@
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="700" height="90" viewBox="0 0 700 90"
+     fill="none">
+
+  <!-- Header frame -->
+  <path d="M12 15 H688 V70 H12 Z"
+        stroke="#0F4C91" stroke-width="1.5"/>
+
+  <!-- Orange frame accents -->
+  <path d="M12 15 H115"
+        stroke="#E07830" stroke-width="4"/>
+  <path d="M585 70 H688"
+        stroke="#E07830" stroke-width="4"/>
+
+  <!-- Animated technology icon -->
+  <g stroke="#E07830" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round"
+     fill="none">
+
+    <animateTransform
+      attributeName="transform"
+      type="translate"
+      values="0 0; 0 -2; 0 0"
+      dur="2.5s"
+      repeatCount="indefinite"/>
+
+    <!-- Laptop screen -->
+    <rect x="28" y="25" width="38" height="27" rx="2"/>
+
+    <!-- Code brackets -->
+    <path d="M39 33 L34 38.5 L39 44"/>
+    <path d="M49 33 L54 38.5 L49 44"/>
+
+    <!-- Laptop base -->
+    <path d="M24 57 H70 L66 52 H28 Z"/>
+
+  </g>
+
+  <!-- Header title -->
+  <text x="80" y="49"
+        fill="#0F4C91"
+        font-family="'Special Gothic Expanded One', sans-serif"
+        font-size="30"
+        font-weight="700">TECHNOLOGY STACK</text>
+
+  <!-- Orange detail -->
+  <circle cx="660" cy="42" r="4" fill="#E07830"/>
+
+</svg>
