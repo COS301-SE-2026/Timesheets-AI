@@ -97,7 +97,7 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
           e);
       throw new RuntimeException("Failed to retrieve Google Calendar events", e);
     } finally {
-      // The Google client can refresh automatically while executing a request
+      // The Google client can refresh automatically while executing a  
       persistRefreshedToken(token, credentials);
     }
   }
@@ -212,7 +212,7 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
 
   @Override
   public CalendarEvent createEvent(UUID workspaceMemberId, CalendarEvent event) {
-    return event; 
+    return event;
   }
 
   @Override
@@ -221,8 +221,7 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
   }
 
   @Override
-  public void deleteEvent(UUID workspaceMemberId, String externalEventId) {
-  }
+  public void deleteEvent(UUID workspaceMemberId, String externalEventId) {}
 
   @Override
   public void exchangeAndsaveToken(UUID workspaceMemberId, String code) {
