@@ -40,6 +40,10 @@ public class AiServiceClient {
   @Value("${app.ai-service.url}")
   private String aiServiceBaseUrl;
 
+  // shared secret the ai-service requires on every route except /health, empty only in local dev
+  @Value("${app.ai-service.api-key:}")
+  private String aiServiceApiKey;
+
   // fastapi returns snake cause while spring uses camelcase
   private final JsonMapper snakeCaseMapper =
       JsonMapper.builder()
@@ -50,6 +54,12 @@ public class AiServiceClient {
   private RestClient buildClient() {
     return restClientBuilder
         .baseUrl(aiServiceBaseUrl)
+        .defaultHeaders(
+            headers -> {
+              if (!aiServiceApiKey.isBlank()) {
+                headers.set("X-Internal-Api-Key", aiServiceApiKey);
+              }
+            })
         .messageConverters(
             converters -> {
               converters.removeIf(c -> c instanceof MappingJackson2HttpMessageConverter);

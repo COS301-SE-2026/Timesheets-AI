@@ -24,6 +24,24 @@ public class JiraEvidenceCollector implements EvidenceCollector {
   public List<EvidenceEvent> collect(
       UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
 
+    List<EvidenceEvent> evidenceEvents =
+        collectIssueEvidence(workspaceMemberId, startTime, endTime);
+
+    // collect Jira worklog evidence
+    evidenceEvents.addAll(collectWorklogEvidence(workspaceMemberId, startTime, endTime));
+    evidenceEvents.addAll(collectCommentEvidence(workspaceMemberId, startTime, endTime));
+    evidenceEvents.addAll(collectStatusChangeEvidence(workspaceMemberId, startTime, endTime));
+    return evidenceEvents;
+  }
+
+  /*
+  - the ticket stage on its own: Jira issues created or updated inside the window
+  - collect() builds on this, and the manager assistant calls it directly so it reads tickets the
+    same way the forecast does, minus the per-issue worklog / comment / changelog calls
+  */
+  public List<EvidenceEvent> collectIssueEvidence(
+      UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
+
     List<IssueResponse> issues =
         issueTrackerAdapter.getIssues(workspaceMemberId, startTime, endTime);
     List<EvidenceEvent> evidenceEvents = new ArrayList<EvidenceEvent>();
@@ -59,10 +77,6 @@ public class JiraEvidenceCollector implements EvidenceCollector {
       evidenceEvents.add(evidenceEvent);
     }
 
-    // collect Jira worklog evidence
-    evidenceEvents.addAll(collectWorklogEvidence(workspaceMemberId, startTime, endTime));
-    evidenceEvents.addAll(collectCommentEvidence(workspaceMemberId, startTime, endTime));
-    evidenceEvents.addAll(collectStatusChangeEvidence(workspaceMemberId, startTime, endTime));
     return evidenceEvents;
   }
 

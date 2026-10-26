@@ -188,6 +188,10 @@
 	background-color: var(--color-primary-surface);
 	color: var(--color-primary);
 }
+.notification-icon.mention {
+    background-color: var(--color-semantic-purple);
+    color: var(--color-semantic-purple-text);
+}
 
 .notification-icon.default {
 	background-color: var(--color-gray-light);
