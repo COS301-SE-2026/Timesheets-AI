@@ -19,26 +19,42 @@
   Created by <strong>Team Cybernauts</strong> &nbsp;·&nbsp; University of Pretoria &nbsp;·&nbsp; COS 301 Capstone 2026
 </p>
 
----
+
+<p align="center">
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/backend-ci.yml?branch=dev&label=BACKEND%20BUILD&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="Backend Build"/>
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/frontend-ci.yml?branch=dev&label=FRONTEND%20BUILD&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="Frontend Build"/>
+  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/ai-ci.yml?branch=dev&label=AI%20SERVICES&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="AI Services"/>
+</p>
+
+<p align="center">
+  <a href="https://github.com/COS301-SE-2026/Timesheets-AI/commits/main">
+  <img src="https://img.shields.io/github/last-commit/COS301-SE-2026/Timesheets-AI/main?style=for-the-badge&logo=git&logoColor=white&color=E07830" alt="Last Commit"/>
+</a>
+  <img src="https://img.shields.io/github/issues/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830&label=open%20issues" alt="Open Issues"/>
+  <img src="https://img.shields.io/github/issues-closed/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=1A65BF&label=closed%20issues" alt="Closed Issues"/>
+</p>
+
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
+</p>
 
 <div align="center">
-
 <p align="center"><strong>Quick Links</strong></p>
 
-[![About](https://img.shields.io/badge/ABOUT-0F4C91?style=for-the-badge)](#about-momently)
-[![Documentation](https://img.shields.io/badge/DOCUMENTATION-E07830?style=for-the-badge)](#documentation)
-[![Dashboard](https://img.shields.io/badge/PROJECT_DASHBOARD-0F4C91?style=for-the-badge)](#project-dashboard)
-[![Features](https://img.shields.io/badge/FEATURES-E07830?style=for-the-badge)](#features)
-[![Getting Started](https://img.shields.io/badge/GETTING_STARTED-0F4C91?style=for-the-badge)](#getting-started)
-[![Commands](https://img.shields.io/badge/COMMAND_REFERENCE-E07830?style=for-the-badge)](#command-reference)
-[![Tech Stack](https://img.shields.io/badge/TECH_STACK-0F4C91?style=for-the-badge)](#technology-stack)
-[![Team](https://img.shields.io/badge/TEAM_CYBERNAUTS-E07830?style=for-the-badge)](#team-cybernauts)
-[![Important Links](https://img.shields.io/badge/IMPORTANT_LINKS-0F4C91?style=for-the-badge)](#important-links)
-[![Contact](https://img.shields.io/badge/CONTACT-E07830?style=for-the-badge)](#contact)
-
+<p align="center">
+  <a href="#about-momently"><img src="https://img.shields.io/badge/About-0F4C91?style=flat-square" alt="About"></a>&nbsp;&nbsp;
+  <a href="#documentation"><img src="https://img.shields.io/badge/Documentation-E07830?style=flat-square" alt="Documentation"></a>&nbsp;&nbsp;
+  <a href="#technology-stack"><img src="https://img.shields.io/badge/Technology_Stack-0F4C91?style=flat-square" alt="Technology Stack"></a>&nbsp;&nbsp;
+  <a href="#getting-started"><img src="https://img.shields.io/badge/Getting_Started-E07830?style=flat-square" alt="Getting Started"></a>&nbsp;&nbsp;
+  <a href="#team-cybernauts"><img src="https://img.shields.io/badge/Meet_the_Team-0F4C91?style=flat-square" alt="Meet the Team"></a>&nbsp;&nbsp;
+  <a href="#contact"><img src="https://img.shields.io/badge/Contact_Info-E07830?style=flat-square" alt="Contact Info"></a>
+</p>
 </div>
 
----
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
+</p>
+
 
 <a id="about-momently"></a>
 <p align="center"><strong>About Momently</strong></p>
@@ -48,40 +64,57 @@
 
 <p align="center">
   <a href="https://momentlyapp.org/">
-    <img src="https://img.shields.io/badge/Visit_Momently_Now-Live_Website-00BFA5?style=for-the-badge&logo=netlify&logoColor=white" alt="Try Momently"/>
+    <img src="https://img.shields.io/badge/Live_Website-Visit_Momently_Now-00BFA5?style=for-the-badge&logo=netlify&logoColor=white" alt="Try Momently"/>
   </a>
 </p>
 
----
+<p align="center">
+  <a href="https://github.com/COS301-SE-2026/Timesheets-AI/projects">
+    <img src="https://img.shields.io/badge/Project_Board-View_Sprint_Planning-43A047?style=for-the-badge&logo=github&logoColor=white" alt="View Project Board"/>
+  </a>
+  <a href="./SETUP.md">
+    <img src="https://img.shields.io/badge/Setup_Guide-Get_Started_Now-8B5CF6?style=for-the-badge&logo=rocket&logoColor=white" alt="View Setup Guide"/>
+  </a>
+</p>
+
+
+<p align="center">
+  <img src="./assets/images/section-divider.svg"
+       width="100%"
+       alt="Section divider"/>
+</p>
 
 <a id="documentation"></a>
-<details>
-<summary><strong>Documentation</strong></summary>
 
+<p align="left">
+  <img src="./assets/images/headers/documentation.svg" width="600" alt="Documentation"/>
+</p>
 
 <details open>
 <summary><strong>Demo 4 Documentation</strong></summary>
 <br>
 
-| Document | Link |
-|---|---|
-| Software Requirements Specification | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Software%20Requirements%20Specifications.pdf) |
-| Software Architecture Specification | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Software%20Architecture%20Specifications.pdf) |
-| API Service Contract | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/API%20Service%20Contract.pdf) |
-| Mapping Quality Requirements to Architectural Decisions | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Mapping%20Quality%20Requirements%20to%20Architectural%20Decisions.pdf) |
-| Acceptance Criteria | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Acceptance%20Criteria%20%281%29.pdf) |
-| Coding Standards Handbook | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Final%20Coding%20Standards%20Handbook%20%281%29.pdf) |
-| Testing Policy | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Testing%20Policy.pdf) |
-| NFR Testing | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/NFR%20TESTING.pdf) |
-| User Manual | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/User_Manual_updated%20%282%29.pdf) |
-| Project Forecast (Wow Factor) | [![View PDF](https://img.shields.io/badge/OPEN_PDF-0F4C91?style=flat-square&logo=googledocs&logoColor=white)](./docs/demo-4/Project%20forecast%20wow%20factor%20explained.pdf) |
-| Domain Model | [![View Diagram](https://img.shields.io/badge/OPEN_DIAGRAM-E07830?style=flat-square&logo=diagramsnet&logoColor=white)](./docs/demo-4/Domain%20model.drawio.png) |
-| Deployment Diagram | [![View Diagram](https://img.shields.io/badge/OPEN_DIAGRAM-E07830?style=flat-square&logo=diagramsnet&logoColor=white)](./docs/demo-4/Deployment%20diagram.png) |
+<div align="center">
 
+[![Software Requirements Specification](https://img.shields.io/badge/Software_Requirements_Specification-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Software%20Requirements%20Specifications.pdf)
+[![Software Architecture Specification](https://img.shields.io/badge/Software_Architecture_Specification-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Software%20Architecture%20Specifications.pdf)
+[![API Service Contract](https://img.shields.io/badge/API_Service_Contract-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/API%20Service%20Contract.pdf)
+[![Mapping Quality Requirements](https://img.shields.io/badge/Quality_Requirements_Mapping-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Mapping%20Quality%20Requirements%20to%20Architectural%20Decisions.pdf)
+[![Acceptance Criteria](https://img.shields.io/badge/Acceptance_Criteria-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Acceptance%20Criteria%20%281%29.pdf)
+[![Coding Standards Handbook](https://img.shields.io/badge/Coding_Standards-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Final%20Coding%20Standards%20Handbook%20%281%29.pdf)
+[![Testing Policy](https://img.shields.io/badge/Testing_Policy-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Testing%20Policy.pdf)
+[![NFR Testing](https://img.shields.io/badge/NFR_Testing-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/NFR%20TESTING.pdf)
+[![User Manual](https://img.shields.io/badge/User_Manual-View_PDF-0F4C91?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/User_Manual_updated%20%282%29.pdf)
+[![Project Forecast](https://img.shields.io/badge/Project_Forecast-View_PDF-E07830?style=for-the-badge&logo=googledocs&logoColor=white)](./docs/demo-4/Project%20forecast%20wow%20factor%20explained.pdf)
+[![Domain Model](https://img.shields.io/badge/Domain_Model-View_Diagram-0F4C91?style=for-the-badge&logo=diagramsnet&logoColor=white)](./docs/demo-4/Domain%20model.drawio.png)
+[![Deployment Diagram](https://img.shields.io/badge/Deployment_Diagram-View_Diagram-E07830?style=for-the-badge&logo=diagramsnet&logoColor=white)](./docs/demo-4/Deployment%20diagram.png)
+
+</div>
 </details>
 
 
-<details open>
+
+<details>
 <summary><strong>Demo 3 Documentation</strong></summary>
 <br>
 
@@ -100,7 +133,7 @@
 
 </details>
 
-<details open>
+<details>
 <summary><strong>Demo 2 Documentation</strong></summary>
 <br>
 
@@ -131,184 +164,311 @@
 </div>
 </details>
 
----
-
 </details>
 
-<a id="project-dashboard"></a>
-<details>
-<summary><strong>Project Dashboard</strong></summary>
-
-
-
-### Build and Quality
-
-<p align="left">
-  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/backend-ci.yml?branch=dev&label=backend%20build&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="Backend Build"/>
-  <img src="https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/Timesheets-AI/frontend-ci.yml?branch=dev&label=frontend%20build&style=for-the-badge&logo=githubactions&logoColor=white&color=0F4C91" alt="Frontend Build"/>
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
 </p>
 
-<p align="left">
-  <img src="https://img.shields.io/badge/linting-clean-1A65BF?style=for-the-badge&logo=eslint&logoColor=white" alt="Linting"/>
-  <img src="https://img.shields.io/badge/tests-passing-1A65BF?style=for-the-badge&logo=jest&logoColor=white" alt="Tests"/>
-  
-</p>
-<p>
-  <img src ="https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg" alt="Contributors"/>
-</p>
-
-### SonarQube quality badges
-<p>
-   <img src = "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=security_rating&logoColor=white&color=0F4C91" alt="Bugs"/>
-   <img src = "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=sqale_rating&logoColor=white&color=0F4C91" alt = "Badge"/>
-  <img src= "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=reliability_rating" alt = "Badges"/>
-</p>
-<p>
-   <img src= "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=sqale_index" alt = "Badges"/>
-  <img src = "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=bugs&logoColor=white&color=0F4C91" alt="Bugs"/>
-   <img src = "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=ncloc&logoColor=white&color=0F4C91" alt="Bugs"/>
-     <img src = "https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&metric=vulnerabilities&logoColor=white&color=0F4C91" alt="Bugs"/>
-</p>
-
-
-
-### Project Status
-
-<p align="left">
-  <img src="https://img.shields.io/badge/status-active-E07830?style=for-the-badge" alt="Status"/>
-  <img src="https://img.shields.io/badge/maintained-yes-E07830?style=for-the-badge" alt="Maintained"/>
-  <img src="https://img.shields.io/github/last-commit/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830&label=last%20commit" alt="Last Commit"/>
-  <img src="https://img.shields.io/github/contributors/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830" alt="Contributors"/>
-</p>
-
-
-
-
-### Issues and Activity
-
-<p align="left">
-  <img src="https://img.shields.io/github/issues/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830&label=open%20issues" alt="Open Issues"/>
-  <img src="https://img.shields.io/github/issues-closed/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=1A65BF&label=closed%20issues" alt="Closed Issues"/>
-  <img src="https://img.shields.io/github/stars/COS301-SE-2026/Timesheets-AI?style=for-the-badge&color=E07830" alt="Stars"/>
-</p>
-
-<p align="left">
-  <img src="https://img.shields.io/badge/Powered%20by-Cybernauts-0F4C91?style=for-the-badge" alt="Powered by Cybernauts"/>
-</p>
-</p>
-
----
-
-</details>
-
-<a id="important-links"></a>
-<details>
-<summary><strong>Important Links</strong></summary>
-
-
-| Link | Description |
-|------|-------------|
-| [Project Board](https://github.com/COS301-SE-2026/Timesheets-AI/projects) | Sprint board: backlog, in progress, review, done |
-| [Issues](https://github.com/COS301-SE-2026/Timesheets-AI/issues) | All tracked tasks and bug reports |
-| [Pull Requests](https://github.com/COS301-SE-2026/Timesheets-AI/pulls) | Active and merged pull requests |
-| [SRS Document](./docs/srs/functional-requirements.pdf) | Demo 1 Functional Requirements |
-| [Wireframes](./docs/wireframes/) | UI wireframes and brand style guide |
-| [Setup Guide](./SETUP.md) | Local development setup, startup options and command reference |
-| [Architecture](./docs/architecture/) | Domain model and ERD |
-| [Demo 1 video](./docs/) | Video recording for demo one |
-
-</details>
 
 <a id="technology-stack"></a>
-<details>
-<summary><strong>Technology Stack</strong></summary>
-
-
-### Core Stack
-
-<p align="center">
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=angular,java,spring,python,postgres,docker,aws,github&perline=8" alt="Core stack"/>
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=ts,jest,githubactions,redis,vscode,idea&perline=8" alt="Supporting stack"/>
-  </a>
-</p>
-
-### Stack Breakdown
-
-| Area | Technology |
-|------|------------|
-| **Frontend** | Angular 17+, Angular Material UI, TypeScript |
-| **Backend** | Java 17+, Spring Boot 3.5+, Spring Security |
-| **Database** | PostgreSQL 15, Flyway migrations |
-| **AI and ML** | Python 3.11+, FastAPI, PyTorch, TensorFlow, Scikit-learn |
-| **Auth** | JWT (stateless), Spring Security |
-| **Infrastructure** | AWS (EC2) |
-| **Containerisation** | Docker, Docker Compose |
-| **CI/CD** | GitHub Actions |
-| **Testing: Backend** | JUnit 5, Mockito, Spring Boot Test |
-| **Testing: Frontend** | Jest, Cypress (E2E) |
-| **Testing: AI** | PyTest |
-| **Monitoring** | Prometheus, Grafana, UptimeRobot |
-| **API Docs** | Swagger / OpenAPI |
-| **Version Control** | Git, GitHub |
-
-### Technology Badges
 
 <p align="left">
-  <img src="https://img.shields.io/badge/Angular-17+-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular"/>
-  <img src="https://img.shields.io/badge/Material_UI-Angular-0081CB?style=for-the-badge&logo=mui&logoColor=white" alt="Material UI"/>
+  <img src="./assets/images/headers/tech-stack.svg" width="600" alt="tech stack"/>
+</p>
+
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=angular,ts,java,spring,python,fastapi,pytorch,postgres,redis&perline=9"
+         alt="Core application stack"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=docker,aws,git,github,githubactions,jest,cypress,vscode,idea&perline=9"
+         alt="Infrastructure, testing and development tools"/>
+  </a>
+</p>
+
+
+<details>
+<summary><strong>View Detailed Tech Stack</strong></summary>
+<br>
+
+<!-- Frontend -->
+<p align="left"><strong>Frontend</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Angular-17%2B-DD0031?style=for-the-badge&logo=angular&logoColor=white" alt="Angular 17+"/>
+  <img src="https://img.shields.io/badge/Angular_Material-UI-0081CB?style=for-the-badge&logo=materialdesign&logoColor=white" alt="Angular Material"/>
   <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
 </p>
 
+<!-- Backend -->
+<p align="left"><strong>Backend</strong></p>
 <p align="left">
-  <img src="https://img.shields.io/badge/Java-17+-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java"/>
-  <img src="https://img.shields.io/badge/Spring_Boot-3.5+-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot"/>
-  <img src="https://img.shields.io/badge/Spring_Security-JWT-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Spring Security"/>
+  <img src="https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 17+"/>
+  <img src="https://img.shields.io/badge/Spring_Boot-3.5%2B-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot 3.5+"/>
   <img src="https://img.shields.io/badge/Maven-Build-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white" alt="Maven"/>
 </p>
 
+<!-- Database and Caching -->
+<p align="left"><strong>Database and Caching</strong></p>
 <p align="left">
-  <img src="https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
-  <img src="https://img.shields.io/badge/Flyway-Migrations-CC0200?style=for-the-badge&logo=flyway&logoColor=white" alt="Flyway"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-Database-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
   <img src="https://img.shields.io/badge/Redis-Cache-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis"/>
 </p>
 
+<!-- Authentication -->
+<p align="left"><strong>Authentication and Security</strong></p>
 <p align="left">
-  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
-  <img src="https://img.shields.io/badge/FastAPI-AI_Service-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
-  <img src="https://img.shields.io/badge/PyTorch-ML-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch"/>
-  <img src="https://img.shields.io/badge/TensorFlow-ML-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow"/>
+  <img src="https://img.shields.io/badge/Spring_Security-Authentication-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white" alt="Spring Security"/>
+  <img src="https://img.shields.io/badge/JWT-Token_Authentication-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT"/>
 </p>
 
+<!-- AI and Machine Learning -->
+<p align="left"><strong>AI and Machine Learning</strong></p>
 <p align="left">
-  <img src="https://img.shields.io/badge/AWS-EC2%20%7C%20RDS%20%7C%20Amplify-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="AWS"/>
-  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
-  <img src="https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions"/>
+  <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.11+"/>
+  <img src="https://img.shields.io/badge/FastAPI-Python_Microservices-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
+  <img src="https://img.shields.io/badge/PyTorch-Machine_Learning-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch"/>
 </p>
 
+<!-- Containerization and Hosting -->
+<p align="left"><strong>Containerization and Hosting</strong></p>
 <p align="left">
-  <img src="https://img.shields.io/badge/JUnit_5-Backend_Tests-25A162?style=for-the-badge&logo=java&logoColor=white" alt="JUnit"/>
-  <img src="https://img.shields.io/badge/Mockito-Mocking-25A162?style=for-the-badge&logo=java&logoColor=white" alt="Mockito"/>
-  <img src="https://img.shields.io/badge/Jest-Unit_Tests-C21325?style=for-the-badge&logo=jest&logoColor=white" alt="Jest"/>
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+  <img src="https://img.shields.io/badge/Docker_Compose-Multi--Container-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Compose"/>
+  <img src="https://img.shields.io/badge/AWS-EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="AWS EC2"/>
+</p>
+
+<!-- Testing -->
+<p align="left"><strong>Testing and Quality Assurance</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/JUnit_5-Backend_Tests-25A162?style=for-the-badge&logo=junit5&logoColor=white" alt="JUnit 5"/>
+  <img src="https://img.shields.io/badge/Mockito-Mocking-25A162?style=for-the-badge" alt="Mockito"/>
+  <img src="https://img.shields.io/badge/Spring_Boot_Test-Integration_Testing-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot Test"/>
   <img src="https://img.shields.io/badge/Cypress-E2E_Tests-17202C?style=for-the-badge&logo=cypress&logoColor=white" alt="Cypress"/>
   <img src="https://img.shields.io/badge/PyTest-AI_Tests-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white" alt="PyTest"/>
 </p>
 
+<!-- API Communication and Documentation -->
+<p align="left"><strong>API Communication and Documentation</strong></p>
 <p align="left">
-  <img src="https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger"/>
-  <img src="https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" alt="Prometheus"/>
-  <img src="https://img.shields.io/badge/Grafana-Dashboards-F46800?style=for-the-badge&logo=grafana&logoColor=white" alt="Grafana"/>
-  <img src="https://img.shields.io/badge/Yarn-Package_Manager-2C8EBB?style=for-the-badge&logo=yarn&logoColor=white" alt="Yarn"/>
+  <img src="https://img.shields.io/badge/RESTful_APIs-Communication-02569B?style=for-the-badge" alt="RESTful APIs"/>
+  <img src="https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger and OpenAPI"/>
 </p>
 
----
+<!-- External Integrations -->
+<p align="left"><strong>External Integrations</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Spring_WebClient-HTTP_Integration-6DB33F?style=for-the-badge&logo=spring&logoColor=white" alt="Spring WebClient"/>
+</p>
+
+<!-- CI/CD and Version Control -->
+<p align="left"><strong>CI/CD and Version Control</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Git-Version_Control-F05032?style=for-the-badge&logo=git&logoColor=white" alt="Git"/>
+  <img src="https://img.shields.io/badge/GitHub-Repository_Hosting-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/>
+  <img src="https://img.shields.io/badge/GitHub_Actions-CI%2FCD-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="GitHub Actions"/>
+</p>
+
+<!-- Monitoring -->
+<p align="left"><strong>Monitoring and Observability</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=white" alt="Prometheus"/>
+  <img src="https://img.shields.io/badge/Grafana-Dashboards-F46800?style=for-the-badge&logo=grafana&logoColor=white" alt="Grafana"/>
+</p>
+
+<!-- Development Methodology -->
+<p align="left"><strong>Development Methodology</strong></p>
+<p align="left">
+  <img src="https://img.shields.io/badge/Scrum-Agile_Development-6B4FBB?style=for-the-badge" alt="Scrum"/>
+  <img src="https://img.shields.io/badge/GitHub_Projects-Project_Management-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Projects"/>
+</p>
 
 </details>
+
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
+</p>
+
+
+<a id="getting-started"></a>
+
+<p align="left">
+  <img src="./assets/images/headers/getting-started.svg" width="600" alt="getting started"/>
+</p>
+
+
+<h3 align="center">Prerequisites</h3>
+<div align = center>
+
+| Tool | Check | Installation |
+|---|---|---|
+| [![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://adoptium.net/) | `java -version` | [Adoptium](https://adoptium.net/) |
+| [![Maven](https://img.shields.io/badge/Maven-3.9%2B-C71A36?style=flat-square&logo=apachemaven&logoColor=white)](https://maven.apache.org/) | `mvn -version` | [Maven](https://maven.apache.org/) |
+| [![Node.js](https://img.shields.io/badge/Node.js-20_LTS-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/) | `node -v` | [Node.js](https://nodejs.org/) |
+| [![Yarn](https://img.shields.io/badge/Yarn-1.22%2B-2C8EBB?style=flat-square&logo=yarn&logoColor=white)](https://classic.yarnpkg.com/) | `yarn -v` | `npm install -g yarn` |
+| [![Angular CLI](https://img.shields.io/badge/Angular_CLI-17%2B-DD0031?style=flat-square&logo=angular&logoColor=white)](https://angular.dev/tools/cli) | `ng version` | `npm install -g @angular/cli` |
+| [![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/) | `python3 --version` | [Python](https://www.python.org/) |
+| [![Docker](https://img.shields.io/badge/Docker-24%2B-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/) | `docker -v` | [Docker](https://www.docker.com/) |
+
+</div>
+
+<details>
+<summary><strong>First time setup</strong></summary>
+
+```bash
+git clone https://github.com/COS301-SE-2026/Timesheets-AI.git
+cd Timesheets-AI
+yarn install
+cp .env.example .env
+```
+
+> `.env` defaults work out of the box for local development. No changes needed unless you want custom values.
+
+### Setup Options
+
+**Option A: Docker**
+
+<p align="left">
+  <img src="https://img.shields.io/badge/requires-Docker_24+-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Requires Docker"/>
+</p>
+
+Use this if you want everything running with one command and do not need to actively develop a specific service.
+
+```bash
+docker compose up -d
+```
+
+All five services start automatically: postgres, redis, backend, frontend and ai-service.
+
+**Option B: Hybrid (recommended for active development)**
+
+<p align="left">
+  <img src="https://img.shields.io/badge/requires-Docker_+_Java_17_+_Node_20-0F4C91?style=for-the-badge" alt="Requires Docker and Java"/>
+</p>
+
+Use this if you are actively developing the backend or frontend and want hot reload without running everything in Docker.
+
+```bash
+# Start only the database and cache
+docker compose up -d postgres redis
+
+# Then run whichever service you are working on
+cd apps/backend && mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# or
+cd apps/frontend && yarn start
+# or
+cd ai-service && source venv/bin/activate && uvicorn main:app --reload --port 8000
+```
+
+**Option C: Fully local (no Docker)**
+
+<p align="left">
+  <img src="https://img.shields.io/badge/requires-Java_17_+_Node_20_+_Python_3.11_+_PostgreSQL_+_Redis-E07830?style=for-the-badge" alt="Requires everything locally"/>
+</p>
+
+Use this if you cannot run Docker on your machine. Requires postgres and redis installed and running locally.
+
+```bash
+# Backend
+cd apps/backend
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+
+# Frontend (new terminal)
+cd apps/frontend
+yarn start
+
+# AI service (new terminal)
+cd ai-service
+source venv/bin/activate
+uvicorn main:app --reload --port 8000
+```
+
+**Option D: GitHub Codespaces**
+
+<p align="left">
+  <img src="https://img.shields.io/badge/requires-GitHub_account_only-181717?style=for-the-badge&logo=github&logoColor=white" alt="Requires GitHub"/>
+</p>
+
+Use this if you are on a low-spec machine, on Windows without WSL, or want to get started without installing anything locally.
+
+1. Go to the repo on GitHub
+2. Click the green **Code** button, then **Codespaces**, then **Create codespace on dev**
+3. Wait approximately 3 minutes for the environment to set up automatically
+4. Run Option A or B inside the Codespaces terminal
+
+</details>
+
+<a id="command-reference"></a>
+<details>
+<summary><strong>Command Reference</strong></summary>
+
+
+<p>Run all commands from the repo root. Full reference in <a href="./SETUP.md">SETUP.md</a>.</p>
+
+### Full Stack
+| Command | Description |
+|---------|-------------|
+| `yarn dev` | Run everything in parallel |
+| `yarn build` | Build all services |
+| `yarn test` | Test all services |
+| `yarn lint` | Lint all services |
+| `yarn coverage` | Coverage for all services |
+
+### Backend
+| Command | Description |
+|---------|-------------|
+| `yarn backend:dev` | Run with dev profile (hot reload) |
+| `yarn backend:build` | Package JAR (skip tests) |
+| `yarn backend:test` | Run tests |
+| `yarn backend:coverage` | Tests with coverage report |
+| `yarn backend:lint` | Checkstyle check |
+
+### Frontend
+| Command | Description |
+|---------|-------------|
+| `yarn frontend:dev` | Dev server |
+| `yarn frontend:build` | Production build |
+| `yarn frontend:test` | Run tests |
+| `yarn frontend:lint` | Lint |
+| `yarn frontend:coverage` | Coverage report |
+| `yarn frontend:e2e` | Cypress E2E tests |
+
+### AI Service
+| Command | Description |
+|---------|-------------|
+| `yarn ai:dev` | Uvicorn on port 8000 |
+| `yarn ai:test` | Pytest |
+| `yarn ai:coverage` | Pytest with HTML coverage report |
+| `yarn ai:lint` | Ruff linter |
+
+### Docker
+| Command | Description |
+|---------|-------------|
+| `yarn docker:up` | Start all containers |
+| `yarn docker:down` | Stop containers |
+| `yarn docker:build` | Build images |
+| `yarn docker:logs` | Follow logs |
+| `yarn docker:reset` | Wipe volumes and restart |
+
+### Verify everything is running
+
+| Service | URL | Expected |
+|---------|-----|----------|
+| Backend health | http://localhost:8080/actuator/health | `{"status":"UP"}` |
+| Swagger UI | http://localhost:8080/swagger-ui.html | Swagger page loads |
+| Frontend | http://localhost:4200 | Angular app loads |
+| AI service health | http://localhost:8000/health | `{"status":"ok"}` |
+| AI service docs | http://localhost:8000/docs | FastAPI Swagger loads |
+
+
+> Full setup guide and command reference: [`SETUP.md`](./SETUP.md)
+
+</details>
+
 
 <a id="repository-structure"></a>
 <details>
@@ -512,14 +672,18 @@
 ├── turbo.json
 └── yarn.lock
 ```
-
----
-
 </details>
 
+<p align="center">
+  <img src="./assets/images/section-divider.svg"
+       width="100%"
+       alt="Section divider"/>
+</p>
+
 <a id="team-cybernauts"></a>
-<details>
-<summary><strong>Team Cybernauts</strong></summary>
+<p align="left">
+  <img src="./assets/images/headers/meet-the-team.svg" width="600" alt="getting started"/>
+</p>
 
 
 <p align="center">
@@ -533,295 +697,65 @@
 We are a team of five women in Computer Science at the University of Pretoria. We bring technical depth, collaborative energy, and a shared commitment to building software that makes a real difference. Roles are clearly defined but we work across the whole stack - no one gets stuck, no one gets left behind.
 
 
-### <img src="https://img.icons8.com/?size=100&id=vthqLC9ZovO9&format=png&color=000000" width="18"> Members
+<details>
+<summary><strong>More about us...</strong></summary>
 
-| Name | Role | GitHub | LinkedIn |
-|---|---|:---:|:---:|
-| **Zamokuhle Zwane** | Team Lead · AI/ML Specialist | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/zamokuhle-zwane) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/zamokuhle-zwane) |
-| **Nyashadzashe Makwabarara** | Backend Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/nyasha-makwabarara) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/nyashadzashe-makwabarara) |
-| **Lerato Sibanda** | Frontend Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/lerato-sibanda) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/lerato-sibanda) |
-| **Kgaugelo Matsena** | DevOps Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/kgaugelo-matsena) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/kgaugelo-matsena) |
-| **Cleopatra Kwenda** | Integration and QA Engineer | [![GitHub](https://img.shields.io/badge/-GitHub-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/cleopatra-kwenda) | [![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/cleopatra-kwenda) |
+<div align="center">
 
+### Members
+
+<div align="center">
+
+| <a href="https://github.com/cybersurfe"><img src="assets/images/members-headshots/zamokuhle.jpeg" width="120" height="120" alt="Zamokuhle" style="object-fit: cover; border-radius: 12px;"></a> | <a href="https://github.com/kc-node"><img src="assets/images/members-headshots/kgaugelo.png" width="120" height="120" alt="Kgaugelo" style="object-fit: cover; border-radius: 12px;"></a> | <a href="https://github.com/Cleopatra-K"><img src="assets/images/members-headshots/cleopatra.jpeg" width="120" height="120" alt="Cleopatra" style="object-fit: cover; border-radius: 12px;"></a> | <a href="https://github.com/TheDzashe"><img src="assets/images/members-headshots/nyashadzashe.jpeg" width="120" height="120" alt="Nyashadzashe" style="object-fit: cover; border-radius: 12px;"></a> | <a href="https://github.com/LeratoNS"><img src="assets/images/members-headshots/lerato.jpeg" width="120" height="120" alt="Lerato" style="object-fit: cover; border-radius: 12px;"></a> |
+|:---:|:---:|:---:|:---:|:---:|
+| **[Zamokuhle Zwane](https://github.com/cybersurfe)** | **[Kgaugelo Matsena](https://github.com/kc-node)** | **[Cleopatra Kwenda](https://github.com/Cleopatra-K)** | **[Nyashadzashe Makwabarara](https://github.com/TheDzashe)** | **[Lerato Sibanda](https://github.com/LeratoNS)** |
+| Team Lead · AI/ML Specialist | DevOps Engineer | Integration & QA Engineer | Backend Engineer | Frontend Engineer |
+| [![GitHub](https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white)](https://github.com/cybersurfe) [![LinkedIn](https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/zamokuhle-zwane) | [![GitHub](https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white)](https://github.com/kc-node) [![LinkedIn](https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/kgaugelo-matsena) | [![GitHub](https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white)](https://github.com/Cleopatra-K) [![LinkedIn](https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/cleopatra-kwenda) | [![GitHub](https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white)](https://github.com/TheDzashe) [![LinkedIn](https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/nyashadzashe-makwabarara) | [![GitHub](https://img.shields.io/badge/GitHub-0F4C91?style=flat-square&logo=github&logoColor=white)](https://github.com/LeratoNS) [![LinkedIn](https://img.shields.io/badge/LinkedIn-E07830?style=flat-square&logo=linkedin&logoColor=white)](https://linkedin.com/in/lerato-sibanda) |
+
+</div>
 
 ### Role Breakdown
 
 | Name | Responsibilities |
 |------|-----------------|
 | **Zamokuhle Zwane** | Team leadership, AI/ML model development, anomaly detection, backend support |
-| **Nyashadzashe Makwabarara** | REST API development, JPA entities, Spring Security, database design, audit logging |
-| **Lerato Sibanda** | Angular component design, UI/UX, frontend testing, API integration, responsive layouts |
 | **Kgaugelo Matsena** | AWS infrastructure, CI/CD pipelines, Docker, cloud deployment, external integrations |
 | **Cleopatra Kwenda** | Testing strategy, E2E testing with Cypress, QA, documentation, system reliability |
+| **Nyashadzashe Makwabarara** | REST API development, JPA entities, Spring Security, database design, audit logging |
+| **Lerato Sibanda** | Angular component design, UI/UX, frontend testing, API integration, responsive layouts |
 
----
-
-</details>
-
-<a id="features"></a>
-<details>
-<summary><strong>Features</strong></summary>
-
-
-<table>
-<tr>
-  <td><strong>Smart time tracking</strong> - start/stop timer or manual entry, linked to projects and tasks</td>
-</tr>
-<tr>
-  <td><strong>AI-powered productivity insights</strong> - understand where effort goes, not just how many hours were logged</td>
-</tr>
-<tr>
-  <td><strong>Anomaly detection</strong> - flags unusual time patterns before they become a problem</td>
-</tr>
-<tr>
-  <td><strong>Timesheet approval workflow</strong> - submit, approve, reject with full audit trail</td>
-</tr>
-<tr>
-  <td><strong>Leave management</strong> - annual leave, sick leave, and public holidays feeding into AI insights</td>
-</tr>
-<tr>
-  <td><strong>Project-scoped roles</strong> - a user can be a Developer on one project and a Manager on another</td>
-</tr>
-<tr>
-  <td><strong>Jira and GitHub integration</strong> - compare logged time against external task data</td>
-</tr>
-<tr>
-  <td><strong>Responsive design</strong> - optimised for desktop and mobile screens with light and dark themes</td>
-</tr>
-</table>
-
----
+</div>
 
 </details>
 
-<a id="getting-started"></a>
-<details>
-<summary><strong>Getting Started</strong></summary>
-
-
-### Prerequisites
-
-| Tool | Version | Check | Install |
-|------|---------|-------|---------|
-| Java | 17+ | `java -version` | [adoptium.net](https://adoptium.net) |
-| Maven | 3.9+ | `mvn -version` | [maven.apache.org](https://maven.apache.org) |
-| Node.js | 20 LTS | `node -v` | [nodejs.org](https://nodejs.org) |
-| Yarn | 1.22+ | `yarn -v` | `npm install -g yarn` |
-| Angular CLI | 17+ | `ng version` | `npm install -g @angular/cli` |
-| Python | 3.11+ | `python3 --version` | [python.org](https://python.org) |
-| Docker | 24+ | `docker -v` | [docker.com](https://docker.com) |
-
-<p align="left">
-  <img src="https://img.shields.io/badge/Java-17+-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java"/>
-  <img src="https://img.shields.io/badge/Node.js-20_LTS-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node"/>
-  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
-  <img src="https://img.shields.io/badge/Docker-24+-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
 </p>
 
-### First-time setup
 
-```bash
-git clone https://github.com/COS301-SE-2026/Timesheets-AI.git
-cd Timesheets-AI
-yarn install
-cp .env.example .env
-```
-
-> `.env` defaults work out of the box for local development. No changes needed unless you want custom values.
-
-### Setup Options
-
-**Option A: Docker**
-
-<p align="left">
-  <img src="https://img.shields.io/badge/requires-Docker_24+-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Requires Docker"/>
+<p align="center">
+  <img src="https://sonarcloud.io/images/project_badges/sonarcloud-highlight.svg" alt="SonarCloud" />
 </p>
 
-Use this if you want everything running with one command and do not need to actively develop a specific service.
+<h4 align="center">SonarCloud Quality Badges</h4>
 
-```bash
-docker compose up -d
-```
-
-All five services start automatically: postgres, redis, backend, frontend and ai-service.
-
-**Option B: Hybrid (recommended for active development)**
-
-<p align="left">
-  <img src="https://img.shields.io/badge/requires-Docker_+_Java_17_+_Node_20-0F4C91?style=for-the-badge" alt="Requires Docker and Java"/>
+<p align="center">
+  <img src="https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&amp;metric=security_rating" alt="Security Rating" />
+  <img src="https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&amp;metric=sqale_rating" alt="Maintainability Rating" />
+  <img src="https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&amp;metric=reliability_rating" alt="Reliability Rating" />
+  <img src="https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&amp;metric=sqale_index" alt="Technical Debt" />
+  <img src="https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&amp;metric=bugs" alt="Bugs" />
+  <img src="https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&amp;metric=ncloc" alt="Lines of Code" />
+  <img src="https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_Timesheets-AI&amp;metric=vulnerabilities" alt="Vulnerabilities" />
 </p>
 
-Use this if you are actively developing the backend or frontend and want hot reload without running everything in Docker.
-
-```bash
-# Start only the database and cache
-docker compose up -d postgres redis
-
-# Then run whichever service you are working on
-cd apps/backend && mvn spring-boot:run -Dspring-boot.run.profiles=dev
-# or
-cd apps/frontend && yarn start
-# or
-cd ai-service && source venv/bin/activate && uvicorn main:app --reload --port 8000
-```
-
-**Option C: Fully local (no Docker)**
-
-<p align="left">
-  <img src="https://img.shields.io/badge/requires-Java_17_+_Node_20_+_Python_3.11_+_PostgreSQL_+_Redis-E07830?style=for-the-badge" alt="Requires everything locally"/>
+<p align="center">
+  <img src="./assets/images/section-divider.svg" width="100%" alt="Section divider"/>
 </p>
-
-Use this if you cannot run Docker on your machine. Requires postgres and redis installed and running locally.
-
-```bash
-# Backend
-cd apps/backend
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-
-# Frontend (new terminal)
-cd apps/frontend
-yarn start
-
-# AI service (new terminal)
-cd ai-service
-source venv/bin/activate
-uvicorn main:app --reload --port 8000
-```
-
-**Option D: GitHub Codespaces**
-
-<p align="left">
-  <img src="https://img.shields.io/badge/requires-GitHub_account_only-181717?style=for-the-badge&logo=github&logoColor=white" alt="Requires GitHub"/>
-</p>
-
-Use this if you are on a low-spec machine, on Windows without WSL, or want to get started without installing anything locally.
-
-1. Go to the repo on GitHub
-2. Click the green **Code** button, then **Codespaces**, then **Create codespace on dev**
-3. Wait approximately 3 minutes for the environment to set up automatically
-4. Run Option A or B inside the Codespaces terminal
-
----
-
-</details>
-
-<a id="command-reference"></a>
-<details>
-<summary><strong>Command Reference</strong></summary>
-
-
-<p> Run all commands from the repo root. Full reference in [`SETUP.md`](./SETUP.md).</p>
-
-### Full Stack
-| Command | Description |
-|---------|-------------|
-| `yarn dev` | Run everything in parallel |
-| `yarn build` | Build all services |
-| `yarn test` | Test all services |
-| `yarn lint` | Lint all services |
-| `yarn coverage` | Coverage for all services |
-
-### Backend
-| Command | Description |
-|---------|-------------|
-| `yarn backend:dev` | Run with dev profile (hot reload) |
-| `yarn backend:build` | Package JAR (skip tests) |
-| `yarn backend:test` | Run tests |
-| `yarn backend:coverage` | Tests with coverage report |
-| `yarn backend:lint` | Checkstyle check |
-
-### Frontend
-| Command | Description |
-|---------|-------------|
-| `yarn frontend:dev` | Dev server |
-| `yarn frontend:build` | Production build |
-| `yarn frontend:test` | Run tests |
-| `yarn frontend:lint` | Lint |
-| `yarn frontend:coverage` | Coverage report |
-| `yarn frontend:e2e` | Cypress E2E tests |
-
-### AI Service
-| Command | Description |
-|---------|-------------|
-| `yarn ai:dev` | Uvicorn on port 8000 |
-| `yarn ai:test` | Pytest |
-| `yarn ai:coverage` | Pytest with HTML coverage report |
-| `yarn ai:lint` | Ruff linter |
-
-### Docker
-| Command | Description |
-|---------|-------------|
-| `yarn docker:up` | Start all containers |
-| `yarn docker:down` | Stop containers |
-| `yarn docker:build` | Build images |
-| `yarn docker:logs` | Follow logs |
-| `yarn docker:reset` | Wipe volumes and restart |
-
-### Verify everything is running
-
-| Service | URL | Expected |
-|---------|-----|----------|
-| Backend health | http://localhost:8080/actuator/health | `{"status":"UP"}` |
-| Swagger UI | http://localhost:8080/swagger-ui.html | Swagger page loads |
-| Frontend | http://localhost:4200 | Angular app loads |
-| AI service health | http://localhost:8000/health | `{"status":"ok"}` |
-| AI service docs | http://localhost:8000/docs | FastAPI Swagger loads |
-
-### DBeaver connection
-
-| Field | Value |
-|-------|-------|
-| Host | `localhost` |
-| Port | `5432` |
-| Database | `momently_dev` |
-| Username | `momently` |
-| Password | from `.env` file |
-
-### Seeded test users
-
-After Flyway migrations run, these users are available:
-
-| Name | Email | Password | Role |
-|------|-------|----------|------|
-| Alice Admin | alice@momentum.co.za | Password123! | ADMIN |
-| Bob Developer | bob@momentum.co.za | Password123! | DEVELOPER |
-| Carol Manager | carol@momentum.co.za | Password123! | MANAGER |
-
-```bash
-curl -s -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"alice@momentum.co.za","password":"Password123!"}' | jq .
-```
-
-> Full setup guide and command reference: [`SETUP.md`](./SETUP.md)
-
-</details>
-
-<a id="documentation"></a>
-<details>
-<summary><strong>Documentation</strong></summary>
-
-
-| Document | Location |
-|----------|----------|
-| Functional Requirements (SRS) | [`docs/srs/`](./docs/srs/) |
-| Domain Model and ERD | [`docs/architecture/`](./docs/architecture/) |
-| Brand Style Guide | [`docs/wireframes/`](./docs/wireframes/) |
-| Wireframes | [`docs/wireframes/`](./docs/wireframes/) |
-| Meeting Minutes | [`docs/meeting-minutes/`](./docs/meeting-minutes/) |
-| Git and Code Standards | [`docs/`](./docs/) |
-
-
-See the full [Git and Code Standards](./docs/) guide for commit conventions, branch rules, and the PR checklist.
-
----
-
-</details>
 
 <a id="contact"></a>
-<p align="center"><strong>Contact Info</strong></p>
 
-
+<h3 align="center">Contact Information</h3>
 <p align="center">
   <img src="./assets/images/logo-light.png#gh-light-mode-only" width="120" alt="Momently"/>
   <img src="./assets/images/logo-light.png#gh-dark-mode-only" width="120" alt="Momently"/>
@@ -839,9 +773,10 @@ See the full [Git and Code Standards](./docs/) guide for commit conventions, bra
   <sub>Team Cybernauts &nbsp;·&nbsp; COS 301 &nbsp;·&nbsp; University of Pretoria &nbsp;·&nbsp; 2026</sub>
 </p>
 
-<p align="center"> </p>
 
-<p align="center"><a href="mailto:cybernauts301@gmail.com">
-    <img src="https://img.shields.io/badge/cybernauts301%40gmail.com-0F4C91?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"/>
-  </a>
+
+<p align="center">
+  <a href="mailto:cybernauts301@gmail.com"><img src="https://img.shields.io/badge/cybernauts301@gmail.com-0F4C91?style=for-the-badge&logo=gmail&logoColor=white" alt="Email Cybernauts"></a> 
 </p>
+
+
