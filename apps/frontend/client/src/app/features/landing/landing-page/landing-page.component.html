@@ -1,35 +1,36 @@
 <!--
 Author: Cleopatra Kwenda
 Date: 2026-07-30
-Purpose: will display our desired wireframe of 
+Purpose: will display our desired wireframe of
 the Landing page.
 Related Requirements: N/A
 -->
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap');
+html { scroll-behavior: smooth; }
 </style>
 
 <div class="landing-container">
 
-    <!-- HEADER AREA -->
+    <!-- HEADER AREA-->
     <header class="navbar">
-        <!-- LOGO AREA -->
-        <a 
-            class="brand brand--hero" 
+
+        <!-- LOGO AREA-->
+        <a
+            class="brand brand--hero"
             (click)="goHome()"
             style="cursor: pointer;"
             aria-label="Momently home">
 
-            <img 
+            <img
                 class="brand-logo"
                 [src]="brandLogo"
                 alt="Momently logo"/>
 
             <span class="brand-copy">
                 <span class="brand-name">
-                    <span class="brand-name__accent">
-                        m</span>omently
+                    <span class="brand-name__accent">m</span>omently
                 </span>
 
                 <span class="brand-tagline">
@@ -38,19 +39,29 @@ Related Requirements: N/A
             </span>
         </a>
 
-        <!-- AUTH BUTTON( LOG-IN / SIGN-UP) AND BRAND STYLE BUTTON -->
+        <!-- SECTION NAV (home view only)-->
+        @if (activeTab === 'home') {
+            <nav class="nav-links" aria-label="Section navigation">
+                <a href="#features">Features</a>
+                <a href="#forecast">Forecast</a>
+                <a href="#mission">Mission</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+        }
+
+        <!-- AUTH BUTTONS AND BRAND STYLE BUTTON-->
         <div class="auth-buttons">
-            <a href="https://momently-brand-style.netlify.app/" class="btn-signup">
+            <a href="https://momently-brand-style.netlify.app/" class="btn-ghost">
                 Brand Style Guide
             </a>
 
-            <button 
+            <button
                 type="button"
-                class="btn-signup"
+                class="btn-ghost"
                 [class.active]="activeTab === 'help'"
-                (click)="setActiveTab(activeTab=== 'home'? 'help': 'home')">
+                (click)="setActiveTab(activeTab === 'home' ? 'help' : 'home')">
 
-                {{ activeTab === 'home' ? 'Help Menu' : 'Home'}}
+                {{ activeTab === 'home' ? 'Help Menu' : 'Home' }}
             </button>
 
             <a routerLink="/login" class="btn-login">
@@ -62,107 +73,531 @@ Related Requirements: N/A
         </div>
     </header>
 
-    @if (activeTab === 'home'){
-        <!-- HERO SECTION -->
+    @if (activeTab === 'home') {
+
+        
+        <!-- HERO SECTION-->
         <section class="hero-section">
             <div class="hero-content">
                 <div class="badge-tag">
-                    <i class="fa-solid fa-wand-magic-sparkles"> </i> AI-POWERED TIME ANALYTICS
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI-POWERED TIME ANALYTICS
                 </div>
 
+                
                 <h1 class="hero-title">
-                    Time tracking <br />
-                    that drives <br />
-                    <span class="highlight">
-                        productivity.
-                    </span>
+                    <span class="typing-line">Time tracking</span>
+                    <span class="typing-line typing-line--second">that drives</span>
+                    <span class="highlight typing-highlight">productivity.</span>
                 </h1>
 
+
                 <p class="hero-description">
-                    Momently helps development teams track time effortlessly, gain 
+                    Momently helps development teams track time effortlessly, gain
                     intelligent insight, and deliver more impact.
                 </p>
+
+                <div class="hero-actions">
+                    <a routerLink="/signup" class="btn-primary">
+                        Explore Momently
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+
+                    <button type="button" class="btn-secondary" (click)="watchDemo()">
+                        <i class="fa-solid fa-circle-play"></i>
+                        Watch the tour
+                    </button>
+                </div>
+
+                <ul class="hero-proof">
+                    <li><i class="fa-solid fa-circle-check"></i> Timer and manual time entry</li>
+                    <li><i class="fa-solid fa-circle-check"></i> Insights from your logged time</li>
+                </ul>
             </div>
 
-            <!-- SREENSHOT OF OUR PRETTIEST PAGE -->
+            <!-- SCREENSHOT OF OUR PRETTIEST PAGE-->
             <div class="hero-preview">
                 <div class="hero-glow"></div>
 
                 <div class="image-wrapper">
-                    <img 
+                    <img
                         src="/assets/images/dashboard-preview.png"
                         alt="Momently App Screenshot"
                         class="preview-img"/>
                 </div>
+
+                <div class="floating-chip chip-top">
+                    <i class="fa-solid fa-bolt"></i>
+                    <div>
+                        <strong>AI</strong>
+                        <span>time and delivery insights</span>
+                    </div>
+                </div>
+
+                <div class="floating-chip chip-bottom">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <div>
+                        <strong>Review</strong>
+                        <span>manager timesheet workflow</span>
+                    </div>
+                </div>
             </div>
-    </section>
+        </section>
 
-    <!-- FEATURES GRID AREA -->
-    <section class="features-section">
-        <div class="features-grid">
-            @for (item of features; track item.title) {
-                <div 
-            
-                    class="features-card"
-                    [style.background]="item.bgColor">
+        
+        <!-- MOVING CAPABILITY MARQUEE-->
+        
+        <section class="marquee-section" aria-label="Momently capabilities">
+            <div class="marquee">
+                <div class="marquee-track">
 
-                    <div 
-                        class="features-icon"
-                        [style.background-color]="item.bgColor"
-                        [style.color]="item.iconColor">
-
-                        <i [class]="item.icon"></i>
-
+                    <div class="marquee-group">
+                        @for (tag of featureTags; track tag.label) {
+                            <span class="marquee-pill"
+                                  [style.color]="tag.color"
+                                  [style.border-color]="tag.color + '33'">
+                                <i [class]="tag.icon"></i>{{ tag.label }}
+                            </span>
+                        }
                     </div>
 
-                    <h3>
-                        {{ item.title }}
-                    </h3>
+                    <div class="marquee-group" aria-hidden="true">
+                        @for (tag of featureTags; track $index) {
+                            <span class="marquee-pill"
+                                  [style.color]="tag.color"
+                                  [style.border-color]="tag.color + '33'">
+                                <i [class]="tag.icon"></i>{{ tag.label }}
+                            </span>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        
+        <!-- FEATURES GRID AREA-->
+        
+        <section class="features-section" id="features">
+
+            <div class="section-heading">
+                <div class="badge-tag">
+                    <i class="fa-solid fa-layer-group"></i> WHY TEAMS PICK MOMENTLY
+                </div>
+                <h2>
+                    Everything you need to turn
+                    <span class="highlight">hours into impact.</span>
+                </h2>
+                <p>
+                    Four pillars, one platform - built for developers who would rather
+                    ship than fill in timesheets.
+                </p>
+            </div>
+
+            <div class="features-grid">
+                @for (item of features; track item.title) {
+                    <div class="features-card">
+
+                        <div
+                            class="features-icon"
+                            [style.background-color]="item.bgColor"
+                            [style.color]="item.iconColor">
+
+                            <i [class]="item.icon"></i>
+
+                        </div>
+
+                        <h3>
+                            {{ item.title }}
+                        </h3>
+                        <p>
+                            {{ item.description }}
+                        </p>
+                    </div>
+                }
+            </div>
+        </section>
+
+        
+        <!-- PRODUCT WOW FACTORS     -->
+        
+        <section class="wow-section" aria-labelledby="wow-heading">
+            <div class="section-heading">
+                <div class="badge-tag">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> SEE MOMENTLY IN ACTION
+                </div>
+                <h2 id="wow-heading">
+                    More than a timer.
+                    <span class="highlight">Insights you can act on.</span>
+                </h2>
+                <p>Explore the two standout capabilities: understand delivery risk and review time entries with AI assistance.</p>
+            </div>
+        </section>
+
+        
+        <!-- PROJECT FORECAST (WOW FACTOR)-->
+        
+        <section class="forecast-section" id="forecast">
+
+            <div class="forecast-copy">
+                <div class="badge-tag forecast-badge">
+                    <i class="fa-solid fa-chart-line"></i> PROJECT FORECAST
+                </div>
+
+                <h2>
+                    See where the sprint
+                    <span class="highlight">lands</span>
+                    - before it does.
+                </h2>
+
+                <p>
+                    Momently's forecast engine reads your logged hours, your team's
+                    velocity and the scope still open on the board. Then it tells you
+                    what that actually means for your delivery date.
+                </p>
+
+                <ul class="forecast-points">
+                    @for (point of forecastPoints; track point.title) {
+                        <li>
+                            <span class="point-icon"><i [class]="point.icon"></i></span>
+                            <div>
+                                <strong>{{ point.title }}</strong>
+                                <p>{{ point.description }}</p>
+                            </div>
+                        </li>
+                    }
+                </ul>
+
+                <a routerLink="/signup" class="btn-primary forecast-cta">
+                    Run your first forecast
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- FORECAST DASHBOARD MOCK-->
+            <div class="forecast-panel">
+
+                <div class="panel-top">
+                    <div>
+                        <span class="panel-eyebrow">Illustrative project view</span>
+                        <h3>Delivery forecast</h3>
+                    </div>
+                    <span class="live-pill">Forecast preview</span>
+                </div>
+
+                <div class="panel-body">
+
+                    <div class="confidence">
+                        <div class="ring-wrap">
+                            <svg class="ring" viewBox="0 0 120 120"
+                                 role="img"
+                                 aria-label="Illustrative forecast confidence">
+                                <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+                                <circle class="ring-value" cx="60" cy="60" r="52"></circle>
+                            </svg>
+                            <div class="ring-label">
+                                <strong>AI</strong>
+                                <span>forecast</span>
+                            </div>
+                        </div>
+
+                        <p class="confidence-note">
+                            A forecast based on available task and time-entry data
+                        </p>
+                    </div>
+
+                    <div class="sprint-bars">
+                        @for (bar of forecastBars; track bar.label) {
+                            <div class="sprint-row">
+                                <span class="sprint-label">{{ bar.label }}</span>
+                                <div class="bar-track">
+                                    <div class="bar-fill" [style.width.%]="bar.value"></div>
+                                </div>
+                                <span class="sprint-value">{{ bar.value }}%</span>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+
+                <div class="ai-callout">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
                     <p>
-                        {{ item.description}}
+                        <strong>AI insight preview:</strong> use logged effort and remaining work
+                        to identify delivery risks and investigate where attention may be needed.
                     </p>
                 </div>
+
+                <div class="panel-footer">
+                    <div class="panel-stat"><strong>Logged time</strong><span>Effort recorded against work</span></div>
+                    <div class="panel-stat"><strong>Open work</strong><span>Remaining tasks in view</span></div>
+                    <div class="panel-stat"><strong>AI insights</strong><span>Signals to help assess delivery</span></div>
+                </div>
+            </div>
+        </section>
+
+        
+        <!-- AI TIMESHEET REVIEW WOW FACTOR-->
+        
+        <section class="review-section" id="timesheet-review">
+            <div class="review-copy">
+                <div class="badge-tag review-badge">
+                    <i class="fa-solid fa-clipboard-check"></i> AI-ASSISTED TIMESHEET REVIEW
+                </div>
+                <h2>Review time with <span class="highlight">more context.</span></h2>
+                <p>
+                    Momently helps managers examine submitted timesheets alongside time-entry
+                    details and AI-generated signals. It supports the review process; managers
+                    remain responsible for approval decisions.
+                </p>
+                <ul class="review-points">
+                    <li><i class="fa-solid fa-check-circle"></i><span><strong>Spot entries to investigate</strong> - surface unusual or potentially inconsistent time patterns.</span></li>
+                    <li><i class="fa-solid fa-check-circle"></i><span><strong>Keep the human in the loop</strong> - use AI insights as supporting information, not an automatic verdict.</span></li>
+                    <li><i class="fa-solid fa-check-circle"></i><span><strong>Support manager review</strong> - make it easier to assess submitted time before approving or requesting changes.</span></li>
+                </ul>
+                <a routerLink="/login" class="btn-primary">Review timesheets <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="review-panel" aria-label="Illustrative AI-assisted timesheet review interface">
+                <div class="review-panel-top">
+                    <div>
+                        <span class="panel-eyebrow">MANAGER WORKFLOW</span>
+                        <h3>Timesheet review</h3>
+                    </div>
+                    <span class="review-status">Submitted</span>
+                </div>
+                <div class="review-person">
+                    <span class="review-avatar">JD</span>
+                    <div><strong>Developer timesheet</strong><span>Weekly submission · Example view</span></div>
+                </div>
+                <div class="review-hours">
+                    <div><span>Total logged</span><strong>Time entries</strong></div>
+                    <div><span>Review status</span><strong>Needs review</strong></div>
+                </div>
+                <div class="review-insight">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <div><strong>AI review signal</strong><p>An entry may differ from the surrounding task or activity pattern. Check its details before deciding.</p></div>
+                </div>
+                <div class="review-entry">
+                    <span class="review-entry-icon"><i class="fa-solid fa-clock"></i></span>
+                    <div><strong>Time entry details</strong><span>Project · Task · Duration · Description</span></div>
+                    <span class="review-check">Review</span>
+                </div>
+                <p class="review-disclaimer">Illustrative example - not live user data or a real review result.</p>
+            </div>
+        </section>
+
+        
+        <!-- MISSION & VISION-->
+        
+        <section class="mission-section" id="mission">
+
+            <div class="section-heading">
+                <div class="badge-tag">
+                    <i class="fa-solid fa-compass"></i> OUR PURPOSE
+                </div>
+                <h2>
+                    Time tracking that drives productivity,
+                    <span class="highlight">not paperwork.</span>
+                </h2>
+            </div>
+
+            <div class="mission-grid">
+
+                <article class="mission-card">
+                    <span class="mission-tag">Our Vision</span>
+                    <h3>Make time the most visible asset a team has.</h3>
+                    <p>
+                        We are transforming the way software development teams
+                        understand and optimise their most valuable asset - time. We
+                        picture a future where tracking is no longer a burden but a
+                        strategic advantage, giving every developer clear visibility
+                        into how their hours are spent, and giving managers the insight
+                        they need to build high-performing, balanced teams.
+                    </p>
+                    <p class="mission-short">
+                        "Time tracking that drives productivity, not paperwork."
+                    </p>
+                </article>
+
+                <article class="mission-card mission-card--alt">
+                    <span class="mission-tag">Our Mission</span>
+                    <h3>Turn logged hours into measurable impact.</h3>
+                    <p>
+                        We empower development teams with an intelligent, AI-driven time
+                        analytics platform that removes manual overhead, delivers
+                        predictive insight, and fits into the tools teams already use.
+                        We move beyond basic time logging - helping developers work more
+                        effectively, managers make data-informed decisions, and
+                        organisations unlock the full potential of their technical
+                        capacity.
+                    </p>
+                    <p class="mission-short">
+                        "AI-powered insights that turn logged hours into measurable impact."
+                    </p>
+                </article>
+
+            </div>
+        </section>
+
+        
+        <!-- IMPACT STATS-->
+        
+        <section class="stats-section">
+            @for (stat of impactStats; track stat.label) {
+                <div class="stat-item">
+                    <strong>{{ stat.value }}</strong>
+                    <span>{{ stat.label }}</span>
+                </div>
             }
-        </div>
-    </section>
+        </section>
 
-    <!-- CLIENT NAMES AND LOGOS -->
-    <section class="logos-section">
-        <p class="trust-text">
-            Trusted by development teams that value every moment
-        </p>
+        
+        <!-- PLATFORM FAQ-->
+        
+        <section class="faq-section landing-faq" id="faq">
+            <div class="faq-header">
+                <div class="badge-tag">
+                    <i class="fa-solid fa-circle-question"></i> PLATFORM FAQ
+                </div>
 
-        <div class="logos-container">
-            <img 
-                src="/assets/images/momentum.png"
-                alt="momentum"
-            />
-            <img 
-                src="/assets/images/gaurdrisk.png"
-                alt="gardrisk"
-            />
-            <img 
-                src="/assets/images/multiply-logo.png"
-                alt="multiply"
-            />
-            <img 
-                src="/assets/images/er24-logo.png"
-                alt="er24"
-            />
-            
-        </div>
-    </section>
-}
+                <h2>
+                    Questions about
+                    <span class="highlight">Momently.</span>
+                </h2>
 
-    <!-- HELP VIEW PAGE -->
-    @if (activeTab === 'help'){
+                <p>
+                    Everything worth knowing before you sign up. Looking for
+                    in-app help instead? Switch to the
+                    <strong>Help Menu</strong> at the top of the page.
+                </p>
+            </div>
+
+            <div class="faq-list">
+                @for (faq of landingFaqs; track faq.question) {
+                    <details class="faq-item">
+                        <summary>
+                            {{ faq.question }}
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </summary>
+                        <div class="faq-answer">
+                            {{ faq.answer }}
+                        </div>
+                    </details>
+                }
+            </div>
+
+            <div class="faq-footer">
+                <p>Still curious about something?</p>
+
+                <a
+                    href="https://mail.google.com/mail/?view=cm&fs=1&to=cybernauts301@gmail.com&su=Momently%20Support%20Enquiry"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn-secondary">
+
+                    <i class="fa-brands fa-google"></i>
+                    Talk to us via Gmail
+                </a>
+
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    (click)="setActiveTab('help')">
+
+                    <i class="fa-solid fa-circle-question"></i>
+                    Help Menu
+                </button>
+
+                
+</div>
+        </section>
+
+        
+        <!-- CLOSING CALL TO ACTION  -->
+        
+        <section class="cta-section">
+            <h2>
+                Every moment counts.
+                <span class="highlight">Start counting yours.</span>
+            </h2>
+            <p>
+                Track work against projects and tasks, review timesheets, and use AI-assisted insights to understand delivery risks and team effort.
+            </p>
+
+            <div class="cta-actions">
+                <a routerLink="/signup" class="btn-primary">
+                    Get started
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <button type="button" class="btn-secondary" (click)="watchDemo()">
+                    <i class="fa-solid fa-circle-play"></i>
+                    Watch the tour
+                </button>
+            </div>
+        </section>
+
+        
+        <!-- CLIENT NAMES AND LOGOS  -->
+        
+        <section class="logos-section">
+            <p class="trust-text">
+                Built for development teams that value every moment
+            </p>
+
+            <div class="logos-container">
+                <img
+                    src="/assets/images/momentum.png"
+                    alt="momentum"
+                />
+                <img
+                    src="/assets/images/gaurdrisk.png"
+                    alt="gardrisk"
+                />
+                <img
+                    src="/assets/images/multiply-logo.png"
+                    alt="multiply"
+                />
+                <img
+                    src="/assets/images/er24-logo.png"
+                    alt="er24"
+                />
+            </div>
+        </section>
+
+        
+        <!-- FOOTER      -->
+
+        <footer class="site-footer">
+            <span class="footer-brand">
+                <span class="brand-name__accent">m</span>omently
+            </span>
+
+            <nav class="footer-links" aria-label="Footer navigation">
+                <a href="#features">Features</a>
+                <a href="#forecast">Forecast</a>
+                <a href="#mission">Mission</a>
+                <a href="#faq">FAQ</a>
+                <a href="https://momently-brand-style.netlify.app/">Brand Style Guide</a>
+                <a href="https://github.com/COS301-SE-2026/Timesheets-AI">GitHub Repository</a>
+            </nav>
+
+            <p class="footer-copy">
+                © 2026 Momently · Built by Cybernauts
+            </p>
+        </footer>
+    }
+
+    
+    <!-- HELP VIEW PAGE-->
+    
+    @if (activeTab === 'help') {
         <div class="help-view-wrapper">
 
-            <!-- HELP HERO SECTION -->
+            <!-- HELP HERO SECTION-->
             <section class="hero-section">
                 <div class="hero-content">
                     <div class="badge-tag help-badge">
-                        <i class="fa-solid fa-wand-magic-sparkles"> </i> HELP CENTRE
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> HELP CENTRE
                     </div>
 
                     <h1 class="hero-title">
@@ -180,13 +615,13 @@ Related Requirements: N/A
                     </p>
                 </div>
 
-                <!-- HOURGLASS COMPONENT -->
+                <!-- HOURGLASS COMPONENT-->
                 <div class="hero-preview">
                     <app-hourglass></app-hourglass>
                 </div>
             </section>
 
-            <!--  HELP CARDS AREA-->
+            <!-- HELP CARDS AREA-->
             <section class="features-section help-cards-section">
                 <div class="features-grid help-grid">
                     <div class="features-card help-card">
@@ -201,12 +636,11 @@ Related Requirements: N/A
                             Take a guided visual tour of Momently's
                             task dashboard and workflow features.
                         </p>
-                        <button 
+                        <button
                             class="btn-card-action btn-orange"
                             (click)="watchDemo()">
 
                             <i class="fa-solid fa-play"></i>Watch Video
-                        
                         </button>
                     </div>
 
@@ -222,17 +656,94 @@ Related Requirements: N/A
                             Get the full PDF manual covering setup, keyboard
                             shortcuts, and team collaboration.
                         </p>
-                        <button 
+                        <button
                             class="btn-card-action btn-blue"
                             (click)="downloadManual()">
 
                             <i class="fa-solid fa-download"></i>Download PDF
-                        
                         </button>
                     </div>
                 </div>
             </section>
+
+            <!-- FAQ SECTION-->
+            <section class="faq-section">
+                <div class="faq-header">
+                    <h2>
+                        Frequently asked
+                        <span class="highlight">questions.</span>
+                    </h2>
+
+                    <p>
+                        Find quick answers to common questions about using
+                        Momently.
+                    </p>
+                </div>
+
+                <div class="faq-list">
+                    <details class="faq-item">
+                        <summary>
+                            How do i track my time?
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </summary>
+                        <div class="faq-answer">
+                            Select a project and task, then start the timer. When you finish working, stop the timer and your time will be saved to your entries. You can also add a manual time entry if you forget to start a timer while working.
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>
+                            How do i submit my timesheet?
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </summary>
+                        <div class="faq-answer">
+                            Review your logged timer on the log time page and submit the timesheet from the log time page once you are ready forthe manager's approval.
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>
+                            Why can't i edit my timesheet?
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </summary>
+                        <div class="faq-answer">
+                            A timesheet may not be editable once it has been submitted or approved. If it was rejected, review the feedback, make the required change and resubmit the timesheet.
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>
+                            What are AI insights?
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </summary>
+                        <div class="faq-answer">
+                            AI insights analyze your time-tracking data to identify patterns and provide useful information about productivity and project activity.
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>
+                            Why does my project forecast change?
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </summary>
+                        <div class="faq-answer">
+                            Project forecast can change as new time entries, project changes and workload information become available.
+                        </div>
+                    </details>
+
+                    <details class="faq-item">
+                        <summary>
+                            Where can i get more help?
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </summary>
+                        <div class="faq-answer">
+                            Watch the tutorial video, download the user manual or contact the developers (cybernauts301&#64;gmail.com) if you need further assistance.
+                        </div>
+                    </details>
+                </div>
+            </section>
+
         </div>
     }
-    
+
 </div>

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { TimerService } from '../../../core/services/timer.service';
 
@@ -10,6 +10,7 @@ import { TimerService } from '../../../core/services/timer.service';
   styleUrl: './floating-timer.component.scss'
 })
 export class FloatingTimerComponent implements OnInit{
+  @Input() sidebarCollapsed= false;
   readonly timerService= inject(TimerService);
   private readonly router= inject(Router);
 

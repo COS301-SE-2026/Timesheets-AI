@@ -1,0 +1,75 @@
+// Author: Cleopatra Kwenda
+// Date: 2026-09-22
+// Purpose: a pop-up for account deletion
+
+mat-dialog-content{
+    background: #ffffff;
+}
+
+mat-dialog-actions{
+    background: #ffffff;
+}
+
+h2[mat-dialog-title]{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    color: #172033;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.3;
+    background: #ffffff;
+}
+
+.title-icon{
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 17px;
+}
+
+
+.warning-text{
+    margin-bottom: 18px;
+    background: #fdecec;
+    color: #b91c1c;
+}
+
+.full-width{
+    width: 100%;
+}
+
+.error-message{
+    margin-top: 8px;
+    color: #dc2626;
+    font-size: 14px;
+}
+
+.dialog-field{
+    width: 100%;
+    margin-top: 10px;
+
+    --mdc-outlined-text-field-outline-color: #dc2626;
+    --mdc-outlined-text-field-hover-outline-color: #dc2626;
+    --mdc-outlined-text-field-focus-outline-color: #dc2626;
+    --mdc-outlined-text-field-label-text-color: #dc2626;
+    --mdc-outlined-text-field-focus-label-text-color: #dc2626;
+    --mdc-outlined-text-field-caret-color: #dc2626;
+}
+
+button[mat-flat-button]{
+    --mdc-filled-button-container-color: #dc2626;
+    --mdc-filled-button-label-text-color: #ffffff;
+}
+
+button[mat-button]{
+    color: #0f4c91;
+}

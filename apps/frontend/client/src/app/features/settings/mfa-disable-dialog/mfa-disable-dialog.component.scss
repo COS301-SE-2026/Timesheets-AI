@@ -2,6 +2,18 @@
 // Date: 2026-09-22
 // Purpose: a pop-up for mfa disabling
 
+.dialog-title{
+    background: #ffffff;
+}
+
+mat-dialog-content{
+    background: #ffffff;
+}
+
+mat-dialog-actions{
+    background: #ffffff;
+}
+
 .dialog-description{
     margin: 0 0 20px;
     color: #6b7a99;

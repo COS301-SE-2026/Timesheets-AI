@@ -1,0 +1,55 @@
+<!--  Author: Cleopatra Kwenda
+    Date:2026-09-24
+    Purpose: this is for the browsing integrations disable
+    Related Requirement: N/A -->
+
+
+<h2 mat-dialog-title class="dialog-title">
+    Browse Integrations
+</h2>
+
+<mat-dialog-content>
+
+    <p class="dialog-description">
+        Add integrations that can be made avaiable to your workspace.
+    </p>
+
+    <div class="integration-list">
+        <div class="integration-grid">
+            @for(integration of integrations; track integration.id){
+                <div class="integration-option">
+                    <div class="integration-icon">
+                        <i [class]="integration.icon"></i>
+                    </div>
+
+                    <div class="integration-info">
+                        <h3>
+                            {{ integration.name }}
+                        </h3>
+                        <p>
+                            {{ integration.description }}
+                        </p>
+                    </div>
+
+                    <button
+                        mat-flat-button
+                        class="add-button"
+                        type="button"
+                        (click)="canAddIntegration(integration)">
+                        Add
+                    </button>                    
+                </div>
+            }
+        </div>
+    </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    
+        <button
+            mat-button
+            type="button"
+            (click)="cancel()">
+            Cancel
+        </button>
+</mat-dialog-actions>

@@ -62,7 +62,7 @@ export class SidebarComponent {
     { label: 'Projects', icon: 'folder', route: '/projects', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
     { label: 'My Tasks', icon: 'task', route: '/my-tasks', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER']},
     { label: 'Calendar', icon: 'calendar_month', route: '/calendar', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
-    { label: 'Insights', icon: 'trending_up', route: '/insights', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN']},
+    { label: 'Insights', icon: 'trending_up', route: '/insights', requiresWorkspace: true, allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER']},
     { label: 'Team', icon: 'groups', route: '/team', requiresWorkspace: true, allowedRoles: ['ROLE_ADMIN', 'ROLE_MANAGER']},
     { label: 'Settings', icon: 'settings', route: '/settings', allowedRoles: ['ROLE_DEVELOPER', 'ROLE_MANAGER', 'ROLE_ADMIN'] }
   ]);

@@ -39,7 +39,9 @@
   </nav>
 
   <!-- @if(timerService.activeTimer(); as timer){ -->
-    <app-floating-timer></app-floating-timer>
+    <app-floating-timer [sidebarCollapsed]="isCollapsed()">
+      
+    </app-floating-timer>
   <!-- } -->
 
   <!-- user profile -->

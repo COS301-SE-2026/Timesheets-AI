@@ -9,6 +9,7 @@ import { LandingPageComponent } from './features/landing/landing-page/landing-pa
 import { authGuard } from './core/guards/auth.guard';
 import { workspaceGuard } from './core/guards/workspace.guard'; 
 import { teamGuard } from './core/guards/team.guard'
+import { insightsGaurd } from './core/guards/insights.guard';
 
 export const routes: Routes = [
   /* Default redirect */
@@ -131,7 +132,7 @@ export const routes: Routes = [
 
   {
     path: 'insights',
-    canActivate: [authGuard, workspaceGuard],
+    canActivate: [authGuard, workspaceGuard, insightsGaurd],
     loadComponent: () =>
       import('./features/insights/insights.component').then(
         (m) => m.InsightsComponent,

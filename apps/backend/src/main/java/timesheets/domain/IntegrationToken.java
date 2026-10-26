@@ -50,6 +50,9 @@ public class IntegrationToken {
   @Column(name = "provider_resource_id")
   private String providerResourceId;
 
+  @Column(name = "provider_site_url")
+  private String providerSiteUrl;
+
   @PrePersist
   protected void onCreate() {
     createdAt = LocalDateTime.now();

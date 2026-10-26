@@ -16,7 +16,7 @@ public class IssueResponse {
   // summary changed to title (more provider-neutral)
 
   private String key;
-  private String title;
+  private String summary;
   private String status;
   private String issueType;
 
