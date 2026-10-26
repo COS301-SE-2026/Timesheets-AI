@@ -32,7 +32,10 @@
     "docker:down": "docker compose down",
     "docker:build": "docker compose build",
     "docker:logs": "docker compose logs -f",
-    "docker:reset": "docker compose down -v && docker compose up -d"
+    "docker:reset": "docker compose down -v && docker compose up -d",
+    "frontend:format": "cd apps/frontend/client && prettier --write \"src/**/*.{ts,html,scss,css,json}\"",
+    "frontend:format:check": "cd apps/frontend/client && prettier --check \"src/**/*.{ts,html,scss,css,json}\"",
+    "frontend:lint:fix": "cd apps/frontend/client && ng lint --fix"
   },
   "devDependencies": {
     "turbo": "^2.0.0"
