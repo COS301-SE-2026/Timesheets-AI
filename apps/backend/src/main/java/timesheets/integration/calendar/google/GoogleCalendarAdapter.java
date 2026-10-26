@@ -104,7 +104,7 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
 
   @Override
   public CalendarEvent getEvent(UUID workspaceMemberId, String externalEventId) {
-  
+
     IntegrationToken token = findToken(workspaceMemberId);
     UserCredentials credentials = buildCredentials(token);
 
