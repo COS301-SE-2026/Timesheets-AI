@@ -187,7 +187,7 @@ export const routes: Routes = [
   {
     path: 'suggestions',
     redirectTo: 'log-time',
-    pathMatch: 'full'gi
+    pathMatch: 'full'
   },
 
   /* Catch-all wildcard (redirects to 404) */
