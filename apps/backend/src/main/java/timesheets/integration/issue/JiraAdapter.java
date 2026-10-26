@@ -237,7 +237,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
     for (IssueResponse issue : issues) {
       String url =
-          "https://api.atlassian.com/ex/jira"
+          "https://api.atlassian.com/ex/jira/"
               + cloudId
               + "/rest/api/3/issue/"
               + issue.getKey()
@@ -308,7 +308,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
     for (IssueResponse issue : issues) {
       String url =
-          "https://api.atlassian.com/ex/jira"
+          "https://api.atlassian.com/ex/jira/"
               + cloudId
               + "/rest/api/3/issue/"
               + issue.getKey()
@@ -377,7 +377,7 @@ public class JiraAdapter implements IssueTrackerAdapter {
 
     for (IssueResponse issue : issues) {
       String url =
-          "https://api.atlassian.com/ex/jira"
+          "https://api.atlassian.com/ex/jira/"
               + cloudId
               + "/rest/api/3/issue/"
               + issue.getKey()
