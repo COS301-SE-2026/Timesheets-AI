@@ -47,22 +47,23 @@
   </header>
 
   @if (currentTimesheet(); as timesheet) {
-    @if (timesheet.status === 'REJECTED') {
+    @if (timesheet.status === "REJECTED") {
       <section class="banner banner--danger" role="alert">
-        This timesheet was rejected {{ timesheet.rejectionReason ? ':' + timesheet.rejectionReason : '.' }}
+        This timesheet was rejected
+        {{ timesheet.rejectionReason ? ":" + timesheet.rejectionReason : "." }}
       </section>
     }
-      @if (timesheet.status === 'APPROVED') {
-        <section class="banner banner--success">
-          Timesheet has been approved and is locked.
-        </section>
-      }
-      @if (timesheet.status === 'SUBMITTED') {
-        <section class="banner banner--success">
-          The timesheet is awaiting review.
-        </section>
-      }
+    @if (timesheet.status === "APPROVED") {
+      <section class="banner banner--success">
+        Timesheet has been approved and is locked.
+      </section>
     }
+    @if (timesheet.status === "SUBMITTED") {
+      <section class="banner banner--success">
+        The timesheet is awaiting review.
+      </section>
+    }
+  }
 
   <!-- Conflict error banner, shown when a time overlap is detected -->
   @if (conflictMessage()) {
@@ -88,7 +89,7 @@
   @if (activeTimer() && activePanel() !== "timer") {
     <section class="banner banner--info">
       <span class="timer-status"
-        ><span class="timer-status__dot"></span> Timer running: 
+        ><span class="timer-status__dot"></span> Timer running:
         {{ formatElapsed(elapsedSeconds()) }}</span
       >
       <button type="button" class="link-btn" (click)="openTimerPanel()">
@@ -99,15 +100,30 @@
 
   <!-- Entry action buttons to open manual or timer panels -->
   <section class="entry-actions">
-    <button class="btn btn--outline" type="button" [disabled]="!canEditEntries()" (click)="openManualPanel()">
+    <button
+      class="btn btn--outline"
+      type="button"
+      [disabled]="!canEditEntries()"
+      (click)="openManualPanel()"
+    >
       + Add Manual Time Entry
     </button>
 
-    <button class="btn btn--primary" type="button" [disabled]="!canEditEntries()" (click)="openTimerPanel()">
+    <button
+      class="btn btn--primary"
+      type="button"
+      [disabled]="!canEditEntries()"
+      (click)="openTimerPanel()"
+    >
       Start Automatic Time Entry
     </button>
 
-    <button class="btn btn--outline" type="button" [disabled]="!canEditEntries()" (click)="openSuggestionsPanel()">
+    <button
+      class="btn btn--outline"
+      type="button"
+      [disabled]="!canEditEntries()"
+      (click)="openSuggestionsPanel()"
+    >
       See Suggested Work
     </button>
   </section>
@@ -216,10 +232,8 @@
               <input
                 type="text"
                 readonly
-                [value]="
-                  formatDuration(durationPreviewSeconds())
-                "
-              /> 
+                [value]="formatDuration(durationPreviewSeconds())"
+              />
             </label>
           </div>
 
@@ -235,7 +249,11 @@
 
           <!-- Form actions: cancel or save/update -->
           <div class="manual-form__actions">
-            <button class="btn btn--ghost" type="button" (click)="cancelTimer()">
+            <button
+              class="btn btn--ghost"
+              type="button"
+              (click)="cancelTimer()"
+            >
               Cancel
             </button>
             <!-- Button label changes based on whether we're creating or editing -->
@@ -410,507 +428,454 @@
 
   <!---redoing this -->
   <!-- I am just copying what time entry (manual) as pattern-->
-<div class="suggestions-panel">
+  @if (activePanel() === "suggestions") {
+    <div class="suggestions-panel">
+      @if (suggestionsLoading()) {
+        <div class="suggestions-state">
+          <p>Looking for suggested work...</p>
+        </div>
 
-  @if (suggestionsLoading()) {
-    <div class="suggestions-state">
-      <p>Looking for suggested work...</p>
-    </div>
-  }
+      } @else if (suggestions().length === 0) {
+        <div class="suggestions-state">
+          <h3>No suggested work found</h3>
+          <p>We could not find any additional work for this period.</p>
+        </div>
 
-  @else if (suggestions().length === 0) {
-    <div class="suggestions-state">
-      <h3>No suggested work found</h3>
-      <p>We could not find any additional work for this period.</p>
-    </div>
-  }
-
-  @else {
-    @if (getCurrentSuggestion(); as suggestion) {
-      <section class="suggestion-carousel">
-
-        <header class="suggestion-carousel__header">
-          <div>
-            <h2>Recommended Suggestion</h2>
-            <span>
-              {{ currentSuggestionIndex() + 1 }} / {{ suggestions().length }}
-            </span>
-          </div>
-
-          <div class="suggestion-carousel__navigation">
-            <button
-              type="button"
-              class="btn btn--ghost"
-              (click)="previousSuggestion()"
-              [disabled]="suggestions().length <= 1">
-              ←
-            </button>
-            <button
-              type="button"
-              class="btn btn--ghost"
-              (click)="nextSuggestion()"
-              [disabled]="suggestions().length <= 1">
-              →
-            </button>
-          </div>
-        </header>
-
-        <!-- SINGLE SUGGESTION CARD for slideshow -->
-        <article class="suggestion-card">
-
-          <header class="suggestion-card-header">
-            <div class="suggestion-card-header-main-one">
-              <h3 class="suggestion-card-title">
-                {{ suggestion.title }}
-              </h3>
-
-              <div class="suggestion-card-date">
-                <span>{{ formatDate(suggestion.startTime) }}</span>
+      } @else {
+        @if (getCurrentSuggestion(); as suggestion) {
+          <section class="suggestion-carousel">
+            <header class="suggestion-carousel__header">
+              <div class="suggestion-carousel__heading">
+                <h2>Suggested Work</h2>
+                <p>
+                  Review detected work activity before adding it to your
+                  timesheet.
+                </p>
               </div>
 
-              <div class="suggestion-card-summary">
-                <span class="suggestion-source-summary">
-                  {{ getSourceSummary(suggestion) }}
+              <div class="suggestion-carousel__navigation">
+                <span class="suggestion-carousel__counter">
+                  Suggestion {{ currentSuggestionIndex() + 1 }} of
+                  {{ suggestions().length }}
                 </span>
 
-                @if (getSuggestionDurationSeconds(suggestion) > 0) {
-                  <span class="suggestion-duration-summary">
-                    {{ formatDuration(getSuggestionDurationSeconds(suggestion)) }}
-                  </span>
-                }
+                <button
+                  type="button"
+                  class="btn btn--outline suggestion-carousel__arrow"
+                  (click)="previousSuggestion()"
+                  [disabled]="suggestions().length <= 1"
+                  aria-label="Previous suggestion"
+                >
+                  ←
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn--outline suggestion-carousel__arrow"
+                  (click)="nextSuggestion()"
+                  [disabled]="suggestions().length <= 1"
+                  aria-label="Next suggestion"
+                >
+                  →
+                </button>
               </div>
-            </div>
+            </header>
 
-            <div class="suggestion-card-status">
-              <span class="suggestion-pending-badge">Pending</span>
-            </div>
-          </header>
+            <!-- SINGLE SUGGESTION CARD for slideshow -->
+            <article class="suggestion-card">
+              <header class="suggestion-card-header">
+                <div class="suggestion-card-header-main-one">
+                  <div class="suggestion-card-date">
+                    {{ formatSuggestionDate(suggestion.startTime) }}
+                  </div>
 
-          <div class="suggestion-card-fields">
+                  <h3 class="suggestion-card-title">
+                    {{ suggestion.title }}
+                  </h3>
 
-            <!-- Project -->
-            <label class="field">
-              <span class="field-label">Project</span>
-              <select
-                [value]="suggestion.projectId || ''"
-                (change)="assignSuggestionProject(suggestion, $event)"
-              >
-                <option value="">Select project</option>
-                @for (project of projects(); track project.id) {
-                  <option [value]="project.id">{{ project.name }}</option>
+                  <div class="suggestion-card-summary">
+                    <span class="suggestion-source-summary">
+                      {{ getSourceSummary(suggestion) }}
+                    </span>
+
+                    @if (getSuggestionDurationSeconds(suggestion) > 0) {
+                      <span class="suggestion-duration-summary">
+                        {{
+                          formatDuration(
+                            getSuggestionDurationSeconds(suggestion)
+                          )
+                        }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <div class="suggestion-card-status">
+                  <span class="suggestion-pending-badge">Pending</span>
+                </div>
+              </header>
+
+              <div class="suggestion-card-fields">
+                <div class="manual-form__row manual-form__row--2">
+                  <label class="field">
+                    <span class="field-label">Project</span>
+                    <select
+                      [value]="suggestion.projectId || ''"
+                      (change)="assignSuggestionProject(suggestion, $event)"
+                    >
+                      <option value="">Select project</option>
+                      @for (project of projects(); track project.id) {
+                        <option [value]="project.id">{{ project.name }}</option>
+                      }
+                    </select>
+                  </label>
+
+                  <label class="field">
+                    <span class="field-label">Task</span>
+                    <select
+                      [value]="suggestion.taskId || ''"
+                      (change)="assignSuggestionTask(suggestion, $event)"
+                    >
+                      <option value="">No task selected</option>
+                      @for (
+                        task of getSuggestionTasks(suggestion.id);
+                        track task.id
+                      ) {
+                        <option [value]="task.id">{{ task.title }}</option>
+                      }
+                      <option value="CREATE NEW TASK">+ Create new task</option>
+                    </select>
+                  </label>
+                </div>
+                <!-- Create new task -->
+                @if (suggestionCreatingTask() === suggestion.id) {
+                  <div class="suggestion-new-task">
+                    <label class="field">
+                      <span class="field-label">New task</span>
+                      <input
+                        type="text"
+                        [value]="newSuggestionTaskTitle()"
+                        (input)="
+                          newSuggestionTaskTitle.set($any($event.target).value)
+                        "
+                        placeholder="Enter task title"
+                      />
+                    </label>
+
+                    <div class="suggestion-new-task-actions">
+                      <button
+                        type="button"
+                        class="btn btn--ghost"
+                        (click)="cancelCreateSuggestionTask()"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn--primary"
+                        [disabled]="
+                          !newSuggestionTaskTitle().trim() ||
+                          suggestionTaskCreating()
+                        "
+                        (click)="createSuggestionTask(suggestion)"
+                      >
+                        @if (suggestionTaskCreating()) {
+                          Creating...
+                        } @else {
+                          Create task
+                        }
+                      </button>
+                    </div>
+                  </div>
                 }
-              </select>
-            </label>
 
-            <label class="field">
-              <span class="field-label">Task</span>
-              <select
-                [value]="suggestion.taskId || ''"
-                (change)="assignSuggestionTask(suggestion, $event)"
-              >
-                <option value="">No task selected</option>
-                @for (task of getSuggestionTasks(suggestion.id); track task.id) {
-                  <option [value]="task.id">{{ task.title }}</option>
-                }
-                <option value="CREATE NEW TASK">+ Create new task</option>
-              </select>
-            </label>
+                <div class="manual-form__row manual-form__row--3">
+                  <label class="field">
+                    <span class="field-label">Start Time</span>
+                    <input
+                      type="time"
+                      [value]="getSuggestionStartTime(suggestion)"
+                      (change)="
+                        updateSuggestionTime(suggestion, $event, 'startTime')
+                      "
+                    />
+                  </label>
 
-            <!-- Create new task -->
-            @if (suggestionCreatingTask() === suggestion.id) {
-              <div class="suggestion-new-task">
+                  <label class="field">
+                    <span class="field-label">End Time</span>
+                    <input
+                      type="time"
+                      [value]="getSuggestionEndTime(suggestion)"
+                      (change)="
+                        updateSuggestionTime(suggestion, $event, 'endTime')
+                      "
+                    />
+                    @if (isSuggestionEndTimeInvalid(suggestion)) {
+                      <span class="field-error"
+                        >End time must be after start time.</span
+                      >
+                    }
+                  </label>
+
+                  <label class="field">
+                    <span class="field-label">Duration</span>
+                    <input
+                      type="text"
+                      readonly
+                      [value]="
+                        formatDuration(getSuggestionDurationSeconds(suggestion))
+                      "
+                    />
+                  </label>
+                </div>
+
                 <label class="field">
-                  <span class="field-label">New task</span>
-                  <input
-                    type="text"
-                    [value]="newSuggestionTaskTitle()"
-                    (input)="newSuggestionTaskTitle.set($any($event.target).value)"
-                    placeholder="Enter task title"
-                  />
+                  <span class="field__label">Description</span>
+                  <textarea
+                    [value]="suggestion.description || ''"
+                    (input)="updateSuggestionDescription(suggestion, $event)"
+                    rows="4"
+                    placeholder="Add a description of this work..."
+                  ></textarea>
                 </label>
+              </div>
 
-                <div class="suggestion-new-task-actions">
+              <footer class="suggestion-card-actions">
+                <button
+                  type="button"
+                  class="btn btn--secondary"
+                  (click)="seeSuggestionEvidence(suggestion)"
+                >
+                  See Evidence
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn--ghost"
+                  (click)="confirmRejectSuggestion(suggestion)"
+                >
+                  Reject
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn--primary"
+                  [disabled]="
+                    !suggestion.projectId ||
+                    isSuggestionEndTimeInvalid(suggestion)
+                  "
+                  (click)="approveSuggestion(suggestion)"
+                >
+                  Approve &amp; Add
+                </button>
+              </footer>
+            </article>
+
+            <!-- Carousel -->
+            <div class="suggestion-carousel__dots">
+              @for (item of suggestions(); track item.id; let i = $index) {
+                <button
+                  type="button"
+                  [class.active]="i === currentSuggestionIndex()"
+                  (click)="currentSuggestionIndex.set(i)"
+                  [attr.aria-label]="'Show suggestion ' + (i + 1)"
+                ></button>
+              }
+            </div>
+          </section>
+
+          <!-- Reject confirmation -->
+          @if (suggestionPendingReject()) {
+            <div class="suggestion-confirmation">
+              <div class="suggestion-confirm">
+                <h3>Reject suggestion?</h3>
+                <p>
+                  Are you sure that you want to reject
+                  <strong>{{ suggestionPendingReject()?.title }}</strong
+                  >?
+                </p>
+
+                <div class="suggestion-confirm-actions">
                   <button
                     type="button"
                     class="btn btn--ghost"
-                    (click)="cancelCreateSuggestionTask()"
+                    (click)="cancelRejectSuggestion()"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     class="btn btn--primary"
-                    [disabled]="!newSuggestionTaskTitle().trim()"
-                    (click)="createSuggestionTask(suggestion)"
+                    (click)="confirmReject()"
                   >
-                    Create task
+                    Reject
                   </button>
                 </div>
               </div>
-            }
-
-            <div class="suggestion-time-row">
-              <label class="field">
-                <span class="field-label">Start Time</span>
-                <input
-                  type="time"
-                  [value]="getSuggestionStartTime(suggestion)"
-                  (change)="updateSuggestionTime(suggestion, $event, 'startTime')"
-                />
-              </label>
-
-              <label class="field">
-                <span class="field-label">End Time</span>
-                <input
-                  type="time"
-                  [value]="getSuggestionEndTime(suggestion)"
-                  (change)="updateSuggestionTime(suggestion, $event, 'endTime')"
-                />
-                @if (isSuggestionEndTimeInvalid(suggestion)) {
-                  <span class="field-error">End time must be after start time.</span>
-                }
-              </label>
-
-              <label class="field">
-                <span class="field-label">Duration</span>
-                <input
-                  type="text"
-                  readonly
-                  [value]="formatDuration(getSuggestionDurationSeconds(suggestion))"
-                />
-              </label>
             </div>
-
-            <label class="field">
-              <span class="field-label">Description</span>
-              <textarea
-                [value]="suggestion.description || ''"
-                (input)="updateSuggestionDescription(suggestion, $event)"
-                rows="4"
-                placeholder="Add a description of this work..."
-              ></textarea>
-            </label>
-
-          </div>
-
-          <footer class="suggestion-card-actions">
-            <button
-              type="button"
-              class="btn btn--secondary"
-              (click)="seeSuggestionEvidence(suggestion)"
-            >
-              See Evidence
-            </button>
-
-            <button
-              type="button"
-              class="btn btn--ghost"
-              (click)="confirmRejectSuggestion(suggestion)"
-            >
-              Reject
-            </button>
-
-            <button
-              type="button"
-              class="btn btn--primary"
-              [disabled]="!suggestion.projectId || isSuggestionEndTimeInvalid(suggestion)"
-              (click)="approveSuggestion(suggestion)"
-            >
-              Approve &amp; Add
-            </button>
-          </footer>
-
-        </article>
-
-        <!-- Carousel Indicators -->
-        <div class="suggestion-carousel__dots">
-          @for (item of suggestions(); track item.id; let i = $index) {
-            <button
-              type="button"
-              [class.active]="i === currentSuggestionIndex()"
-              (click)="currentSuggestionIndex.set(i)"
-              [attr.aria-label]="'Show suggestion ' + (i + 1)">
-            </button>
           }
-        </div>
-
-      </section>
-
-      <!-- Reject confirmation -->
-      @if (suggestionPendingReject()) {
-        <div class="suggestion-confirmation">
-          <div class="suggestion-confirm">
-            <h3>Reject suggestion?</h3>
-            <p>
-              Are you sure that you want to reject
-              <strong>{{ suggestionPendingReject()?.title }}</strong>?
-            </p>
-
-            <div class="suggestion-confirm-actions">
-              <button
-                type="button"
-                class="btn btn--ghost"
-                (click)="cancelRejectSuggestion()"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                class="btn btn--primary"
-                (click)="confirmReject()"
-              >
-                Reject
-              </button>
-            </div>
-          </div>
-        </div>
+        }
       }
-    }
+    </div>
   }
+  <!-- See the Evidence Modal -->
+  @if (suggestionEvidence(); as evidence) {
+    <div class="suggestion-evidence-overlay">
+      <section
+        class="suggestion-evidence-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="suggestion-evidence-title"
+      >
+        <header class="suggestion-evidence-header">
+          <div>
+            <span class="suggestion-evidence-eyebrow">
+              WORK SESSION EVIDENCE
+            </span>
 
-</div>
+            <h2 id="suggestion-evidence-title">
+              Supporting Evidence
+            </h2>
 
-     <!-- See the Evidence Modal -->
-@if (suggestionEvidence(); as evidence) {
-
-  <div
-    class="suggestion-evidence-overlay"
-    (click)="closeSuggestionEvidence()">
-
-    <section
-      class="suggestion-evidence-modal"
-      aria-labelledby="suggestion-evidence-title"
-      (click)="$event.stopPropagation()">
-
-      <header class="suggestion-evidence-header">
-
-        <div>
-          <span class="suggestion-evidence-eyebrow">
-            Evidence Supporting Work Session
-          </span>
-
-          <h2 id="suggestion-evidence-title">
-            Evidence Supporting Work Session
-          </h2>
-
-          <p>
-            Grouped based on timing, workspace metadata &amp;
-            shared issue context.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          class="icon-btn"
-          aria-label="Close evidence"
-          (click)="closeSuggestionEvidence()">
-
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M6 6l12 12M18 6 6 18"></path>
-          </svg>
-
-        </button>
-
-      </header>
-
-
-      <div class="suggestion-evidence-content">
-
-        <!-- Target Session -->
-        <section class="evidence-target-session">
-
-          <span class="field-label">
-            Target Session
-          </span>
-
-          <h3>
-            {{ evidence.title }}
-          </h3>
-
-          <p>
-            Generated from
-            {{ evidence.evidenceEvents?.length || 0 }}
-
-            @if (evidence.evidenceEvents?.length === 1) {
-              correlated evidence event.
-            } @else {
-              correlated evidence events.
-            }
-          </p>
-
-        </section>
-
-
-        <!-- Raw Evidence -->
-        <section class="raw-evidence-section">
-
-          <div class="raw-evidence-header">
-
-            <div>
-              <span class="field-label">
-                Raw Evidence Log
-              </span>
-
-              <h3>
-                {{ evidence.evidenceEvents?.length || 0 }}
-                @if (evidence.evidenceEvents?.length === 1) {
-                  Signal
-                } @else {
-                  Signals
-                }
-              </h3>
-            </div>
-
+            <p>
+             Review the activity that contributed to this suggested work session.
+            </p>
           </div>
 
+          <button
+            type="button"
+            class="icon-btn"
+            aria-label="Close evidence"
+            (click)="closeSuggestionEvidence()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18"></path>
+            </svg>
+          </button>
+        </header>
 
-          @if (evidence.evidenceEvents?.length) {
+        <div class="suggestion-evidence-content">
+          <section class="evidence-target-session">
+            <span class="field-label"> Target Session </span>
 
-            <div class="raw-evidence-list">
+            <h3>
+              {{ evidence.title }}
+            </h3>
 
-              @for (
-                event of evidence.evidenceEvents;
-                track event.id
-              ) {
+            <p>
+              Generated from
+              {{ evidence.evidenceEvents?.length || 0 }}
 
-                <article class="raw-evidence-item">
+              @if (evidence.evidenceEvents?.length === 1) {
+                correlated evidence event.
+              } @else {
+                correlated evidence events.
+              }
+            </p>
+          </section>
 
-                  <div class="raw-evidence-source">
+          <!-- Raw Evidence -->
+          <section class="raw-evidence-section">
+            <div class="raw-evidence-header">
+              <div>
+                <span class="field-label"> Raw Evidence Log </span>
 
-                    @if (event.source === 'GITHUB') {
-                      <span>GH</span>
-                    }
+                <h3>
+                  {{ evidence.evidenceEvents?.length || 0 }}
+                  @if (evidence.evidenceEvents?.length === 1) {
+                    Signal
+                  } @else {
+                    Signals
+                  }
+                </h3>
+              </div>
+            </div>
 
-                    @else if (event.source === 'JIRA') {
-                      <span>JR</span>
-                    }
+            @if (evidence.evidenceEvents?.length) {
+              <div class="raw-evidence-list">
+                @for (event of evidence.evidenceEvents; track event.id) {
+                  <article class="raw-evidence-item">
+                    <div class="raw-evidence-source">
+                      @if (event.source === "GITHUB") {
+                        <span>GH</span>
 
-                    @else if (event.source === 'GOOGLE_CALENDAR') {
-                      <span>CA</span>
-                    }
+                      } @else if (event.source === "JIRA") {
+                        <span>JR</span>
 
-                    @else {
-                      <span>EV</span>
-                    }
+                      } @else if (event.source === "GOOGLE_CALENDAR") {
+                        <span>CA</span>
 
-                  </div>
-
-
-                  <div class="raw-evidence-content">
-
-                    <div class="raw-evidence-meta">
-
-                      <strong>
-
-                        @if (event.source === 'GITHUB') {
-                          GitHub Commit
-                        }
-
-                        @else if (event.source === 'JIRA') {
-                          Jira Activity
-                        }
-
-                        @else if (event.source === 'GOOGLE_CALENDAR') {
-                          Google Calendar
-                        }
-
-                        @else {
-                          {{ event.source }}
-                        }
-
-                      </strong>
-
-                      @if (event.timestamp) {
-                        <span>
-                          {{ formatTime(event.timestamp) }}
-                        </span>
+                      } @else {
+                        <span>EV</span>
                       }
-
                     </div>
 
+                    <div class="raw-evidence-content">
+                      <div class="raw-evidence-meta">
+                        <strong>
+                          @if (event.source === "GITHUB") {
+                            GitHub Commit
 
-                    <h4>
-                      {{ event.description || 'Evidence event' }}
-                    </h4>
+                          } @else if (event.source === "JIRA") {
+                            Jira Activity
 
+                          } @else if (event.source === "GOOGLE_CALENDAR") {
+                            Google Calendar
 
-                    @if (event.metadata) {
+                          } @else {
+                            {{ event.source }}
+                          }
+                        </strong>
 
-                      <div class="raw-evidence-metadata">
-
-                        @if (event.metadata['repositoryName']) {
+                        @if (event.timestamp) {
                           <span>
-                            Repo:
-                            {{ event.metadata['repositoryName'] }}
+                            {{ formatTime(event.timestamp) }}
                           </span>
                         }
-
-                        @if (event.metadata['commitHash']) {
-                          <span>
-                            Commit:
-                            {{ event.metadata['commitHash'] }}
-                          </span>
-                        }
-
-                        @if (event.metadata['issueKey']) {
-                          <span>
-                            Jira:
-                            {{ event.metadata['issueKey'] }}
-                          </span>
-                        }
-
                       </div>
-                    }
 
-                  </div>
+                      <h4>
+                        {{ event.description || "Evidence event" }}
+                      </h4>
 
-                </article>
-              }
+                      @if (event.metadata) {
+                        <div class="raw-evidence-metadata">
+                          @if (event.metadata["repositoryName"]) {
+                            <span>
+                              Repo:
+                              {{ event.metadata["repositoryName"] }}
+                            </span>
+                          }
 
-            </div>
+                          @if (event.metadata["commitHash"]) {
+                            <span>
+                              Commit:
+                              {{ event.metadata["commitHash"] }}
+                            </span>
+                          }
 
-          } @else {
-
-            <p class="evidence-empty">
-              No detailed evidence is available for this suggestion.
-            </p>
-
-          }
-
-        </section>
-
-      </div>
-
-    </section>
-
-  </div>
-
-}
-
-            <!-- <footer class="suggestion-evidence-footer">
-
-              <button
-                type="button"
-                class="btn btn--ghost"
-                (click)="closeSuggestionEvidence()">
-                Close
-              </button>
-
-              <button
-                type="button"
-                class="btn btn--primary"
-                [disabled]="!evidence.projectId"
-                (click)="approveSuggestion(evidence); closeSuggestionEvidence()">
-                Approve Work Session
-              </button>
-            </footer>
+                          @if (event.metadata["issueKey"]) {
+                            <span>
+                              Jira:
+                              {{ event.metadata["issueKey"] }}
+                            </span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </article>
+                }
+              </div>
+            } @else {
+              <p class="evidence-empty">
+                No detailed evidence is available for this suggestion.
+              </p>
+            }
           </section>
         </div>
-      }
-    </section>
-   } -->
-
-
+      </section>
+    </div>
+  }
   <!-- Entries list section -->
   <section class="entries-section">
     <article class="card entries-card">
@@ -927,7 +892,6 @@
 
         <!-- Project and date range filters -->
         <div class="entries-toolbar__filters" [formGroup]="filterForm">
-
           <label class="filter-date">
             <span>From</span>
             <input type="date" formControlName="from" />
@@ -973,18 +937,16 @@
                 <td class="col-description">
                   <span>{{ entry.description }}</span>
                   <!-- Status notes shown below description -->
-                  @if ( currentTimesheet()?.status === "SUBMITTED") {
+                  @if (currentTimesheet()?.status === "SUBMITTED") {
                     <em class="status-note">Awaiting review</em>
                   }
-                  @if ( currentTimesheet()?.status === "APPROVED") {
+                  @if (currentTimesheet()?.status === "APPROVED") {
                     <em class="status-note status-note--approved">Approved</em>
                   }
-              
                 </td>
                 <td class="col-actions">
-                 <!-- Draft and rejected timesheets expose all row actions through one menu  -->
+                  <!-- Draft and rejected timesheets expose all row actions through one menu  -->
                   @if (canEditEntries()) {
-
                     <div class="action-menu">
                       <button
                         type="button"
