@@ -16,13 +16,20 @@
  * SO that the timer doesnt persist, so when i go to the next page, it goes away and thats a problem because that means the timer would never stop and its a silent error
  *
  * Patched: Zamokuhle Zwane, 03 August 2026
- * Fixed time related issues, it was 2 hours behind, 
+ * Fixed time related issues, it was 2 hours behind,
  * so i added a new function to format the duration to show hours, minutes and seconds
  * i also fixed the total duration to show the correct total duration across all filtered entries
  */
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, computed, inject, OnDestroy, signal, effect } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnDestroy,
+  signal,
+  effect,
+} from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
@@ -161,7 +168,7 @@ export class LogtimeComponent implements OnDestroy {
   private readonly suggestionService = inject(SuggestionService);
 
   private readonly route = inject(ActivatedRoute);
-  private  pendingTaskId: string | null = null;
+  private pendingTaskId: string | null = null;
 
   //I used Enzokuhle Khumalo's workspace_members.id (real seed data), because it didnt need mfa
   private readonly workspaceMemberId =
@@ -196,9 +203,11 @@ export class LogtimeComponent implements OnDestroy {
   readonly newTaskTitleError = signal(false);
   readonly isTimerPaused = signal(false);
   readonly pausedElapsedSeconds = signal(0);
+  // to prevent duplicate tasks from being created
+  readonly suggestionTaskCreating = signal(false);
   // readonly filterFrom = signal(this.today());
   // readonly filterTo = signal(this.today());
-  // this is to make it 7 days (week) and not cuurent day 
+  // this is to make it 7 days (week) and not cuurent day
   readonly filterFrom = signal(this.todayStartOfWeek());
   readonly filterTo = signal(this.todayEndOfWeek());
   readonly durationPreviewSeconds = signal(3600);
@@ -229,7 +238,7 @@ export class LogtimeComponent implements OnDestroy {
 
   readonly suggestions = signal<SuggestedWorkSession[]>([]);
   readonly suggestionsLoading = signal(false);
-  // to store the suggestion id 
+  // to store the suggestion id
   readonly suggestionCreatingTask = signal<string | null>(null);
   readonly newSuggestionTaskTitle = signal('');
 
@@ -305,7 +314,13 @@ export class LogtimeComponent implements OnDestroy {
       const matchesFrom = !from || entryDate >= from;
       const matchesTo = !to || entryDate <= to;
 
-      return (!entry.isDeleted && matchesProject && matchesStatus && matchesFrom && matchesTo);
+      return (
+        !entry.isDeleted &&
+        matchesProject &&
+        matchesStatus &&
+        matchesFrom &&
+        matchesTo
+      );
     });
   });
 
@@ -343,38 +358,38 @@ export class LogtimeComponent implements OnDestroy {
     return `Entries: ${this.formatDateLabel(from)} – ${this.formatDateLabel(to)}`;
   });
 
-  readonly canEditEntries = computed (() => {
+  readonly canEditEntries = computed(() => {
     const timesheet = this.currentTimesheet();
     if (!timesheet) {
       return true;
     }
     return (
-      (!timesheet.isLocked &&
-      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED'))
+      !timesheet.isLocked &&
+      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED')
     );
-  }); 
+  });
 
-    readonly canSubmitTimesheet = computed (() => {
+  readonly canSubmitTimesheet = computed(() => {
     const timesheet = this.currentTimesheet();
     if (!timesheet) {
       return false;
     }
     return (
-      (!timesheet.isLocked &&
-      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED'))
+      !timesheet.isLocked &&
+      (timesheet.status === 'DRAFT' || timesheet.status === 'REJECTED')
     );
-  }); 
+  });
 
   // to get 7 days (week)
   private todayStartOfWeek(): string {
-  const date = new Date();
-  const day = date.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
+    const date = new Date();
+    const day = date.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
 
-  date.setDate(date.getDate() + diff);
+    date.setDate(date.getDate() + diff);
 
-  return this.formatDateForInput(date);
-}
+    return this.formatDateForInput(date);
+  }
 
   private todayEndOfWeek(): string {
     const date = new Date();
@@ -401,10 +416,10 @@ export class LogtimeComponent implements OnDestroy {
 
     const query = this.route.snapshot.queryParamMap;
     const from = query.get('from') ?? query.get('date');
-    const  to = query.get('to') ?? from;
+    const to = query.get('to') ?? from;
     this.pendingTaskId = query.get('taskId');
-    if(from) {
-      this.filterForm.controls.from.setValue(from, {emitEvent: false });
+    if (from) {
+      this.filterForm.controls.from.setValue(from, { emitEvent: false });
       this.filterFrom.set(from);
     }
     if (to) {
@@ -460,8 +475,8 @@ export class LogtimeComponent implements OnDestroy {
     */
     this.loadProjects();
 
-    effect(()=>{
-      if(this.timerService.openTimerPanel()){
+    effect(() => {
+      if (this.timerService.openTimerPanel()) {
         this.openTimerPanel();
         this.timerService.closeTimerPanel();
       }
@@ -507,13 +522,15 @@ export class LogtimeComponent implements OnDestroy {
     this.toastMessage.set(message);
 
     setTimeout(() => {
-      this.toastMessage.set(''); 
+      this.toastMessage.set('');
     }, 3000);
   }
 
   openManualPanel(): void {
     if (!this.canEditEntries()) {
-      this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+      this.conflictMessage.set(
+        'This timesheet has been submitted and cannot be edited.',
+      );
       return;
     }
     this.resetEntryForm();
@@ -540,7 +557,9 @@ export class LogtimeComponent implements OnDestroy {
   openTimerPanel(): void {
     if (!this.canEditEntries()) {
       if (!this.canEditEntries()) {
-        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+        this.conflictMessage.set(
+          'This timesheet has been submitted and cannot be edited.',
+        );
         return;
       }
     }
@@ -549,9 +568,11 @@ export class LogtimeComponent implements OnDestroy {
   }
 
   //suggestions panel
-  openSuggestionsPanel() : void {
-    if (!this.canEditEntries()){
-      this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
+  openSuggestionsPanel(): void {
+    if (!this.canEditEntries()) {
+      this.conflictMessage.set(
+        'This timesheet has been submitted and cannot be edited.',
+      );
       return;
     }
 
@@ -563,57 +584,55 @@ export class LogtimeComponent implements OnDestroy {
     this.activePanel.set(null);
   }
 
-    getCurrentSuggestion(): SuggestedWorkSession | null {
-  const suggestions = this.suggestions();
+  getCurrentSuggestion(): SuggestedWorkSession | null {
+    const suggestions = this.suggestions();
 
-  if (suggestions.length === 0) {
-    return null;
+    if (suggestions.length === 0) {
+      return null;
+    }
+
+    return suggestions[this.currentSuggestionIndex()];
   }
 
-  return suggestions[this.currentSuggestionIndex()];
-}
+  previousSuggestion(): void {
+    const suggestions = this.suggestions();
 
-previousSuggestion(): void {
-  const suggestions = this.suggestions();
+    if (suggestions.length === 0) {
+      return;
+    }
 
-  if (suggestions.length === 0) {
-    return;
+    const currentIndex = this.currentSuggestionIndex();
+
+    this.currentSuggestionIndex.set(
+      currentIndex === 0 ? suggestions.length - 1 : currentIndex - 1,
+    );
   }
 
-  const currentIndex = this.currentSuggestionIndex();
+  nextSuggestion(): void {
+    const suggestions = this.suggestions();
 
-  this.currentSuggestionIndex.set(
-    currentIndex === 0
-      ? suggestions.length - 1
-      : currentIndex - 1
-  );
-}
+    if (suggestions.length === 0) {
+      return;
+    }
 
-nextSuggestion(): void {
-  const suggestions = this.suggestions();
+    const currentIndex = this.currentSuggestionIndex();
 
-  if (suggestions.length === 0) {
-    return;
+    this.currentSuggestionIndex.set(
+      currentIndex === suggestions.length - 1 ? 0 : currentIndex + 1,
+    );
   }
-
-  const currentIndex = this.currentSuggestionIndex();
-
-  this.currentSuggestionIndex.set(
-    currentIndex === suggestions.length - 1
-      ? 0
-      : currentIndex + 1
-  );
-}
 
   /*
    Persists log form values into the records array.
    Performs bounds verification and double booking collision screening.
    */
   saveEntry(): void {
-  if (!this.canEditEntries()) {
-        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
-        return;
-      }
+    if (!this.canEditEntries()) {
+      this.conflictMessage.set(
+        'This timesheet has been submitted and cannot be edited.',
+      );
+      return;
+    }
     this.updateDuration();
 
     if (this.endTimeInvalid) {
@@ -747,11 +766,11 @@ nextSuggestion(): void {
     //       ),
     //   });
     this.timerService.startTimer(request).subscribe({
-      next:(response)=>{
-        const activateTimer: ActiveTimer={
+      next: (response) => {
+        const activateTimer: ActiveTimer = {
           id: response.id,
           projectId: response.project.id,
-          taskId: response.task?.id?? null,
+          taskId: response.task?.id ?? null,
           notes: timer.notes,
           startedAt: new Date(response.startedAt),
         };
@@ -761,23 +780,24 @@ nextSuggestion(): void {
         this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
         this.isTimerPaused.set(response.isPaused ?? false);
         this.pausedElapsedSeconds.set(response.elapsedSeconds ?? 0);
-        this.timerForm.disable({ emitEvent: false});
+        this.timerForm.disable({ emitEvent: false });
 
-        if(response.isPaused){
+        if (response.isPaused) {
           this.clearTimerInterval();
-        }else{
-          this.startElapsedInterval(response.elapsedSeconds?? 0);
+        } else {
+          this.startElapsedInterval(response.elapsedSeconds ?? 0);
         }
       },
 
-      error: (error)=> this.conflictMessage.set(
-        error.error?.message?? 'Unable to start the timer.',
-      ),
-    })
+      error: (error) =>
+        this.conflictMessage.set(
+          error.error?.message ?? 'Unable to start the timer.',
+        ),
+    });
   }
 
   pauseTimer(): void {
-    if (!this.activeTimer() || this.isTimerPaused()){
+    if (!this.activeTimer() || this.isTimerPaused()) {
       return;
     }
 
@@ -792,10 +812,9 @@ nextSuggestion(): void {
       },
       error: (error) =>
         this.conflictMessage.set(
-          error.error?.message ?? 'Unable to pause the timer'
+          error.error?.message ?? 'Unable to pause the timer',
         ),
-    })
-
+    });
   }
 
   resumeTimer(): void {
@@ -804,9 +823,9 @@ nextSuggestion(): void {
       return;
     }
 
-   if (!this.isTimerPaused()) {
-    return;
-   }
+    if (!this.isTimerPaused()) {
+      return;
+    }
 
     this.timerService.resumeTimer().subscribe({
       next: (response) => {
@@ -817,9 +836,9 @@ nextSuggestion(): void {
         this.pausedElapsedSeconds.set(elapsed);
         this.startElapsedInterval(elapsed);
       },
-      error: (error) => 
+      error: (error) =>
         this.conflictMessage.set(
-          error.error?.message ?? 'Unable to resume timer.'
+          error.error?.message ?? 'Unable to resume timer.',
         ),
     });
   }
@@ -898,7 +917,7 @@ nextSuggestion(): void {
           this.entries.set(
             fetchedEntries.map((entry) => ({
               ...entry,
-              durationSeconds: entry.durationMinutes, 
+              durationSeconds: entry.durationMinutes,
               durationMinutes: Math.round(entry.durationMinutes / 60),
             })),
           );
@@ -979,12 +998,12 @@ nextSuggestion(): void {
       )
       .subscribe({
         next: (response) => {
-          if(!response.createdTimeEntry?.id) {
+          if (!response.createdTimeEntry?.id) {
             console.error(
               '[LogTimeComponent] StopTimerResponse missing createdTimeEntry.id',
               response,
             );
-          }else{
+          } else {
             attachNotesIfPresent(response.createdTimeEntry.id);
           }
           this.loadEntries();
@@ -1020,7 +1039,8 @@ nextSuggestion(): void {
     const seconds = totalSeconds % 60;
 
     if (hours === 0 && minutes === 0) return `${seconds}s`;
-    if (hours === 0) return seconds === 0 ? `${minutes}m` : `${minutes}m ${seconds}s`;
+    if (hours === 0)
+      return seconds === 0 ? `${minutes}m` : `${minutes}m ${seconds}s`;
     if (minutes === 0 && seconds === 0) return `${hours}h`;
 
     return `${hours}h ${minutes}m`;
@@ -1050,15 +1070,19 @@ nextSuggestion(): void {
   getTaskTitle(taskId: string | null): string {
     return (
       this.tasks().find((task) => task.id === taskId)?.title ??
-      (taskId ? this.taskTitles()[taskId] ?? 'Unknown task' : 'No task selected')
+      (taskId
+        ? (this.taskTitles()[taskId] ?? 'Unknown task')
+        : 'No task selected')
     );
   }
 
   editEntry(entry: TimeEntry): void {
     if (!this.canEditEntries()) {
-        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
-        return;
-      }
+      this.conflictMessage.set(
+        'This timesheet has been submitted and cannot be edited.',
+      );
+      return;
+    }
     this.openMenuEntryId.set(null);
     this.resetNewTaskState();
     this.entryForm.setValue({
@@ -1138,9 +1162,11 @@ nextSuggestion(): void {
 
   deleteEntry(entry: TimeEntry): void {
     if (!this.canEditEntries()) {
-        this.conflictMessage.set('This timesheet has been submitted and cannot be edited.');
-        return;
-      }
+      this.conflictMessage.set(
+        'This timesheet has been submitted and cannot be edited.',
+      );
+      return;
+    }
     const deleted = () => {
       this.entries.update((entries) =>
         entries.filter((existingEntry) => existingEntry.id !== entry.id),
@@ -1187,7 +1213,7 @@ nextSuggestion(): void {
     const form = context === 'manual' ? this.entryForm : this.timerForm;
     return form.controls.taskId.value;
   }
-  
+
   private updateDuration(): void {
     const duration = Math.max(
       0,
@@ -1201,7 +1227,7 @@ nextSuggestion(): void {
     });
     this.durationPreviewSeconds.set(duration * 60);
   }
-  
+
   private buildEntryFromForm(request: TimeEntryRequest): TimeEntry {
     /*
     note: buildTimeEntryRequestFromForm() now returns durationSeconds not durationMinutes (matches the real request schema), but the local
@@ -1319,8 +1345,8 @@ nextSuggestion(): void {
           this.entries.set(
             //same durationMinutes-is-actually-seconds fix as onSaved() in saveEntry() — see that comment for the full explanation
             entries
-             .filter((entry) => !entry.isDeleted)
-             .map((entry) => this.normaliseEntryDuration(entry)),
+              .filter((entry) => !entry.isDeleted)
+              .map((entry) => this.normaliseEntryDuration(entry)),
           ),
         error: (error) =>
           this.conflictMessage.set(
@@ -1353,14 +1379,15 @@ nextSuggestion(): void {
           // Entries can belong to any project, independent of the form selection
           for (const project of projects) {
             if (project.id !== firstProjectId) {
-              this.http.get<TaskApiResponse[]>(
-                `${this.apiBaseUrl}/tasks/project/${project.id}`,
-                this.requestOptions(),
-              )
-              .subscribe({
-                next: (tasks) => this.cacheTaskTitles(tasks),
-                error: () => {},
-              });
+              this.http
+                .get<TaskApiResponse[]>(
+                  `${this.apiBaseUrl}/tasks/project/${project.id}`,
+                  this.requestOptions(),
+                )
+                .subscribe({
+                  next: (tasks) => this.cacheTaskTitles(tasks),
+                  error: () => {},
+                });
             }
           }
         },
@@ -1371,434 +1398,457 @@ nextSuggestion(): void {
       });
   }
 
-  
   private loadSuggestions(): void {
     this.suggestionsLoading.set(true);
 
-    // fetch or create suggestions 24 hours range 
-    this.suggestionService.generateSuggestions(this.workspaceMemberId, `${this.filterFrom()}T00:00:00`,
-  `${this.filterTo()}T23:59:59`).subscribe({
-    next: (suggestions) => {
-      this.suggestions.set(suggestions);
-      this.suggestionsLoading.set(false);
-    },
-    error: (error) => {
-      this.suggestionsLoading.set(false);
-    }
-  });
+    // fetch or create suggestions 24 hours range
+    this.suggestionService
+      .generateSuggestions(
+        this.workspaceMemberId,
+        `${this.filterFrom()}T00:00:00`,
+        `${this.filterTo()}T23:59:59`,
+      )
+      .subscribe({
+        next: (suggestions) => {
+          this.suggestions.set(suggestions);
+          this.suggestionsLoading.set(false);
+        },
+        error: (error) => {
+          this.suggestionsLoading.set(false);
+        },
+      });
   }
 
   rejectSuggestion(suggestion: SuggestedWorkSession): void {
-  this.suggestionService.reject(suggestion.id).subscribe({
-    next: () => {
-      this.suggestions.set(
-        this.suggestions().filter(
-          (item) => item.id !== suggestion.id
-        )
-      );
+    this.suggestionService.reject(suggestion.id).subscribe({
+      next: () => {
+        this.suggestions.set(
+          this.suggestions().filter((item) => item.id !== suggestion.id),
+        );
 
-      // display a friendly message
-      this.showToast('Suggestion rejected.') 
-    },
-    error: (error) => {
-      this.showToast('We could not reject this suggestion. Please try again.')
+        // display a friendly message
+        this.showToast('Suggestion rejected.');
+      },
+      error: (error) => {
+        this.showToast(
+          'We could not reject this suggestion. Please try again.',
+        );
+      },
+    });
+  }
+
+  getSuggestionStartTime(suggestion: SuggestedWorkSession): string {
+    return this.timeFromDateTime(suggestion.startTime);
+  }
+
+  getSuggestionEndTime(suggestion: SuggestedWorkSession): string {
+    return this.timeFromDateTime(suggestion.endTime);
+  }
+
+  getSuggestionDurationSeconds(suggestion: SuggestedWorkSession): number {
+    if (!suggestion.startTime || !suggestion.endTime) {
+      return 0;
     }
-  });
-}
 
-getSuggestionStartTime(suggestion: SuggestedWorkSession): string {
-  return this.timeFromDateTime(suggestion.startTime);
-}
+    const startTime = this.timeFromDateTime(suggestion.startTime);
+    const endTime = this.timeFromDateTime(suggestion.endTime);
 
-getSuggestionEndTime(suggestion: SuggestedWorkSession): string {
-  return this.timeFromDateTime(suggestion.endTime);
-}
+    const startMinutes = this.timeToMinutes(startTime);
+    const endMinutes = this.timeToMinutes(endTime);
 
-getSuggestionDurationSeconds(
-  suggestion: SuggestedWorkSession
-): number {
+    const durationMinutes = endMinutes - startMinutes;
 
-  if (!suggestion.startTime || !suggestion.endTime) {
-    return 0;
+    if (durationMinutes <= 0) {
+      return 0;
+    }
+
+    return durationMinutes * 60;
   }
 
-  const startTime = this.timeFromDateTime(suggestion.startTime);
-  const endTime = this.timeFromDateTime(suggestion.endTime);
-
-  const startMinutes = this.timeToMinutes(startTime);
-  const endMinutes = this.timeToMinutes(endTime);
-
-  const durationMinutes = endMinutes - startMinutes;
-
-  if (durationMinutes <= 0) {
-    return 0;
+  getSuggestionDurationMinutes(suggestion: SuggestedWorkSession): number {
+    return Math.floor(this.getSuggestionDurationSeconds(suggestion) / 60);
   }
 
-  return durationMinutes * 60;
-}
+  isSuggestionEndTimeInvalid(suggestion: SuggestedWorkSession): boolean {
+    if (!suggestion.startTime || !suggestion.endTime) {
+      return true;
+    }
 
-getSuggestionDurationMinutes(
-  suggestion: SuggestedWorkSession
-): number {
-  return Math.floor(
-    this.getSuggestionDurationSeconds(suggestion) / 60
-  );
-}
+    const startTime = this.timeFromDateTime(suggestion.startTime);
+    const endTime = this.timeFromDateTime(suggestion.endTime);
 
-isSuggestionEndTimeInvalid(
-  suggestion: SuggestedWorkSession
-): boolean {
-  if (!suggestion.startTime || !suggestion.endTime) {
-    return true;
+    return this.calculateDuration(startTime, endTime) <= 0;
   }
 
-  const startTime = this.timeFromDateTime(suggestion.startTime);
-  const endTime = this.timeFromDateTime(suggestion.endTime);
+  updateSuggestionTime(
+    suggestion: SuggestedWorkSession,
+    event: Event,
+    field: 'startTime' | 'endTime',
+  ): void {
+    const input = event.target as HTMLInputElement;
+    const time = input.value;
 
-  return this.calculateDuration(startTime, endTime) <= 0;
-}
+    if (!time) {
+      return;
+    }
 
-updateSuggestionTime(
-  suggestion: SuggestedWorkSession,
-  event: Event,
-  field: 'startTime' | 'endTime'
-): void {
-  const input = event.target as HTMLInputElement;
-  const time = input.value;
+    const date = this.dateFromDateTime(suggestion.startTime);
 
-  if (!time) {
-    return;
-  }
-
-  const date = this.dateFromDateTime(suggestion.startTime);
-
-  const startTime =
-    field === 'startTime'
-      ? time
-      : this.timeFromDateTime(suggestion.startTime);
-
-  const endTime =
-    field === 'endTime'
-      ? time
-      : this.timeFromDateTime(suggestion.endTime);
-
-  const duration = this.calculateDuration(
-    startTime,
-    endTime
-  );
-
-  if (duration <= 0) {
-    this.showToast(
+    const startTime =
       field === 'startTime'
-        ? 'Start time must be before end time.'
-        : 'End time must be after start time.'
-    );
-    return;
-  }
+        ? time
+        : this.timeFromDateTime(suggestion.startTime);
 
-  this.suggestionService.edit(suggestion.id, {
-    title: suggestion.title,
-    projectId: suggestion.projectId || undefined,
-    taskId: suggestion.taskId || undefined,
-    startTime: this.toDateTimeValue(date, startTime),
-    endTime: this.toDateTimeValue(date, endTime),
-    description: suggestion.description || undefined
-  }).subscribe({
-    next: (updatedSuggestion) => {
-      this.suggestions.set(
-        this.suggestions().map((item) =>
-          item.id === updatedSuggestion.id
-            ? updatedSuggestion
-            : item
-        )
-      );
-    },
-    error: (error) => {
+    const endTime =
+      field === 'endTime' ? time : this.timeFromDateTime(suggestion.endTime);
+
+    const duration = this.calculateDuration(startTime, endTime);
+
+    if (duration <= 0) {
       this.showToast(
-        error.error?.message ?? 'Unable to update the time.'
+        field === 'startTime'
+          ? 'Start time must be before end time.'
+          : 'End time must be after start time.',
       );
+      return;
     }
-  });
-}
 
-// this is when the user reject suggestion, we should alert them of this action 
-confirmRejectSuggestion(suggestion: SuggestedWorkSession): void {
-  this.suggestionPendingReject.set(suggestion);
-}
-
-cancelRejectSuggestion(): void {
-  this.suggestionPendingReject.set(null);
-}
-
-confirmReject(): void {
-  const suggestion = this.suggestionPendingReject();
-
-  if (!suggestion){
-    return;
+    this.suggestionService
+      .edit(suggestion.id, {
+        title: suggestion.title,
+        projectId: suggestion.projectId || undefined,
+        taskId: suggestion.taskId || undefined,
+        startTime: this.toDateTimeValue(date, startTime),
+        endTime: this.toDateTimeValue(date, endTime),
+        description: suggestion.description || undefined,
+      })
+      .subscribe({
+        next: (updatedSuggestion) => {
+          this.suggestions.set(
+            this.suggestions().map((item) =>
+              item.id === updatedSuggestion.id ? updatedSuggestion : item,
+            ),
+          );
+        },
+        error: (error) => {
+          this.showToast(error.error?.message ?? 'Unable to update the time.');
+        },
+      });
   }
 
-  this.suggestionPendingReject.set(null);
-  this.rejectSuggestion(suggestion);
-}
-
-approveSuggestion(suggestion: SuggestedWorkSession): void {
-
-  this.conflictMessage.set('');
-
-  if (!suggestion.projectId) {
-    this.showToast('Please select a project before approving.');
-    return;
+  // this is when the user reject suggestion, we should alert them of this action
+  confirmRejectSuggestion(suggestion: SuggestedWorkSession): void {
+    this.suggestionPendingReject.set(suggestion);
   }
 
-  if (this.isSuggestionEndTimeInvalid(suggestion)) {
-    this.showToast('End time must be after start time.');
-    return;
+  cancelRejectSuggestion(): void {
+    this.suggestionPendingReject.set(null);
   }
 
-  const durationSeconds =
-    this.getSuggestionDurationSeconds(suggestion);
+  confirmReject(): void {
+    const suggestion = this.suggestionPendingReject();
 
-  if (durationSeconds <= 0) {
-    this.showToast('Please enter a valid start and end time.');
-    return;
-  }
-
-  this.suggestionService.approve(suggestion.id).subscribe({
-    next: () => {
-      this.suggestions.set(
-        this.suggestions().filter(
-          (item) => item.id !== suggestion.id
-        )
-      );
-
-      this.loadEntries();
-
-      this.showToast('Suggested work added to your timesheet.');
-    },
-    error: (error) => {
-      if (error.status === 409){
-        this.conflictMessage.set( error.error?.message || 'This suggestion overlaps with an existing time entry. Please adjust the time before approving.');
-      } else {
-        this.conflictMessage.set(error.error?.message || 'Failed to add suggested work to your timesheet.');
-      }
+    if (!suggestion) {
+      return;
     }
-  });
-}
+
+    this.suggestionPendingReject.set(null);
+    this.rejectSuggestion(suggestion);
+  }
+
+  approveSuggestion(suggestion: SuggestedWorkSession): void {
+    this.conflictMessage.set('');
+
+    if (!suggestion.projectId) {
+      this.showToast('Please select a project before approving.');
+      return;
+    }
+
+    if (this.isSuggestionEndTimeInvalid(suggestion)) {
+      this.showToast('End time must be after start time.');
+      return;
+    }
+
+    const durationSeconds = this.getSuggestionDurationSeconds(suggestion);
+
+    if (durationSeconds <= 0) {
+      this.showToast('Please enter a valid start and end time.');
+      return;
+    }
+
+    this.suggestionService.approve(suggestion.id).subscribe({
+      next: () => {
+        this.suggestions.set(
+          this.suggestions().filter((item) => item.id !== suggestion.id),
+        );
+
+        this.loadEntries();
+
+        this.showToast('Suggested work added to your timesheet.');
+      },
+      error: (error) => {
+        if (error.status === 409) {
+          this.conflictMessage.set(
+            error.error?.message ||
+              'This suggestion overlaps with an existing time entry. Please adjust the time before approving.',
+          );
+        } else {
+          this.conflictMessage.set(
+            error.error?.message ||
+              'Failed to add suggested work to your timesheet.',
+          );
+        }
+      },
+    });
+  }
 
   assignSuggestionProject(
-  suggestion: SuggestedWorkSession,
-  event: Event
-): void {
-  const select = event.target as HTMLSelectElement;
-  const projectId = select.value;
+    suggestion: SuggestedWorkSession,
+    event: Event,
+  ): void {
+    const select = event.target as HTMLSelectElement;
+    const projectId = select.value;
 
-  if (!projectId) {
-    return;
+    if (!projectId) {
+      return;
+    }
+
+    this.suggestionService
+      .edit(suggestion.id, {
+        title: suggestion.title,
+        projectId: projectId,
+        taskId: suggestion.taskId || undefined,
+        startTime: suggestion.startTime,
+        endTime: suggestion.endTime,
+        description: suggestion.description || undefined,
+      })
+      .subscribe({
+        next: (updatedSuggestion) => {
+          const updatedSuggestions = this.suggestions().map((item) =>
+            item.id === updatedSuggestion.id ? updatedSuggestion : item,
+          );
+
+          this.suggestions.set(updatedSuggestions);
+          // load the tasks here
+          this.loadSuggestionTasks(updatedSuggestion.id, projectId);
+        },
+        error: (error) => {
+          console.error('Failed to assign project:', error);
+        },
+      });
   }
 
-  this.suggestionService.edit(suggestion.id, {
-    title: suggestion.title,
-    projectId: projectId,
-    taskId: suggestion.taskId || undefined,
-    startTime: suggestion.startTime,
-    endTime: suggestion.endTime,
-    description: suggestion.description || undefined
-  }).subscribe({
-    next: (updatedSuggestion) => {
-      const updatedSuggestions = this.suggestions().map((item) =>
-        item.id === updatedSuggestion.id
-          ? updatedSuggestion
-          : item
-      );
+  assignSuggestionTask(suggestion: SuggestedWorkSession, event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const taskId = select.value;
 
-      this.suggestions.set(updatedSuggestions);
-      // load the tasks here 
-      this.loadSuggestionTasks(updatedSuggestion.id, projectId);
-    },
-    error: (error) => {
-      console.error('Failed to assign project:', error);
+    if (taskId === 'CREATE NEW TASK') {
+      this.suggestionCreatingTask.set(suggestion.id);
+      this.newSuggestionTaskTitle.set('');
+
+      select.value = suggestion.taskId || '';
+      return;
     }
-  });
-}
 
+    this.suggestionService
+      .edit(suggestion.id, {
+        title: suggestion.title,
+        projectId: suggestion.projectId || undefined,
+        taskId: taskId || undefined,
+        startTime: suggestion.startTime,
+        endTime: suggestion.endTime,
+        description: suggestion.description || undefined,
+      })
+      .subscribe({
+        next: (updatedSuggestion) => {
+          const updatedSuggestions = this.suggestions().map((item) =>
+            item.id === updatedSuggestion.id ? updatedSuggestion : item,
+          );
 
-assignSuggestionTask(suggestion: SuggestedWorkSession, event: Event): void {
-  const select = event.target as HTMLSelectElement;
-  const taskId = select.value;
+          this.suggestions.set(updatedSuggestions);
+        },
+        error: (error) => {
+          this.toastMessage.set(
+            error.eror?.message ?? 'Unable to assign the task.',
+          );
+        },
+      });
+  }
 
-  if (taskId === 'CREATE NEW TASK'){
-    this.suggestionCreatingTask.set(suggestion.id);
+  createSuggestionTask(suggestion: SuggestedWorkSession): void {
+    // to avoid duplicate tasks from occuring
+    if (this.suggestionTaskCreating()) {
+      return;
+    }
+
+    const title = this.newSuggestionTaskTitle().trim();
+    const projectId = suggestion.projectId;
+
+    if (!projectId) {
+      this.showToast('Please select a project before creating a task.');
+      return;
+    }
+
+    if (!title) {
+      this.showToast('Please enter a task title.');
+      return;
+    }
+
+    this.suggestionTaskCreating.set(true);
+
+    const request = {
+      title,
+      projectId,
+    };
+
+    this.http
+      .post<TaskApiResponse>(
+        `${this.apiBaseUrl}/tasks`,
+        request,
+        this.requestOptions(),
+      )
+      .subscribe({
+        next: (createdTask) => {
+          // Update the task dropdown with newly created tasj
+          const currentTasks = this.suggestionTasks.get(suggestion.id) ?? [];
+
+          this.suggestionTasks.set(suggestion.id, [
+            ...currentTasks.filter((task) => task.id !== createdTask.id),
+            {
+              id: createdTask.id,
+              projectId: createdTask.projectId,
+              title: createdTask.title,
+            },
+          ]);
+
+          // display to user
+          this.showToast(`Task "${createdTask.title}" created successfully.`);
+          this.suggestionCreatingTask.set(null);
+          this.newSuggestionTaskTitle.set('');
+
+          // link newly created task to suggestion id
+          this.suggestionService
+            .edit(suggestion.id, {
+              title: suggestion.title,
+              projectId,
+              taskId: createdTask.id,
+              startTime: suggestion.startTime,
+              endTime: suggestion.endTime,
+              description: suggestion.description || undefined,
+            })
+            .subscribe({
+              next: (updatedSuggestion) => {
+                // update the suggestion with this task
+                this.suggestions.update((suggestions) =>
+                  suggestions.map((item) =>
+                    item.id === updatedSuggestion.id ? updatedSuggestion : item,
+                  ),
+                );
+                this.showToast(
+                  'Task created and assigned to suggestion successfully.',
+                );
+                this.suggestionTaskCreating.set(false);
+              },
+
+              error: (error) => {
+                this.showToast(
+                  'Task was created successfully but could not be assigned to the suggestion.',
+                );
+
+                this.suggestionTaskCreating.set(false);
+              },
+            });
+        },
+
+        error: (error) => {
+          this.showToast(
+            error.error?.message ?? 'Unable to create task. Please try again.',
+          );
+
+          this.suggestionTaskCreating.set(false);
+        },
+      });
+  }
+
+  cancelCreateSuggestionTask(): void {
+    this.suggestionCreatingTask.set(null);
     this.newSuggestionTaskTitle.set('');
-
-    select.value = suggestion.taskId || '';
-    return;
   }
 
-  this.suggestionService.edit(suggestion.id, {
-    title: suggestion.title,
-    projectId: suggestion.projectId || undefined,
-    taskId: taskId || undefined,
-    startTime: suggestion.startTime,
-    endTime: suggestion.endTime,
-    description: suggestion.description || undefined
-  }).subscribe({
-    next: (updatedSuggestion) => {
-      const updatedSuggestions = this.suggestions().map((item) =>
-        item.id === updatedSuggestion.id
-        ? updatedSuggestion
-        : item
-      );
+  updateSuggestionDescription(
+    suggestion: SuggestedWorkSession,
+    event: Event,
+  ): void {
+    const textarea = event.target as HTMLTextAreaElement;
+    const description = textarea.value;
 
-      this.suggestions.set(updatedSuggestions);
-    },
-    error: (error) => {
-      this.toastMessage.set(error.eror?.message ?? 'Unable to assign the task.');
-    }
-  });
-}
+    this.suggestionService
+      .edit(suggestion.id, {
+        title: suggestion.title,
+        projectId: suggestion.projectId || undefined,
+        taskId: suggestion.taskId || undefined,
+        startTime: suggestion.startTime,
+        endTime: suggestion.endTime,
+        description: description || undefined,
+      })
+      .subscribe({
+        next: (updatedSuggestion) => {
+          const updatedSuggestions = this.suggestions().map((item) =>
+            item.id === updatedSuggestion.id ? updatedSuggestion : item,
+          );
 
-createSuggestionTask(suggestion: SuggestedWorkSession): void {
-  const title = this.newSuggestionTaskTitle().trim();
-  const projectId = suggestion.projectId;
-
-  if (!projectId){
-    this.showToast('Please select a project before creating a task.');
-    return;
+          this.suggestions.set(updatedSuggestions);
+        },
+        error: (error) => {
+          this.showToast(
+            error.error?.message ?? 'Unable to update the description.',
+          );
+        },
+      });
   }
 
-  if (!title){
-    this.showToast('Please enter a task title.');
-    return;
+  suggestionEvidence = signal<SuggestedWorkSession | null>(null);
+
+  seeSuggestionEvidence(suggestion: SuggestedWorkSession): void {
+    this.suggestionEvidence.set(suggestion);
   }
 
-  const request = {
-    title: title,
-    projectId: projectId
-  };
+  closeSuggestionEvidence(): void {
+    this.suggestionEvidence.set(null);
+  }
 
-  this.http.post<TaskApiResponse>(`${this.apiBaseUrl}/tasks`, request, this.requestOptions()).subscribe({
-    next: (createdTask) => {
-      // add new task to this suggestion's task list
-      const currentTasks = this.suggestionTasks.get(suggestion.id) || [];
-
-        currentTasks.push({
-          id: createdTask.id,
-          projectId: createdTask.projectId,
-          title: createdTask.title
-        });
-      
-        this.suggestionTasks.set(
-          suggestion.id, currentTasks
-        )
-
-        this.suggestionService.edit(suggestion.id, {
-          title: suggestion.title,
-          projectId: projectId,
-          taskId: createdTask.id,
-          startTime: suggestion.startTime,
-          endTime: suggestion.endTime,
-          description: suggestion.description || undefined
-        }).subscribe({
-          next: (updatedSuggestion) => {
-            const updatedSuggestions = this.suggestions().map((item) =>
-              item.id === updatedSuggestion.id
-              ? updatedSuggestion
-              : item
-            );
-
-            this.suggestions.set(updatedSuggestions);
-            this.suggestionCreatingTask.set(null);
-            this.newSuggestionTaskTitle.set('');
-            this.showToast('Task created and assigned to the suggestion.');
-          },
-          error: (error) => {
-            this.showToast('The task was created but we could not assign it to the suggestion.');
-          }
-        });
-    },
-    error: (error) => {
-      this.showToast(error.error?.message ?? 'We could not create the task. Please try again.');
-    }
-  });
-}
-
-cancelCreateSuggestionTask(): void {
-  this.suggestionCreatingTask.set(null);
-  this.newSuggestionTaskTitle.set('');
-}
-
-
-updateSuggestionDescription(
-  suggestion: SuggestedWorkSession,
-  event: Event
-): void {
-  const textarea = event.target as HTMLTextAreaElement;
-  const description = textarea.value;
-
-  this.suggestionService.edit(suggestion.id, {
-    title: suggestion.title,
-    projectId: suggestion.projectId || undefined,
-    taskId: suggestion.taskId || undefined,
-    startTime: suggestion.startTime,
-    endTime: suggestion.endTime,
-    description: description || undefined
-  }).subscribe({
-    next: (updatedSuggestion) => {
-      const updatedSuggestions = this.suggestions().map((item) =>
-        item.id === updatedSuggestion.id
-          ? updatedSuggestion
-          : item
-      );
-
-      this.suggestions.set(updatedSuggestions);
-    },
-    error: (error) => {
-      this.showToast(error.error?.message ?? 'Unable to update the description.');
-    }
-  });
-}
-  
-
-suggestionEvidence = signal<SuggestedWorkSession | null>(null);
-
-seeSuggestionEvidence(suggestion: SuggestedWorkSession): void {
-  this.suggestionEvidence.set(suggestion);
-}
-
-closeSuggestionEvidence(): void {
-  this.suggestionEvidence.set(null);
-}
-
-// this is for fetching all the tasks to display in the suggestion panel 
-// goal here is connect the suggestion's selected project to this existing task 
-  private suggestionTasks = new Map<string, Task[]>;
-  private loadSuggestionTasks(suggestionId: string, projectId: string): void{
-    if (!projectId){
+  // this is for fetching all the tasks to display in the suggestion panel
+  // goal here is connect the suggestion's selected project to this existing task
+  private suggestionTasks = new Map<string, Task[]>();
+  private loadSuggestionTasks(suggestionId: string, projectId: string): void {
+    if (!projectId) {
       this.suggestionTasks.set(suggestionId, []);
       return;
     }
 
-    this.http.get<TaskApiResponse[]>(
-      `${this.apiBaseUrl}/tasks/project/${projectId}`,
-      this.requestOptions()
-    ).subscribe({
-      next: (tasks) => {
-        this.suggestionTasks.set(
-          suggestionId,
-          tasks.map((task) => ({
-            id: task.id,
-            projectId: task.projectId,
-            title: task.title
-          }))
-        );
-      },
-      error: (error) => {
-        this.showToast('We could not the tasks for this project.');
-      }
-    });
+    this.http
+      .get<TaskApiResponse[]>(
+        `${this.apiBaseUrl}/tasks/project/${projectId}`,
+        this.requestOptions(),
+      )
+      .subscribe({
+        next: (tasks) => {
+          this.suggestionTasks.set(
+            suggestionId,
+            tasks.map((task) => ({
+              id: task.id,
+              projectId: task.projectId,
+              title: task.title,
+            })),
+          );
+        },
+        error: (error) => {
+          this.showToast('We could not the tasks for this project.');
+        },
+      });
   }
 
-  getSuggestionTasks(suggestionId: string): Task[]{
+  getSuggestionTasks(suggestionId: string): Task[] {
     return this.suggestionTasks.get(suggestionId) || [];
   }
   /*
@@ -1884,7 +1934,7 @@ closeSuggestionEvidence(): void {
       this.pausedElapsedSeconds.set(response.elapsedSeconds ?? 0);
       this.elapsedSeconds.set(response.elapsedSeconds ?? 0);
     } else {
-     this.startElapsedInterval(response.elapsedSeconds ?? 0);
+      this.startElapsedInterval(response.elapsedSeconds ?? 0);
     }
   }
 
@@ -1898,7 +1948,7 @@ closeSuggestionEvidence(): void {
       this.elapsedSeconds.set(
         Math.max(0, Math.floor((Date.now() - clientStartTime) / 1000)),
       );
-    }, 1000)
+    }, 1000);
   }
 
   private parseServerTimestamp(value: string): Date {
@@ -1941,6 +1991,17 @@ closeSuggestionEvidence(): void {
     });
   }
 
+  // to format the suggestion date  - new method - I didnt want to affect other stylings
+  formatSuggestionDate(dateValue: string): string {
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('en-ZA', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  }
   // Local unique runtime identifier fallback algorithm
   private createId(): string {
     return `entry-${crypto.randomUUID()}`;
@@ -1957,7 +2018,7 @@ closeSuggestionEvidence(): void {
   sonarqube was complaining about the duplicated lines as a maintenance risk, so i factored them out
   into a single helper function to reduce duplication and make it easier to change the logic in one place if needed
   */
- private resetTimerState(toastMessage: string): void {
+  private resetTimerState(toastMessage: string): void {
     this.activeTimer.set(null);
     this.timerService.clearActiveTimer();
     this.elapsedSeconds.set(0);
@@ -1973,12 +2034,12 @@ closeSuggestionEvidence(): void {
     this.toastMessage.set(toastMessage);
   }
 
-  private normaliseEntryDuration<T extends { durationMinutes: number; durationSeconds: number }>(
-    entry: T,
-  ): T & { durationSeconds: number}{
+  private normaliseEntryDuration<
+    T extends { durationMinutes: number; durationSeconds: number },
+  >(entry: T): T & { durationSeconds: number } {
     return {
       ...entry,
-      durationSeconds: entry.durationMinutes, 
+      durationSeconds: entry.durationMinutes,
       durationMinutes: Math.round(entry.durationMinutes / 60),
     };
   }
@@ -1994,7 +2055,7 @@ closeSuggestionEvidence(): void {
 
     return new Date(date).toLocaleTimeString([], {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 }
