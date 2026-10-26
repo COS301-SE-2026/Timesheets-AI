@@ -15,7 +15,7 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { Chart, ChartConfiguration, ChartOptions, ScriptableContext, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
@@ -87,4 +87,43 @@ export function tokenColor(varName: string): string {
 export function tokenFont(varName: string): string {
   const raw = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
   return raw.replace(/['"]/g, '') || 'sans-serif';
+}
+
+/*
+Sleek-chart helpers shared by the Insights pages, so every line chart gets the same soft area fill and tooltip
+instead of each component hand-rolling its own. Chart.js needs literal colours, so hex tokens are converted here.
+*/
+function withAlpha(color: string, alpha: number): string {
+  const hex = color.trim().replace('#', '');
+  if (/^[0-9a-f]{3}$/i.test(hex) || /^[0-9a-f]{6}$/i.test(hex)) {
+    const full = hex.length === 3 ? hex.split('').map((c) => c + c).join('') : hex;
+    const n = Number.parseInt(full, 16);
+    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+  }
+  return color;
+}
+
+// Scriptable gradient fill for line charts, fades from the line colour to transparent
+export function areaGradient(color: string, topAlpha = 0.2) {
+  return (context: ScriptableContext<'line'>) => {
+    const { chart } = context;
+    const area = chart.chartArea;
+    if (!area) return withAlpha(color, topAlpha / 2);
+    const gradient = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
+    gradient.addColorStop(0, withAlpha(color, topAlpha));
+    gradient.addColorStop(1, withAlpha(color, 0));
+    return gradient;
+  };
+}
+
+export function sleekTooltip(): NonNullable<ChartOptions['plugins']>['tooltip'] {
+  return {
+    backgroundColor: '#102b61',
+    titleFont: { family: tokenFont('--font-body'), size: 11, weight: 600 },
+    bodyFont: { family: tokenFont('--font-body'), size: 11 },
+    padding: 10,
+    cornerRadius: 8,
+    boxPadding: 4,
+    displayColors: false,
+  };
 }

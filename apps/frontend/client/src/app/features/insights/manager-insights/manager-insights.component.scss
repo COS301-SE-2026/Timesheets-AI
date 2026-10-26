@@ -106,6 +106,7 @@
 .donut-wrap {
   position: relative;
 }
+
 .donut-center {
   position: absolute;
   inset: 0;
@@ -121,20 +122,22 @@
  */
 
 .forecast-footer {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
-.forecast-footer .metric-label {
-  margin-top: 0;
+.forecast-stat {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.forecast-footer .metric-sm {
-  margin: 2px 0 8px;
+.forecast-stat .metric-label {
+  margin: 0 0 4px;
 }
 
 .forecast-footer .bar-track {
-  margin-top: 0;
-  margin-bottom: 8px;
+  margin-top: 12px;
 }
 
 /*
@@ -248,27 +251,6 @@
 .narrative-note i {
   margin-top: 2px;
 }
-.compare-row .name {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  overflow: hidden;
-  white-space: nowrap;
-  font-size: 12px;
-  font-weight: 600;
-  color: #173b78;
-}
-.compare-row .name-truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;   /* <-- required for ellipsis to work inside a flex item */
-  flex-shrink: 1;
-}
-.compare-row .name-suffix {
-  flex-shrink: 0;  /* "— hours" / "— commits" never gets cut */
-  white-space: nowrap;
-}
 /*
  * Responsive
  */
@@ -289,4 +271,117 @@
     width: 100%;
     justify-content: space-between;
   }
+}
+/*
+ * Section + shared bits that live on the developer page's stylesheet
+ */
+
+.insights-section {
+  width: 100%;
+}
+
+.project-section {
+  margin-bottom: -4px;
+}
+
+.chart-panel {
+  min-width: 0;
+}
+
+/*
+ * Team logged hours (names get a wider column than the shared 120px so
+ * "First Last" fits without clipping)
+ */
+
+@media (min-width: 901px) {
+  .compare-row {
+    grid-template-columns: minmax(110px, 36%) minmax(0, 1fr) 52px;
+  }
+}
+
+/*
+ * GitHub activity, one row per member with an hours bar and a commits bar
+ */
+
+.github-legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-bottom: 14px;
+
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.github-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-hours {
+  background: #0877ed;
+}
+
+.legend-commits {
+  background: var(--color-secondary);
+}
+
+.github-members {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.github-member {
+  display: grid;
+  grid-template-columns: minmax(110px, 30%) minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.github-member .name {
+  overflow: hidden;
+
+  font-size: 12px;
+  font-weight: 600;
+  color: #173b78;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.github-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.github-bar-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  align-items: center;
+  gap: 12px;
+}
+
+.github-bar-line .val {
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+  color: #102b61;
+}
+
+@media (max-width: 600px) {
+  .github-member {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
