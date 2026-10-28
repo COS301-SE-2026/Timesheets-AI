@@ -82,7 +82,10 @@ export class NotificationPanelComponent implements OnInit {
     if (!notification.isRead) {
       this.markAsRead(notification);
     }
-
+    if (this.notificationService.openNotificationTarget(notification)) {
+      this.closePanel.emit();
+      return;
+    }
     const route = this.notificationService.getNotificationRoute( notification.type, );
 
 		if (route) {

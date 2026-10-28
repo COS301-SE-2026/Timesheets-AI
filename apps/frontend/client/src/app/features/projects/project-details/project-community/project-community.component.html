@@ -1,0 +1,184 @@
+<section class="community-card" aria-label="Project community">
+  <!-- CHANNEL HEADER -->
+  <header class="channel-header">
+    <span class="channel-icon" aria-hidden="true"><i class="fa-solid fa-hashtag"></i></span>
+    <div class="channel-heading">
+      <h2 class="channel-name">{{ channelName() }}</h2>
+      <p class="channel-description">Project updates, discussions and team collaboration.</p>
+    </div>
+  </header>
+
+  <!-- MESSAGES -->
+  <div
+    class="feed"
+    #scroller
+    (scroll)="onScroll()"
+    role="log"
+    aria-live="polite"
+    aria-label="Project messages">
+    @if (loading()) {
+      <p class="feed-state">Loading messages...</p>
+    } @else if (loadError()) {
+      <div class="feed-state">
+        <p>Couldn't load the conversation.</p>
+        <button type="button" class="link-btn" (click)="retry()">Try again</button>
+      </div>
+    } @else if (messages().length === 0) {
+      <div class="feed-state empty">
+        <span class="empty-icon" aria-hidden="true"><i class="fa-regular fa-comments"></i></span>
+        <p class="empty-title">No messages yet</p>
+        <p>Start the conversation with your team.</p>
+      </div>
+    } @else {
+      @for (item of feed(); track item.key) {
+        @if (item.kind === 'day') {
+          <div class="day-divider" role="separator"><span>{{ item.label }}</span></div>
+        } @else if (item.kind === 'message') {
+          <article
+            class="message"
+            [class.grouped]="item.grouped"
+            [class.flash]="flashId() === item.message.id"
+            [id]="'msg-' + item.message.id">
+            <div class="avatar-col">
+              @if (!item.grouped) {
+                <span class="avatar" [ngClass]="item.colour" aria-hidden="true">{{ item.initials }}</span>
+              }
+            </div>
+
+            <div class="body">
+              @if (!item.grouped) {
+                <div class="meta">
+                  <strong class="author">{{ item.message.mine ? 'You' : item.message.authorName }}</strong>
+                  <time class="time" [attr.datetime]="item.message.createdAt">{{ item.time }}</time>
+                </div>
+              }
+
+              <p class="content">
+                @for (part of item.segments; track $index) {
+                  <span [class.mention]="part.mention">{{ part.text }}</span>
+                }
+              </p>
+
+              @if (item.message.reactions.length) {
+                <div class="reactions">
+                  @for (r of item.message.reactions; track r.type) {
+                    <button
+                      type="button"
+                      class="reaction-pill"
+                      [ngClass]="meta[r.type].tone"
+                      [class.mine]="r.reactedByMe"
+                      [attr.aria-pressed]="r.reactedByMe"
+                      [attr.aria-label]="meta[r.type].label + ', ' + r.count"
+                      (click)="react(item.message, r.type)">
+                      <i [class]="meta[r.type].icon" aria-hidden="true"></i>
+                      <span class="count">{{ r.count }}</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- hover toolbar -->
+            <div class="toolbar" role="toolbar" aria-label="Message actions">
+              @for (type of order; track type) {
+                <button
+                  type="button"
+                  class="tool-btn"
+                  [ngClass]="meta[type].tone"
+                  [title]="meta[type].label"
+                  [attr.aria-label]="'React: ' + meta[type].label"
+                  (click)="react(item.message, type)">
+                  <i [class]="meta[type].icon" aria-hidden="true"></i>
+                </button>
+              }
+              @if (item.message.mine) {
+                <button
+                  type="button"
+                  class="tool-btn delete"
+                  title="Delete"
+                  aria-label="Delete message"
+                  (click)="remove(item.message)">
+                  <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
+                </button>
+              }
+            </div>
+          </article>
+        }
+      }
+    }
+  </div>
+
+  <!-- COMPOSER -->
+  <footer class="composer-wrap">
+    @if (sendError()) {
+      <p class="send-error" role="alert">{{ sendError() }}</p>
+    }
+
+    <div class="composer">
+      <button
+        type="button"
+        class="attach-btn"
+        disabled
+        title="Attachments coming soon"
+        aria-label="Attach a file (coming soon)">
+        <i class="fa-solid fa-paperclip" aria-hidden="true"></i>
+      </button>
+
+      <div class="input-shell">
+        @if (suggestions().length) {
+          <ul class="mention-menu" role="listbox" aria-label="Mention a teammate">
+            @for (m of suggestions(); track m.workspaceMemberId; let i = $index) {
+              <li
+                role="option"
+                [class.active]="i === mentionIndex()"
+                [attr.aria-selected]="i === mentionIndex()"
+                (mousedown)="$event.preventDefault(); pickMention(m)">
+                <span class="avatar sm avatar-0" aria-hidden="true">{{ initials(m.firstName + ' ' + m.lastName) }}</span>
+                {{ m.firstName }} {{ m.lastName }}
+              </li>
+            }
+          </ul>
+        }
+
+        <input
+          #composer
+          type="text"
+          class="composer-input"
+          placeholder="Type a message..."
+          maxlength="2000"
+          autocomplete="off"
+          aria-label="Message"
+          [value]="draft()"
+          (input)="onInput($event)"
+          (keydown)="onKeydown($event)"
+          (click)="onCaretMove()" />
+
+        <button
+          type="button"
+          class="emoji-btn"
+          aria-label="Insert emoji"
+          [attr.aria-expanded]="emojiOpen()"
+          (click)="emojiOpen.set(!emojiOpen())">
+          <i class="fa-regular fa-face-smile" aria-hidden="true"></i>
+        </button>
+
+        @if (emojiOpen()) {
+          <div class="emoji-popover" role="menu" aria-label="Emoji">
+            @for (e of emojis; track e) {
+              <button type="button" role="menuitem" (click)="insertEmoji(e)">{{ e }}</button>
+            }
+          </div>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="send-btn"
+        aria-label="Send message"
+        [disabled]="!draft().trim() || sending()"
+        (click)="send()">
+        <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+      </button>
+    </div>
+  </footer>
+</section>

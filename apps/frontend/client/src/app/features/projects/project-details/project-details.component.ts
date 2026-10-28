@@ -32,7 +32,7 @@ import { TaskService } from "../../../core/services/task.service";
 import {mapToProjectDetails, mapToProjectTask} from "../utils/project-mapper";
 import { ProjectForecastComponent } from './project-forecast/project-forecast.component';
 import { AuthService } from '../../../core/services/auth.service';
-
+import { ProjectCommunityComponent } from "./project-community/project-community.component";
 
 //this is used to keep every template binding valid while real data is being loaded
 const EMPTY_PROJECT_DETAILS: ProjectDetails = {
@@ -73,6 +73,7 @@ const EMPTY_PROJECT_DETAILS: ProjectDetails = {
     MatDialogActions,
     MatDialogClose,
     ProjectForecastComponent,
+    ProjectCommunityComponent,
 ],
     templateUrl: './project-details.component.html',
     styleUrls: ['./project-details.component.scss']
@@ -175,6 +176,14 @@ export class ProjectDetailsComponent {
         return typeof state?.projectId === 'string' ? state.projectId : '';
     }
 
+    // set when the user arrives from a project-community notification
+    protected readonly highlightMessageId = signal<string | null>(this.messageIdFromHistory());
+
+    private messageIdFromHistory(): string | null {
+        const state = this.location.getState() as { messageId?: unknown } | null;
+        return typeof state?.messageId === 'string' ? state.messageId : null;
+    }
+
     protected readonly project= signal<ProjectDetails>(
         EMPTY_PROJECT_DETAILS,
     )
@@ -191,9 +200,11 @@ export class ProjectDetailsComponent {
 
     // protected readonly project= signal<Project>(PROJECTS[0]);
 
-    protected readonly activeTab = signal<'overview' | 'tasks' | 'forecast'>('overview');
+    protected readonly activeTab = signal<'community' | 'overview' | 'tasks' | 'forecast'>(
+        this.messageIdFromHistory() ? 'community' : 'overview'
+    );
 
-    protected setActiveTab( tab: 'overview' | 'tasks' | 'forecast'):void{
+    protected setActiveTab( tab: 'community' | 'overview' | 'tasks' | 'forecast'):void{
         this.activeTab.set(tab);
     }
 

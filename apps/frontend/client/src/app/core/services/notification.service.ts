@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { ProjectCommunityService } from './project-community.service';
 
 export interface NotificationResponse {
     id: string;
@@ -24,6 +26,8 @@ export class NotificationService {
 
   private readonly http = inject(HttpClient);
   private readonly baseUrl = '/api/notifications';
+  private readonly router = inject(Router);
+  private readonly community = inject(ProjectCommunityService);
 
   private readonly notificationConfig: Record<string, NotificationConfig> = {
 
@@ -51,6 +55,11 @@ export class NotificationService {
 			icon: 'fa-solid fa-user-plus',
 			cssClass: 'new-user',
 			route: ['/team'],
+		},
+		PROJECT_MENTION: {
+			icon: 'fa-solid fa-at',
+			cssClass: 'mention',
+			route: null,
 		},
 	};
 
@@ -90,7 +99,21 @@ export class NotificationService {
   markAllAsRead(): Observable<void> {
     return this.http.patch<void>(`${this.baseUrl}/read-all`, {}) .pipe(tap(() => this.unreadCount.set(0)));
   }
+   // project mentions need the message's project first, so they open themselves.
+  // returns true when the click was handled here
+  public openNotificationTarget(notification: NotificationResponse): boolean {
+    if (notification.type !== 'PROJECT_MENTION' || !notification.entityId) {
+      return false;
+    }
 
+    this.community.getMessageLocation(notification.entityId).subscribe({
+      next: ({ projectId, messageId }) =>
+        this.router.navigate(['/projects/details'], { state: { projectId, messageId } }),
+      error: () => this.router.navigate(['/projects']),
+    });
+
+    return true;
+  }
   public getNotificationIcon(type: string): string {
 		return this.notificationConfig[type]?.icon ?? 'fa-solid fa-bell';
 	}

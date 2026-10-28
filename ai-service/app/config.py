@@ -24,5 +24,20 @@ class Settings(BaseSettings):
     app_env: str = "development"
     log_level: str = "info"
 
+    # shared secret the Spring backend sends in X-Internal-Api-Key, see app/security.py
+    ai_service_api_key: str = ""
+
+    # the browser should never call this service directly, so no origins by default.
+    # comma separated, e.g. "http://localhost:4200" if you ever need Swagger from the frontend origin
+    cors_allowed_origins: str = ""
+
+    @property
+    def is_development(self) -> bool:
+        return self.app_env.lower() in {"development", "dev", "local", "test"}
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [o.strip() for o in self.cors_allowed_origins.split(",") if o.strip()]
+
 
 settings = Settings()
