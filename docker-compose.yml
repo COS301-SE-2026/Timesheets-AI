@@ -71,6 +71,9 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI}
+
+      # backend -> ai-service (same secret on both sides)
+      AI_SERVICE_API_KEY: ${AI_SERVICE_API_KEY:-}
       APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:4200 }
       APP_CORS_ALLOWED_METHODS: ${APP_CORS_ALLOWED_METHODS}
       APP_CORS_ALLOWED_HEADERS: ${APP_CORS_ALLOWED_HEADERS}
@@ -118,9 +121,11 @@ services:
     environment:
       DB_URL: postgresql://${DB_USERNAME:-momently}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-momently_dev}
       BACKEND_URL: http://backend:8080
-      ENVIRONMENT: development
+      APP_ENV: ${APP_ENV:-development}
+      AI_SERVICE_API_KEY: ${AI_SERVICE_API_KEY:-}
     ports:
-      - "8000:8000"
+      # loopback only: the backend reaches it over the compose network, nothing else should reach it
+      - "127.0.0.1:8000:8000"
     volumes:
       - ./ai-service:/app
     healthcheck:

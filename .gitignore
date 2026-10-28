@@ -9,6 +9,7 @@ Thumbs.db
 
 .env
 .env.*
+*.env copy*
 !.env.example
 *.pem
 

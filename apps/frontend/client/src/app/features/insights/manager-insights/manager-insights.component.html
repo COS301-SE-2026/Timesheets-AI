@@ -52,9 +52,10 @@
           </button>
         </div>
       </app-insight-card>
+
       <!-- Project row -->
 
-      <section class="insights-section">
+      <section class="insights-section project-section">
 
         <div class="project-row">
           <div class="project-pills">
@@ -90,7 +91,18 @@
           </div>
         </div>
 
-        <!-- Row 1: Forecast / Team Hours / Burnout -->
+      </section>
+
+      <!-- Delivery and team -->
+
+      <section class="insights-section">
+
+        <div class="section-heading">
+          <div>
+            <h2>Delivery & team</h2>
+            <p>Where the project is heading and how the team is holding up.</p>
+          </div>
+        </div>
 
         <div class="grid">
 
@@ -102,16 +114,28 @@
             badge="raw"
             [span]="4"
           >
-            <app-insight-chart [config]="completionChart()" [height]="200"></app-insight-chart>
+            <div class="chart-panel">
+              <app-insight-chart [config]="completionChart()" [height]="170"></app-insight-chart>
+            </div>
+
             <div class="forecast-footer">
-              <p class="metric-label">Current progress</p>
-              <p class="metric-sm">{{ d.projectCompletionForecast.currentProgressPercent }}%</p>
+              <div class="forecast-stat">
+                <div>
+                  <p class="metric-label">Current progress</p>
+                  <div class="metric-sm">{{ d.projectCompletionForecast.currentProgressPercent }}%</div>
+                </div>
+
+                @if (d.projectCompletionForecast.forecastCompletionDate) {
+                  <span class="chip chip-progress">
+                    <i class="fa-solid fa-flag-checkered"></i>
+                    Forecast: {{ d.projectCompletionForecast.forecastCompletionDate | date: 'MMM d, y' }}
+                  </span>
+                }
+              </div>
+
               <div class="bar-track">
                 <div class="bar-fill" [style.width.%]="d.projectCompletionForecast.currentProgressPercent"></div>
               </div>
-              @if (d.projectCompletionForecast.forecastCompletionDate) {
-                <p class="note">Forecast completion: {{ d.projectCompletionForecast.forecastCompletionDate | date: 'MMM d, y' }}</p>
-              }
             </div>
           </app-insight-card>
 
@@ -126,12 +150,14 @@
             <div class="compare-bars">
               @for (member of d.teamLoggedHours.members; track member.memberName) {
                 <div class="compare-row">
-                <span class="name"><span class="name-text">{{ member.memberName }}</span> — hours</span>
+                  <span class="name" [attr.title]="member.memberName">{{ member.memberName }}</span>
                   <div class="compare-track">
                     <div class="compare-fill" [style.width.%]="hoursBarPercent(member.hours)"></div>
                   </div>
-                  <span class="val">{{ member.hours }}h</span>
+                  <span class="val">{{ member.hours | number: '1.0-1' }}h</span>
                 </div>
+              } @empty {
+                <p class="note">No hours logged this period.</p>
               }
             </div>
           </app-insight-card>
@@ -189,8 +215,18 @@
           </app-insight-card>
 
         </div>
-<br>
-        <!-- Row 2: Task Overview / Velocity / Project Health -->
+      </section>
+
+      <!-- Tasks and health -->
+
+      <section class="insights-section">
+
+        <div class="section-heading">
+          <div>
+            <h2>Tasks & health</h2>
+            <p>Task progress, delivery pace and overall project health.</p>
+          </div>
+        </div>
 
         <div class="grid">
 
@@ -289,14 +325,62 @@
           </app-insight-card>
 
         </div>
-<br>
-        <!-- Row 3: GitHub Activity / Jira Tickets -->
+      </section>
+
+      <!-- Engineering activity -->
+
+      <section class="insights-section">
+
+        <div class="section-heading">
+          <div>
+            <h2>Engineering activity</h2>
+            <p>Commits and tickets coming through GitHub and Jira.</p>
+          </div>
+        </div>
 
         <div class="grid">
 
-          <app-insight-card icon="fa-brands fa-github" title="GitHub activity" subtitle="Hours logged vs commits, by member" variant="raw" badge="raw" [span]="6">
-          <app-insight-chart [config]="githubActivityChart()" [height]="220"></app-insight-chart>
-        </app-insight-card>
+          <app-insight-card
+            icon="fa-brands fa-github"
+            title="GitHub activity"
+            subtitle="Hours logged vs commits, by member"
+            variant="raw"
+            badge="raw"
+            [span]="6"
+          >
+            @if (githubMembers().length > 0) {
+              <div class="github-legend">
+                <span><span class="legend-dot legend-hours"></span>Hours logged</span>
+                <span><span class="legend-dot legend-commits"></span>Commits</span>
+              </div>
+
+              <div class="github-members">
+                @for (member of githubMembers(); track member.workspaceMemberId) {
+                  <div class="github-member">
+                    <span class="name" [attr.title]="member.memberName">{{ member.memberName }}</span>
+
+                    <div class="github-bars">
+                      <div class="github-bar-line">
+                        <div class="compare-track">
+                          <div class="compare-fill" [style.width.%]="githubHoursPercent(member.hoursLogged)"></div>
+                        </div>
+                        <span class="val">{{ member.hoursLogged | number: '1.0-1' }}h</span>
+                      </div>
+
+                      <div class="github-bar-line">
+                        <div class="compare-track">
+                          <div class="compare-fill you" [style.width.%]="githubCommitsPercent(member.commitCount)"></div>
+                        </div>
+                        <span class="val">{{ member.commitCount }}</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="note">GitHub is not connected yet.</p>
+            }
+          </app-insight-card>
 
           <app-insight-card
             icon="fa-brands fa-jira"

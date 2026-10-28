@@ -3,9 +3,8 @@ this file handles the computes the deterministic confidence score for a whole Ti
 only runs when ManagerAssistantController is hit directly, which only happens when the manager clicks "AI Review" on an opened timesheet. no scheduler, no
 queue, no auto trigger anywhere in this file, dont add one later without checking this comment first
 
-fully separate from timesheets.evidence (kguagelo's folder, shes using it for a different feature right now). only shared dependency is the base adapters
-(GitHubAdapter, CalendarService, IssueTrackerAdapter), the oauth/fetch layer every integration already sits on, not her collector abstraction, so this
-doesn't need to touch her files at all
+jira is read through JiraEvidenceCollector (timesheets.evidence), the same collector the project forecast uses, so both features agree on what a ticket in a
+period is. github and calendar still go straight to their adapters/services
 
 gemini never touches this class, only the one narrative sentence in ManagerAssistantNarrativeClient does, through ai-service. reasoning: a
 confidence score gating a manager's approve/reject call needs to be testable and reproducible, cant write a junit test against an llm's output even at
@@ -29,22 +28,22 @@ package timesheets.managerassistant;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import timesheets.domain.TimeEntry;
 import timesheets.domain.Timesheet;
-import timesheets.dto.response.IssueResponse;
+import timesheets.evidence.EvidenceEvent;
+import timesheets.evidence.JiraEvidenceCollector;
 import timesheets.integration.calendar.CalendarEvent;
 import timesheets.integration.calendar.CalendarNotConnectedException;
 import timesheets.integration.calendar.CalendarService;
 import timesheets.integration.github.GitCommitActivity;
 import timesheets.integration.github.GitHubAdapter;
 import timesheets.integration.github.GitHubService;
-import timesheets.integration.issue.IssueTrackerAdapter;
 import timesheets.repository.TimeEntryRepository;
 
 @Slf4j
@@ -61,7 +60,7 @@ public class ManagerAssistantScoringService {
 
   private final GitHubAdapter gitHubAdapter;
   private final CalendarService CalendarService;
-  private final IssueTrackerAdapter issueTrackerAdapter;
+  private final JiraEvidenceCollector jiraEvidenceCollector;
   private final TimeEntryRepository timeEntryRepository;
 
   public ManagerAssistantReview scoreTimesheet(Timesheet timesheet) {
@@ -145,48 +144,32 @@ public class ManagerAssistantScoringService {
 
   private ManagerAssistantEvidenceResult scoreJira(
       UUID memberId, LocalDateTime start, LocalDateTime end) {
-    // heads up: IssueTrackerAdapter.getIssues has no date range param at all, it pulls everything
-    // assigned to the jira user (jql
-    // assignee=currentUser(), max 50), live atlassian api call every time filtering by the
-    // timesheet window happens here in java after the fetch
-    List<IssueResponse> issues;
+    // same ticket collection the project forecast runs: issues assigned to the member that were
+    // created or updated inside the window, with Jira's timestamp format handled in JiraAdapter
+    List<EvidenceEvent> events;
     try {
-      issues = issueTrackerAdapter.getIssues(memberId);
+      events = jiraEvidenceCollector.collectIssueEvidence(memberId, start, end);
     } catch (RuntimeException e) {
       log.debug(
-          "issue tracker not connected or fetch failed for member {}, treating as 0 evidence",
-          memberId);
+          "jira not connected or fetch failed for member {}, treating as 0 evidence", memberId, e);
       return new ManagerAssistantEvidenceResult("JIRA", 0, 0.0, "jira not connected");
     }
 
     long count =
-        issues.stream()
-            .filter(issue -> updatedWithinWindow(issue.getUpdatedAt(), start, end))
+        events.stream()
+            .map(event -> event.getMetadata() == null ? null : event.getMetadata().get("issueKey"))
+            .filter(Objects::nonNull)
+            .distinct()
             .count();
 
-    double subScore = Math.min(count / 1.0, 1.0);
+    double subScore = count > 0 ? 1.0 : 0.0;
 
     String detail =
         count == 0
             ? "0 tickets (expected >= 1)"
-            : count + " ticket" + (count > 1 ? "s" : "") + " work logged";
+            : count + " ticket" + (count > 1 ? "s" : "") + " with activity in this period";
 
     return new ManagerAssistantEvidenceResult("JIRA", (int) count, subScore, detail);
-  }
-
-  // JiraIssueResponse.updatedAt is a raw string straight from atlassian's json, something like
-  // "2026-09-18T13:20:00.000+0200", not a
-  // LocalDateTime. parsing it defensively here since a malformed date from a third party api should
-  // never crash the whole score
-  private boolean updatedWithinWindow(String updatedAtRaw, LocalDateTime start, LocalDateTime end) {
-    if (updatedAtRaw == null) return false;
-    try {
-      LocalDateTime updatedAt = java.time.OffsetDateTime.parse(updatedAtRaw).toLocalDateTime();
-      return !updatedAt.isBefore(start) && !updatedAt.isAfter(end);
-    } catch (DateTimeParseException e) {
-      log.warn("could not parse jira updatedAt '{}', skipping this issue", updatedAtRaw);
-      return false;
-    }
   }
 
   private ManagerAssistantEvidenceResult scoreCalendar(

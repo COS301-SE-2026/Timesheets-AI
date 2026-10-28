@@ -12,10 +12,10 @@ Date: 03/09/2026
 
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChartConfiguration } from 'chart.js';
+import { ChartConfiguration, ScriptableContext } from 'chart.js';
 
 import { InsightCardComponent } from '../../../shared/components/insight-card/insight-card.component';
-import { InsightChartComponent, insightChartDefaults, tokenColor } from '../../../shared/components/insight-chart/insight-chart.component';
+import { InsightChartComponent, areaGradient, sleekTooltip, tokenColor, tokenFont } from '../../../shared/components/insight-chart/insight-chart.component';
 import { InsightsService } from '../../../core/services/insights.service';
 import {
   FlaggedBurnoutMember,
@@ -151,12 +151,16 @@ export class ManagerInsightsComponent implements OnInit {
     const points = forecast?.weeklyProgress ?? [];
     const labels = points.map((p) => p.weekLabel);
     const actualValues = points.map((p) => p.percent);
+    const primary = tokenColor('--color-primary');
+    const secondary = tokenColor('--color-secondary');
+    const muted = tokenColor('--color-text-muted');
 
     const forecastLabel = forecast?.forecastCompletionDate
-      ? new Date(forecast.forecastCompletionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      ? this.parseDate(forecast.forecastCompletionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
       : null;
 
     const allLabels = forecastLabel ? [...labels, forecastLabel] : labels;
+    const lastIndex = allLabels.length - 1;
 
     return {
       type: 'line',
@@ -165,41 +169,54 @@ export class ManagerInsightsComponent implements OnInit {
         datasets: [
           {
             label: 'Actual progress',
-            data: [...actualValues, null],
-            borderColor: tokenColor('--color-primary'),
-            backgroundColor: 'rgba(15,76,145,0.12)',
+            data: [...actualValues, ...(forecastLabel ? [null] : [])],
+            borderColor: primary,
+            backgroundColor: areaGradient(primary, 0.22),
+            borderWidth: 2.5,
             fill: true,
-            tension: 0.3,
-            pointRadius: 3,
+            cubicInterpolationMode: 'monotone',
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            pointBackgroundColor: primary,
           },
           {
             label: 'Forecast',
             data: forecastLabel
-              ? [...new Array(allLabels.length - 2).fill(null), actualValues[actualValues.length - 1] ?? 0, 100]
+              ? [...new Array(Math.max(allLabels.length - 2, 0)).fill(null), actualValues[actualValues.length - 1] ?? 0, 100]
               : [],
-            borderColor: tokenColor('--color-secondary'),
-            borderDash: [6, 4],
+            borderColor: secondary,
+            borderWidth: 2,
+            borderDash: [6, 5],
             fill: false,
             tension: 0,
-            pointRadius: (ctx: any) => (ctx.dataIndex === allLabels.length - 1 ? 5 : 0),
+            pointRadius: (ctx: ScriptableContext<'line'>) => (ctx.dataIndex === lastIndex ? 5 : 0),
+            pointBackgroundColor: secondary,
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
           },
         ],
       },
       options: {
-        ...insightChartDefaults(),
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 10.5 }, color: tokenColor('--color-text-muted') } },
-          y: {
-            min: 0,
-            max: 100,
-            grid: { color: tokenColor('--color-border') },
-            ticks: { callback: (v: any) => `${v}%`, font: { size: 10 }, color: tokenColor('--color-text-muted') },
-          },
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        layout: { padding: { top: 6, right: 6 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: { ...sleekTooltip(), callbacks: { label: (item) => `${item.dataset.label}: ${item.parsed.y}%` } },
         },
-        plugins: { legend: { display: true, position: 'top', align: 'end', labels: { boxWidth: 10, font: { size: 10.5 } } } },
+        scales: {
+          x: { grid: { display: false }, border: { display: false }, ticks: { font: { family: tokenFont('--font-body'), size: 10.5 }, color: muted, maxRotation: 0, autoSkip: true, maxTicksLimit: 6 } },
+          y: { display: false, min: 0, max: 100 },
+        },
       },
     };
   });
+
+  // Dates from the API are plain yyyy-mm-dd, pin them to local midnight so the label can't slip a day
+  private parseDate(value: string): Date {
+    return /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T00:00:00`) : new Date(value);
+  }
 
   // Team Logged Hours
 
@@ -264,6 +281,8 @@ export class ManagerInsightsComponent implements OnInit {
     const velocity = this.data()?.velocity;
     const weeks = velocity?.weeks ?? [];
     const average = velocity?.rollingAverage ?? 0;
+    const primary = tokenColor('--color-primary');
+    const secondary = tokenColor('--color-secondary');
     const muted = tokenColor('--color-text-muted');
     const border = tokenColor('--color-border');
 
@@ -275,17 +294,25 @@ export class ManagerInsightsComponent implements OnInit {
           {
             label: 'Tasks completed',
             data: weeks.map((w) => w.completed),
-            borderColor: tokenColor('--color-primary'),
-            backgroundColor: 'transparent',
-            tension: 0.35,
+            borderColor: primary,
+            backgroundColor: areaGradient(primary, 0.2),
+            borderWidth: 2.5,
+            fill: true,
+            cubicInterpolationMode: 'monotone',
             pointRadius: 3,
+            pointHoverRadius: 5,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: primary,
+            pointBorderWidth: 2,
           },
           {
             label: 'Average',
             data: weeks.map(() => average),
-            borderColor: tokenColor('--color-secondary'),
-            borderDash: [6, 4],
+            borderColor: secondary,
+            borderWidth: 1.5,
+            borderDash: [6, 5],
             pointRadius: 0,
+            pointHoverRadius: 0,
             fill: false,
           },
         ],
@@ -293,10 +320,25 @@ export class ManagerInsightsComponent implements OnInit {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: true, position: 'top', align: 'end', labels: { boxWidth: 10, font: { size: 10.5 }, color: muted } } },
+        interaction: { mode: 'index', intersect: false },
+        layout: { padding: { top: 6, right: 6 } },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            align: 'end',
+            labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 6, boxHeight: 6, font: { family: tokenFont('--font-body'), size: 10.5 }, color: muted },
+          },
+          tooltip: sleekTooltip(),
+        },
         scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 10.5 }, color: muted } },
-          y: { grid: { color: border }, ticks: { font: { size: 10 }, color: muted } },
+          x: { grid: { display: false }, border: { display: false }, ticks: { font: { family: tokenFont('--font-body'), size: 10.5 }, color: muted } },
+          y: {
+            beginAtZero: true,
+            grid: { color: border },
+            border: { display: false },
+            ticks: { precision: 0, maxTicksLimit: 5, font: { family: tokenFont('--font-mono'), size: 10 }, color: muted },
+          },
         },
       },
     };
@@ -314,60 +356,21 @@ export class ManagerInsightsComponent implements OnInit {
     return { 'On Track': '#3FA34D', 'At Risk': '#E0A930', Behind: '#C94F4F', 'No data': '#9CB9DD' }[status] ?? '#9CB9DD';
   }
 
-  // GitHub Activity — grouped horizontal bar chart, dual x-axis (hours vs commits differ in magnitude)
+  // GitHub Activity: same bar-row treatment as the developer page, one row per member
+  // (the old dual-axis horizontal chart was hard to read once a member had zero commits)
 
-  readonly githubActivityChart = computed<ChartConfiguration>(() => {
-    const members = this.data()?.githubActivityByMember ?? [];
-    const border = tokenColor('--color-border');
-    const muted = tokenColor('--color-text-muted');
+  readonly githubMembers = computed(() => this.data()?.githubActivityByMember ?? []);
 
-    return {
-      type: 'bar',
-      data: {
-        labels: members.map((m) => m.memberName),
-        datasets: [
-          {
-            label: 'Hours logged',
-            data: members.map((m) => m.hoursLogged),
-            backgroundColor: tokenColor('--color-primary'),
-            xAxisID: 'xHours',
-          },
-          {
-            label: 'Commits',
-            data: members.map((m) => m.commitCount),
-            backgroundColor: tokenColor('--color-secondary'),
-            xAxisID: 'xCommits',
-          },
-        ],
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: true, position: 'top', align: 'end', labels: { boxWidth: 10, font: { size: 10.5 } } },
-        },
-        scales: {
-          xHours: {
-            position: 'bottom',
-            grid: { color: border },
-            ticks: { font: { size: 10.5 }, color: muted },
-            title: { display: true, text: 'Hours', font: { size: 10 }, color: muted },
-          },
-          xCommits: {
-            position: 'top',
-            grid: { display: false },
-            ticks: { font: { size: 10.5 }, color: muted },
-            title: { display: true, text: 'Commits', font: { size: 10 }, color: muted },
-          },
-          y: {
-            grid: { display: false },
-            ticks: { font: { size: 11 }, color: muted },
-          },
-        },
-      },
-    };
-  });
+  readonly githubMaxHours = computed(() => Math.max(...this.githubMembers().map((m) => m.hoursLogged), 1));
+  readonly githubMaxCommits = computed(() => Math.max(...this.githubMembers().map((m) => m.commitCount), 1));
+
+  githubHoursPercent(hours: number): number {
+    return (hours / this.githubMaxHours()) * 100;
+  }
+
+  githubCommitsPercent(commits: number): number {
+    return (commits / this.githubMaxCommits()) * 100;
+  }
 
   // Jira Tickets donut — fixed color map (backend returns UPPERCASE issue types) + fixed Bug/Story/Task order
 
