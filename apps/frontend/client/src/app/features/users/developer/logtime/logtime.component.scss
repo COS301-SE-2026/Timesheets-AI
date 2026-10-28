@@ -1,4 +1,4 @@
-@use '../../../../shared/styles' as *;
+@use "../../../../shared/styles" as *;
 
 :host {
   display: block;
@@ -82,7 +82,7 @@
   position: relative;
   cursor: pointer;
 
-  input[type='date'] {
+  input[type="date"] {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -434,7 +434,10 @@
   font-weight: 700;
   color: var(--color-text-muted);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
 
   &--active,
   &:hover {
@@ -648,7 +651,10 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    opacity 0.15s;
 
   svg {
     width: 16px;
@@ -739,6 +745,138 @@
   }
 }
 
+//
+.suggestions-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.suggestions-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  padding: 32px 20px;
+  text-align: center;
+  border: 1px dashed #e5e7eb;
+  border-radius: 12px;
+  background: #fafafa;
+
+  h3 {
+    margin: 0 0 8px;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 700;
+    color: #14213d;
+  }
+
+  p {
+    max-width: 360px;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+}
+
+.suggestions-list {
+  display: grid;
+  gap: 14px;
+}
+
+.suggestion-card {
+  margin-top: 34px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    h3 {
+      margin: 0 0 5px;
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 700;
+      color: #14213d;
+    }
+  }
+}
+
+.suggestion-card-time {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.suggestion-card-confidence {
+  flex-shrink: 0;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: var(--color-text-body);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.suggestion-card-details {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.suggestion-card-field {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+
+  span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #17264d;
+  }
+}
+
+.suggestion-card-evidence {
+  padding: 14px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: #f9fafb;
+
+  .field-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #51627f;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-text-body);
+  }
+}
+
+.suggestion-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid #f3f4f6;
+}
+
 .link-btn {
   border: 0;
   background: transparent;
@@ -775,3 +913,323 @@
     grid-template-columns: 1fr;
   }
 }
+
+// to implement the evidence modal to match the system 
+
+.suggestion-carousel {
+  width: 100%;
+}
+
+.suggestion-carousel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.suggestion-carousel__heading {
+  h2 {
+    margin: 0 0 6px;
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    color: #14213d;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+}
+
+.suggestion-carousel__navigation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.suggestion-carousel__counter {
+  margin-right: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #51627f;
+  white-space: nowrap;
+}
+
+.suggestion-carousel__arrow {
+  min-width: 38px;
+  min-height: 38px;
+  padding: 0 12px;
+  font-size: 17px;
+}
+
+// made to match the manual time entry colours and styling
+.suggestion-card {
+  padding: 24px;
+}
+
+.suggestion-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.suggestion-card-header-main-one {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestion-card-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.suggestion-card-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: #14213d;
+}
+
+.suggestion-card-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.suggestion-duration-summary {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.suggestion-pending-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: #fff7ed;
+  color: #c2410c;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+// inside the form styling
+.suggestion-card-fields {
+  display: grid;
+  gap: 20px;
+}
+
+.suggestion-card-fields .manual-form__row {
+  width: 100%;
+}
+
+.suggestion-card-fields .field {
+  min-width: 0;
+}
+
+.suggestion-card-fields .field__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #51627f;
+}
+
+.suggestion-card-actions {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+// Evidence modal styling 
+
+.suggestion-evidence-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.suggestion-evidence-modal {
+  width: min(900px, 100%);
+  max-height: calc(100dvh - 40px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.2);
+}
+
+.suggestion-evidence-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 32px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.suggestion-evidence-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.suggestion-evidence-header h2 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: #14213d;
+}
+
+.suggestion-evidence-header p {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.suggestion-evidence-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 28px 32px;
+}
+
+// target work session 
+
+.evidence-target-session {
+  padding: 24px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.evidence-target-session h3 {
+  margin: 8px 0;
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  color: #14213d;
+}
+
+.evidence-target-session p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.raw-evidence-section {
+  margin-top: 28px;
+}
+
+.raw-evidence-header {
+  margin-bottom: 16px;
+}
+
+.raw-evidence-header h3 {
+  margin: 6px 0 0;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: #14213d;
+}
+
+.raw-evidence-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.raw-evidence-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.raw-evidence-source {
+  flex: 0 0 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: #ea6937;
+  border-radius: 10px;
+  color: #14213d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+
+.raw-evidence-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.raw-evidence-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.raw-evidence-meta span {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.raw-evidence-content h4 {
+  margin: 10px 0;
+
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: #14213d;
+}
+
+.raw-evidence-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  span {
+    padding: 6px 10px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+  }
+}
+

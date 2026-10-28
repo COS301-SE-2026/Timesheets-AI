@@ -104,6 +104,10 @@ export class CalendarComponent implements OnInit{
 
     datesSet:(dateInfo)=>{
       this.currentDateTitle.set(dateInfo.view.title);
+    },
+    // this is for when syncing the calendar, old one fetch and then set isSyncing to false (it does not reflect fullcalendar cycle - the loading indicator wont be shown until fetching cycle is done)
+    loading: (isLoading: boolean) => {
+      this.isSyncing.set(isLoading);
     }
   };
 
@@ -175,23 +179,43 @@ export class CalendarComponent implements OnInit{
     );
   }
 
-  connectCalendar(): void {
-    const authProvider = this.authService.getAuthProvider();
+  /* 
+  review:
+  restrict users who signed in using email and password from connecting Google or Microsoft Calendar
+  
+  developer must be able to connect Google or Microsoft Calendar regardless 
+*/
 
-    if (authProvider !== 'GOOGLE' && authProvider !== 'MICROSOFT') {
-      console.error('Calendar connection requires Google or Microsoft authentication.');
-      return;
-    }
+  // connectCalendar(): void {
+  //   const authProvider = this.authService.getAuthProvider();
 
-    this.calendarService.connectCalendar(authProvider).subscribe({
+  //   if (authProvider !== 'GOOGLE' && authProvider !== 'MICROSOFT') {
+  //     console.error('Calendar connection requires Google or Microsoft authentication.');
+  //     return;
+  //   }
+
+  //   this.calendarService.connectCalendar(authProvider).subscribe({
+  //     next: (authUrl: string) => {
+  //       window.location.href = authUrl;
+  //     },
+  //     error: (error) => {
+  //       console.error(`Failed to connect ${authProvider} Calendar`, error);
+  //     }
+  //   });
+  // }
+
+  // to be tested 
+  connectCalendar(provider: 'GOOGLE' | 'MICROSOFT'): void {
+    this.calendarService.connectCalendar(provider).subscribe({
       next: (authUrl: string) => {
         window.location.href = authUrl;
       },
       error: (error) => {
-        console.error(`Failed to connect ${authProvider} Calendar`, error);
+        console.error(`Failed to connect ${provider} Calendar`, error);
       }
     });
   }
+
 
   private formatCalendarDate(date: Date): string{
     const year= date.getFullYear();
@@ -247,6 +271,17 @@ export class CalendarComponent implements OnInit{
     this.selectedEvent.set(null);
   }
 
+
+  // to prevent XSS injection because we are fetching external parties text so zero trust!!!
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+  }
+
   private renderEventContent(arg: any){
     if(arg.view.type=== 'dayGridMonth'){
       const category= arg.event.extendedProps['category'] || 'meetings';
@@ -257,13 +292,13 @@ export class CalendarComponent implements OnInit{
             <span class="event-dot ${category}">
             </span>
             <span class="event-title">
-              ${arg.event.title}
+              ${this.escapeHtml(arg.event.title)}
             </span>
 
             ${
               arg.timeText ? `
                 <span class="event-time">
-                  ${arg.timeText}
+                  ${this.escapeHtml(arg.timeText)}
                 </span>
               `: ''
             }
@@ -297,12 +332,14 @@ export class CalendarComponent implements OnInit{
     }
   }
 
+
+  // fix typo for deadline 
   private getCategoryLabel(category: string){
     const labels: Record<string, string>={
       meetings: 'Meeting',
       work: 'Work',
       calls: 'Call',
-      deadlines: 'Deadline'
+      deadline: 'Deadline'
     };
 
     return labels[category] || 'Event';

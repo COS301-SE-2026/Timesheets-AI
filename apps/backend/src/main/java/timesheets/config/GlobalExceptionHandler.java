@@ -9,6 +9,7 @@ import exception.StateConflictException;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,6 +21,35 @@ import timesheets.dto.response.MessageResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
   private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+  /*
+   409 - Conflict: Overlaapping time entries
+   This is to be used in Suggested Work when the user tries to approve and add suggested work session to the time entries
+  */
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+      DataIntegrityViolationException e) {
+    Throwable cause = e;
+
+    while (cause != null) {
+      if (cause instanceof java.sql.SQLException sqlException
+          && "23P01".equals(sqlException.getSQLState())) {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(
+                new ErrorResponse(
+                    409,
+                    "Conflict",
+                    "A time entry already exists during this period. "
+                        + "Please review your existing entries or choose a different time."));
+      }
+
+      cause = cause.getCause();
+    }
+
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+        .body(new ErrorResponse(409, "Conflict", "This operation conflicts with existing data."));
+  }
 
   /*
   ! 400 - Bad Request

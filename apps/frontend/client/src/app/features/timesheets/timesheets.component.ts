@@ -635,7 +635,7 @@ export class TimesheetsComponent {
       if (!secondsByGroup.has(groupKey)) {
         secondsByGroup.set(groupKey, new Array(days.length).fill(0));
       }
-      secondsByGroup.get(groupKey)![dayIndex] += seconds;
+      secondsByGroup.get(groupKey)![dayIndex] += seconds ?? 0;
       dayTotals[dayIndex] += seconds;
     }
     const tasks = Array.from(secondsByGroup.entries()).map(

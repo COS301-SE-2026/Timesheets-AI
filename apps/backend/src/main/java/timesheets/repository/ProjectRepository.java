@@ -1,6 +1,7 @@
 package timesheets.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,7 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
   // find all the projects (for an admin)
   List<Project> findAllByIsDeletedFalse();
+
+  // find all project based workspace member id and jira project key
+  Optional<Project> findByWorkspaceIdAndJiraProjectKey(UUID workspaceId, String jiraProjectKey);
 }

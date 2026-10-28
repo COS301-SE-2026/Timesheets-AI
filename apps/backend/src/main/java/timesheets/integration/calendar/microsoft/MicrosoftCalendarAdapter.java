@@ -53,6 +53,33 @@ public class MicrosoftCalendarAdapter implements CalendarAdapter {
             .findByWorkspaceMemberIdAndProvider(workspaceMemberId, "MICROSOFT_CALENDAR")
             .orElseThrow(() -> new RuntimeException("Microsoft Calendar is not connected"));
 
+    // refresh the access token if it is about to expire in next 5 minutes
+    if (token.getExpiresAt() == null
+        || !token.getExpiresAt().isAfter(LocalDateTime.now().plusMinutes(5))) {
+      if (token.getRefreshToken() == null || token.getRefreshToken().isBlank()) {
+        throw new IllegalStateException(
+            "Microsoft Calendar token expired. Please reconnect Outlook.");
+      }
+
+      MicrosoftTokenResponse refreshedToken =
+          microsoftOAuthService.refreshAccessToken(token.getRefreshToken());
+
+      if (refreshedToken == null
+          || refreshedToken.getAccessToken() == null
+          || refreshedToken.getAccessToken().isBlank()) {
+        throw new IllegalStateException("Microsoft Calendar token refresh failed.");
+      }
+
+      token.setAccessToken(refreshedToken.getAccessToken());
+      token.setExpiresAt(LocalDateTime.now().plusSeconds(refreshedToken.getExpiresIn()));
+
+      // Save the rotated refresh token if Microsoft provides one
+      if (refreshedToken.getRefreshToken() != null && !refreshedToken.getRefreshToken().isBlank()) {
+        token.setRefreshToken(refreshedToken.getRefreshToken());
+      }
+
+      integrationTokenRepository.save(token);
+    }
     String startDateTime = startTime.atZone(SOUTH_AFRICA_ZONE).toLocalDateTime().toString();
     String endDateTime = endTime.atZone(SOUTH_AFRICA_ZONE).toLocalDateTime().toString();
 

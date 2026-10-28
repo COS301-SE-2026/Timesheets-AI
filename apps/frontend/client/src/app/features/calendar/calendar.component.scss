@@ -309,6 +309,7 @@ $calendar-red-text: #dc2626;
                     &.calls{
                         background: $calendar-amber-text;
                     }
+                    &.deadline,
                     &.deadlines{
                         background: $calendar-red-text;
                     }
@@ -413,8 +414,6 @@ $calendar-red-text: #dc2626;
                         color: $calendar-red-text;
                     }
                 }
-
-            
 
             }
 
@@ -811,5 +810,55 @@ $calendar-red-text: #dc2626;
                 font-size: 18px;
             }
         }
+    }
+}
+
+
+// Google and Outlook buttons
+
+.calendar-connect-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.fa-google-styling {
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.fa-outlook-styling {
+    font-size: 16px;
+    color: #ffffff;
+}
+
+// for disconnected calendar messgae
+
+.calendar-empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    padding: 20px 24px;
+    margin-bottom: 20px;
+
+    background: $calendar-primary-surface;
+    border: 1px solid $calendar-border;
+    border-radius: 12px;
+
+    color: $calendar-text-muted;
+    font-size: 14px;
+
+    .fa-calendar {
+        font-size: 22px;
+        color: $calendar-primary;
+        flex-shrink: 0;
+    }
+
+    p {
+        margin: 0;
+        line-height: 1.6;
     }
 }

@@ -418,7 +418,7 @@ public class IntegrationController {
     - in order to protect the callback being used by another user, link the state value to an auth request
     */
     String state = oauthStateService.generateState(workspaceMemberId, "MICROSOFT_CALENDAR");
-    String authorizationUrl = microsoftOAuthService.buildAuthorizationUrl(state, currentUserEmail);
+    String authorizationUrl = microsoftOAuthService.buildAuthorizationUrl(state, null);
 
     return ResponseEntity.ok(authorizationUrl);
   }

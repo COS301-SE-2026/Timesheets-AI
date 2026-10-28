@@ -7,8 +7,8 @@
 import { Routes } from '@angular/router';
 import { LandingPageComponent } from './features/landing/landing-page/landing-page.component';
 import { authGuard } from './core/guards/auth.guard';
-import { workspaceGuard } from './core/guards/workspace.guard'; 
-import { teamGuard } from './core/guards/team.guard'
+import { workspaceGuard } from './core/guards/workspace.guard';
+import { teamGuard } from './core/guards/team.guard';
 import { insightsGaurd } from './core/guards/insights.guard';
 
 export const routes: Routes = [
@@ -21,8 +21,9 @@ export const routes: Routes = [
   {
     path: 'auth/microsoft-redirect',
     loadComponent: () =>
-      import('./features/microsoft-redirect/microsoft-redirect.component')
-        .then((m) => m.MicrosoftRedirectComponent),
+      import('./features/microsoft-redirect/microsoft-redirect.component').then(
+        (m) => m.MicrosoftRedirectComponent,
+      ),
   },
 
   /* Log Time page */
@@ -62,22 +63,24 @@ export const routes: Routes = [
         (m) => m.TimesheetsComponent,
       ),
   },
-  
+
   /* Projects page */
   {
     path: 'projects',
     canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
-      import('./features/projects/projects.component')
-        .then(m => m.ProjectsComponent)
+      import('./features/projects/projects.component').then(
+        (m) => m.ProjectsComponent,
+      ),
   },
 
   {
     path: 'projects/details',
     canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
-      import('./features/projects/project-details/project-details.component')
-        .then(m => m.ProjectDetailsComponent)
+      import('./features/projects/project-details/project-details.component').then(
+        (m) => m.ProjectDetailsComponent,
+      ),
   },
 
   /* Project Details Page */
@@ -85,8 +88,9 @@ export const routes: Routes = [
     path: 'projects/:id',
     canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
-      import('./features/projects/project-details/project-details.component')
-        .then(m => m.ProjectDetailsComponent)
+      import('./features/projects/project-details/project-details.component').then(
+        (m) => m.ProjectDetailsComponent,
+      ),
   },
   // Tasks page
 
@@ -94,15 +98,16 @@ export const routes: Routes = [
     path: 'my-tasks',
     canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
-      import('./features/my-tasks/my-tasks.component')
-        .then(m => m.MyTasksComponent)
+      import('./features/my-tasks/my-tasks.component').then(
+        (m) => m.MyTasksComponent,
+      ),
   },
 
   // Team page
 
   {
     path: 'team',
-    canActivate: [authGuard, workspaceGuard, teamGuard ],
+    canActivate: [authGuard, workspaceGuard, teamGuard],
     loadComponent: () =>
       import('./features/teams/teams.component').then((m) => m.TeamsComponent),
   },
@@ -112,22 +117,25 @@ export const routes: Routes = [
     path: 'waiting-for-workspace',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/onboarding/waiting-for-workspace/waiting-for-workspace.component')
-        .then(m => m.WaitingForWorkspaceComponent)
+      import('./features/onboarding/waiting-for-workspace/waiting-for-workspace.component').then(
+        (m) => m.WaitingForWorkspaceComponent,
+      ),
   },
   // CALENDER PAGE LINK
   {
     path: 'calendar',
     loadComponent: () =>
-      import('./features/calendar/calendar.component')
-        .then(m => m.CalendarComponent)
+      import('./features/calendar/calendar.component').then(
+        (m) => m.CalendarComponent,
+      ),
   },
   // SETTINGS PAGE ROUTE LINK
   {
     path: 'settings',
     loadComponent: () =>
-      import('./features/settings/settings.component')
-        .then(m => m.SettingsComponent)
+      import('./features/settings/settings.component').then(
+        (m) => m.SettingsComponent,
+      ),
   },
 
   {
@@ -162,16 +170,24 @@ export const routes: Routes = [
     path: 'dashboard',
     canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
-      import('./features/dashboard/dashboard.component')
-        .then(m => m.DashboardComponent)
+      import('./features/dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent,
+      ),
   },
 
   {
     path: 'notifications',
     canActivate: [authGuard, workspaceGuard],
     loadComponent: () =>
-      import('./features/notifications/notification-page/notifications-page.component')
-        .then(m => m.NotificationsPageComponent),
+      import('./features/notifications/notification-page/notifications-page.component').then(
+        (m) => m.NotificationsPageComponent,
+      ),
+  },
+
+  {
+    path: 'suggestions',
+    redirectTo: 'log-time',
+    pathMatch: 'full'
   },
 
   /* Catch-all wildcard (redirects to 404) */
