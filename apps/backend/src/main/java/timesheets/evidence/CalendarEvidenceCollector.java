@@ -32,6 +32,7 @@ public class CalendarEvidenceCollector implements EvidenceCollector {
       evidenceEvent.setId(UUID.randomUUID());
       evidenceEvent.setSource("CALENDAR");
       evidenceEvent.setTimestamp(calendarEvent.getStartTime());
+      evidenceEvent.setEndTime(calendarEvent.getEndTime());
       evidenceEvent.setWorkspaceMemberId(workspaceMemberId);
       evidenceEvent.setActivityType("MEETING");
       evidenceEvent.setDescription(calendarEvent.getTitle());

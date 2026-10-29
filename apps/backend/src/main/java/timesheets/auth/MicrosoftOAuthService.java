@@ -30,17 +30,22 @@ public class MicrosoftOAuthService {
 
   public String buildAuthorizationUrl(String state, String loginHint) {
 
-    return UriComponentsBuilder.fromHttpUrl(MICROSOFT_AUTHORIZATION_URL)
-        .queryParam("client_id", clientId)
-        .queryParam("response_type", "code")
-        .queryParam("redirect_uri", redirectUri)
-        .queryParam("response_mode", "query")
-        .queryParam("scope", "openid profile email offline_access Calendars.Read")
-        .queryParam("login_hint", loginHint)
-        .queryParam("state", state)
-        .build()
-        .encode()
-        .toUriString();
+    UriComponentsBuilder builder =
+        UriComponentsBuilder.fromHttpUrl(MICROSOFT_AUTHORIZATION_URL)
+            .queryParam("client_id", clientId)
+            .queryParam("response_type", "code")
+            .queryParam("redirect_uri", redirectUri)
+            .queryParam("response_mode", "query")
+            .queryParam("scope", "openid profile email offline_access Calendars.Read")
+            .queryParam("state", state);
+
+    // this is to ensure we are not assumming that their email address as their Microsoft account -
+    // provides flexibility
+    if (loginHint != null && !loginHint.isBlank()) {
+      builder.queryParam("login_hint", loginHint);
+    }
+
+    return builder.build().encode().toUriString();
     // the offline_access is so that microsoft can give a refresh token
   }
 
@@ -53,6 +58,26 @@ public class MicrosoftOAuthService {
     formData.add("code", code);
     formData.add("redirect_uri", redirectUri);
     formData.add("grant_type", "authorization_code");
+    formData.add("scope", "openid profile email offline_access Calendars.Read");
+
+    // microsoft needs the token request to be sent as form data
+    return restClient
+        .post()
+        .uri(MICROSOFT_TOKEN_URL)
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(formData)
+        .retrieve()
+        .body(MicrosoftTokenResponse.class);
+  }
+
+  // adding refresh token method (this is for when the access token is expired)
+  public MicrosoftTokenResponse refreshAccessToken(String refreshToken) {
+    MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+
+    formData.add("client_id", clientId);
+    formData.add("client_secret", clientSecret);
+    formData.add("grant_type", "refresh_token");
+    formData.add("refresh_token", refreshToken);
     formData.add("scope", "openid profile email offline_access Calendars.Read");
 
     // microsoft needs the token request to be sent as form data

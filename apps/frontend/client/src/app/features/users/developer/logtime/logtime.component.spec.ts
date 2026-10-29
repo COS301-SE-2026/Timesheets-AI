@@ -69,13 +69,13 @@ describe('LogtimeComponent', () => {
     isLocked: false,
   };
 
-  const mockActiveTimer={
+  const mockActiveTimer = {
     id: 'timer-1',
-    project:{
+    project: {
       id: projectOneId,
       name: 'Mobile App Development',
     },
-    task:{
+    task: {
       id: taskOneId,
       title: 'Implement Login Screen',
     },
@@ -97,32 +97,37 @@ describe('LogtimeComponent', () => {
     httpMock.expectOne('/api/timesheets/me').flush([mockTimesheet]);
     httpMock.expectOne('/api/time-entries/me').flush(mockEntries);
     httpMock.expectOne('/api/projects').flush(mockProjects);
-   
+
     //no active timer running at start of normal test, 204 No Content
-    httpMock.expectOne('/api/timers/active').flush(null, {status: 204, statusText: 'No Content'});
+    httpMock
+      .expectOne('/api/timers/active')
+      .flush(null, { status: 204, statusText: 'No Content' });
 
-    httpMock.expectOne(`/api/tasks/project/${projectOneId}`).flush(
-      mockTasks.filter((t)=> t.projectId === projectOneId),);
+    httpMock
+      .expectOne(`/api/tasks/project/${projectOneId}`)
+      .flush(mockTasks.filter((t) => t.projectId === projectOneId));
 
-      httpMock.expectOne(`/api/tasks/project/${projectTwoId}`).flush(
-    mockTasks.filter((t) => t.projectId === projectTwoId),
-  );
+    httpMock
+      .expectOne(`/api/tasks/project/${projectTwoId}`)
+      .flush(mockTasks.filter((t) => t.projectId === projectTwoId));
   }
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LogtimeComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting(),
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         {
           provide: ActivatedRoute,
           useValue: {
             snapshot: {
-              queryParamMap : {
+              queryParamMap: {
                 get: jest.fn(),
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
       ],
     }).compileComponents();
 
@@ -167,7 +172,9 @@ describe('LogtimeComponent', () => {
 
     //tasks signal keeps the "No task selected" placeholder at index 0
     expect(component.tasks()[0].title).toBe('No task selected');
-    const projectOneTasks = mockTasks.filter((t) => t.projectId === projectOneId);
+    const projectOneTasks = mockTasks.filter(
+      (t) => t.projectId === projectOneId,
+    );
     expect(component.tasks()).toHaveLength(projectOneTasks.length + 1);
   });
 
@@ -244,9 +251,9 @@ describe('LogtimeComponent', () => {
       description: 'Designed the log time page.',
     });
 
-    httpMock.expectOne(`/api/tasks/project/${projectTwoId}`).flush(
-      mockTasks.filter((t) => t.projectId === projectTwoId),
-    );
+    httpMock
+      .expectOne(`/api/tasks/project/${projectTwoId}`)
+      .flush(mockTasks.filter((t) => t.projectId === projectTwoId));
 
     component.saveEntry();
 
@@ -277,7 +284,6 @@ describe('LogtimeComponent', () => {
     expect(component.toastMessage()).toBe('Time entry saved.');
     expect(component.activePanel()).toBeNull();
   });
-
 
   // Overlap validation
   it('should prevent overlapping manual entries', () => {
@@ -386,8 +392,8 @@ describe('LogtimeComponent', () => {
 
   //Timer functionality
   it('should start and stop a timer entry', () => {
-     jest.useFakeTimers();
-     jest.setSystemTime(new Date(`${today()}T03:00:00`)); // fixed, off-hours — avoids the 09:00-11:00 mock entry
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(`${today()}T03:00:00`)); // fixed, off-hours — avoids the 09:00-11:00 mock entry
 
     const initialCount = component.entries().length;
 
@@ -397,9 +403,9 @@ describe('LogtimeComponent', () => {
       description: 'Timer tracked work.',
     });
 
-    httpMock.expectOne(`/api/tasks/project/${projectTwoId}`).flush(
-      mockTasks.filter((t) => t.projectId === projectTwoId),
-    );
+    httpMock
+      .expectOne(`/api/tasks/project/${projectTwoId}`)
+      .flush(mockTasks.filter((t) => t.projectId === projectTwoId));
 
     component.startTimer();
 
@@ -410,11 +416,11 @@ describe('LogtimeComponent', () => {
     });
     startReq.flush({
       ...mockActiveTimer,
-      project:{
+      project: {
         id: projectTwoId,
         name: 'Backend API',
       },
-      task:{
+      task: {
         id: taskTwoId,
         title: 'Create Timesheet API',
       },
@@ -425,7 +431,6 @@ describe('LogtimeComponent', () => {
     expect(component.activeTimer()).toBeTruthy();
     expect(component.elapsedSeconds()).toBe(61);
 
-    
     component.stopTimer();
 
     //stopTimer() refreshes entries first to check for conflicts
@@ -457,14 +462,14 @@ describe('LogtimeComponent', () => {
       },
     });
 
-  const attachNotesReq = httpMock.expectOne('/api/time-entries/entry-timer');
-  expect(attachNotesReq.request.method).toBe('PUT');
-  expect(attachNotesReq.request.body.description).toBe('Timer tracked work.');
-  attachNotesReq.flush({
-    ...mockEntries[0],
-    id: 'entry-timer',
-    description: 'Timer tracked work.',
-  });
+    const attachNotesReq = httpMock.expectOne('/api/time-entries/entry-timer');
+    expect(attachNotesReq.request.method).toBe('PUT');
+    expect(attachNotesReq.request.body.description).toBe('Timer tracked work.');
+    attachNotesReq.flush({
+      ...mockEntries[0],
+      id: 'entry-timer',
+      description: 'Timer tracked work.',
+    });
 
     //then reloads entries again via loadEntries()
     const reloadReq = httpMock.expectOne('/api/time-entries/me');
@@ -483,9 +488,9 @@ describe('LogtimeComponent', () => {
       },
     ]);
 
-    httpMock.expectOne(`/api/tasks/project/${projectOneId}`).flush(
-      mockTasks.filter((t) => t.projectId === projectOneId),
-    );
+    httpMock
+      .expectOne(`/api/tasks/project/${projectOneId}`)
+      .flush(mockTasks.filter((t) => t.projectId === projectOneId));
 
     expect(component.entries().length).toBe(initialCount + 1);
     expect(component.activeTimer()).toBeNull();
@@ -509,11 +514,11 @@ describe('LogtimeComponent', () => {
 
     jest.advanceTimersByTime(10_000);
     component.pauseTimer();
-    httpMock.expectOne('/api/timers/pause').flush({ 
+    httpMock.expectOne('/api/timers/pause').flush({
       ...mockActiveTimer,
       elapsedSeconds: 10,
       elapsedMinutes: 0,
-      isPaused: true ,
+      isPaused: true,
       pausedAt: `${today()}T03:00:10`,
     });
 
@@ -524,9 +529,9 @@ describe('LogtimeComponent', () => {
     expect(component.elapsedSeconds()).toBe(10); //frozen while paused
 
     component.resumeTimer();
-    httpMock.expectOne('/api/timers/resume').flush({ 
+    httpMock.expectOne('/api/timers/resume').flush({
       ...mockActiveTimer,
-      elapsedSeconds: 10, 
+      elapsedSeconds: 10,
       isPaused: false,
       elapsedMinutes: 0,
       pausedAt: null,
@@ -593,9 +598,9 @@ describe('LogtimeComponent', () => {
 
     component.entryForm.controls.projectId.setValue(projectTwoId);
 
-    httpMock.expectOne(`/api/tasks/project/${projectTwoId}`).flush(
-      mockTasks.filter((t) => t.projectId === projectTwoId),
-    );
+    httpMock
+      .expectOne(`/api/tasks/project/${projectTwoId}`)
+      .flush(mockTasks.filter((t) => t.projectId === projectTwoId));
 
     expect(component.entryForm.controls.taskId.value).toBe('');
   });
@@ -604,8 +609,9 @@ describe('LogtimeComponent', () => {
   it('should compute selectable tasks correctly', () => {
     component.entryForm.controls.projectId.setValue(projectTwoId);
 
-    httpMock.expectOne(`/api/tasks/project/${projectTwoId}`)
-    .flush(mockTasks.filter((t) => t.projectId === projectTwoId));
+    httpMock
+      .expectOne(`/api/tasks/project/${projectTwoId}`)
+      .flush(mockTasks.filter((t) => t.projectId === projectTwoId));
 
     const tasks = component.selectableTasks();
 
@@ -618,8 +624,9 @@ describe('LogtimeComponent', () => {
   it('should compute selectable timer tasks correctly', () => {
     component.timerForm.controls.projectId.setValue(projectTwoId);
 
-    httpMock.expectOne(`/api/tasks/project/${projectTwoId}`)
-    .flush(mockTasks.filter((t) => t.projectId === projectTwoId));
+    httpMock
+      .expectOne(`/api/tasks/project/${projectTwoId}`)
+      .flush(mockTasks.filter((t) => t.projectId === projectTwoId));
 
     const tasks = component.selectableTimerTasks();
 
@@ -661,9 +668,9 @@ describe('LogtimeComponent', () => {
 
   // Duration formatting
   it('should format duration values correctly', () => {
-    expect(component.formatDuration(30*60)).toBe('30m');
-    expect(component.formatDuration(60*60)).toBe('1h');
-    expect(component.formatDuration(75*60)).toBe('1h 15m');
+    expect(component.formatDuration(30 * 60)).toBe('30m');
+    expect(component.formatDuration(60 * 60)).toBe('1h');
+    expect(component.formatDuration(75 * 60)).toBe('1h 15m');
     expect(component.formatDuration(0)).toBe('0s');
     expect(component.formatDuration(45)).toBe('45s');
     expect(component.formatDuration(90)).toBe('1m 30s');
@@ -696,7 +703,7 @@ describe('LogtimeComponent', () => {
     component.startTimer();
     httpMock.expectOne('/api/timers/start').flush({
       ...mockActiveTimer,
-      task:{
+      task: {
         id: taskTwoId,
         title: 'Create Timesheet API',
       },
@@ -719,6 +726,13 @@ describe('LogtimeComponent', () => {
   it('should build a backend-compatible create/update payload without response-only fields', () => {
     component.filterForm.controls.from.setValue('2026-05-21');
     httpMock.expectOne('/api/timesheets/me').flush([mockTimesheet]);
+
+    // intelligent suggestions request is being triggered when date filter chnage 
+    const suggestionsRequest = httpMock.expectOne(
+      (req) => req.method === 'POST' && req.url === '/api/suggestions/generate',
+    );
+
+    suggestionsRequest.flush([]);
     
     component.entryForm.patchValue({
       projectId: projectOneId,

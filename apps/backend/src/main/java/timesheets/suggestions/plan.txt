@@ -1,0 +1,6 @@
+what does related means?
+
+- same developer (based on workspaceMemberId)
+- temporal proximity (Events close together are more likely to represent the same work) - will use window of 60 minutes
+- Project/task relationship (will use projectId, taskId, repoName, projectKey, issueKey, localTaskId)
+- Jira issue key appears in Git commit message

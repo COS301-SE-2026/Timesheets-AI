@@ -1,25 +1,26 @@
 <main class="signup-shell">
-
   <!-- ── LEFT PANEL ── -->
   <section class="signup-hero">
     <div class="hero-inner">
-
       <!-- Brand (hero header) -->
       <a class="brand brand--hero" href="/" aria-label="Momently home">
         <img class="brand-logo" [src]="brandLogo" alt="" />
         <span class="brand-copy">
-          <span class="brand-name"><span class="brand-name__accent">m</span>omently</span>
+          <span class="brand-name"
+            ><span class="brand-name__accent">m</span>omently</span
+          >
           <span class="brand-tagline">Every moment counts</span>
         </span>
       </a>
 
       <div class="hero-content">
         <h1 class="hero-title">
-          Welcome back!<br>
+          Welcome back!<br />
           <span class="hero-title__accent">Sign in</span> to continue
         </h1>
         <p class="hero-description">
-          Track time, boost productivity, and make every moment count with Momently.
+          Track time, boost productivity, and make every moment count with
+          Momently.
         </p>
       </div>
 
@@ -34,8 +35,8 @@
           <div class="preview-row">
             <span class="preview-icon">
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
               </svg>
             </span>
             <div class="progress-track">
@@ -47,8 +48,8 @@
           <div class="preview-row">
             <span class="preview-icon preview-icon--wand">
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="2" y="7" width="20" height="14" rx="2"/>
-                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
               </svg>
             </span>
             <div class="progress-track">
@@ -62,10 +63,12 @@
         <div class="suggestion-card">
           <span class="spark-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
-                <polygon points="12 2 15.09 8.26 22 9.27
+              <polygon
+                points="12 2 15.09 8.26 22 9.27
                                 17 14.14 18.18 21.02 12 17.77
                                 5.82 21.02 7 14.14 2 9.27
-                                8.91 8.26 12 2"/>
+                                8.91 8.26 12 2"
+              />
             </svg>
           </span>
           <div class="suggestion-copy">
@@ -75,31 +78,35 @@
           <button type="button" tabindex="-1">View full insights</button>
         </div>
       </div>
-
     </div>
   </section>
 
   <!-- ── RIGHT PANEL ── -->
   <section class="signup-panel">
     <div class="form-wrap">
-
       <header class="form-heading">
         <h2 class="form-title">Sign in to your account</h2>
-        <p class="form-subtitle">Enter your details to access your workspace.</p>
+        <p class="form-subtitle">
+          Enter your details to access your workspace.
+        </p>
       </header>
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-
         <!-- Email -->
         <div class="field">
           <label class="field-label" for="email">Work Email</label>
-          <span class="input-shell"
-                [class.input-shell--error]="loginForm.get('email')?.invalid &&
-                                            loginForm.get('email')?.touched">
+          <span
+            class="input-shell"
+            [class.input-shell--error]="
+              loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+            "
+          >
             <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4
-                        c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
+              <path
+                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4
+                        c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              />
+              <polyline points="22,6 12,13 2,6" />
             </svg>
             <input
               id="email"
@@ -108,11 +115,15 @@
               formControlName="email"
               placeholder="john@company.com"
               autocomplete="username"
-                    [attr.aria-invalid]="loginForm.get('email')?.invalid &&
-                                        loginForm.get('email')?.touched"
-              />
+              [attr.aria-invalid]="
+                loginForm.get('email')?.invalid &&
+                loginForm.get('email')?.touched
+              "
+            />
           </span>
-          @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          @if (
+            loginForm.get("email")?.invalid && loginForm.get("email")?.touched
+          ) {
             <p class="field-error" role="alert">
               Please enter a valid email address.
             </p>
@@ -124,13 +135,16 @@
         <div class="field">
           <label class="field-label" for="password">Password</label>
 
-          <span class="input-shell"
-                    [class.input-shell--error]="loginForm.get('password')?.invalid &&
-                                                loginForm.get('password')?.touched">
-
+          <span
+            class="input-shell"
+            [class.input-shell--error]="
+              loginForm.get('password')?.invalid &&
+              loginForm.get('password')?.touched
+            "
+          >
             <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
 
             <input
@@ -142,25 +156,31 @@
               autocomplete="off"
               autocapitalize="none"
               spellcheck="false"
-                        [attr.aria-invalid]="loginForm.get('password')?.invalid &&
-                                            loginForm.get('password')?.touched"
-              />
+              [attr.aria-invalid]="
+                loginForm.get('password')?.invalid &&
+                loginForm.get('password')?.touched
+              "
+            />
 
             <button
               class="icon-button"
               type="button"
               (click)="togglePassword()"
-              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
-
+              [attr.aria-label]="
+                showPassword ? 'Hide password' : 'Show password'
+              "
+            >
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
               </svg>
             </button>
-
           </span>
 
-          @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          @if (
+            loginForm.get("password")?.invalid &&
+            loginForm.get("password")?.touched
+          ) {
             <p class="field-error" role="alert">Password is required.</p>
           }
         </div>
@@ -168,12 +188,15 @@
         <!-- Remember me + Forgot -->
         <div class="terms-block">
           <label class="terms" for="remember">
-            <input id="remember" type="checkbox" formControlName="remember"/>
+            <input id="remember" type="checkbox" formControlName="remember" />
             <span>Remember me</span>
           </label>
-          <a href="#" class="signin-copy"
-            style="text-align:right; display:block; margin-top:8px;"
-            (click)="onForgotPassword($event)">
+          <a
+            href="#"
+            class="signin-copy"
+            style="text-align: right; display: block; margin-top: 8px"
+            (click)="onForgotPassword($event)"
+          >
             Forgot password?
           </a>
         </div>
@@ -184,10 +207,7 @@
         }
 
         <!-- Submit -->
-        <button
-          type="submit"
-          class="submit-button"
-          [disabled]="loading">
+        <button type="submit" class="submit-button" [disabled]="loading">
           @if (!loading) {
             <span>Sign In</span>
           }
@@ -195,26 +215,31 @@
             <span>Signing in...</span>
           }
         </button>
-
       </form>
 
       <!-- Divider -->
       <div class="divider" aria-hidden="true">
-        <hr class="divider-line"/>
+        <hr class="divider-line" />
         <span class="divider-label">OR SIGN IN WITH</span>
-        <hr class="divider-line"/>
+        <hr class="divider-line" />
       </div>
 
       <!-- Social buttons -->
       <div class="social-grid">
         <div #googleBtn class="google-button"></div>
 
-        <button type="button" class="social-button" aria-label="Sign in with Microsoft" (click)="loginWithMicrosoft()" [disabled]="loading">
+        <button
+          type="button"
+          class="social-button"
+          aria-label="Sign in with Microsoft"
+          (click)="loginWithMicrosoft()"
+          [disabled]="loading"
+        >
           <svg class="social-logo" viewBox="0 0 24 24" aria-hidden="true">
-            <path fill="#F25022" d="M1 1h10v10H1z"/>
-            <path fill="#7FBA00" d="M13 1h10v10H13z"/>
-            <path fill="#00A4EF" d="M1 13h10v10H1z"/>
-            <path fill="#FFB900" d="M13 13h10v10H13z"/>
+            <path fill="#F25022" d="M1 1h10v10H1z" />
+            <path fill="#7FBA00" d="M13 1h10v10H13z" />
+            <path fill="#00A4EF" d="M1 13h10v10H1z" />
+            <path fill="#FFB900" d="M13 13h10v10H13z" />
           </svg>
           Sign in with Microsoft
         </button>
@@ -227,7 +252,7 @@
 
       <!-- Validation error banner -->
       @if (errorMessage) {
-        <p class="field-error" role="alert" style="margin-top: 8px;">
+        <p class="field-error" role="alert" style="margin-top: 8px">
           {{ errorMessage }}
         </p>
       }
@@ -238,8 +263,6 @@
           {{ toastMessage }}
         </div>
       }
-
     </div>
   </section>
-
 </main>

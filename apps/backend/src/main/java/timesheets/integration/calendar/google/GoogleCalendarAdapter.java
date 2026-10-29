@@ -10,16 +10,17 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.UserCredentials;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import timesheets.auth.GoogleOAuthService;
@@ -27,11 +28,16 @@ import timesheets.auth.GoogleTokenResponse;
 import timesheets.domain.IntegrationToken;
 import timesheets.integration.calendar.CalendarAdapter;
 import timesheets.integration.calendar.CalendarEvent;
+import timesheets.integration.calendar.CalendarNotConnectedException;
 import timesheets.repository.IntegrationTokenRepository;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class GoogleCalendarAdapter implements CalendarAdapter {
+
+  private static final ZoneId SAST = ZoneId.of("Africa/Johannesburg");
+  private static final String PROVIDER = "GOOGLE_CALENDAR";
 
   @Value("${app.google.client-id}")
   private String googleClientId;
@@ -44,224 +50,166 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
 
   @Override
   public String getProvider() {
-    // What is specified in dbs
-    return "GOOGLE_CALENDAR";
+    return PROVIDER;
   }
 
   @Override
   public List<CalendarEvent> getEvents(
       UUID workspaceMemberId, LocalDateTime startTime, LocalDateTime endTime) {
-    Optional<IntegrationToken> integrationToken =
-        integrationTokenRepository.findByWorkspaceMemberIdAndProvider(
-            workspaceMemberId, "GOOGLE_CALENDAR");
-
-    // token is not found
-    if (integrationToken.isEmpty()) {
-      throw new RuntimeException("Google Calendar is not connected");
+    if (startTime == null || endTime == null || !startTime.isBefore(endTime)) {
+      throw new IllegalArgumentException("startTime must be before endTime");
     }
 
-    // token exists
-
-    IntegrationToken token = integrationToken.get();
-
-    // this token provide Momently to gain persmission to the user's Google calendar
-    // google libraries wraps tokens in objects rather raw strings, ojects allows us to track
-    // expiration time
-
-    String accessToken = token.getAccessToken();
-    String refreshToken = token.getRefreshToken();
-
-    Date expirationTime =
-        Date.from(token.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant());
-
-    AccessToken googleAccessToken = new AccessToken(accessToken, expirationTime);
-
-    // GoogleCredentials is Google authentication object, it will wrap the AccessToken in a format
-    // that the Google's API libraries understand
-    // GoogleCredentials credentials = GoogleCredentials.create(googleAccessToken);
-
-    /* after testing, google credentials (line above) just give the access token so when it expires, it cannot refresh it (got error related here)
-       UserCredentials (object created here)
-       UserCredentials contains the OAuth client details, accessToken and refreshToken
-    */
-
-    UserCredentials credentials =
-        UserCredentials.newBuilder()
-            .setClientId(googleClientId)
-            .setClientSecret(googleClientSecret)
-            .setAccessToken(googleAccessToken)
-            .setRefreshToken(refreshToken)
-            .build();
-
-    HttpCredentialsAdapter requestInitializer = new HttpCredentialsAdapter(credentials);
-
-    // To get the user's calendar events
-    // this communicate with the google api
-    Calendar calendarService =
-        new Calendar.Builder(
-                new NetHttpTransport(), GsonFactory.getDefaultInstance(), requestInitializer)
-            .setApplicationName("Momently")
-            .build();
-
-    // putting all the events in here
-    // making the request to get collection of calendar events and it is stored Events event
-    // insert try and catch because request() might fail
-
-    Events events;
+    IntegrationToken token = findToken(workspaceMemberId);
+    UserCredentials credentials = buildCredentials(token);
 
     try {
-      events =
-          calendarService
+      credentials.refreshIfExpired();
+      persistRefreshedToken(token, credentials);
+
+      Calendar calendar = buildCalendar(credentials);
+      Events response =
+          calendar
               .events()
               .list("primary")
               .setTimeMin(
                   new com.google.api.client.util.DateTime(
-                      startTime.toInstant(ZoneOffset.UTC).toEpochMilli()))
+                      startTime.atZone(SAST).toInstant().toEpochMilli()))
               .setTimeMax(
                   new com.google.api.client.util.DateTime(
-                      endTime.toInstant(ZoneOffset.UTC).toEpochMilli()))
+                      endTime.atZone(SAST).toInstant().toEpochMilli()))
               .setSingleEvents(true)
               .setOrderBy("startTime")
               .execute();
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to retrieve Google Calendar events", e);
-    }
 
-    // for returning, convert to match CalendarEvent expected vars
-    List<Event> googleEvents = events.getItems();
-
-    // conversion
-    List<CalendarEvent> calendarEvents = new ArrayList<>();
-
-    for (Event googleEvent : googleEvents) {
-      CalendarEvent calendarEvent = new CalendarEvent();
-      calendarEvent.setTitle(googleEvent.getSummary());
-      calendarEvent.setExternalEventId(googleEvent.getId());
-
-      calendarEvent.setProvider(getProvider());
-
-      List<String> participants = new ArrayList<>();
-
-      if (googleEvent.getAttendees() != null) {
-        for (EventAttendee attendee : googleEvent.getAttendees()) {
-          if (attendee.getEmail() != null) {
-            participants.add(attendee.getEmail());
-          }
+      List<CalendarEvent> result = new ArrayList<>();
+      if (response.getItems() != null) {
+        for (Event event : response.getItems()) {
+          result.add(toCalendarEvent(event));
         }
       }
-
-      calendarEvent.setParticipants(participants);
-
-      // The times is stored differently in Google
-      // google stores as googlevent - getStart() and getEnd(): EventDateTime objects
-      // I am using LocalDateTime
-
-      if (googleEvent.getStart().getDateTime() != null
-          && googleEvent.getEnd().getDateTime() != null) {
-        LocalDateTime eventStartTime =
-            LocalDateTime.ofInstant(
-                java.time.Instant.ofEpochMilli(googleEvent.getStart().getDateTime().getValue()),
-                ZoneId.systemDefault());
-
-        LocalDateTime eventEndTime =
-            LocalDateTime.ofInstant(
-                java.time.Instant.ofEpochMilli(googleEvent.getEnd().getDateTime().getValue()),
-                ZoneId.systemDefault());
-
-        calendarEvent.setStartTime(eventStartTime);
-        calendarEvent.setEndTime(eventEndTime);
-      } else if (googleEvent.getStart().getDate() != null
-          && googleEvent.getEnd().getDate() != null) {
-
-        LocalDate eventStartDate = LocalDate.parse(googleEvent.getStart().getDate().toString());
-        LocalDate eventEndDate = LocalDate.parse(googleEvent.getEnd().getDate().toString());
-
-        calendarEvent.setStartTime(eventStartDate.atStartOfDay());
-        calendarEvent.setEndTime(eventEndDate.atStartOfDay());
-      }
-
-      calendarEvents.add(calendarEvent);
+      return result;
+    } catch (IOException e) {
+      log.error(
+          "Google Calendar events request failed for workspace member {}: {}",
+          workspaceMemberId,
+          e.getMessage(),
+          e);
+      throw new RuntimeException("Failed to retrieve Google Calendar events", e);
+    } finally {
+      // The Google client can refresh automatically while executing a
+      persistRefreshedToken(token, credentials);
     }
-
-    return calendarEvents;
   }
 
   @Override
   public CalendarEvent getEvent(UUID workspaceMemberId, String externalEventId) {
-    Optional<IntegrationToken> integrationToken =
-        integrationTokenRepository.findByWorkspaceMemberIdAndProvider(
-            workspaceMemberId, "GOOGLE_CALENDAR");
 
-    if (integrationToken.isEmpty()) {
-      throw new RuntimeException("Google Calendar is not connected");
-    }
-
-    IntegrationToken token = integrationToken.get();
-    String accessToken = token.getAccessToken();
-    String refreshToken = token.getRefreshToken();
-
-    Date expirationTime =
-        Date.from(token.getExpiresAt().atZone(ZoneId.systemDefault()).toInstant());
-
-    AccessToken googleAccessToken = new AccessToken(accessToken, expirationTime);
-
-    UserCredentials credentials =
-        UserCredentials.newBuilder()
-            .setClientId(googleClientId)
-            .setClientSecret(googleClientSecret)
-            .setAccessToken(googleAccessToken)
-            .setRefreshToken(refreshToken)
-            .build();
-    HttpCredentialsAdapter requestInitializer = new HttpCredentialsAdapter(credentials);
-
-    Calendar calendarService =
-        new Calendar.Builder(
-                new NetHttpTransport(), GsonFactory.getDefaultInstance(), requestInitializer)
-            .setApplicationName("Momently")
-            .build();
-
-    Event googleEvent;
+    IntegrationToken token = findToken(workspaceMemberId);
+    UserCredentials credentials = buildCredentials(token);
 
     try {
-      googleEvent = calendarService.events().get("primary", externalEventId).execute();
+      credentials.refreshIfExpired();
+      persistRefreshedToken(token, credentials);
+      Event event = buildCalendar(credentials).events().get("primary", externalEventId).execute();
+      return toCalendarEvent(event);
     } catch (IOException e) {
+      log.error(
+          "Google Calendar event request failed for workspace member {}: {}",
+          workspaceMemberId,
+          e.getMessage(),
+          e);
       throw new RuntimeException("Failed to retrieve Google Calendar event", e);
+    } finally {
+      persistRefreshedToken(token, credentials);
     }
-
-    CalendarEvent calendarEvent = new CalendarEvent();
-
-    calendarEvent.setTitle(googleEvent.getSummary());
-    calendarEvent.setExternalEventId(googleEvent.getId());
-
-    if (googleEvent.getStart().getDateTime() != null
-        && googleEvent.getEnd().getDateTime() != null) {
-
-      LocalDateTime eventStartTime =
-          LocalDateTime.ofInstant(
-              java.time.Instant.ofEpochMilli(googleEvent.getStart().getDateTime().getValue()),
-              ZoneId.systemDefault());
-
-      LocalDateTime eventEndTime =
-          LocalDateTime.ofInstant(
-              java.time.Instant.ofEpochMilli(googleEvent.getEnd().getDateTime().getValue()),
-              ZoneId.systemDefault());
-
-      calendarEvent.setStartTime(eventStartTime);
-      calendarEvent.setEndTime(eventEndTime);
-    } else if (googleEvent.getStart().getDate() != null && googleEvent.getEnd().getDate() != null) {
-      LocalDate eventStartDate = LocalDate.parse(googleEvent.getStart().getDate().toString());
-
-      LocalDate eventEndDate = LocalDate.parse(googleEvent.getEnd().getDate().toString());
-
-      calendarEvent.setStartTime(eventStartDate.atStartOfDay());
-      calendarEvent.setEndTime(eventEndDate.atStartOfDay());
-    }
-
-    return calendarEvent;
   }
 
-  // will implement later
-  // adding these functions back
+  private IntegrationToken findToken(UUID workspaceMemberId) {
+    return integrationTokenRepository
+        .findByWorkspaceMemberIdAndProvider(workspaceMemberId, PROVIDER)
+        .orElseThrow(CalendarNotConnectedException::new);
+  }
+
+  private UserCredentials buildCredentials(IntegrationToken token) {
+    Date expiration =
+        token.getExpiresAt() == null
+            ? null
+            : Date.from(token.getExpiresAt().atZone(SAST).toInstant());
+
+    return UserCredentials.newBuilder()
+        .setClientId(googleClientId)
+        .setClientSecret(googleClientSecret)
+        .setAccessToken(new AccessToken(token.getAccessToken(), expiration))
+        .setRefreshToken(token.getRefreshToken())
+        .build();
+  }
+
+  private Calendar buildCalendar(UserCredentials credentials) {
+    return new Calendar.Builder(
+            new NetHttpTransport(),
+            GsonFactory.getDefaultInstance(),
+            new HttpCredentialsAdapter(credentials))
+        .setApplicationName("Momently")
+        .build();
+  }
+
+  private void persistRefreshedToken(IntegrationToken token, UserCredentials credentials) {
+    AccessToken current = credentials.getAccessToken();
+    if (current == null || current.getTokenValue() == null) {
+      return;
+    }
+
+    Date expiration = current.getExpirationTime();
+    LocalDateTime expiresAt =
+        expiration == null ? null : LocalDateTime.ofInstant(expiration.toInstant(), SAST);
+
+    if (!Objects.equals(token.getAccessToken(), current.getTokenValue())
+        || !Objects.equals(token.getExpiresAt(), expiresAt)) {
+      token.setAccessToken(current.getTokenValue());
+      token.setExpiresAt(expiresAt);
+      integrationTokenRepository.save(token);
+      log.info(
+          "Persisted refreshed Google Calendar access token for member {}",
+          token.getWorkspaceMemberId());
+    }
+  }
+
+  private CalendarEvent toCalendarEvent(Event event) {
+    CalendarEvent result = new CalendarEvent();
+    result.setTitle(event.getSummary());
+    result.setExternalEventId(event.getId());
+    result.setProvider(PROVIDER);
+
+    List<String> participants = new ArrayList<>();
+    if (event.getAttendees() != null) {
+      for (EventAttendee attendee : event.getAttendees()) {
+        if (attendee.getEmail() != null) {
+          participants.add(attendee.getEmail());
+        }
+      }
+    }
+    result.setParticipants(participants);
+
+    if (event.getStart() == null || event.getEnd() == null) {
+      return result;
+    }
+
+    if (event.getStart().getDateTime() != null && event.getEnd().getDateTime() != null) {
+      result.setStartTime(
+          LocalDateTime.ofInstant(
+              Instant.ofEpochMilli(event.getStart().getDateTime().getValue()), SAST));
+      result.setEndTime(
+          LocalDateTime.ofInstant(
+              Instant.ofEpochMilli(event.getEnd().getDateTime().getValue()), SAST));
+    } else if (event.getStart().getDate() != null && event.getEnd().getDate() != null) {
+      LocalDate startDate = LocalDate.parse(event.getStart().getDate().toString());
+      LocalDate endDate = LocalDate.parse(event.getEnd().getDate().toString());
+      result.setStartTime(startDate.atStartOfDay());
+      result.setEndTime(endDate.atStartOfDay());
+    }
+    return result;
+  }
 
   @Override
   public CalendarEvent createEvent(UUID workspaceMemberId, CalendarEvent event) {
@@ -278,23 +226,21 @@ public class GoogleCalendarAdapter implements CalendarAdapter {
 
   @Override
   public void exchangeAndsaveToken(UUID workspaceMemberId, String code) {
+    GoogleTokenResponse response = googleOAuthService.exchangeCodeforToken(code);
+    LocalDateTime expiresAt = LocalDateTime.now(SAST).plusSeconds(response.getExpiresIn());
 
-    // need to exchange Google's authorization code for tokens
-    GoogleTokenResponse tokenResponse = googleOAuthService.exchangeCodeforToken(code);
-
-    // save tokens received Google so that the user dont have to
-
-    LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(tokenResponse.getExpiresIn());
-
-    IntegrationToken integrationToken =
-        IntegrationToken.builder()
-            .workspaceMemberId(workspaceMemberId)
-            .provider("GOOGLE_CALENDAR")
-            .accessToken(tokenResponse.getAccessToken())
-            .refreshToken(tokenResponse.getRefreshToken())
-            .expiresAt(expiresAt)
-            .build();
-
-    integrationTokenRepository.save(integrationToken);
+    IntegrationToken token =
+        integrationTokenRepository
+            .findByWorkspaceMemberIdAndProvider(workspaceMemberId, PROVIDER)
+            .orElseGet(IntegrationToken::new);
+    token.setWorkspaceMemberId(workspaceMemberId);
+    token.setProvider(PROVIDER);
+    token.setAccessToken(response.getAccessToken());
+    // Google may omit a refresh token on subsequent authorizations.
+    if (response.getRefreshToken() != null && !response.getRefreshToken().isBlank()) {
+      token.setRefreshToken(response.getRefreshToken());
+    }
+    token.setExpiresAt(expiresAt);
+    integrationTokenRepository.save(token);
   }
 }
